@@ -165,7 +165,7 @@ export default function Signup() {
               </div>
             </div>
 
-            <Button className="w-full" type="submit">
+            <Button variant="success" className="w-full" type="submit">
               <UserPlus className="mr-2 h-4 w-4" />
               Crear cuenta
             </Button>
@@ -175,7 +175,7 @@ export default function Signup() {
             Ya tienes una cuenta?{" "}
             <Link
               href="/login"
-              className="font-medium text-primary hover:underline"
+              className="text-primary hover:underline text-blue-500 font-bold hover:text-blue-600"
             >
               Iniciar sesión
             </Link>

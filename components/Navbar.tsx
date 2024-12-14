@@ -32,11 +32,11 @@ export function Navbar() {
         </Link>
       </NavigationMenuItem>
       <NavigationMenuItem>
-        <Link href="/pqrs" legacyBehavior passHref>
+        {/* <Link href="/pqrs" legacyBehavior passHref>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
             PQRS
           </NavigationMenuLink>
-        </Link>
+        </Link> */}
       </NavigationMenuItem>
     </>
   )
@@ -75,9 +75,9 @@ export function Navbar() {
                     <Link href="/about" className="text-lg font-semibold">
                       Acerca de Nosotros
                     </Link>
-                    <Link href="/pqrs" className="text-lg font-semibold">
+                    {/* <Link href="/pqrs" className="text-lg font-semibold">
                       PQRS
-                    </Link>
+                    </Link> */}
                   </div>
                 </SheetContent>
               </Sheet>
