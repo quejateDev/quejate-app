@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn, User, Phone, UserPlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -64,22 +64,26 @@ export default function Login() {
     }
   };
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="max-w-md w-full">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Iniciar sesión</CardTitle>
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-2xl md:text-3xl text-center font-bold">
+            Iniciar sesión
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
+              <Label htmlFor="email" className="text-sm md:text-base">
+                Correo electrónico
+              </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="nombre@ejemplo.com"
-                  className="pl-10"
+                  className="pl-10 h-12 text-sm md:text-base"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -90,14 +94,16 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password" className="text-sm md:text-base">
+                Contraseña
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  className="pl-10"
+                  className="pl-10 h-12 text-sm md:text-base"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
@@ -107,12 +113,17 @@ export default function Login() {
               </div>
             </div>
 
-            <Button variant="success" type="submit" className="w-full" onClick={handleSubmit}>
+            <Button
+              variant="success"
+              type="submit"
+              className="w-full h-12 text-sm md:text-base"
+              onClick={handleSubmit}
+            >
               <LogIn className="mr-2 h-4 w-4" /> Iniciar sesión
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
+          <div className="mt-6 text-center text-xs md:text-sm text-muted-foreground">
             No tienes una cuenta?{" "}
             <Link
               href="/signup"
