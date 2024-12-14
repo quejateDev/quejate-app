@@ -76,8 +76,8 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                      <item.icon className="text-blue-500" />
+                      <span className={``}>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -94,7 +94,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="text-green-500" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -119,7 +119,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={handleLogout}>
+                <SidebarMenuButton className="bg-red-500 text-white hover rounded-lg hover:bg-red-600 hover:text-white" onClick={handleLogout}>
                   <LogOut />
                   <span>Cerrar Sesión</span>
                 </SidebarMenuButton>
