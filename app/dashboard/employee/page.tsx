@@ -17,7 +17,7 @@ export default async function EmployeesPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Empleados Registrados</h1>
         <Link href="/dashboard/employee/create">
-          <Button>Crear Nuevo Empleado</Button>
+          <Button variant={"success"}>Crear Nuevo Empleado</Button>
         </Link>
       </div>
 
