@@ -28,21 +28,6 @@ const InternalManagement = [
     url: "/dashboard/area",
     icon: Building2,
   },
-  // {
-  //   title: "Calendar",
-  //   url: "#",
-  //   icon: Calendar,
-  // },
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
 ];
 
 const ExternalManagement = [

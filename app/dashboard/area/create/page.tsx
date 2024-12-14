@@ -1,13 +1,13 @@
 // app/dashboard/area/page.tsx
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,21 +15,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { toast } from "@/hooks/use-toast"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
+import axios from "axios";
 
 // Define the form schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Department name must be at least 2 characters.",
   }),
-})
+});
 
 export default function NewAreaPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,40 +44,33 @@ export default function NewAreaPage() {
     defaultValues: {
       name: "",
     },
-  })
+  });
 
   // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsLoading(true)
-      
-      const response = await fetch('/api/departments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      })
+      setIsLoading(true);
 
-      if (!response.ok) {
-        throw new Error('Failed to create department')
-      }
+      const response = await axios.post("/api/area", {
+        ...values,
+      });
 
       toast({
         title: "Success",
-        description: "Department created successfully",
-      })
+        description: "Area creada correctamente",
+      });
 
-      router.push('/dashboard/area')
-      router.refresh()
+      router.push("/dashboard/area");
     } catch (error) {
+      console.error(error);
+
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: "Algo salió mal. Por favor, inténtalo de nuevo.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -78,9 +78,9 @@ export default function NewAreaPage() {
     <div className="container mx-auto py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Create New Department</CardTitle>
+          <CardTitle>Crear Nueva Área</CardTitle>
           <CardDescription>
-            Add a new department to your organization
+            Agrega una nueva área a tu organización
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -91,21 +91,21 @@ export default function NewAreaPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Department Name</FormLabel>
+                    <FormLabel>Nombre de la área</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter department name" {...field} />
+                      <Input placeholder="Nombre de la área" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Department"}
+                {isLoading ? "Creando..." : "Crear Área"}
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

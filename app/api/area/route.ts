@@ -2,6 +2,17 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+export async function GET() {
+  const areas = await prisma.department.findMany({
+    include: {
+      employees: true,
+      forms: true,
+      pqrs: true,
+    },
+  });
+  return NextResponse.json(areas);
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
