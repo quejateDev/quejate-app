@@ -26,6 +26,7 @@ import {
 import { createEmployeeService } from "@/services/Employee.service";
 import { toast } from "@/hooks/use-toast";
 import { Department } from "@prisma/client";
+import { Client } from "@/services/Client";
 
 const formSchema = z.object({
   username: z
@@ -40,37 +41,70 @@ const formSchema = z.object({
   departmentId: z.string(),
 });
 
-export default function EmployeeForm({ departments }: { departments: Department[] }) {
+interface InitialData {
+  id?: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: string;
+  departmentId: string;
+}
+
+interface EmployeeFormProps {
+  departments: Department[];
+  initialData?: InitialData;
+  isEditing?: boolean;
+}
+
+export default function EmployeeForm({
+  departments,
+  initialData,
+  isEditing,
+}: EmployeeFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      username: initialData?.username || "",
       password: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      role: "EMPLOYEE",
-      departmentId: undefined,
+      firstName: initialData?.firstName || "",
+      lastName: initialData?.lastName || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
+      role:
+        (initialData?.role as "ADMIN" | "EMPLOYEE" | "CLIENT") || "EMPLOYEE",
+      departmentId: initialData?.departmentId || undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      const response = await createEmployeeService(values);
-      toast({
-        title: "Empleado creado",
-        description: "El empleado ha sido creado correctamente",
-      });
+      if (isEditing && initialData?.id) {
+        await Client.put(`/employee/${initialData.id}`, values);
+        toast({
+          title: "Empleado actualizado",
+          description: "El empleado ha sido actualizado correctamente",
+        });
+      } else {
+        await createEmployeeService(values);
+        toast({
+          title: "Empleado creado",
+          description: "El empleado ha sido creado correctamente",
+        });
+      }
       router.push("/dashboard/employee");
     } catch (error) {
-      console.error("Error creating employee:", error);
+      console.error("Error:", error);
       toast({
         title: "Error",
-        description: "Error al crear el empleado",
+        description: isEditing
+          ? "Error al actualizar el empleado"
+          : "Error al crear el empleado",
         variant: "destructive",
       });
     } finally {
@@ -222,7 +256,13 @@ export default function EmployeeForm({ departments }: { departments: Department[
             Cancelar
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? "Creando..." : "Crear Empleado"}
+            {loading
+              ? isEditing
+                ? "Actualizando..."
+                : "Creando..."
+              : isEditing
+              ? "Actualizar Empleado"
+              : "Crear Empleado"}
           </Button>
         </div>
       </form>

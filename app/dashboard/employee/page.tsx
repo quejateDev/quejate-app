@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { getEmployeesService } from "@/services/Employee.service";
+import EmployeeTable from "@/components/EmployeeTable";
 
 async function getEmployees() {
   const employees = await getEmployeesService();
@@ -29,50 +30,7 @@ export default async function EmployeesPage() {
         </Link>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Usuario</TableHead>
-              <TableHead>Nombre Completo</TableHead>
-              <TableHead>Correo</TableHead>
-              <TableHead>Teléfono</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Departamento</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {employees.map((employee: any) => (
-              <TableRow key={employee.id}>
-                <TableCell>{employee.username}</TableCell>
-                <TableCell>{`${employee.firstName} ${employee.lastName}`}</TableCell>
-                <TableCell>{employee.email}</TableCell>
-                <TableCell>{employee.phone}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      employee.role === "ADMIN"
-                        ? "destructive"
-                        : employee.role === "EMPLOYEE"
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {employee.role === "ADMIN"
-                      ? "Administrador"
-                      : employee.role === "EMPLOYEE"
-                      ? "Empleado"
-                      : "Cliente"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {employee.department?.name || "No asignado"}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <EmployeeTable employees={employees} />
     </div>
   );
 }

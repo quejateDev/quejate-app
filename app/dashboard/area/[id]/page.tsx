@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardContent,
 } from "@/components/ui/card";
+import { useParams } from "next/navigation";
 
 interface AreaPageProps {
   params: {
@@ -22,11 +23,11 @@ interface AreaPageProps {
 const AreaPage = ({ params }: AreaPageProps) => {
   const [area, setArea] = useState<Department | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { id } = useParams();
   useEffect(() => {
     const fetchArea = async () => {
       try {
-        const response = await Client.get(`/area/${params.id}`);
+        const response = await Client.get(`/area/${id}`);
         setArea(response.data);
       } catch (error) {
         toast({
@@ -40,7 +41,7 @@ const AreaPage = ({ params }: AreaPageProps) => {
     };
 
     fetchArea();
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return (
