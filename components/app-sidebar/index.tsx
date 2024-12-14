@@ -13,7 +13,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Users, Building2, Settings, LogOut } from "lucide-react";
+import {
+  Users,
+  Building2,
+  Settings,
+  LogOut,
+  MessageCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // Menu items.
@@ -27,6 +33,11 @@ const InternalManagement = [
     title: "Areas",
     url: "/dashboard/area",
     icon: Building2,
+  },
+  {
+    title: "PQRs",
+    url: "/dashboard/pqr",
+    icon: MessageCircle,
   },
 ];
 

@@ -41,52 +41,49 @@ enum FieldType {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  username      String    @unique
-  password      String
-  firstName     String
-  lastName      String
-  email         String    @unique
-  phone         String
-  role          UserRole
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  department    Department? @relation(fields: [departmentId], references: [id])
-  departmentId  String?
-  pqrsCreated   PQRS[]     @relation("CreatedBy")
-  pqrsAssigned  PQRS[]     @relation("AssignedTo")
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
+  pqrsCreated  PQRS[]      @relation("CreatedBy")
 }
 
 model Department {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  employees   User[]
-  pqrs        PQRS[]
-  forms       Form[]
+  employees User[]
+  pqrs      PQRS[]
+  forms     Form[]
 }
 
 model PQRS {
-  id            String      @id @default(uuid())
-  type          PQRSType
-  subject       String
-  description   String
-  status        PQRSStatus  @default(PENDING)
-  dueDate       DateTime
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  
+  id          String     @id @default(uuid())
+  type        PQRSType
+  subject     String
+  description String
+  status      PQRSStatus @default(PENDING)
+  dueDate     DateTime
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
   // Relations
-  creator       User        @relation("CreatedBy", fields: [creatorId], references: [id])
-  creatorId     String
-  assignedTo    User        @relation("AssignedTo", fields: [assignedToId], references: [id])
-  assignedToId  String
-  department    Department  @relation(fields: [departmentId], references: [id])
+  creator       User?           @relation("CreatedBy", fields: [creatorId], references: [id])
+  creatorId     String?
+  department    Department     @relation(fields: [departmentId], references: [id])
   departmentId  String
   responses     Response[]
   attachments   Attachment[]
@@ -94,71 +91,71 @@ model PQRS {
 }
 
 model Response {
-  id          String    @id @default(uuid())
-  content     String
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+
   // Relations
-  pqrs        PQRS      @relation(fields: [pqrsId], references: [id])
-  pqrsId      String
+  pqrs   PQRS   @relation(fields: [pqrsId], references: [id])
+  pqrsId String
 }
 
 model Attachment {
-  id          String    @id @default(uuid())
-  filename    String
-  url         String
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  createdAt DateTime @default(now())
+
   // Relations
-  pqrs        PQRS      @relation(fields: [pqrsId], references: [id])
-  pqrsId      String
+  pqrs   PQRS   @relation(fields: [pqrsId], references: [id])
+  pqrsId String
 }
 
 model Form {
-  id            String    @id @default(uuid())
-  name          String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  department    Department @relation(fields: [departmentId], references: [id])
-  departmentId  String
-  fields        FormField[]
-  responses     FormResponse[]
+  department   Department     @relation(fields: [departmentId], references: [id])
+  departmentId String
+  fields       FormField[]
+  responses    FormResponse[]
 }
 
 model FormField {
-  id          String    @id @default(uuid())
-  label       String
-  type        FieldType
-  required    Boolean   @default(false)
-  order       Int
-  
+  id       String    @id @default(uuid())
+  label    String
+  type     FieldType
+  required Boolean   @default(false)
+  order    Int
+
   // Relations
-  form        Form      @relation(fields: [formId], references: [id])
-  formId      String
-  responses   FieldResponse[]
+  form      Form            @relation(fields: [formId], references: [id])
+  formId    String
+  responses FieldResponse[]
 }
 
 model FormResponse {
-  id          String    @id @default(uuid())
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
   // Relations
-  form        Form      @relation(fields: [formId], references: [id])
-  formId      String
-  pqrs        PQRS      @relation(fields: [pqrsId], references: [id])
-  pqrsId      String
-  fields      FieldResponse[]
+  form   Form            @relation(fields: [formId], references: [id])
+  formId String
+  pqrs   PQRS            @relation(fields: [pqrsId], references: [id])
+  pqrsId String
+  fields FieldResponse[]
 }
 
 model FieldResponse {
-  id            String    @id @default(uuid())
-  value         String
-  
+  id    String @id @default(uuid())
+  value String
+
   // Relations
-  formResponse  FormResponse @relation(fields: [formResponseId], references: [id])
+  formResponse   FormResponse @relation(fields: [formResponseId], references: [id])
   formResponseId String
-  field         FormField    @relation(fields: [fieldId], references: [id])
-  fieldId       String
+  field          FormField    @relation(fields: [fieldId], references: [id])
+  fieldId        String
 }
