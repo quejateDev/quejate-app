@@ -1,30 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import {
-  deleteDepartmentService,
-  getDepartmentsService,
-} from "@/services/Department.service";
+    deleteDepartmentService,
+    getDepartmentsService,
+} from "@/services/api/Department.service";
 import { Form, PQRS, User } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import ConfirmationModal from "./modals/ConfirmationModal";
 

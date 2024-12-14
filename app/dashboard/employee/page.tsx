@@ -1,15 +1,6 @@
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { getEmployeesService } from "@/services/Employee.service";
+import { getEmployeesService } from "@/services/api/Employee.service";
 import EmployeeTable from "@/components/EmployeeTable";
 
 async function getEmployees() {

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getDepartmentsService } from "@/services/Department.service";
+import { getDepartmentsService } from "@/services/api/Department.service";
 import { DeparmentsTable } from "@/components/DeparmentsTable";
 
 export default async function AreasPage() {

@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Button } from "@react-email/components";
 import {
   Users,
   Building2,
@@ -119,10 +120,10 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/auth/logout" onClick={handleLogout}>
+                  <Button onClick={handleLogout}>
                     <LogOut />
                     <span>Cerrar Sesión</span>
-                  </a>
+                  </Button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

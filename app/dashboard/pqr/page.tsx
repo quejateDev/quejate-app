@@ -6,7 +6,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { getPQRS } from "@/services/pqr.service";
+import { getPQRS } from "@/services/api/pqr.service";
 import { Prisma } from "@prisma/client";
 
 const pqrs = await getPQRS();

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
+import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 
 export async function GET(req: NextRequest) {
   const pqrs = await prisma.pQRS.findMany({
@@ -63,10 +64,24 @@ export async function POST(req: NextRequest) {
             id: body.creatorId,
           },
         },
-      },      
+      },
+      include: {
+        creator: true,
+      },
     });
 
-    console.log("Created PQRS:", response);
+    console.log("Response:", response);
+
+    const email = await sendPQRCreationEmail(
+      response.creator?.email || "luisevilla588@gmail.com",
+      response.creator?.firstName || "John Doe",
+      "Registro exitoso de PQR @tuqueja.com.co",
+      response.id.toString(),
+      new Date(response.createdAt).toLocaleString('es-CO', { timeZone: 'America/Bogota' }),
+      `https://tuqueja.com.co/pqr/${response.id}`
+    );
+
+    console.log("Email:", email);
 
     return NextResponse.json(response);
   } catch (error: any) {

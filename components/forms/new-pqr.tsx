@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { getDepartmentsService } from "@/services/Department.service";
-import { createPQRS } from "@/services/pqr.service";
+import { getDepartmentsService } from "@/services/api/Department.service";
+import { createPQRS } from "@/services/api/pqr.service";
 import { Department, PQRSType, Prisma, User } from "@prisma/client";
 import { useEffect, useState } from "react";
 

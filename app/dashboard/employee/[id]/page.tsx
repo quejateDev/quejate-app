@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import EmployeeForm from "@/components/forms/employee-form";
-import { Client } from "@/services/Client";
+import { Client } from "@/services/api/Client";
 import { Department, User } from "@prisma/client";
 import { toast } from "@/hooks/use-toast";
 import {

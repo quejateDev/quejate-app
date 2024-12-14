@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AreaForm } from "@/components/forms/area-form";
-import { Client } from "@/services/Client";
+import { Client } from "@/services/api/Client";
 import { Department } from "@prisma/client";
 import { toast } from "@/hooks/use-toast";
 import {

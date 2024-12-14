@@ -1,5 +1,5 @@
 import EmployeeForm from "@/components/forms/employee-form";
-import { getDepartmentsService } from "@/services/Department.service";
+import { getDepartmentsService } from "@/services/api/Department.service";
 
 export default async function CreateEmployee() {
   const departments = await getDepartmentsService();
