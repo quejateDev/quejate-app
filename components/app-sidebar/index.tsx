@@ -12,10 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  Users,
-  Building2
-} from "lucide-react";
+import { Users, Building2, Settings, LogOut } from "lucide-react";
 
 // Menu items.
 const InternalManagement = [
@@ -57,7 +54,12 @@ const ExternalManagement = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        {/* Logo de la empresa */}
+        <div className="flex items-center justify-center p-4">
+          <img src="/logo.png" alt="Logo de la empresa" className="h-8" />
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Gestión Interna</SidebarGroupLabel>
@@ -76,6 +78,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
         <SidebarGroup>
           <SidebarGroupLabel>Gestión Externa</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -94,7 +97,32 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupLabel>Sistema</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/dashboard/settings">
+                    <Settings />
+                    <span>Configuración</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/auth/logout">
+                    <LogOut />
+                    <span>Cerrar Sesión</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   );
 }
