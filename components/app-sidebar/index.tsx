@@ -119,11 +119,9 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Button onClick={handleLogout}>
-                    <LogOut />
-                    <span>Cerrar Sesión</span>
-                  </Button>
+                <SidebarMenuButton onClick={handleLogout}>
+                  <LogOut />
+                  <span>Cerrar Sesión</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

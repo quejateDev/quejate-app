@@ -23,10 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createEmployeeService } from "@/services/Employee.service";
+import { createEmployeeService } from "@/services/api/Employee.service";
 import { toast } from "@/hooks/use-toast";
 import { Department } from "@prisma/client";
-import { Client } from "@/services/Client";
+import { Client } from "@/services/api/Client";
 
 const formSchema = z.object({
   username: z

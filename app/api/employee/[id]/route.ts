@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -14,16 +15,23 @@ export async function GET(
   return NextResponse.json(employee);
 }
 
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { password, ...otherData } = await request.json();
 
-export async function PUT(request: Request) {
-  const { id, ...data } = await request.json();
+  const updateData = {
+    ...otherData,
+    ...(password && { password: await hash(password, 10) })
+  };
+
   const employee = await prisma.user.update({
-    where: { id },
-    data,
+    where: { id: params.id },
+    data: updateData
   });
   return NextResponse.json(employee);
 }
-
 
 export async function DELETE(request: Request) {
   const { id } = await request.json();
@@ -32,4 +40,3 @@ export async function DELETE(request: Request) {
   });
   return NextResponse.json(employee);
 }
-    
