@@ -1,26 +1,57 @@
-'use client'
-import { useState } from 'react'
-import Link from 'next/link'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { UserPlus, Mail, Phone, Lock, User } from "lucide-react"
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UserPlus, Mail, Phone, Lock, User } from "lucide-react";
+import axios from "axios";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-  })
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: Implement signup logic
-  }
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("/api/auth/signup", formData);
+
+      toast({
+        variant: "default",
+        title: "Cuenta creada correctamente",
+        description: "Ahora puedes iniciar sesión",
+      });
+
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        return toast({
+          title: "Error",
+          description: "El correo electrónico ya existe",
+          variant: "destructive",
+        });
+      }
+
+      toast({
+        title: "Error",
+        description: "Hubo un error al crear la cuenta",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -34,9 +65,7 @@ export default function Signup() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">
-                  Nombre
-                </Label>
+                <Label htmlFor="firstName">Nombre</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
@@ -44,14 +73,14 @@ export default function Signup() {
                     placeholder="John"
                     className="pl-10"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">
-                  Apellido
-                </Label>
+                <Label htmlFor="lastName">Apellido</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
@@ -59,16 +88,16 @@ export default function Signup() {
                     placeholder="Doe"
                     className="pl-10"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">
-                Correo electrónico
-              </Label>
+              <Label htmlFor="email">Correo electrónico</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -77,32 +106,32 @@ export default function Signup() {
                   placeholder="ejemplo@correo.com"
                   className="pl-10"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">
-                Número de teléfono
-              </Label>
+              <Label htmlFor="phone">Número de teléfono</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="+1234567890"
+                  placeholder="3041234567"
                   className="pl-10"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">
-                Contraseña
-              </Label>
+              <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -110,15 +139,15 @@ export default function Signup() {
                   type="password"
                   className="pl-10"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">
-                Confirmar contraseña
-              </Label>
+              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -126,7 +155,12 @@ export default function Signup() {
                   type="password"
                   className="pl-10"
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -138,9 +172,9 @@ export default function Signup() {
           </form>
 
           <div className="mt-4 text-center text-sm">
-            Ya tienes una cuenta?{' '}
-            <Link 
-              href="/login" 
+            Ya tienes una cuenta?{" "}
+            <Link
+              href="/login"
               className="font-medium text-primary hover:underline"
             >
               Iniciar sesión
@@ -149,5 +183,5 @@ export default function Signup() {
         </CardContent>
       </Card>
     </main>
-  )
-} 
+  );
+}

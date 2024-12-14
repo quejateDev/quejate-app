@@ -12,7 +12,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Users, Building2, Settings, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Menu items.
 const InternalManagement = [
@@ -52,6 +54,14 @@ const ExternalManagement = [
 ];
 
 export function AppSidebar() {
+  const { logout } = useAuthStore();
+  const router = useRouter();
+
+  function handleLogout() {
+    logout();
+    router.push("/auth/login");
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -113,7 +123,7 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/auth/logout">
+                  <a href="/auth/logout" onClick={handleLogout}>
                     <LogOut />
                     <span>Cerrar Sesión</span>
                   </a>
