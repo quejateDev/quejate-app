@@ -9,44 +9,10 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { getEmployeesService } from "@/services/Employee.service";
 
 async function getEmployees() {
-  // Mock data array
-  const employees = [
-    {
-      id: 1,
-      username: "jsmith",
-      firstName: "John",
-      lastName: "Smith",
-      email: "john.smith@company.com",
-      phone: "+1 234-567-8901",
-      role: "ADMIN",
-      department: { name: "Tecnología" },
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      username: "mgarcia",
-      firstName: "María",
-      lastName: "García",
-      email: "maria.garcia@company.com",
-      phone: "+1 234-567-8902",
-      role: "EMPLOYEE",
-      department: { name: "Recursos Humanos" },
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      username: "rlopez",
-      firstName: "Roberto",
-      lastName: "López",
-      email: "roberto.lopez@company.com",
-      phone: "+1 234-567-8903",
-      role: "EMPLOYEE",
-      department: null,
-      createdAt: new Date(),
-    },
-  ];
+  const employees = await getEmployeesService();
 
   return employees;
 }
@@ -59,9 +25,7 @@ export default async function EmployeesPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Empleados Registrados</h1>
         <Link href="/dashboard/employee/create">
-          <Button>
-            Crear Nuevo Empleado
-          </Button>
+          <Button>Crear Nuevo Empleado</Button>
         </Link>
       </div>
 
@@ -78,24 +42,32 @@ export default async function EmployeesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.map((employee) => (
+            {employees.map((employee: any) => (
               <TableRow key={employee.id}>
                 <TableCell>{employee.username}</TableCell>
                 <TableCell>{`${employee.firstName} ${employee.lastName}`}</TableCell>
                 <TableCell>{employee.email}</TableCell>
                 <TableCell>{employee.phone}</TableCell>
                 <TableCell>
-                  <Badge variant={
-                    employee.role === "ADMIN" ? "destructive" : 
-                    employee.role === "EMPLOYEE" ? "default" : 
-                    "secondary"
-                  }>
-                    {employee.role === "ADMIN" ? "Administrador" : 
-                     employee.role === "EMPLOYEE" ? "Empleado" : 
-                     "Cliente"}
+                  <Badge
+                    variant={
+                      employee.role === "ADMIN"
+                        ? "destructive"
+                        : employee.role === "EMPLOYEE"
+                        ? "default"
+                        : "secondary"
+                    }
+                  >
+                    {employee.role === "ADMIN"
+                      ? "Administrador"
+                      : employee.role === "EMPLOYEE"
+                      ? "Empleado"
+                      : "Cliente"}
                   </Badge>
                 </TableCell>
-                <TableCell>{employee.department?.name || "No asignado"}</TableCell>
+                <TableCell>
+                  {employee.department?.name || "No asignado"}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

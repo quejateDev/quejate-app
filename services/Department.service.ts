@@ -1,5 +1,4 @@
 import { Department, User, Form, PQRS } from "@prisma/client";
-import axios from "axios";
 import { Client } from "./Client";
 
 // Define the extended Department type with relations

@@ -1,0 +1,40 @@
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+
+export async function GET(request: Request) {
+  const employees = await prisma.user.findMany({
+    where: {
+      role: "EMPLOYEE",
+    },
+    include: {
+      department: true,
+    },
+  });
+  return NextResponse.json(employees);
+}
+
+export async function POST(request: Request) {
+  const {
+    username,
+    password,
+    firstName,
+    lastName,
+    email,
+    phone,
+    role,
+    departmentId,
+  } = await request.json();
+  const employee = await prisma.user.create({
+    data: {
+      username,
+      password,
+      firstName,
+      lastName,
+      email,
+      phone,
+      role,
+      departmentId,
+    },
+  });
+  return NextResponse.json(employee);
+}
