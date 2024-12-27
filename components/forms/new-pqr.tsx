@@ -23,6 +23,9 @@ import { FileField } from "../fields/FileField";
 import { NumberField } from "../fields/NumberField";
 import { createPQRS } from "@/services/api/pqr.service";
 import { getEntities } from "@/services/api/entity.service";
+import useAuthStore from "@/store/useAuthStore";
+import { Loader2 } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 type CustomFieldValue = {
   name: string;
@@ -42,18 +45,27 @@ type PQRSForm = {
 };
 
 export function NewPQRForm() {
+  const { user } = useAuthStore();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [entities, setEntities] = useState<Entity[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [pqr, setPqr] = useState<PQRSForm>({
     type: "PETITION",
     departmentId: "",
-    creatorId: "a6e3beaa-57e1-4686-9d21-6c4bb23cd6b6",
+    creatorId: user?.id || "",
     dueDate: new Date(),
     customFields: [],
     isAnonymous: false,
   });
   const [selectedEntityId, setSelectedEntityId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      setPqr((prev) => ({ ...prev, creatorId: user?.id || "" }));
+    }
+  }, [user]);
 
   async function fetchEntities() {
     try {
@@ -66,8 +78,22 @@ export function NewPQRForm() {
         description: "Error al cargar las entidades",
         variant: "destructive",
       });
+    } finally {
+      setIsLoadingInitial(false);
     }
   }
+
+  useEffect(() => {
+    fetchEntities();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEntityId) {
+      fetchDepartments();
+    } else {
+      setDepartments([]);
+    }
+  }, [selectedEntityId]);
 
   async function fetchDepartments() {
     try {
@@ -91,18 +117,6 @@ export function NewPQRForm() {
       });
     }
   }
-
-  useEffect(() => {
-    fetchEntities();
-  }, []);
-
-  useEffect(() => {
-    if (selectedEntityId) {
-      fetchDepartments();
-    } else {
-      setDepartments([]);
-    }
-  }, [selectedEntityId]);
 
   async function fetchCustomFields(departmentId: string) {
     try {
@@ -171,6 +185,8 @@ export function NewPQRForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
       const { customFields: customFieldValues, ...pqrData } = pqr;
 
@@ -195,7 +211,23 @@ export function NewPQRForm() {
         description: "Error al crear el PQR",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
+  }
+
+  if (isLoadingInitial) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-[200px]" />
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -316,8 +348,15 @@ export function NewPQRForm() {
               <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
             </div>
 
-            <Button type="submit" className="w-full">
-              Enviar PQRS
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                'Enviar PQRS'
+              )}
             </Button>
           </div>
         </form>
