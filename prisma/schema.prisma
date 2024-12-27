@@ -174,4 +174,20 @@ model PQRConfig {
   // Relations
   department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   departmentId String     @unique
+  
+  // Custom Fields
+  customFields CustomField[]
+}
+
+model CustomField {
+  id       String    @id @default(uuid())
+  name     String
+  type     String
+  required Boolean   @default(false)
+  
+  // Relations
+  config   PQRConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId String
+  
+  @@index([configId])
 }

@@ -2,7 +2,11 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { pqrConfigSchema, PQRConfigFormProps, PQRConfigFormValues } from "@/types/pqr-config";
+import {
+  pqrConfigSchema,
+  PQRConfigFormProps,
+  PQRConfigFormValues,
+} from "@/types/pqr-config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,10 +25,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "../ui/card";
 import { Separator } from "../ui/separator";
+import PqrFieldsForm from "./pqr-fields-form";
 
 export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
   const form = useForm<PQRConfigFormValues>({
@@ -167,11 +173,9 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
               )}
             />
 
-            <Separator className="my-6" />
-            
-            
-
-            <Button type="submit">Guardar configuración</Button>
+            <div className="flex justify-end">
+              <Button type="submit">Guardar configuración</Button>
+            </div>
           </form>
         </Form>
       </CardContent>

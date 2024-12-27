@@ -14,7 +14,11 @@ export async function GET(
         id
       },
       include: {
-        pqrConfig: true
+        pqrConfig: {
+          include: {
+            customFields: true
+          }
+        }
       }
     });
 

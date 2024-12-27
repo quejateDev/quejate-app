@@ -6,15 +6,6 @@ export const pqrConfigSchema = z.object({
   maxResponseTime: z.string().min(1, "El tiempo de respuesta es requerido"),
   notifyEmail: z.boolean().default(true),
   autoAssign: z.boolean().default(false),
-  // customFields: z
-  //   .array(
-  //     z.object({
-  //       name: z.string().min(1, "El nombre es requerido"),
-  //       required: z.boolean(),
-  //       type: z.enum(["email", "phone", "text", "file"]),
-  //     })
-  //   )
-  //   .default([]),
 });
 
 export type PQRConfigFormValues = z.infer<typeof pqrConfigSchema>;
@@ -23,6 +14,20 @@ export interface PQRConfigFormProps {
   areaId: string;
   initialData?: PQRConfigFormValues;
 }
+
+export const PqrFieldsSchema = z.object({
+  customFields: z.array(
+    z.object({
+      name: z.string(),
+      required: z.boolean(),
+      type: z.enum(["email", "phone", "text", "file"]),
+    })
+  ),
+});
+
+export type PQRFieldsFormValues = {
+  customFields: CustomField[];
+};
 
 export type CustomField = {
   name: string;

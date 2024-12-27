@@ -15,6 +15,7 @@ import {
 import { useParams } from "next/navigation";
 import { PQRConfigForm } from "@/components/forms/pqr-config-form";
 import { DepartmentWithConfig } from "@/dto/deparment/department-with-config.dto";
+import PqrFieldsForm from "@/components/forms/pqr-fields-form";
 
 interface AreaPageProps {
   params: {
@@ -87,6 +88,10 @@ const AreaPage = ({ params }: AreaPageProps) => {
         notifyEmail: area.pqrConfig?.notifyEmail || true,
         autoAssign: area.pqrConfig?.autoAssign || false,
         // customFields: area.pqrConfig?.customFields || [],
+      }} />
+
+      <PqrFieldsForm areaId={id as string} initialData={{
+        customFields: area.pqrConfig?.customFields || [],
       }} />
     </div>
   );
