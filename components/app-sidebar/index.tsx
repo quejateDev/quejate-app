@@ -27,22 +27,22 @@ import { useRouter } from "next/navigation";
 const InternalManagement = [
   {
     title: "Empleados",
-    url: "/dashboard/employee",
+    url: "/admin/employee",
     icon: Users,
   },
   {
     title: "Entidades",
-    url: "/dashboard/entity",
+    url: "/admin/entity",
     icon: Building,
   },
   {
     title: "Areas",
-    url: "/dashboard/area",
+    url: "/admin/area",
     icon: Building2,
   },
   {
     title: "PQRs",
-    url: "/dashboard/pqr",
+    url: "/admin/pqr",
     icon: MessageCircle,
   },
 ];
@@ -50,7 +50,7 @@ const InternalManagement = [
 const ExternalManagement = [
   {
     title: "Clientes",
-    url: "/dashboard/clients",
+    url: "/admin/clients",
     icon: Users,
   },
 ];
@@ -117,7 +117,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/dashboard/settings">
+                  <a href="/admin/settings">
                     <Settings />
                     <span>Configuración</span>
                   </a>

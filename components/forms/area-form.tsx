@@ -63,7 +63,7 @@ export function AreaForm({ initialData, isEditing = false }: AreaFormProps) {
         });
       }
 
-      router.push("/dashboard/area");
+      router.push("/admin/area");
       router.refresh();
     } catch (error) {
       console.error(error);

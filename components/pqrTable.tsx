@@ -78,8 +78,6 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
                 <TableRow key={pqr.id}>
                   <TableCell>{pqr.id.slice(0, 6)}</TableCell>
                   <TableCell>{pqr.type}</TableCell>
-                  <TableCell>{pqr.subject}</TableCell>
-                  <TableCell>{pqr.description}</TableCell>
                   <TableCell>{pqr.department?.name}</TableCell>
                   <TableCell>
                     {pqr.creator?.email}
@@ -91,7 +89,7 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <a href={`/dashboard/pqr/${pqr.id}`}>
+                          <a href={`/admin/pqr/${pqr.id}`}>
                             <Button variant="outline" size="icon">
                               <EyeIcon className="w-4 h-4" />
                             </Button>

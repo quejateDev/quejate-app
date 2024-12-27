@@ -10,7 +10,7 @@ export default async function AreasPage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Áreas Registradas</h1>
-        <Link href="/dashboard/area/create">
+        <Link href="/admin/area/create">
           <Button className="bg-green-500 hover:bg-green-600">
             Crear Nueva Área
           </Button>

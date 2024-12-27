@@ -49,7 +49,7 @@ export default function EmployeeTable({ employees }: EmployeeTableProps) {
                 {employee.department?.name || "No asignado"}
               </TableCell>  
               <TableCell>
-                <Link href={`/dashboard/employee/${employee.id}`}>
+                <Link href={`/admin/employee/${employee.id}`}>
                   <Button variant={"outline"}>Editar</Button>
                 </Link>
               </TableCell>

@@ -16,7 +16,7 @@ export default async function EmployeesPage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Empleados Registrados</h1>
-        <Link href="/dashboard/employee/create">
+        <Link href="/admin/employee/create">
           <Button variant={"success"}>Crear Nuevo Empleado</Button>
         </Link>
       </div>

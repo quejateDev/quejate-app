@@ -45,7 +45,7 @@ export default function Login() {
         });
 
         // Redirect to dashboard or home
-        router.push("/dashboard");
+        router.push("/admin");
       } else {
         // Handle error
         toast({

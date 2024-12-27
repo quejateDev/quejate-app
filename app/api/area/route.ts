@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         },
         pqrConfig: {
           create: {},
-        }
+        },
       },
       include: {
         entity: true,
