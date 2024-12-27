@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { getDepartmentsService } from "@/services/api/Department.service";
-import { Department, PQRSType, User, CustomField } from "@prisma/client";
+import { Entity, Department, PQRSType, User, CustomField } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { TextField } from "../fields/TextField";
 import { TextAreaField } from "../fields/TextAreaField";
@@ -22,6 +22,7 @@ import { EmailField } from "../fields/EmailField";
 import { FileField } from "../fields/FileField";
 import { NumberField } from "../fields/NumberField";
 import { createPQRS } from "@/services/api/pqr.service";
+import { getEntities } from "@/services/api/entity.service";
 
 type CustomFieldValue = {
   name: string;
@@ -42,6 +43,7 @@ type PQRSForm = {
 
 export function NewPQRForm() {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [entities, setEntities] = useState<Entity[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [pqr, setPqr] = useState<PQRSForm>({
     type: "PETITION",
@@ -51,11 +53,35 @@ export function NewPQRForm() {
     customFields: [],
     isAnonymous: false,
   });
+  const [selectedEntityId, setSelectedEntityId] = useState<string>("");
+
+  async function fetchEntities() {
+    try {
+      const response = await getEntities();
+      setEntities(response);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Error al cargar las entidades",
+        variant: "destructive",
+      });
+    }
+  }
 
   async function fetchDepartments() {
     try {
       const response = await getDepartmentsService();
-      setDepartments(response);
+      // Filter departments by selected entity
+      const filteredDepartments = selectedEntityId
+        ? response.filter((dept) => dept.entityId === selectedEntityId)
+        : [];
+      setDepartments(filteredDepartments);
+      
+      // Clear department selection when entity changes
+      if (pqr.departmentId && !filteredDepartments.find(d => d.id === pqr.departmentId)) {
+        setPqr(prev => ({ ...prev, departmentId: "" }));
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -65,6 +91,18 @@ export function NewPQRForm() {
       });
     }
   }
+
+  useEffect(() => {
+    fetchEntities();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEntityId) {
+      fetchDepartments();
+    } else {
+      setDepartments([]);
+    }
+  }, [selectedEntityId]);
 
   async function fetchCustomFields(departmentId: string) {
     try {
@@ -92,10 +130,6 @@ export function NewPQRForm() {
       });
     }
   }
-
-  useEffect(() => {
-    fetchDepartments();
-  }, []);
 
   useEffect(() => {
     if (pqr.departmentId) {
@@ -170,101 +204,122 @@ export function NewPQRForm() {
         <CardTitle>Envía tu PQRS</CardTitle>
       </CardHeader>
       <CardContent>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="type">Tipo</Label>
-            <Select
-              onValueChange={(value) =>
-                setPqr((prev) => ({ ...prev, type: value as PQRSType }))
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-4">
+            <div>
+              <Label>Tipo de Solicitud</Label>
+              <Select
+                value={pqr.type}
+                onValueChange={(value: PQRSType) =>
+                  setPqr((prev) => ({ ...prev, type: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione el tipo de solicitud" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PETITION">Petición</SelectItem>
+                  <SelectItem value="COMPLAINT">Queja</SelectItem>
+                  <SelectItem value="CLAIM">Reclamo</SelectItem>
+                  <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>Entidad</Label>
+              <Select
+                value={selectedEntityId}
+                onValueChange={(value: string) => setSelectedEntityId(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione una entidad" />
+                </SelectTrigger>
+                <SelectContent>
+                  {entities.map((entity) => (
+                    <SelectItem key={entity.id} value={entity.id}>
+                      {entity.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>Área</Label>
+              <Select
+                value={pqr.departmentId}
+                onValueChange={(value: string) =>
+                  setPqr((prev) => ({ ...prev, departmentId: value }))
+                }
+                disabled={!selectedEntityId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione un área" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem key={department.id} value={department.id}>
+                      {department.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {customFields.map((field) => {
+              const commonProps = {
+                id: field.name,
+                label: field.name,
+                placeholder: field.placeholder || "",
+                value:
+                  pqr.customFields.find((cf) => cf.name === field.name)?.value ||
+                  "",
+                onChange: (value: string) =>
+                  handleCustomFieldChange(field.name, value),
+                required: field.required,
+              };
+
+              switch (field.type) {
+                case "text":
+                  return <TextField key={field.name} {...commonProps} />;
+                case "textarea":
+                  return <TextAreaField key={field.name} {...commonProps} />;
+                case "phone":
+                  return <PhoneField key={field.name} {...commonProps} />;
+                case "email":
+                  return <EmailField key={field.name} {...commonProps} />;
+                case "file":
+                  return (
+                    <FileField
+                      key={field.name}
+                      {...commonProps}
+                      accept="image/*,application/pdf"
+                      maxSize={5}
+                    />
+                  );
+                case "number":
+                  return <NumberField key={field.name} {...commonProps} />;
+                default:
+                  return <TextField key={field.name} {...commonProps} />;
               }
-              value={pqr.type}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="PETITION">Petición</SelectItem>
-                <SelectItem value="COMPLAINT">Queja</SelectItem>
-                <SelectItem value="CLAIM">Reclamo</SelectItem>
-                <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
-              </SelectContent>
-            </Select>
+            })}
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isAnonymous"
+                checked={pqr.isAnonymous}
+                onCheckedChange={(checked) =>
+                  setPqr((prev) => ({ ...prev, isAnonymous: checked as boolean }))
+                }
+              />
+              <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
+            </div>
+
+            <Button type="submit" className="w-full">
+              Enviar PQRS
+            </Button>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="department">Departamento</Label>
-            <Select
-              onValueChange={(value) => {
-                setPqr((prev) => ({ ...prev, departmentId: value }));
-                fetchCustomFields(value);
-              }}
-              value={pqr.departmentId}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un departamento" />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((department) => (
-                  <SelectItem key={department.id} value={department.id}>
-                    {department.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {customFields.map((field) => {
-            const commonProps = {
-              id: field.name,
-              label: field.name,
-              placeholder: field.placeholder || "",
-              value:
-                pqr.customFields.find((cf) => cf.name === field.name)?.value ||
-                "",
-              onChange: (value: string) =>
-                handleCustomFieldChange(field.name, value),
-              required: field.required,
-            };
-
-            switch (field.type) {
-              case "text":
-                return <TextField key={field.name} {...commonProps} />;
-              case "textarea":
-                return <TextAreaField key={field.name} {...commonProps} />;
-              case "phone":
-                return <PhoneField key={field.name} {...commonProps} />;
-              case "email":
-                return <EmailField key={field.name} {...commonProps} />;
-              case "file":
-                return (
-                  <FileField
-                    key={field.name}
-                    {...commonProps}
-                    accept="image/*,application/pdf"
-                    maxSize={5}
-                  />
-                );
-              case "number":
-                return <NumberField key={field.name} {...commonProps} />;
-              default:
-                return <TextField key={field.name} {...commonProps} />;
-            }
-          })}
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="isAnonymous"
-              checked={pqr.isAnonymous}
-              onCheckedChange={(checked) =>
-                setPqr((prev) => ({ ...prev, isAnonymous: checked as boolean }))
-              }
-            />
-            <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
-          </div>
-
-          <Button type="submit" className="w-full">
-            Enviar PQRS
-          </Button>
         </form>
       </CardContent>
     </Card>

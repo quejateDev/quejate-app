@@ -38,6 +38,9 @@ export async function POST(request: Request) {
             id: entityId,
           },
         },
+        pqrConfig: {
+          create: {},
+        }
       },
       include: {
         entity: true,

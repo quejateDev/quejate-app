@@ -7,18 +7,30 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { customFields } = PqrFieldsSchema.parse(body);
+
+    console.log("id ", id);
+
+    const pqr = await prisma.pQRConfig.findUnique({
+      where: {
+        departmentId: id,
+      },
+    });
+
+    console.log("pqrConfig ", pqr);
 
     // Update or create PQR config with custom fields
     const pqrConfig = await prisma.pQRConfig.update({
       where: {
-        departmentId: params.id,
+        departmentId: id,
       },
       data: {
         customFields: {
           deleteMany: {},  // Remove all existing fields
           create: customFields.map((field) => ({
+
             name: field.name,
             type: field.type,
             required: field.required,
