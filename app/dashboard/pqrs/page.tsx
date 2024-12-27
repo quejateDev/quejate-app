@@ -4,22 +4,37 @@ import { useEffect, useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
 import {PQRCard} from '@/components/PQRCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PQRSStatus, PQRSType } from '@prisma/client';
 
 interface PQR {
   id: string;
-  title: string;
-  description: string;
-  status: string;
+  type: PQRSType;
+  status: PQRSStatus;
   createdAt: string;
-  userId: string;
-  likes: any[];
+  dueDate: string;
+  anonymous: boolean;
+  department: {
+    name: string;
+    entity: {
+      name: string;
+    };
+  };
+  creator: {
+    firstName: string;
+    lastName: string;
+  };
+  customFieldValues: {
+    name: string;
+    value: string;
+  }[];
+  likes: Array<{ userId: string }>;
   _count: {
     likes: number;
   };
 }
 
 export default function UserPQRs() {
-  const [pqrs, setPqrs] = useState<any[]>([]);
+  const [pqrs, setPqrs] = useState<PQR[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
 
@@ -81,7 +96,7 @@ export default function UserPQRs() {
           <PQRCard
             key={pqr.id}
             pqr={pqr}
-            initialLiked={pqr.likes.some((like: any) => like.userId === user?.id)}
+            initialLiked={pqr.likes.some((like) => like.userId === user?.id)}
           />
         ))}
       </div>
