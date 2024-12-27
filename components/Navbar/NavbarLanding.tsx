@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-
+import Image from "next/image"
 export function Navbar() {
   const NavItems = () => (
     <>
@@ -46,7 +46,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="text-xl font-bold">
-            Tu Queja
+            <Image src="/logo.png" alt="Logo" width={100} height={100} />
           </Link>
           
           <div className="flex items-center gap-4">

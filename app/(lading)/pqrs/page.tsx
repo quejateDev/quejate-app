@@ -1,35 +1,151 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NewPQRForm } from "@/components/forms/new-pqr";
+import { Button } from "@/components/ui/button";
+import { PQRCard } from "@/components/PQRCard";
+import { getAllPQRS } from "@/services/api/pqr.service";
+import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { Prisma, PQRSStatus, PQRSType } from "@prisma/client";
+import prisma from "@/lib/prisma";
+import { PQRFilters } from "@/components/filters/pqr-filters";
 
-export default function PQRS() {
+interface PageProps {
+  searchParams: {
+    type?: string;
+    status?: string;
+    sort?: string;
+    entity?: string;
+    department?: string;
+  };
+}
+
+export default async function PQRS({ searchParams }: PageProps) {
+  const session = await getServerSession();
+
+  // Fetch entities and departments for filters
+  const entities = await prisma.entity.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  const departments = await prisma.department.findMany({
+    select: {
+      id: true,
+      name: true,
+      entityId: true,
+    },
+  });
+
+  // Build where clause based on filters
+  console.log('Search Params:', searchParams);
+  
+  const where: Prisma.PQRSWhereInput = {};
+  
+  if (searchParams.type && searchParams.type !== "all") {
+    where.type = searchParams.type as PQRSType;
+  }
+  
+  if (searchParams.status && searchParams.status !== "all") {
+    where.status = searchParams.status as PQRSStatus;
+  }
+  
+  if (searchParams.entity && searchParams.entity !== "all") {
+    where.department = {
+      entityId: searchParams.entity,
+    };
+  }
+  
+  if (searchParams.department && searchParams.department !== "all") {
+    where.departmentId = searchParams.department;
+  }
+  
+  console.log('Where clause:', where);
+
+  // Determine sort order
+  let orderBy: any = { createdAt: "desc" };
+  if (searchParams.sort === "date-asc") {
+    orderBy = { createdAt: "asc" };
+  } else if (searchParams.sort === "likes-desc") {
+    orderBy = {
+      likes: {
+        _count: "desc",
+      },
+    };
+  }
+
+  console.log('Final query:', {
+    where,
+    orderBy,
+    include: {
+      department: {
+        include: {
+          entity: true,
+        },
+      },
+      customFieldValues: true,
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
+      likes: true,
+      creator: true,
+    },
+  });
+
+  const pqrs = await prisma.pQRS.findMany({
+    where,
+    orderBy,
+    include: {
+      department: {
+        include: {
+          entity: true,
+        },
+      },
+      customFieldValues: true,
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
+      likes: true,
+      creator: true,
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background">
-      <main className="p-8">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-center">
-            Gestión de PQRS
-          </h1>
+      <main className="container mx-auto p-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">
+              PQRS Recientes
+            </h1>
+            <Link href="/pqrs/new">
+              <Button>Crear PQRS</Button>
+            </Link>
+          </div>
 
-          <Tabs defaultValue="new" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="new">Nueva PQRS</TabsTrigger>
-              <TabsTrigger value="list">Mis PQRS</TabsTrigger>
-            </TabsList>
-            <TabsContent value="new">
-              <NewPQRForm />
-            </TabsContent>
-            <TabsContent value="list">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Historial de PQRS</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {/* Aquí puedes mostrar la lista de PQRS */}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <PQRFilters 
+            entities={entities}
+            departments={departments}
+          />
+
+          <div className="space-y-6">
+            {pqrs.map((pqr) => (
+              <PQRCard 
+                key={pqr.id} 
+                pqr={pqr} 
+                // initialLiked={pqr.likes?.length > 0}
+                initialLiked={false}
+              />
+            ))}
+            {pqrs.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No hay PQRS para mostrar</p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>

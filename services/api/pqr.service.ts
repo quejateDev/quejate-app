@@ -28,6 +28,11 @@ export async function createPQRS(data: createPQRS) {
   return response.data;
 }
 
+export async function getAllPQRS() {
+  const response = await Client.get("/pqr");
+  return response.data;
+}
+
 export async function getPQRS() {
   const response = await Client.get(`/pqr`);
   return response.data;
@@ -43,7 +48,6 @@ export async function getPQRSByUser(userId: User["id"]) {
   return response.data;
 }
 
-
 export async function getPQRSByDepartment(departmentId: Department["id"]) {
   const response = await Client.get(`/pqr/department/${departmentId}`);
   return response.data;
@@ -51,5 +55,10 @@ export async function getPQRSByDepartment(departmentId: Department["id"]) {
 
 export async function updatePQRS(id: PQRS["id"], pqrs: PQRS) {
   const response = await Client.put(`/pqr/${id}`, pqrs);
+  return response.data;
+}
+
+export async function toggleLike(pqrId: string, userId: string) {
+  const response = await Client.post(`/pqr/${pqrId}/like`, { userId });
   return response.data;
 }

@@ -4,14 +4,26 @@ import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 
-export async function GET(req: NextRequest) {
-  const pqrs = await prisma.pQRS.findMany({
-    include: {
-      department: true,
-      creator: true,
-    },
-  });
-  return NextResponse.json(pqrs);
+export async function GET() {
+  try {
+    const pqrs = await prisma.pQRS.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        department: true,
+        customFieldValues: true,
+      },
+    });
+
+    return NextResponse.json(pqrs);
+  } catch (error) {
+    console.error("Error fetching PQRs:", error);
+    return NextResponse.json(
+      { error: "Error fetching PQRs" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {

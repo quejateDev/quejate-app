@@ -56,6 +56,8 @@ model User {
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
   PQRS PQRS[]
+
+  Like Like[]
 }
 
 model Department {
@@ -98,8 +100,24 @@ model PQRS {
   department       Department        @relation(fields: [departmentId], references: [id])
   departmentId     String
   attachments      Attachment[] 
-
+  likes           Like[]
   PQRCustomField PQRCustomField[]
+
+  @@index([creatorId])
+  @@index([departmentId])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  pqrId     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  @@unique([pqrId, userId])
+  @@index([pqrId])
+  @@index([userId])
 }
 
 model PQRCustomField {

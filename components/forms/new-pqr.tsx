@@ -48,7 +48,7 @@ export function NewPQRForm() {
   const [pqr, setPqr] = useState<PQRSForm>({
     type: "PETITION",
     departmentId: "",
-    creatorId: "9111e543-2225-4865-af16-b477cbc26f02",
+    creatorId: "a6e3beaa-57e1-4686-9d21-6c4bb23cd6b6",
     dueDate: new Date(),
     customFields: [],
     isAnonymous: false,
