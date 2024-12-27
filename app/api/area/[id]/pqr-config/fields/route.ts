@@ -22,6 +22,7 @@ export async function PUT(
             name: field.name,
             type: field.type,
             required: field.required,
+            placeholder: field.placeholder,
           })),
         },
       },

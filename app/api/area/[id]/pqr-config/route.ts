@@ -61,18 +61,22 @@ export async function PUT(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { areaId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     // const session = await getServerSession(authOptions);
     // if (!session) {
     //   return new NextResponse("Unauthorized", { status: 401 });
     // }
+    const { id } = await params;
 
     const pqrConfig = await prisma.pQRConfig.findUnique({
       where: {
-        departmentId: params.areaId,
+        departmentId: id,
       },
+      include: {
+        customFields: true,
+      }
     });
 
     return NextResponse.json(pqrConfig);

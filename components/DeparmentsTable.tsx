@@ -12,7 +12,7 @@ import {
     deleteDepartmentService,
     getDepartmentsService,
 } from "@/services/api/Department.service";
-import { Form, PQRS, User } from "@prisma/client";
+import { PQRS, User } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -22,7 +22,6 @@ type Department = {
   id: string;
   name: string;
   employees: User[];
-  forms: Form[];
   pqrs: PQRS[];
   createdAt: Date;
   updatedAt: Date;
@@ -78,7 +77,6 @@ export function DeparmentsTable({ departments }: AreasTableProps) {
           <TableRow>
             <TableHead>Nombre del Área</TableHead>
             <TableHead>Empleados</TableHead>
-            <TableHead>Formularios</TableHead>
             <TableHead>PQRS</TableHead>
             <TableHead>Fecha de Creación</TableHead>
             <TableHead>Última Actualización</TableHead>
@@ -90,7 +88,6 @@ export function DeparmentsTable({ departments }: AreasTableProps) {
             <TableRow key={department.id}>
               <TableCell className="font-medium">{department.name}</TableCell>
               <TableCell>{department.employees.length}</TableCell>
-              <TableCell>{department.forms.length}</TableCell>
               <TableCell>{department.pqrs.length}</TableCell>
               <TableCell>
                 {new Date(department.createdAt).toLocaleDateString()}

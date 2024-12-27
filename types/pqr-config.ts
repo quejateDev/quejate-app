@@ -20,7 +20,8 @@ export const PqrFieldsSchema = z.object({
     z.object({
       name: z.string(),
       required: z.boolean(),
-      type: z.enum(["email", "phone", "text", "file"]),
+      type: z.enum(["email", "phone", "text", "file", "number", "textarea"]),
+      placeholder: z.string().optional(),
     })
   ),
 });
@@ -32,5 +33,6 @@ export type PQRFieldsFormValues = {
 export type CustomField = {
   name: string;
   required: boolean;
-  type: "email" | "phone" | "text" | "file";
+  type: "email" | "phone" | "text" | "file" | "number" | "textarea";
+  placeholder?: string;
 };

@@ -91,7 +91,11 @@ const AreaPage = ({ params }: AreaPageProps) => {
       }} />
 
       <PqrFieldsForm areaId={id as string} initialData={{
-        customFields: area.pqrConfig?.customFields || [],
+        customFields: area.pqrConfig?.customFields?.map(field => ({
+          name: field.name,
+          required: field.required,
+          type: field.type as "text" | "email" | "file" | "phone"
+        })) || [],
       }} />
     </div>
   );

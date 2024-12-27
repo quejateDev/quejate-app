@@ -6,7 +6,6 @@ export async function GET() {
   const areas = await prisma.department.findMany({
     include: {
       employees: true,
-      forms: true,
       pqrs: true,
     },
   });

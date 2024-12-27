@@ -24,7 +24,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { PQRConfigFormValues, pqrConfigSchema, PQRFieldsFormValues, PqrFieldsSchema } from "@/types/pqr-config";
+import { PQRFieldsFormValues, PqrFieldsSchema } from "@/types/pqr-config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
@@ -105,6 +105,21 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
                             </FormItem>
                           )}
                         />
+
+                        <FormField
+                          control={form.control}
+                          name={`customFields.${index}.placeholder`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Texto de Ayuda (Opcional)</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Ej: Ingrese su número de documento" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
                         <FormField
                           control={form.control}
                           name={`customFields.${index}.type`}
@@ -124,7 +139,9 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
                                   <SelectItem value="email">Correo Electrónico</SelectItem>
                                   <SelectItem value="phone">Teléfono</SelectItem>
                                   <SelectItem value="text">Texto</SelectItem>
+                                  <SelectItem value="textarea">Texto Largo</SelectItem>
                                   <SelectItem value="file">Archivo</SelectItem>
+                                  <SelectItem value="number">Número</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />

@@ -67,17 +67,15 @@ model Department {
   // Relations
   employees User[]
   pqrs      PQRS[]
-  forms     Form[]
   pqrConfig PQRConfig?
 }
 
 model PQRS {
   id          String     @id @default(uuid())
   type        PQRSType
-  subject     String
-  description String
   status      PQRSStatus @default(PENDING)
   dueDate     DateTime
+  anonymous   Boolean    @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -86,21 +84,25 @@ model PQRS {
   creatorId     String?
   department    Department     @relation(fields: [departmentId], references: [id])
   departmentId  String
-  responses     Response[]
-  attachments   Attachment[]
-  formResponses FormResponse[]
+  attachments   Attachment[]  // Add this inside the PQRS model
+  customFieldValues PQRCustomField[]
 }
 
-model Response {
+model PQRCustomField {
   id        String   @id @default(uuid())
-  content   String
+  name      String
+  value     String
+  type      String
+  placeholder String
+  required  Boolean  @default(false)
   createdAt DateTime @default(now())
 
   // Relations
-  pqrs   PQRS   @relation(fields: [pqrsId], references: [id])
-  pqrsId String
-}
+  pqr          PQRS        @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  pqrId        String
 
+  @@index([pqrId])
+}
 model Attachment {
   id        String   @id @default(uuid())
   filename  String
@@ -110,55 +112,6 @@ model Attachment {
   // Relations
   pqrs   PQRS   @relation(fields: [pqrsId], references: [id])
   pqrsId String
-}
-
-model Form {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  department   Department     @relation(fields: [departmentId], references: [id])
-  departmentId String
-  fields       FormField[]
-  responses    FormResponse[]
-}
-
-model FormField {
-  id       String    @id @default(uuid())
-  label    String
-  type     FieldType
-  required Boolean   @default(false)
-  order    Int
-
-  // Relations
-  form      Form            @relation(fields: [formId], references: [id])
-  formId    String
-  responses FieldResponse[]
-}
-
-model FormResponse {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-
-  // Relations
-  form   Form            @relation(fields: [formId], references: [id])
-  formId String
-  pqrs   PQRS            @relation(fields: [pqrsId], references: [id])
-  pqrsId String
-  fields FieldResponse[]
-}
-
-model FieldResponse {
-  id    String @id @default(uuid())
-  value String
-
-  // Relations
-  formResponse   FormResponse @relation(fields: [formResponseId], references: [id])
-  formResponseId String
-  field          FormField    @relation(fields: [fieldId], references: [id])
-  fieldId        String
 }
 
 model PQRConfig {
@@ -183,6 +136,7 @@ model CustomField {
   id       String    @id @default(uuid())
   name     String
   type     String
+  placeholder String?
   required Boolean   @default(false)
   
   // Relations

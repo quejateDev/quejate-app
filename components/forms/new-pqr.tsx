@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -11,43 +11,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { getDepartmentsService } from "@/services/api/Department.service";
-import { createPQRS } from "@/services/api/pqr.service";
-import { Department, PQRSType, Prisma, User } from "@prisma/client";
+import { Department, PQRSType, User, CustomField } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { TextField } from "../fields/TextField";
+import { TextAreaField } from "../fields/TextAreaField";
+import { PhoneField } from "../fields/PhoneField";
+import { EmailField } from "../fields/EmailField";
+import { FileField } from "../fields/FileField";
+import { NumberField } from "../fields/NumberField";
+import { createPQRS } from "@/services/api/pqr.service";
+
+type CustomFieldValue = {
+  name: string;
+  value: string;
+  type: string;
+  placeholder: string;
+  required: boolean;
+};
 
 type PQRSForm = {
   type: PQRSType;
-  subject: string;
-  description: string;
   departmentId: Department["id"];
   creatorId: User["id"];
   dueDate: Date;
+  customFields: CustomFieldValue[];
+  isAnonymous: boolean;
 };
 
 export function NewPQRForm() {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [pqr, setPqr] = useState<PQRSForm>({
     type: "PETITION",
-    subject: "",
-    description: "",
     departmentId: "",
     creatorId: "9111e543-2225-4865-af16-b477cbc26f02",
     dueDate: new Date(),
+    customFields: [],
+    isAnonymous: false,
   });
 
   async function fetchDepartments() {
     try {
-      const departments = await getDepartmentsService();
-      setDepartments(departments);
+      const response = await getDepartmentsService();
+      setDepartments(response);
     } catch (error) {
       console.error(error);
-
       toast({
         title: "Error",
-        description: "Error al obtener los departamentos",
+        description: "Error al cargar los departamentos",
+        variant: "destructive",
+      });
+    }
+  }
+
+  async function fetchCustomFields(departmentId: string) {
+    try {
+      const response = await fetch(`/api/area/${departmentId}/pqr-config`);
+      const data = await response.json();
+      setCustomFields(data?.customFields || []);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Error al cargar los campos personalizados",
         variant: "destructive",
       });
     }
@@ -57,19 +85,66 @@ export function NewPQRForm() {
     fetchDepartments();
   }, []);
 
+  useEffect(() => {
+    if (pqr.departmentId) {
+      fetchCustomFields(pqr.departmentId);
+    }
+  }, [pqr.departmentId]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setPqr((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCustomFieldChange = (name: string, value: string) => {
+    setPqr((prev) => {
+      const updatedFields = prev.customFields.map((field) =>
+        field.name === name ? { ...field, value } : field
+      );
+      
+      if (!updatedFields.some((field) => field.name === name)) {
+        const fieldConfig = customFields.find((cf) => cf.name === name);
+        if (fieldConfig) {
+          updatedFields.push({
+            name,
+            value,
+            type: fieldConfig.type,
+            placeholder: fieldConfig.placeholder || "",
+            required: fieldConfig.required || false,
+          });
+        }
+      }
+      
+      return { ...prev, customFields: updatedFields };
+    });
+  };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      const response = await createPQRS(pqr);
-      toast({
-        title: "PQRS enviado",
-        description: "PQRS enviado correctamente",
+      const { customFields: customFieldValues, ...pqrData } = pqr;
+
+        console.log("pqrData", pqr);
+
+      // // First create the PQRS
+      const response = await createPQRS({
+        ...pqrData,
+        customFields: customFieldValues,
       });
+
+      // if (response) {
+        toast({
+          title: "PQR creado",
+          description: "El PQR ha sido creado exitosamente",
+        });
+      // }
     } catch (error) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Error al enviar el PQRS",
+        description: "Error al crear el PQR",
         variant: "destructive",
       });
     }
@@ -105,9 +180,10 @@ export function NewPQRForm() {
           <div className="space-y-2">
             <Label htmlFor="department">Departamento</Label>
             <Select
-              onValueChange={(value) =>
-                setPqr((prev) => ({ ...prev, departmentId: value }))
-              }
+              onValueChange={(value) => {
+                setPqr((prev) => ({ ...prev, departmentId: value }));
+                fetchCustomFields(value);
+              }}
               value={pqr.departmentId}
             >
               <SelectTrigger>
@@ -123,53 +199,46 @@ export function NewPQRForm() {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="subject">Asunto</Label>
-            <Input
-              id="subject"
-              placeholder="Ingresa el asunto"
-              value={pqr.subject}
-              onChange={(e) =>
-                setPqr((prev) => ({ ...prev, subject: e.target.value }))
+         {customFields.map((field) => {
+           const commonProps = {
+             id: field.name,
+             label: field.name,
+             placeholder: field.placeholder || "",
+             value: pqr.customFields.find((cf) => cf.name === field.name)?.value || "",
+             onChange: (value: string) => handleCustomFieldChange(field.name, value),
+             required: field.required
+           };
+         
+           switch (field.type) {
+             case "text":
+               return <TextField key={field.name} {...commonProps} />;
+             case "textarea":
+               return <TextAreaField key={field.name} {...commonProps} />;
+             case "phone":
+               return <PhoneField key={field.name} {...commonProps} />;
+             case "email":
+               return <EmailField key={field.name} {...commonProps} />;
+             case "file":
+               return <FileField key={field.name} {...commonProps} accept="image/*,application/pdf" maxSize={5} />;
+             case "number":
+               return <NumberField key={field.name} {...commonProps} />;
+             default:
+               return <TextField key={field.name} {...commonProps} />;
+           }
+         })}
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="isAnonymous"
+              checked={pqr.isAnonymous}
+              onCheckedChange={(checked) => 
+                setPqr((prev) => ({ ...prev, isAnonymous: checked as boolean }))
               }
             />
+            <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
-            <Textarea
-              id="description"
-              placeholder="Ingresa tu descripción"
-              rows={4}
-              value={pqr?.description || ""}
-              onChange={(e) =>
-                setPqr((prev) => ({ ...prev, description: e.target.value }))
-              }
-            />
-          </div>
-
-          {/* <div className="space-y-2">
-            <Label htmlFor="files">Archivos Adjuntos</Label>
-            <Input
-              id="files"
-              type="file"
-              className="cursor-pointer"
-              multiple
-              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-            />
-            <p className="text-sm text-gray-500">
-              Formatos permitidos: PDF, DOC, DOCX, PNG, JPG (Máx. 5MB
-              por archivo)
-            </p>
-          </div> */}
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={
-              !pqr.type || !pqr.subject || !pqr.description || !pqr.departmentId
-            }
-          >
+          <Button type="submit" className="w-full">
             Enviar PQRS
           </Button>
         </form>

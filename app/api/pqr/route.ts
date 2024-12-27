@@ -37,8 +37,6 @@ export async function POST(req: NextRequest) {
     // Validate required fields
     if (
       !body.type ||
-      !body.subject ||
-      !body.description ||
       !body.departmentId ||
       !body.creatorId
     ) {
@@ -51,9 +49,13 @@ export async function POST(req: NextRequest) {
     const response = await prisma.pQRS.create({
       data: {
         type: body.type,
-        subject: body.subject,
-        description: body.description,
         dueDate: new Date(body.dueDate),
+        anonymous: body.isAnonymous,
+        customFieldValues: {
+          createMany: {
+            data: body.customFields,
+          },
+        },
         department: {
           connect: {
             id: body.departmentId,
@@ -67,6 +69,7 @@ export async function POST(req: NextRequest) {
       },
       include: {
         creator: true,
+        customFieldValues: true,
       },
     });
 

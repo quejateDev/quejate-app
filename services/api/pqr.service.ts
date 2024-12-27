@@ -2,8 +2,21 @@ import { Department, PQRS, Prisma, User } from "@prisma/client";
 
 import { Client } from "./Client";
 
-export async function createPQRS(pqrs: Prisma.PQRSCreateArgs["data"]) {
-  const response = await Client.post("/pqr", pqrs);
+type createPQRS = {
+  type: PQRS["type"];
+  departmentId: Department["id"];
+  creatorId: User["id"];
+  customFields: {
+    name: string;
+    value: string;
+    type: string;
+    required: boolean;
+  }[];
+  isAnonymous: boolean;
+};
+
+export async function createPQRS(data: createPQRS) {
+  const response = await Client.post("/pqr", data);
   return response.data;
 }
 
