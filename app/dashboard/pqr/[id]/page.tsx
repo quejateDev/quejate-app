@@ -26,9 +26,8 @@ export default async function PQRDetailPage({
 }: {
   params: { id: string };
 }) {
-  const pqr = await getPQRById(params.id);
-
-  console.log(pqr);
+  const { id } = await params;
+  const pqr = await getPQRById(id);
 
   if (!pqr) {
     notFound();
@@ -38,53 +37,53 @@ export default async function PQRDetailPage({
     <div className="container mx-auto p-6">
       <Card>
         <CardHeader>
-          <CardTitle>PQR Details</CardTitle>
+          <CardTitle>Detalles de la PQR</CardTitle>
           <CardDescription>
-            View detailed information about this PQR request
+            Ver información detallada sobre esta solicitud PQR
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Basic Information */}
+            {/* Información Básica */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Basic Information</h3>
+              <h3 className="text-lg font-semibold">Información Básica</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">ID</span>
                   <span>{pqr.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Type</span>
+                  <span className="text-muted-foreground">Tipo</span>
                   <span>{pqr.type}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status</span>
+                  <span className="text-muted-foreground">Estado</span>
                   <Badge variant={pqr.status === "OPEN" ? "default" : "secondary"}>
-                    {pqr.status}
+                    {pqr.status === "OPEN" ? "ABIERTO" : "CERRADO"}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Created</span>
+                  <span className="text-muted-foreground">Creado</span>
                   <span>{new Date(pqr.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
 
-            {/* Customer Information */}
+            {/* Información del Cliente */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Customer Information</h3>
+              <h3 className="text-lg font-semibold">Información del Cliente</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Name</span>
+                  <span className="text-muted-foreground">Nombre</span>
                   <span>{pqr.creator?.firstName} {pqr.creator?.lastName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Email</span>
+                  <span className="text-muted-foreground">Correo</span>
                   <span>{pqr.creator?.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Phone</span>
+                  <span className="text-muted-foreground">Teléfono</span>
                   <span>{pqr.creator?.phone}</span>
                 </div>
               </div>
@@ -93,20 +92,20 @@ export default async function PQRDetailPage({
 
           <Separator className="my-6" />
 
-          {/* Description */}
+          {/* Descripción */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Description</h3>
+            <h3 className="text-lg font-semibold">Descripción</h3>
             <p className="text-muted-foreground whitespace-pre-wrap">
               {pqr.description}
             </p>
           </div>
 
-          {/* Response (if available) */}
+          {/* Respuesta (si está disponible) */}
           {pqr.response && (
             <>
               <Separator className="my-6" />
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Response</h3>
+                <h3 className="text-lg font-semibold">Respuesta</h3>
                 <Card>
                   <CardContent className="pt-6">
                     <p className="text-muted-foreground whitespace-pre-wrap">

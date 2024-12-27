@@ -54,7 +54,7 @@ export default function Signup() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <main className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl md:text-3xl text-center font-bold">
@@ -90,8 +90,8 @@ export default function Signup() {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="Apellido"
-                    placeholder="Doe"
+                    id="lastName"
+                    placeholder="Apellidos"
                     className="pl-10 h-12 text-sm md:text-base"
                     value={formData.lastName}
                     onChange={(e) =>

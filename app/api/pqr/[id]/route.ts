@@ -5,9 +5,10 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const { id} = await params;
   const pqr = await prisma.pQRS.findUnique({
     where: {
-      id: params.id,
+      id,
     },
     include: {
       department: true,

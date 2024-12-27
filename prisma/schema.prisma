@@ -68,6 +68,7 @@ model Department {
   employees User[]
   pqrs      PQRS[]
   forms     Form[]
+  pqrConfig PQRConfig?
 }
 
 model PQRS {
@@ -158,4 +159,19 @@ model FieldResponse {
   formResponseId String
   field          FormField    @relation(fields: [fieldId], references: [id])
   fieldId        String
+}
+
+model PQRConfig {
+  id             String   @id @default(uuid())
+  allowAnonymous Boolean  @default(false)
+  requireEvidence Boolean @default(false)
+  maxResponseTime Int     @default(15)
+  notifyEmail    Boolean  @default(true)
+  autoAssign     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  departmentId String     @unique
 }

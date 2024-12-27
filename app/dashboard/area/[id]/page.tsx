@@ -13,6 +13,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useParams } from "next/navigation";
+import { PQRConfigForm } from "@/components/forms/pqr-config-form";
+import { DepartmentWithConfig } from "@/dto/deparment/department-with-config.dto";
 
 interface AreaPageProps {
   params: {
@@ -21,13 +23,14 @@ interface AreaPageProps {
 }
 
 const AreaPage = ({ params }: AreaPageProps) => {
-  const [area, setArea] = useState<Department | null>(null);
+  const [area, setArea] = useState<DepartmentWithConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   useEffect(() => {
     const fetchArea = async () => {
       try {
         const response = await Client.get(`/area/${id}`);
+        console.log(response.data);
         setArea(response.data);
       } catch (error) {
         toast({
@@ -58,7 +61,7 @@ const AreaPage = ({ params }: AreaPageProps) => {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="flex flex-col gap-4 mx-auto py-10">
       <Card>
         <CardHeader>
           <CardTitle>Editar Área</CardTitle>
@@ -76,6 +79,15 @@ const AreaPage = ({ params }: AreaPageProps) => {
           />
         </CardContent>
       </Card>
+
+      <PQRConfigForm areaId={id as string} initialData={{
+        allowAnonymous: area.pqrConfig?.allowAnonymous || false,
+        requireEvidence: area.pqrConfig?.requireEvidence || false,
+        maxResponseTime: area.pqrConfig?.maxResponseTime ? area.pqrConfig.maxResponseTime.toString() : "15",
+        notifyEmail: area.pqrConfig?.notifyEmail || true,
+        autoAssign: area.pqrConfig?.autoAssign || false,
+        // customFields: area.pqrConfig?.customFields || [],
+      }} />
     </div>
   );
 };

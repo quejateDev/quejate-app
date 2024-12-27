@@ -7,10 +7,15 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+
+    const { id } = await params;
     const area = await prisma.department.findUnique({
       where: {
-        id: params.id,
+        id
       },
+      include: {
+        pqrConfig: true
+      }
     });
 
     if (!area) {
