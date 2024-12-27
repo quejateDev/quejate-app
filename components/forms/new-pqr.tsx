@@ -71,6 +71,18 @@ export function NewPQRForm() {
       const response = await fetch(`/api/area/${departmentId}/pqr-config`);
       const data = await response.json();
       setCustomFields(data?.customFields || []);
+
+      // Initialize all custom fields with empty values
+      setPqr((prev) => ({
+        ...prev,
+        customFields: (data?.customFields || []).map((field: CustomField) => ({
+          name: field.name,
+          value: "",
+          type: field.type,
+          placeholder: field.placeholder || "",
+          required: field.required || false,
+        })),
+      }));
     } catch (error) {
       console.error(error);
       toast({
@@ -92,7 +104,9 @@ export function NewPQRForm() {
   }, [pqr.departmentId]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setPqr((prev) => ({ ...prev, [name]: value }));
@@ -103,7 +117,7 @@ export function NewPQRForm() {
       const updatedFields = prev.customFields.map((field) =>
         field.name === name ? { ...field, value } : field
       );
-      
+
       if (!updatedFields.some((field) => field.name === name)) {
         const fieldConfig = customFields.find((cf) => cf.name === name);
         if (fieldConfig) {
@@ -116,7 +130,7 @@ export function NewPQRForm() {
           });
         }
       }
-      
+
       return { ...prev, customFields: updatedFields };
     });
   };
@@ -126,7 +140,7 @@ export function NewPQRForm() {
     try {
       const { customFields: customFieldValues, ...pqrData } = pqr;
 
-        console.log("pqrData", pqr);
+      console.log("pqrData", pqr);
 
       // // First create the PQRS
       const response = await createPQRS({
@@ -134,12 +148,12 @@ export function NewPQRForm() {
         customFields: customFieldValues,
       });
 
-      // if (response) {
+      if (response) {
         toast({
           title: "PQR creado",
           description: "El PQR ha sido creado exitosamente",
         });
-      // }
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -199,39 +213,49 @@ export function NewPQRForm() {
             </Select>
           </div>
 
-         {customFields.map((field) => {
-           const commonProps = {
-             id: field.name,
-             label: field.name,
-             placeholder: field.placeholder || "",
-             value: pqr.customFields.find((cf) => cf.name === field.name)?.value || "",
-             onChange: (value: string) => handleCustomFieldChange(field.name, value),
-             required: field.required
-           };
-         
-           switch (field.type) {
-             case "text":
-               return <TextField key={field.name} {...commonProps} />;
-             case "textarea":
-               return <TextAreaField key={field.name} {...commonProps} />;
-             case "phone":
-               return <PhoneField key={field.name} {...commonProps} />;
-             case "email":
-               return <EmailField key={field.name} {...commonProps} />;
-             case "file":
-               return <FileField key={field.name} {...commonProps} accept="image/*,application/pdf" maxSize={5} />;
-             case "number":
-               return <NumberField key={field.name} {...commonProps} />;
-             default:
-               return <TextField key={field.name} {...commonProps} />;
-           }
-         })}
+          {customFields.map((field) => {
+            const commonProps = {
+              id: field.name,
+              label: field.name,
+              placeholder: field.placeholder || "",
+              value:
+                pqr.customFields.find((cf) => cf.name === field.name)?.value ||
+                "",
+              onChange: (value: string) =>
+                handleCustomFieldChange(field.name, value),
+              required: field.required,
+            };
+
+            switch (field.type) {
+              case "text":
+                return <TextField key={field.name} {...commonProps} />;
+              case "textarea":
+                return <TextAreaField key={field.name} {...commonProps} />;
+              case "phone":
+                return <PhoneField key={field.name} {...commonProps} />;
+              case "email":
+                return <EmailField key={field.name} {...commonProps} />;
+              case "file":
+                return (
+                  <FileField
+                    key={field.name}
+                    {...commonProps}
+                    accept="image/*,application/pdf"
+                    maxSize={5}
+                  />
+                );
+              case "number":
+                return <NumberField key={field.name} {...commonProps} />;
+              default:
+                return <TextField key={field.name} {...commonProps} />;
+            }
+          })}
 
           <div className="flex items-center space-x-2">
             <Checkbox
               id="isAnonymous"
               checked={pqr.isAnonymous}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setPqr((prev) => ({ ...prev, isAnonymous: checked as boolean }))
               }
             />

@@ -13,6 +13,7 @@ export async function GET(
     include: {
       department: true,
       creator: true,
+      customFieldValues: true
     },
   });
   return NextResponse.json(pqr);

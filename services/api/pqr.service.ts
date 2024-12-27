@@ -15,6 +15,14 @@ type createPQRS = {
   isAnonymous: boolean;
 };
 
+type getGetPQRDTO = Prisma.PQRSGetPayload<{
+  include: {
+    creator: true;
+    department: true;
+    customFieldValues: true;
+  };
+}>;
+
 export async function createPQRS(data: createPQRS) {
   const response = await Client.post("/pqr", data);
   return response.data;
@@ -25,7 +33,7 @@ export async function getPQRS() {
   return response.data;
 }
 
-export async function getPQRSById(id: PQRS["id"]) {
+export async function getPQRSById(id: PQRS["id"]): Promise<getGetPQRDTO> {
   const response = await Client.get(`/pqr/${id}`);
   return response.data;
 }
