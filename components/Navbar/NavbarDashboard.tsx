@@ -33,7 +33,7 @@ export default function NavbarDashboard() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href="/dashboard/quejas" legacyBehavior passHref>
+                <Link href="/dashboard/pqrs" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Mis Formularios
                   </NavigationMenuLink>

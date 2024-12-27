@@ -58,10 +58,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const pqrConfig = await prisma.pQRConfig.findFirst({
+      where: {
+        departmentId: body.departmentId,
+      },
+      select: {
+        maxResponseTime: true,
+      },
+    });
+
+    if (!pqrConfig) {
+      return NextResponse.json(
+        { error: "No PQR configuration found for this department" },
+        { status: 400 }
+      );
+    }
+
+    // Calculate due date based on maxTimeResponse (in days)
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + pqrConfig.maxResponseTime);
+
     const response = await prisma.pQRS.create({
       data: {
         type: body.type,
-        dueDate: new Date(body.dueDate),
+        dueDate,
         anonymous: body.isAnonymous,
         customFieldValues: {
           createMany: {

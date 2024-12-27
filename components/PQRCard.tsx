@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PQRS } from "@prisma/client";
-import { Heart } from "lucide-react";
+import { Heart, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toggleLike } from "@/services/api/pqr.service";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 type PQRCardProps = {
   pqr: PQRS & {
@@ -47,6 +48,14 @@ const typeMap = {
   SUGGESTION: "Sugerencia",
 } as const;
 
+const calculateRemainingDays = (createdAt: Date, dueDate: Date) => {
+  const now = new Date();
+  const due = new Date(dueDate);
+  const diffTime = due.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};
+
 export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(pqr._count?.likes || 0);
@@ -61,6 +70,10 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
     hour: "2-digit",
     minute: "2-digit"
   });
+
+  const remainingDays = calculateRemainingDays(new Date(pqr.createdAt), new Date(pqr.dueDate));
+  const isExpired = remainingDays <= 0;
+  const isUrgent = remainingDays <= 3 && remainingDays > 0;
 
   const creatorName = !pqr.anonymous 
     ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
@@ -107,6 +120,25 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
             <p className="text-sm text-muted-foreground mt-1">
               Para: {pqr.department.entity.name} - {pqr.department.name}
             </p>
+            <div className="flex items-center gap-2 mt-2">
+              <Clock className={cn(
+                "h-4 w-4",
+                isExpired && "text-red-500",
+                isUrgent && "text-yellow-500",
+                !isExpired && !isUrgent && "text-green-500"
+              )} />
+              <span className={cn(
+                "text-sm font-medium",
+                isExpired && "text-red-500",
+                isUrgent && "text-yellow-500",
+                !isExpired && !isUrgent && "text-green-500"
+              )}>
+                {isExpired 
+                  ? "Vencido"
+                  : `${remainingDays} ${remainingDays === 1 ? 'día' : 'días'} restantes`
+                }
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <Button

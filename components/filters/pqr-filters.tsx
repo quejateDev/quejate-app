@@ -1,7 +1,7 @@
 "use client";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PQRSStatus, PQRSType } from "@prisma/client";
+import { PQRSType } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const sortOptions = [
@@ -16,13 +16,6 @@ const typeOptions = [
   { label: "Reclamo", value: "CLAIM" },
 ] as const;
 
-const statusOptions = [
-  { label: "Pendiente", value: "PENDING" },
-  { label: "En Proceso", value: "IN_PROGRESS" },
-  { label: "Resuelto", value: "RESOLVED" },
-  { label: "Cerrado", value: "CLOSED" },
-] as const;
-
 interface PQRFiltersProps {
   entities: Array<{ id: string; name: string }>;
   departments: Array<{ id: string; name: string; entityId: string }>;
@@ -33,7 +26,6 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
   const searchParams = useSearchParams();
 
   const currentType = searchParams.get("type");
-  const currentStatus = searchParams.get("status");
   const currentSort = searchParams.get("sort") || "date-desc";
   const currentEntity = searchParams.get("entity");
   const currentDepartment = searchParams.get("department");
@@ -95,23 +87,6 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
       </Select>
 
       <Select
-        value={currentStatus || "all"}
-        onValueChange={(value) => updateQueryParams("status", value === "all" ? null : value)}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Estado" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos los estados</SelectItem>
-          {statusOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
         value={currentEntity || "all"}
         onValueChange={(value) => updateQueryParams("entity", value === "all" ? null : value)}
       >
@@ -128,23 +103,24 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
         </SelectContent>
       </Select>
 
-      <Select
-        value={currentDepartment || "all"}
-        onValueChange={(value) => updateQueryParams("department", value === "all" ? null : value)}
-        disabled={!currentEntity}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Departamento" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos los departamentos</SelectItem>
-          {filteredDepartments.map((department) => (
-            <SelectItem key={department.id} value={department.id}>
-              {department.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {currentEntity && (
+        <Select
+          value={currentDepartment || "all"}
+          onValueChange={(value) => updateQueryParams("department", value === "all" ? null : value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Departamento" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los departamentos</SelectItem>
+            {filteredDepartments.map((department) => (
+              <SelectItem key={department.id} value={department.id}>
+                {department.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }

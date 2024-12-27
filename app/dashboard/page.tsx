@@ -3,14 +3,13 @@ import { PQRCard } from "@/components/PQRCard";
 import { getAllPQRS } from "@/services/api/pqr.service";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { Prisma, PQRSStatus, PQRSType } from "@prisma/client";
+import { Prisma, PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 
 interface PageProps {
   searchParams: {
     type?: string;
-    status?: string;
     sort?: string;
     entity?: string;
     department?: string;
@@ -42,10 +41,6 @@ export default async function PQRS({ searchParams }: PageProps) {
     where.type = searchParams.type as PQRSType;
   }
   
-  if (searchParams.status && searchParams.status !== "all") {
-    where.status = searchParams.status as PQRSStatus;
-  }
-  
   if (searchParams.entity && searchParams.entity !== "all") {
     where.department = {
       entityId: searchParams.entity,
@@ -55,8 +50,6 @@ export default async function PQRS({ searchParams }: PageProps) {
   if (searchParams.department && searchParams.department !== "all") {
     where.departmentId = searchParams.department;
   }
-  
-  console.log('Where clause:', where);
 
   // Determine sort order
   let orderBy: any = { createdAt: "desc" };
@@ -69,26 +62,6 @@ export default async function PQRS({ searchParams }: PageProps) {
       },
     };
   }
-
-  console.log('Final query:', {
-    where,
-    orderBy,
-    include: {
-      department: {
-        include: {
-          entity: true,
-        },
-      },
-      customFieldValues: true,
-      _count: {
-        select: {
-          likes: true,
-        },
-      },
-      likes: true,
-      creator: true,
-    },
-  });
 
   const pqrs = await prisma.pQRS.findMany({
     where,
