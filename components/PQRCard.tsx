@@ -7,7 +7,7 @@ import { PQRS } from "@prisma/client";
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toggleLike } from "@/services/api/pqr.service";
-import { useAuthStore } from "@/store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
 
 type PQRCardProps = {

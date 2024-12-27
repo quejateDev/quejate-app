@@ -133,8 +133,7 @@ export default async function PQRS({ searchParams }: PageProps) {
               <PQRCard 
                 key={pqr.id} 
                 pqr={pqr} 
-                // initialLiked={pqr.likes?.length > 0}
-                initialLiked={false}
+                initialLiked={pqr.likes?.length > 0}
               />
             ))}
             {pqrs.length === 0 && (

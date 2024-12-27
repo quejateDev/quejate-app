@@ -7,7 +7,7 @@ export async function POST(
 ) {
   try {
     const { userId } = await request.json();
-    const { id: pqrId } = params;
+    const { id: pqrId } = await params;
 
     // Check if like already exists
     const existingLike = await prisma.like.findUnique({

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, LogIn, User, Phone, UserPlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/store/useAuthStore";
+import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 
 export default function Login() {
@@ -15,9 +15,19 @@ export default function Login() {
     email: "",
     password: "",
   });
-  const login = useAuthStore((state) => state.login);
+  const { login, user } = useAuthStore();
   const router = useRouter();
 
+
+  useEffect(() => {
+    if (user) {
+      if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  }, [user]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -30,11 +40,13 @@ export default function Login() {
 
       if (response.ok) {
         const userData = await response.json();
+
         // Store user data in Zustand
         login({
-          id: userData.id,
-          email: userData.email,
-          name: userData.name,
+          id: userData.user.id,
+          email: userData.user.email,
+          name: userData.user.name,
+          role: userData.user.role,
         });
 
         // Optional: Show success message
@@ -43,9 +55,6 @@ export default function Login() {
           description: "Bienvenido de nuevo!",
           variant: "default",
         });
-
-        // Redirect to dashboard or home
-        router.push("/admin");
       } else {
         // Handle error
         toast({

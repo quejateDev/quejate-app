@@ -1,9 +1,11 @@
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import Footer from "@/components/footer";
-import { Navbar } from "@/components/Navbar/NavbarLanding";
+import NavbarDashboard from "@/components/Navbar/NavbarDashboard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +29,13 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <Navbar />
-      {children}
+        <SidebarProvider>
+          <main className="flex-1 flex-col">
+            <NavbarDashboard />
+            <div className="flex-1 flex-col px-6 py-4">{children}</div>
+          </main>
+        </SidebarProvider>
+
     </>
   );
 }

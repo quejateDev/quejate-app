@@ -1,10 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import {
-  NavigationMenu, NavigationMenuItem,
-  NavigationMenuList
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { LogOut, User } from "lucide-react";
+import AvatarMenu from "../AvatarMenu";
 
 export default function NavbarDashboard() {
   return (
@@ -14,10 +26,21 @@ export default function NavbarDashboard() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+                <Link href="/dashboard" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Inicio
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/dashboard/quejas" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Mis Formularios
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+              <AvatarMenu/>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
