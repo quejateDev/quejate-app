@@ -13,13 +13,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Button } from "@react-email/components";
 import {
   Users,
   Building2,
   Settings,
   LogOut,
   MessageCircle,
+  Building
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -29,6 +29,11 @@ const InternalManagement = [
     title: "Empleados",
     url: "/dashboard/employee",
     icon: Users,
+  },
+  {
+    title: "Entidades",
+    url: "/dashboard/entity",
+    icon: Building,
   },
   {
     title: "Areas",

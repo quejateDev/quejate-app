@@ -1,4 +1,3 @@
-// app/dashboard/area/create/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -12,64 +11,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { createDepartmentService } from "@/services/api/Department.service";
-import { getEntities } from "@/services/api/entity.service";
+import { createEntity } from "@/services/api/entity.service";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Entity } from "@prisma/client";
+import { useState } from "react";
 
-export default function NewAreaPage() {
+export default function CreateEntityPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [entities, setEntities] = useState<Entity[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    entityId: "",
   });
-
-  useEffect(() => {
-    async function fetchEntities() {
-      try {
-        const data = await getEntities();
-        setEntities(data);
-      } catch (error) {
-        console.error("Error fetching entities:", error);
-        toast({
-          title: "Error",
-          description: "Error al cargar las entidades",
-          variant: "destructive",
-        });
-      }
-    }
-
-    fetchEntities();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await createDepartmentService(formData);
+      await createEntity(formData);
       toast({
-        title: "Área creada",
-        description: "El área ha sido creada exitosamente",
+        title: "Entidad creada",
+        description: "La entidad ha sido creada exitosamente",
       });
-      router.push("/dashboard/area");
+      router.push("/dashboard/entity");
     } catch (error) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Error al crear el área",
+        description: "Error al crear la entidad",
         variant: "destructive",
       });
     } finally {
@@ -81,9 +51,9 @@ export default function NewAreaPage() {
     <div className="container mx-auto py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Crear Nueva Área</CardTitle>
+          <CardTitle>Crear Nueva Entidad</CardTitle>
           <CardDescription>
-            Ingrese los datos del área
+            Ingrese los datos de la nueva entidad
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -112,32 +82,11 @@ export default function NewAreaPage() {
                 }
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="entity">Entidad</Label>
-              <Select
-                value={formData.entityId}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, entityId: value }))
-                }
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione una entidad" />
-                </SelectTrigger>
-                <SelectContent>
-                  {entities.map((entity) => (
-                    <SelectItem key={entity.id} value={entity.id}>
-                      {entity.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex justify-end space-x-4">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/dashboard/area")}
+                onClick={() => router.push("/dashboard/entity")}
               >
                 Cancelar
               </Button>
@@ -146,7 +95,7 @@ export default function NewAreaPage() {
                 className="bg-green-500 hover:bg-green-600"
                 disabled={loading}
               >
-                {loading ? "Creando..." : "Crear Área"}
+                {loading ? "Creando..." : "Crear Entidad"}
               </Button>
             </div>
           </form>

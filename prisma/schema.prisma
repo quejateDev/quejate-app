@@ -55,37 +55,51 @@ model User {
   // Relations
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
-  pqrsCreated  PQRS[]      @relation("CreatedBy")
+  PQRS PQRS[]
 }
 
 model Department {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  pqrs        PQRS[]
+  employees   User[]
+  pqrConfig   PQRConfig?
+  entity      Entity   @relation(fields: [entityId], references: [id])
+  entityId    String
 
-  // Relations
-  employees User[]
-  pqrs      PQRS[]
-  pqrConfig PQRConfig?
+  @@index([entityId])
+}
+
+model Entity {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Department Department[]
 }
 
 model PQRS {
-  id          String     @id @default(uuid())
-  type        PQRSType
-  status      PQRSStatus @default(PENDING)
-  dueDate     DateTime
-  anonymous   Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id               String            @id @default(uuid())
+  type             PQRSType
+  status           PQRSStatus        @default(PENDING)
+  dueDate          DateTime
+  anonymous        Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  creator          User              @relation(fields: [creatorId], references: [id])
+  creatorId        String
+  customFieldValues CustomFieldValue[]
+  customFields     CustomField[]
+  department       Department        @relation(fields: [departmentId], references: [id])
+  departmentId     String
+  attachments      Attachment[] 
 
-  // Relations
-  creator       User?           @relation("CreatedBy", fields: [creatorId], references: [id])
-  creatorId     String?
-  department    Department     @relation(fields: [departmentId], references: [id])
-  departmentId  String
-  attachments   Attachment[]  // Add this inside the PQRS model
-  customFieldValues PQRCustomField[]
+  PQRCustomField PQRCustomField[]
 }
 
 model PQRCustomField {
@@ -103,6 +117,7 @@ model PQRCustomField {
 
   @@index([pqrId])
 }
+
 model Attachment {
   id        String   @id @default(uuid())
   filename  String
@@ -144,4 +159,21 @@ model CustomField {
   configId String
   
   @@index([configId])
+  PQRS PQRS[]
+}
+
+model CustomFieldValue {
+  id        String   @id @default(uuid())
+  name      String
+  value     String
+  type      String
+  placeholder String
+  required  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  pqr          PQRS        @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  pqrId        String
+
+  @@index([pqrId])
 }
