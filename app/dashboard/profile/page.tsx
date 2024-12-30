@@ -6,27 +6,11 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserCircle } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
-
-interface PQRS {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  status: string;
-  department: {
-    name: string;
-    entity: {
-      name: string;
-    };
-  };
-  _count: {
-    likes: number;
-  };
-}
+import { getGetPQRDTO } from '@/dto/pqr.dto';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const [userPQRs, setUserPQRs] = useState<PQRS[]>([]);
+  const [userPQRs, setUserPQRs] = useState<getGetPQRDTO[]>([]);
 
   useEffect(() => {
     const fetchUserPQRs = async () => {

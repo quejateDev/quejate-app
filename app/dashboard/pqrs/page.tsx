@@ -5,36 +5,10 @@ import useAuthStore from '@/store/useAuthStore';
 import {PQRCard} from '@/components/PQRCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PQRSStatus, PQRSType } from '@prisma/client';
-
-interface PQR {
-  id: string;
-  type: PQRSType;
-  status: PQRSStatus;
-  createdAt: string;
-  dueDate: string;
-  anonymous: boolean;
-  department: {
-    name: string;
-    entity: {
-      name: string;
-    };
-  };
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  customFieldValues: {
-    name: string;
-    value: string;
-  }[];
-  likes: Array<{ userId: string }>;
-  _count: {
-    likes: number;
-  };
-}
+import { getGetPQRDTO } from '@/dto/pqr.dto';
 
 export default function UserPQRs() {
-  const [pqrs, setPqrs] = useState<PQR[]>([]);
+  const [pqrs, setPqrs] = useState<getGetPQRDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
 

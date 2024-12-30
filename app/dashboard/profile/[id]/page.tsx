@@ -12,49 +12,6 @@ import { useParams } from "next/navigation";
 import UseUser from "@/hooks/useUser";
 import usePQR from "@/hooks/usePQR";
 
-interface UserProfile {
-  id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isFollowing: boolean;
-  followers: Array<{
-    id: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-  }>;
-  following: Array<{
-    id: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-  }>;
-  _count: {
-    followers: number;
-    following: number;
-    PQRS: number;
-  };
-}
-
-interface PQRS {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  status: string;
-  department: {
-    name: string;
-    entity: {
-      name: string;
-    };
-  };
-  _count: {
-    likes: number;
-  };
-}
-
 export default function ProfilePage() {
   const { user: currentUser } = useAuthStore();
   const params = useParams();
