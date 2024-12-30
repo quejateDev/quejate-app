@@ -56,8 +56,8 @@ export default function ProfilePage() {
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRs Recientes</h3>
           <div className="space-y-4">
-            {userPQRs.length > 0 ? (
-              userPQRs.map((pqr) => (
+            {userPQRs?.length > 0 ? (
+              userPQRs?.map((pqr) => (
                 <PQRCard key={pqr.id} pqr={pqr} />
               ))
             ) : (
