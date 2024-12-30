@@ -44,8 +44,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Received body:", body);
-
     // Validate required fields
     if (
       !body.type ||
@@ -105,8 +103,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log("Response:", response);
-
     const email = await sendPQRCreationEmail(
       response.creator?.email || "luisevilla588@gmail.com",
       response.creator?.firstName || "John Doe",
@@ -115,8 +111,6 @@ export async function POST(req: NextRequest) {
       new Date(response.createdAt).toLocaleString('es-CO', { timeZone: 'America/Bogota' }),
       `https://tuqueja.com.co/pqr/${response.id}`
     );
-
-    console.log("Email:", email);
 
     return NextResponse.json(response);
   } catch (error: any) {

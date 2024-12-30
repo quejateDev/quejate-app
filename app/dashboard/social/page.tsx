@@ -1,0 +1,175 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { UserCircle, Users2 } from 'lucide-react';
+import Link from 'next/link';
+import { Input } from '@/components/ui/input';
+import { useDebounce } from '@/hooks/use-debounce';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+
+interface User {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  _count: {
+    followers: number;
+    following: number;
+    PQRS: number;
+  };
+}
+
+export default function SocialPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [popularUsers, setPopularUsers] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/users');
+        if (response.ok) {
+          const data = await response.json();
+          // Sort users by follower count for popular users
+          const sortedByFollowers = [...data].sort(
+            (a, b) => (b._count?.followers || 0) - (a._count?.followers || 0)
+          );
+          setPopularUsers(sortedByFollowers.slice(0, 5));
+          setUsers(data);
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Filter users based on search query
+  const filteredUsers = users.filter(user => {
+    const searchLower = debouncedSearch.toLowerCase();
+    return (
+      user.username.toLowerCase().includes(searchLower) ||
+      user.firstName.toLowerCase().includes(searchLower) ||
+      user.lastName.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const UserCard = ({ user }: { user: User }) => (
+    <Link href={`/dashboard/profile/${user.username}`}>
+      <Card className="hover:bg-accent transition-colors">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-4">
+            <Avatar className="h-12 w-12">
+              <AvatarFallback>
+                <UserCircle className="h-6 w-6" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col flex-1">
+              <h3 className="text-lg font-semibold">
+                {user.firstName} {user.lastName}
+              </h3>
+              <p className="text-sm text-muted-foreground">@{user.username}</p>
+              <div className="flex gap-4 mt-2 text-sm">
+                <span className="text-muted-foreground">
+                  {user._count.followers} seguidores
+                </span>
+                <span className="text-muted-foreground">
+                  {user._count.PQRS} PQRs
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="grid gap-6 md:grid-cols-12">
+        {/* Main Content */}
+        <div className="md:col-span-8 space-y-6">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl font-bold">Descubre Usuarios</h1>
+            <p className="text-muted-foreground">
+              Encuentra y conecta con otros usuarios de la plataforma
+            </p>
+          </div>
+
+          <Input
+            type="search"
+            placeholder="Buscar usuarios..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+
+          <div className="space-y-4">
+            {isLoading ? (
+              <p className="text-muted-foreground">Cargando usuarios...</p>
+            ) : filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))
+            ) : (
+              <p className="text-muted-foreground">No se encontraron usuarios</p>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="md:col-span-4 space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Users2 className="h-5 w-5" />
+                <h2 className="text-lg font-semibold">Usuarios Populares</h2>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-4">
+                  {popularUsers.map((user, index) => (
+                    <div key={user.id}>
+                      <Link
+                        href={`/dashboard/profile/${user.username}`}
+                        className="flex items-center gap-3 hover:bg-accent rounded-lg p-2 transition-colors"
+                      >
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback>
+                            <UserCircle className="h-5 w-5" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col flex-1">
+                          <span className="font-medium">
+                            {user.firstName} {user.lastName}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {user._count.followers} seguidores
+                          </span>
+                        </div>
+                      </Link>
+                      {index < popularUsers.length - 1 && (
+                        <Separator className="my-2" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

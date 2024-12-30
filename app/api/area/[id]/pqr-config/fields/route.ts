@@ -11,15 +11,11 @@ export async function PUT(
     const body = await request.json();
     const { customFields } = PqrFieldsSchema.parse(body);
 
-    console.log("id ", id);
-
     const pqr = await prisma.pQRConfig.findUnique({
       where: {
         departmentId: id,
       },
     });
-
-    console.log("pqrConfig ", pqr);
 
     // Update or create PQR config with custom fields
     const pqrConfig = await prisma.pQRConfig.update({

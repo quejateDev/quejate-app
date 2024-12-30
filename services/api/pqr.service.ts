@@ -1,6 +1,7 @@
 import { Department, PQRS, Prisma, User } from "@prisma/client";
 
 import { Client } from "./Client";
+import { getGetPQRDTO } from "@/dto/pqr.dto";
 
 type createPQRS = {
   type: PQRS["type"];
@@ -15,13 +16,7 @@ type createPQRS = {
   isAnonymous: boolean;
 };
 
-type getGetPQRDTO = Prisma.PQRSGetPayload<{
-  include: {
-    creator: true;
-    department: true;
-    customFieldValues: true;
-  };
-}>;
+
 
 export async function createPQRS(data: createPQRS) {
   const response = await Client.post("/pqr", data);

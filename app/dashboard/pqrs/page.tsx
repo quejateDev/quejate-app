@@ -46,8 +46,6 @@ export default function UserPQRs() {
         const response = await fetch(`/api/pqr/user?userId=${user.id}`);
         if (response.ok) {
           const data = await response.json();
-
-          console.log(data);
           setPqrs(data);
         }
       } catch (error) {

@@ -22,7 +22,6 @@ export default function EmployeeTable({ employees }: EmployeeTableProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteConfirm = () => {
-    console.log("Eliminar empleado");
   };
 
   return (

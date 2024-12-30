@@ -1,0 +1,153 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { PQRCard } from "@/components/PQRCard";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserCircle } from "lucide-react";
+import useAuthStore from "@/store/useAuthStore";
+import { FollowButton } from "@/components/FollowButton";
+import { FollowStats } from "@/components/FollowStats";
+import { useParams } from "next/navigation";
+import UseUser from "@/hooks/useUser";
+import usePQR from "@/hooks/usePQR";
+
+interface UserProfile {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isFollowing: boolean;
+  followers: Array<{
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+  }>;
+  following: Array<{
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+  }>;
+  _count: {
+    followers: number;
+    following: number;
+    PQRS: number;
+  };
+}
+
+interface PQRS {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  status: string;
+  department: {
+    name: string;
+    entity: {
+      name: string;
+    };
+  };
+  _count: {
+    likes: number;
+  };
+}
+
+export default function ProfilePage() {
+  const { user: currentUser } = useAuthStore();
+  const params = useParams();
+  const { id } = params;
+  const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = UseUser();
+  const { pqrs, fetchUserPQRS } = usePQR();
+
+  useEffect(() => {
+    if (!id) return;
+
+    fetchUser(id as string);
+    fetchUserPQRS(id as string);
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4">
+        <p className="text-muted-foreground">Cargando perfil...</p>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="container mx-auto p-4">
+        <p className="text-muted-foreground">Usuario no encontrado</p>
+      </div>
+    );
+  }
+
+  const isOwnProfile = currentUser?.id === userProfile.id;
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="grid gap-6 md:grid-cols-12">
+        <div className="md:col-span-4">
+          <Card>
+            <CardHeader className="text-center">
+              <Avatar className="h-24 w-24 mx-auto mb-4">
+                <AvatarFallback>
+                  <UserCircle className="h-12 w-12" />
+                </AvatarFallback>
+              </Avatar>
+              <h2 className="text-2xl font-semibold">
+                {userProfile.firstName} {userProfile.lastName}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                @{userProfile.username}
+              </p>
+
+              {!isOwnProfile && (
+                <div className="mt-4">
+                  <FollowButton
+                    userId={userProfile.id}
+                    initialIsFollowing={userProfile.isFollowing}
+                    onFollowChange={(isFollowing) => {
+                      setUserProfile(prev => prev ? {
+                        ...prev,
+                        isFollowing,
+                        _count: {
+                          ...prev._count,
+                          followers: isFollowing 
+                            ? prev._count.followers + 1 
+                            : prev._count.followers - 1
+                        }
+                      } : undefined);  // Changed null to undefined
+                    }}
+                  />
+                </div>
+              )}
+
+              <FollowStats
+                followers={userProfile.followers}
+                following={userProfile.following}
+              />
+
+              <div className="mt-4 text-sm text-muted-foreground">
+                <p>{userProfile._count.PQRS} PQRs publicadas</p>
+              </div>
+            </CardHeader>
+          </Card>
+        </div>
+        <div className="md:col-span-8">
+          <h3 className="text-lg font-semibold mb-4">PQRs Recientes</h3>
+          <div className="space-y-4">
+            {pqrs?.length && pqrs.length > 0 ? (
+              pqrs?.map((pqr) => <PQRCard key={pqr.id} pqr={pqr} />)
+            ) : (
+              <p className="text-muted-foreground">No hay PQRs publicadas</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

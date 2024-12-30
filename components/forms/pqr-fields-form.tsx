@@ -40,11 +40,8 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
     name: "customFields",
   });
 
-  console.log("Initial data:", initialData);
-
   const onSubmit = async (data: PQRFieldsFormValues) => {
     try {
-      console.log("Submitting data:", data);
       await fetch(`/api/area/${areaId}/pqr-config/fields`, {
         method: "PUT",
         headers: {

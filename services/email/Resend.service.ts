@@ -11,7 +11,6 @@ export async function sendPQRCreationEmail(
   creationDate: string,
   pqrLink: string
 ) {
-  console.log("Sending email to:", email);
   const { data, error } = await resend.emails.send({
     from: "onboarding@resend.dev",
     to: [email],
@@ -23,9 +22,6 @@ export async function sendPQRCreationEmail(
       pqrLink: pqrLink,
     }),
   });
-
-  console.log("Email sent:", data);
-  console.log("Error:", error);
 
   return email;
 }

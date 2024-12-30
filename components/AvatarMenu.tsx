@@ -14,7 +14,6 @@ import useAuthStore from "@/store/useAuthStore";
 export default function AvatarMenu() {
   const { user, isAuthenticated } = useAuthStore();
 
-  console.log(user, isAuthenticated);
   function handleLogout() {
     useAuthStore.getState().logout();
     window.location.href = "/login";
@@ -33,7 +32,7 @@ export default function AvatarMenu() {
           <span>{user?.email}</span>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/perfil" className="flex items-center gap-2">
+          <Link href="/dashboard/profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span>Ver Perfil</span>
           </Link>

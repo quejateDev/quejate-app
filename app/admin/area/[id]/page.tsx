@@ -31,7 +31,6 @@ const AreaPage = ({ params }: AreaPageProps) => {
     const fetchArea = async () => {
       try {
         const response = await Client.get(`/area/${id}`);
-        console.log(response.data);
         setArea(response.data);
       } catch (error) {
         toast({

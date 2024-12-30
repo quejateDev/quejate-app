@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +5,152 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String      @id @default(uuid())
+  username     String      @unique
+  password     String
+  firstName    String
+  lastName     String
+  email        String      @unique
+  phone        String
+  role         UserRole
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  departmentId String?
+  Like         Like[]
+  PQRS         PQRS[]
+  department   Department? @relation(fields: [departmentId], references: [id])
+  
+  // Following relationship
+  following    User[]      @relation("UserFollows")
+  followers    User[]      @relation("UserFollows")
+
+  @@index([departmentId])
+}
+
+model Department {
+  id          String     @id @default(uuid())
+  name        String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  description String?
+  entityId    String
+  entity      Entity     @relation(fields: [entityId], references: [id])
+  pqrConfig   PQRConfig?
+  pqrs        PQRS[]
+  employees   User[]
+
+  @@index([entityId])
+}
+
+model Entity {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  Department  Department[]
+}
+
+model PQRS {
+  id                String             @id @default(uuid())
+  type              PQRSType
+  status            PQRSStatus         @default(PENDING)
+  dueDate           DateTime
+  anonymous         Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  creatorId         String
+  departmentId      String
+  attachments       Attachment[]
+  customFieldValues CustomFieldValue[]
+  likes             Like[]
+  PQRCustomField    PQRCustomField[]
+  creator           User               @relation(fields: [creatorId], references: [id])
+  department        Department         @relation(fields: [departmentId], references: [id])
+  customFields      CustomField[]      @relation("CustomFieldToPQRS")
+
+  @@index([creatorId])
+  @@index([departmentId])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  pqrId     String
+  userId    String
+  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pqrId, userId])
+  @@index([pqrId])
+  @@index([userId])
+}
+
+model PQRCustomField {
+  id          String   @id @default(uuid())
+  name        String
+  value       String
+  type        String
+  placeholder String
+  required    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  pqrId       String
+  pqr         PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+
+  @@index([pqrId])
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  createdAt DateTime @default(now())
+  pqrsId    String
+  pqrs      PQRS     @relation(fields: [pqrsId], references: [id])
+}
+
+model PQRConfig {
+  id              String        @id @default(uuid())
+  allowAnonymous  Boolean       @default(false)
+  requireEvidence Boolean       @default(false)
+  maxResponseTime Int           @default(15)
+  notifyEmail     Boolean       @default(true)
+  autoAssign      Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  departmentId    String        @unique
+  customFields    CustomField[]
+  department      Department    @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+}
+
+model CustomField {
+  id          String    @id @default(uuid())
+  name        String
+  type        String
+  placeholder String?
+  required    Boolean   @default(false)
+  configId    String
+  config      PQRConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  PQRS        PQRS[]    @relation("CustomFieldToPQRS")
+
+  @@index([configId])
+}
+
+model CustomFieldValue {
+  id          String   @id @default(uuid())
+  name        String
+  value       String
+  type        String
+  placeholder String
+  required    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  pqrId       String
+  pqr         PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+
+  @@index([pqrId])
 }
 
 enum UserRole {
@@ -38,160 +178,4 @@ enum FieldType {
   EMAIL
   FILE
   NUMBER
-}
-
-model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  password  String
-  firstName String
-  lastName  String
-  email     String   @unique
-  phone     String
-  role      UserRole
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  department   Department? @relation(fields: [departmentId], references: [id])
-  departmentId String?
-  PQRS PQRS[]
-
-  Like Like[]
-}
-
-model Department {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  pqrs        PQRS[]
-  employees   User[]
-  pqrConfig   PQRConfig?
-  entity      Entity   @relation(fields: [entityId], references: [id])
-  entityId    String
-
-  @@index([entityId])
-}
-
-model Entity {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  Department Department[]
-}
-
-model PQRS {
-  id               String            @id @default(uuid())
-  type             PQRSType
-  status           PQRSStatus        @default(PENDING)
-  dueDate          DateTime
-  anonymous        Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  creator          User              @relation(fields: [creatorId], references: [id])
-  creatorId        String
-  customFieldValues CustomFieldValue[]
-  customFields     CustomField[]
-  department       Department        @relation(fields: [departmentId], references: [id])
-  departmentId     String
-  attachments      Attachment[] 
-  likes           Like[]
-  PQRCustomField PQRCustomField[]
-
-  @@index([creatorId])
-  @@index([departmentId])
-}
-
-model Like {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
-  pqrId     String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-
-  @@unique([pqrId, userId])
-  @@index([pqrId])
-  @@index([userId])
-}
-
-model PQRCustomField {
-  id        String   @id @default(uuid())
-  name      String
-  value     String
-  type      String
-  placeholder String
-  required  Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  // Relations
-  pqr          PQRS        @relation(fields: [pqrId], references: [id], onDelete: Cascade)
-  pqrId        String
-
-  @@index([pqrId])
-}
-
-model Attachment {
-  id        String   @id @default(uuid())
-  filename  String
-  url       String
-  createdAt DateTime @default(now())
-
-  // Relations
-  pqrs   PQRS   @relation(fields: [pqrsId], references: [id])
-  pqrsId String
-}
-
-model PQRConfig {
-  id             String   @id @default(uuid())
-  allowAnonymous Boolean  @default(false)
-  requireEvidence Boolean @default(false)
-  maxResponseTime Int     @default(15)
-  notifyEmail    Boolean  @default(true)
-  autoAssign     Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  // Relations
-  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-  departmentId String     @unique
-  
-  // Custom Fields
-  customFields CustomField[]
-}
-
-model CustomField {
-  id       String    @id @default(uuid())
-  name     String
-  type     String
-  placeholder String?
-  required Boolean   @default(false)
-  
-  // Relations
-  config   PQRConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
-  configId String
-  
-  @@index([configId])
-  PQRS PQRS[]
-}
-
-model CustomFieldValue {
-  id        String   @id @default(uuid())
-  name      String
-  value     String
-  type      String
-  placeholder String
-  required  Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  // Relations
-  pqr          PQRS        @relation(fields: [pqrId], references: [id], onDelete: Cascade)
-  pqrId        String
-
-  @@index([pqrId])
 }

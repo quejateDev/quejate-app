@@ -190,8 +190,6 @@ export function NewPQRForm() {
     try {
       const { customFields: customFieldValues, ...pqrData } = pqr;
 
-      console.log("pqrData", pqr);
-
       // // First create the PQRS
       const response = await createPQRS({
         ...pqrData,

@@ -55,8 +55,6 @@ export default async function PQRS({ searchParams }: PageProps) {
   if (searchParams.department && searchParams.department !== "all") {
     where.departmentId = searchParams.department;
   }
-  
-  console.log('Where clause:', where);
 
   // Determine sort order
   let orderBy: any = { createdAt: "desc" };

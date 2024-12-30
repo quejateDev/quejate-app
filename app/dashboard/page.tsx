@@ -91,7 +91,7 @@ export default async function PQRS({ searchParams }: PageProps) {
             <h1 className="text-3xl font-bold">
               PQRS Recientes
             </h1>
-            <Link href="/pqrs/new">
+            <Link href="/dashboard/pqrs/new">
               <Button>Crear PQRS</Button>
             </Link>
           </div>
