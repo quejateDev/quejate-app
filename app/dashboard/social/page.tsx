@@ -97,7 +97,7 @@ export default function SocialPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="grid gap-6 md:grid-cols-12">
+      <div className="flex flex-col flex-reserve md:grid gap-6 md:grid-cols-12">
         {/* Main Content */}
         <div className="md:col-span-8 space-y-6">
           <div className="flex flex-col gap-2">
@@ -114,7 +114,7 @@ export default function SocialPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {isLoading ? (
               <p className="text-muted-foreground">Cargando usuarios...</p>
             ) : filteredUsers.length > 0 ? (
