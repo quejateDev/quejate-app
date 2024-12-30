@@ -46,7 +46,7 @@ export default function Login() {
           email: userData.user.email,
           name: userData.user.name,
           role: userData.user.role,
-        });
+        }, userData.token);
 
         // Optional: Show success message
         toast({

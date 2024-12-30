@@ -1,27 +1,25 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { verifyToken } from '@/lib/utils';
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { userId } = await req.json();
+    const { id } = await params;
 
-    if (!userId) {
+    if (!id) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
     }
 
-    const cookieStore = await cookies();
-    const authCookie = cookieStore.get('auth-storage');
-    const currentUser = authCookie ? JSON.parse(authCookie.value).state.user : null;
+    const currentUser = verifyToken(req);
 
     if (!currentUser) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     // Check if already following
@@ -30,39 +28,57 @@ export async function POST(req: Request) {
         id: currentUser.id,
         following: {
           some: {
-            id: userId,
+            id,
           },
         },
       },
     });
 
+    let updatedUser;
     if (existingFollow) {
       // Unfollow
-      await prisma.user.update({
+      updatedUser = await prisma.user.update({
         where: { id: currentUser.id },
         data: {
           following: {
-            disconnect: { id: userId },
+            disconnect: { id },
           },
         },
       });
-      return NextResponse.json({ followed: false });
     } else {
       // Follow
-      await prisma.user.update({
+      updatedUser = await prisma.user.update({
         where: { id: currentUser.id },
         data: {
           following: {
-            connect: { id: userId },
+            connect: { id },
           },
         },
       });
-      return NextResponse.json({ followed: true });
     }
+
+    // Get updated counts
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+            PQRS: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({
+      followed: !existingFollow,
+      counts: targetUser?._count,
+    });
   } catch (error) {
-    console.error("Error in follow/unfollow:", error);
+    console.error("Error following user:", error);
     return NextResponse.json(
-      { error: "Error processing follow/unfollow" },
+      { error: "Error following user" },
       { status: 500 }
     );
   }

@@ -66,18 +66,24 @@ export default function ProfilePage() {
                 <div className="mt-4">
                   <FollowButton
                     userId={userProfile.id}
-                    initialIsFollowing={userProfile.isFollowing}
-                    onFollowChange={(isFollowing) => {
-                      setUserProfile(prev => prev ? {
-                        ...prev,
-                        isFollowing,
-                        _count: {
-                          ...prev._count,
-                          followers: isFollowing 
-                            ? prev._count.followers + 1 
-                            : prev._count.followers - 1
-                        }
-                      } : undefined);  // Changed null to undefined
+                    isFollowing={userProfile.followers.some(follower => follower.id === currentUser?.id)}
+                    onFollowChange={(isFollowing, counts) => {
+                      setUserProfile(prev => {
+                        if (!prev) return prev;
+                        
+                        const updatedFollowers = isFollowing
+                          ? [...prev.followers, { id: currentUser?.id || '', username: currentUser?.name || '', firstName: '', lastName: '' }]
+                          : prev.followers.filter(f => f.id !== currentUser?.id);
+                        
+                        return {
+                          ...prev,
+                          followers: updatedFollowers,
+                          _count: {
+                            ...prev._count,
+                            ...counts
+                          }
+                        };
+                      });
                     }}
                   />
                 </div>

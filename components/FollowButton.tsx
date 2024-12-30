@@ -1,75 +1,52 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { UserPlus, UserMinus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { followUserService } from "@/services/api/User.service";
+import useAuthStore from "@/store/useAuthStore";
 
 interface FollowButtonProps {
   userId: string;
-  initialIsFollowing: boolean;
-  onFollowChange?: (isFollowing: boolean) => void;
+  isFollowing: boolean;
+  onFollowChange?: (
+    isFollowing: boolean,
+    counts?: { followers: number; following: number; PQRS: number }
+  ) => void;
 }
 
-export function FollowButton({ userId, initialIsFollowing, onFollowChange }: FollowButtonProps) {
+export function FollowButton({
+  userId,
+  isFollowing: initialIsFollowing,
+  onFollowChange,
+}: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { user } = useAuthStore();
 
   const handleFollow = async () => {
+    if (!user || user.id === userId) return;
+
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await fetch('/api/users/follow', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al procesar la solicitud');
-      }
-
-      const data = await response.json();
-      setIsFollowing(data.followed);
-      onFollowChange?.(data.followed);
-
-      toast({
-        title: data.followed ? 'Usuario seguido' : 'Usuario no seguido',
-        description: data.followed 
-          ? 'Ahora estás siguiendo a este usuario' 
-          : 'Has dejado de seguir a este usuario',
-      });
+      const { followed, counts } = await followUserService(userId);
+      setIsFollowing(followed);
+      onFollowChange?.(followed, counts);
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'No se pudo procesar la solicitud',
-        variant: 'destructive',
-      });
+      console.error("Error following user:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (!user || user.id === userId) return null;
+
   return (
     <Button
       variant={isFollowing ? "outline" : "default"}
-      size="sm"
       onClick={handleFollow}
       disabled={isLoading}
     >
-      {isFollowing ? (
-        <>
-          <UserMinus className="h-4 w-4 mr-2" />
-          Dejar de seguir
-        </>
-      ) : (
-        <>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Seguir
-        </>
-      )}
+      {isFollowing ? "Dejar de seguir" : "Seguir"}
     </Button>
   );
 }

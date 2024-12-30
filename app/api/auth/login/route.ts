@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '@/lib/prisma'
+import { signToken } from '@/lib/utils'
 
 export async function POST(request: Request) {
   try {
@@ -31,11 +32,7 @@ export async function POST(request: Request) {
     }
 
     // Create JWT token
-    const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: '1d' }
-    )
+    const token = signToken(user.id, user.role);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user

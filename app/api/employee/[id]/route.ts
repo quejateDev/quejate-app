@@ -6,9 +6,10 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const { id } = await params;
   const employee = await prisma.user.findUnique({
     where: {
-      id: params.id,
+      id,
       role: "EMPLOYEE",
     },
   });
@@ -20,6 +21,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const { password, ...otherData } = await request.json();
+  const { id } = await params;
 
   const updateData = {
     ...otherData,
@@ -27,7 +29,7 @@ export async function PUT(
   };
 
   const employee = await prisma.user.update({
-    where: { id: params.id },
+    where: { id },
     data: updateData
   });
   return NextResponse.json(employee);
