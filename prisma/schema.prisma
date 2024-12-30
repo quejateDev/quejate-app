@@ -22,7 +22,7 @@ model User {
   Like         Like[]
   PQRS         PQRS[]
   department   Department? @relation(fields: [departmentId], references: [id])
-  
+  notifications Notification[]
   // Following relationship
   following    User[]      @relation("UserFollows")
   followers    User[]      @relation("UserFollows")
@@ -151,6 +151,19 @@ model CustomFieldValue {
   pqr         PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
 
   @@index([pqrId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 enum UserRole {

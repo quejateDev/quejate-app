@@ -17,6 +17,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { NotificationDropdown } from "../NotificationDropdown";
 
 export default function NavbarDashboard() {
   const NavItems = () => (
@@ -40,7 +41,7 @@ export default function NavbarDashboard() {
   );
 
   return (
-    <div className="border-b bg-white">
+    <nav className="border-b bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -53,7 +54,7 @@ export default function NavbarDashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-4">
             {/* Desktop Navigation */}
             <div className="hidden md:block">
               <NavigationMenu>
@@ -86,10 +87,11 @@ export default function NavbarDashboard() {
               </Sheet>
             </div>
 
+            <NotificationDropdown />
             <AvatarMenu />
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

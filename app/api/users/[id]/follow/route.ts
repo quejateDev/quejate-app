@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyToken } from '@/lib/utils';
+import { verifyToken } from "@/lib/utils";
 
 export async function POST(
   req: Request,
@@ -67,6 +67,18 @@ export async function POST(
             following: true,
             PQRS: true,
           },
+        },
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: id,
+        type: "follow",
+        message: `${updatedUser?.firstName} ha comenzado a seguirte`,
+        data: {
+          followerId: updatedUser?.id,
+          followerName: updatedUser?.firstName + " " + updatedUser?.lastName,
         },
       },
     });

@@ -7,26 +7,17 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserCircle } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
 import { getGetPQRDTO } from '@/dto/pqr.dto';
+import usePQR from '@/hooks/usePQR';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const [userPQRs, setUserPQRs] = useState<getGetPQRDTO[]>([]);
+  const { pqr, pqrs, fetchUserPQRS } = usePQR();
 
   useEffect(() => {
-    const fetchUserPQRs = async () => {
-      try {
-        const response = await fetch(`/api/pqr/user?userId=${user?.id}`);
-        const data = await response.json();
-        setUserPQRs(data);
-      } catch (error) {
-        console.error('Error fetching user PQRs:', error);
-      }
-    };
-
     if (user?.id) {
-      fetchUserPQRs();
+      fetchUserPQRS(user.id);
     }
-  }, [user]);
+  }, [user?.id]);
 
   if (!user) {
     return (
@@ -56,8 +47,8 @@ export default function ProfilePage() {
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRs Recientes</h3>
           <div className="space-y-4">
-            {userPQRs?.length > 0 ? (
-              userPQRs?.map((pqr) => (
+            {pqrs.length > 0 ? (
+              pqrs?.map((pqr) => (
                 <PQRCard key={pqr.id} pqr={pqr} />
               ))
             ) : (

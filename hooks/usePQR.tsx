@@ -6,7 +6,7 @@ import { getGetPQRDTO } from "@/dto/pqr.dto";
 
 export default function usePQR() {
   const [pqr, setPqr] = useState<getGetPQRDTO>();
-  const [pqrs, setPqrs] = useState<getGetPQRDTO[]>();
+  const [pqrs, setPqrs] = useState<getGetPQRDTO[]>([]);
 
   async function fetchPQR(id: string) {
     try {

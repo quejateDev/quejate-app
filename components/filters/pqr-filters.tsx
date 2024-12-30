@@ -3,6 +3,18 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PQRSType } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { SlidersHorizontal, X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { useState } from "react";
 
 const sortOptions = [
   { label: "Más recientes", value: "date-desc" },
@@ -24,6 +36,7 @@ interface PQRFiltersProps {
 export function PQRFilters({ entities, departments }: PQRFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
   const currentType = searchParams.get("type");
   const currentSort = searchParams.get("sort") || "date-desc";
@@ -45,19 +58,22 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
     }
 
     router.push(`?${params.toString()}`);
+    setIsOpen(false);
   };
 
   const filteredDepartments = currentEntity
     ? departments.filter((dept) => dept.entityId === currentEntity)
     : departments;
 
-  return (
-    <div className="flex flex-wrap gap-4 mb-6">
+  const hasActiveFilters = currentType || currentEntity || currentDepartment;
+
+  const FilterContent = () => (
+    <>
       <Select
         value={currentSort}
         onValueChange={(value) => updateQueryParams("sort", value)}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px]">
           <SelectValue placeholder="Ordenar por" />
         </SelectTrigger>
         <SelectContent>
@@ -73,7 +89,7 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
         value={currentType || "all"}
         onValueChange={(value) => updateQueryParams("type", value === "all" ? null : value)}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px]">
           <SelectValue placeholder="Tipo de PQR" />
         </SelectTrigger>
         <SelectContent>
@@ -90,7 +106,7 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
         value={currentEntity || "all"}
         onValueChange={(value) => updateQueryParams("entity", value === "all" ? null : value)}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px]">
           <SelectValue placeholder="Entidad" />
         </SelectTrigger>
         <SelectContent>
@@ -108,7 +124,7 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
           value={currentDepartment || "all"}
           onValueChange={(value) => updateQueryParams("department", value === "all" ? null : value)}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full md:w-[180px]">
             <SelectValue placeholder="Departamento" />
           </SelectTrigger>
           <SelectContent>
@@ -121,6 +137,62 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
           </SelectContent>
         </Select>
       )}
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop View */}
+      <div className="hidden md:flex flex-wrap gap-4 mb-6">
+        <FilterContent />
+      </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden mb-6">
+        <div className="flex gap-2">
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full flex justify-between items-center"
+              >
+                <span>Filtros</span>
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {hasActiveFilters && (
+                    <span className="h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </div>
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Filtros</SheetTitle>
+                <SheetDescription>
+                  Ajusta los filtros para encontrar PQRs específicos
+                </SheetDescription>
+              </SheetHeader>
+              <div className="py-6 space-y-4">
+                <FilterContent />
+              </div>
+              <SheetFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    params.set("sort", "date-desc");
+                    router.push(`?${params.toString()}`);
+                    setIsOpen(false);
+                  }}
+                  className="w-full"
+                >
+                  Limpiar Filtros
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </>
   );
 }

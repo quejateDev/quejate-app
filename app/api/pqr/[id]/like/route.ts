@@ -55,8 +55,31 @@ export async function POST(
             likes: true,
           },
         },
+        creator: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        }
       },
     });
+
+
+    if (updatedPQR && !existingLike) {
+      await prisma.notification.create({
+        data: {
+          type: "like",
+          userId: updatedPQR?.creatorId,
+          message: `A ${updatedPQR.creator.firstName} ${updatedPQR.creator.lastName} le gusta tu PQR`,
+          data: {
+            pqrId: pqrId,
+            followerId: userId,
+            followerName: `${userId}`,
+            // followerImage: `${userId}`,
+          },
+        },
+      });
+    }
 
     return NextResponse.json({
       likes: updatedPQR?._count.likes || 0,
