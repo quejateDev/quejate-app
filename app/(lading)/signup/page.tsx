@@ -25,7 +25,7 @@ export default function Signup() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/auth/signup", formData);
+      await axios.post("/api/auth/signup", formData);
 
       toast({
         variant: "default",

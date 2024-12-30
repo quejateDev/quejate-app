@@ -24,13 +24,9 @@ import { Client } from "@/services/api/Client";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardDescription, CardHeader,
+  CardTitle
 } from "../ui/card";
-import { Separator } from "../ui/separator";
-import PqrFieldsForm from "./pqr-fields-form";
 
 export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
   const form = useForm<PQRConfigFormValues>({
@@ -52,6 +48,7 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
         description: "La configuración de PQR ha sido actualizada exitosamente",
       });
     } catch (error) {
+      console.error("Error submitting:", error);
       toast({
         title: "Error",
         description: "Error al actualizar la configuración",

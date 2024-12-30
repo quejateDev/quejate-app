@@ -11,7 +11,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserCircle, Users } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 
 interface User {

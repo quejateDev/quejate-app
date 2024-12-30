@@ -15,13 +15,7 @@ import {
 } from "@/components/ui/card";
 import { useParams } from "next/navigation";
 
-interface EmployeePageProps {
-  params: {
-    id: string;
-  };
-}
-
-const EmployeePage = ({ params }: EmployeePageProps) => {
+const EmployeePage = () => {
   const [employee, setEmployee] = useState<User | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +33,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
         setEmployee(employeeResponse.data);
         setDepartments(departmentsResponse.data);
       } catch (error) {
+        console.error("Error fetching employee:", error);
         toast({
           title: "Error",
           description: "Error al cargar los datos del empleado",

@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { PQRCard } from '@/components/PQRCard';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserCircle } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
-import { getGetPQRDTO } from '@/dto/pqr.dto';
 import usePQR from '@/hooks/usePQR';
 
 export default function ProfilePage() {

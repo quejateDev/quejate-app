@@ -151,15 +151,6 @@ export function NewPQRForm() {
     }
   }, [pqr.departmentId]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setPqr((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleCustomFieldChange = (name: string, value: string) => {
     setPqr((prev) => {
       const updatedFields = prev.customFields.map((field) =>

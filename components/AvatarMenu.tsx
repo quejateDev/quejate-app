@@ -12,7 +12,7 @@ import { LogOut, User } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 
 export default function AvatarMenu() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
   function handleLogout() {
     useAuthStore.getState().logout();

@@ -31,6 +31,7 @@ export async function GET(
 
     return NextResponse.json(area);
   } catch (error) {
+    console.error("Error fetching area:", error);
     return NextResponse.json(
       { error: "Error fetching area" },
       { status: 500 }
@@ -52,6 +53,7 @@ export async function DELETE(
 
     return NextResponse.json(area);
   } catch (error) {
+    console.error("Error deleting area:", error);
     return NextResponse.json(
       { error: "Error deleting area" },
       { status: 500 }
@@ -78,6 +80,7 @@ export async function PATCH(
 
     return NextResponse.json(area);
   } catch (error) {
+    console.error("Error updating area:", error);
     return NextResponse.json(
       { error: "Error updating area" },
       { status: 500 }

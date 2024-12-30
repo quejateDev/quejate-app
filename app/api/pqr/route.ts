@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const email = await sendPQRCreationEmail(
+    await sendPQRCreationEmail(
       response.creator?.email || "luisevilla588@gmail.com",
       response.creator?.firstName || "John Doe",
       "Registro exitoso de PQR @tuqueja.com.co",

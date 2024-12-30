@@ -1,5 +1,4 @@
 import Footer from "@/components/footer";
-import { Toaster } from "@/components/ui/toaster";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 

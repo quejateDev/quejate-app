@@ -38,6 +38,7 @@ export async function POST(request: Request) {
     })
 
     // Remove password from response
+    // @ts-ignore
     const { password: _, ...userWithoutPassword } = user
 
     return NextResponse.json(userWithoutPassword)

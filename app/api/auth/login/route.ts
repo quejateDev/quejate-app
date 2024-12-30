@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import prisma from '@/lib/prisma'
 import { signToken } from '@/lib/utils'
 
@@ -35,6 +34,7 @@ export async function POST(request: Request) {
     const token = signToken(user.id, user.role);
 
     // Remove password from response
+    // @ts-ignore
     const { password: _, ...userWithoutPassword } = user
 
     return NextResponse.json({

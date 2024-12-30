@@ -5,7 +5,6 @@ import { useState } from "react";
 interface FileFieldProps {
   id: string;
   label: string;
-  placeholder?: string;
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
@@ -16,7 +15,6 @@ interface FileFieldProps {
 export function FileField({
   id,
   label,
-  placeholder,
   onChange,
   required = false,
   accept = "image/*,application/pdf",

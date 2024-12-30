@@ -1,8 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-
-export default async function AdminDashboard() {
-  const prisma = new PrismaClient()
-  
+export default async function AdminDashboard() {  
   return (
     <main className="min-h-screen p-8">
      

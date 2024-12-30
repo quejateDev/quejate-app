@@ -1,21 +1,8 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
-import { Toaster } from "@/components/ui/toaster";
 import NavbarDashboard from "@/components/Navbar/NavbarDashboard";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,13 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <>
-        <SidebarProvider>
-          <main className="flex-1 flex-col">
-            <NavbarDashboard />
-            <div className="flex-1 flex-col px-6 py-4">{children}</div>
-          </main>
-        </SidebarProvider>
-
+      <SidebarProvider>
+        <main className="flex-1 flex-col">
+          <NavbarDashboard />
+          <div className="flex-1 flex-col px-6 py-4">{children}</div>
+        </main>
+      </SidebarProvider>
     </>
   );
 }

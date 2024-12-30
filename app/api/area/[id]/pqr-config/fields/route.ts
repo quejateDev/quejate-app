@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { pqrConfigSchema, PqrFieldsSchema } from "@/types/pqr-config";
+import { PqrFieldsSchema } from "@/types/pqr-config";
 
 export async function PUT(
   request: Request,
@@ -10,13 +10,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const { customFields } = PqrFieldsSchema.parse(body);
-
-    const pqr = await prisma.pQRConfig.findUnique({
-      where: {
-        departmentId: id,
-      },
-    });
-
+    
     // Update or create PQR config with custom fields
     const pqrConfig = await prisma.pQRConfig.update({
       where: {

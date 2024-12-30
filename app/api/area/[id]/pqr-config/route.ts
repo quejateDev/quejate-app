@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { connect } from "http2";
-// import { getServerSession } from "next-auth";
-// import { authOptions } from "@/lib/auth";
 
 export async function PUT(
   req: NextRequest,
@@ -10,10 +7,6 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return new NextResponse("Unauthorized", { status: 401 });
-    // }
 
     const body = await req.json();
     const {
@@ -22,10 +15,9 @@ export async function PUT(
       maxResponseTime,
       notifyEmail,
       autoAssign,
-      customFields,
     } = body;
 
-    const pqrConfig = await prisma.pQRConfig.upsert({
+    await prisma.pQRConfig.upsert({
       where: {
         departmentId: id,
       },
@@ -48,7 +40,6 @@ export async function PUT(
         maxResponseTime: parseInt(maxResponseTime),
         notifyEmail,
         autoAssign,
-        // customFields,
       },
     });
 

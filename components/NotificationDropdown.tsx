@@ -14,7 +14,6 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import useAuthStore from "@/store/useAuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import Link from "next/link";
 
 export function NotificationDropdown() {
   const { notifications, unreadCount, setNotifications, markAsRead } = useNotificationStore();

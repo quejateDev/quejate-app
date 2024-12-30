@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { AreaForm } from "@/components/forms/area-form";
 import { Client } from "@/services/api/Client";
-import { Department } from "@prisma/client";
 import { toast } from "@/hooks/use-toast";
 import {
   Card,
@@ -17,13 +16,7 @@ import { PQRConfigForm } from "@/components/forms/pqr-config-form";
 import { DepartmentWithConfig } from "@/dto/deparment/department-with-config.dto";
 import PqrFieldsForm from "@/components/forms/pqr-fields-form";
 
-interface AreaPageProps {
-  params: {
-    id: string;
-  };
-}
-
-const AreaPage = ({ params }: AreaPageProps) => {
+const AreaPage = () => {
   const [area, setArea] = useState<DepartmentWithConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
@@ -33,6 +26,7 @@ const AreaPage = ({ params }: AreaPageProps) => {
         const response = await Client.get(`/area/${id}`);
         setArea(response.data);
       } catch (error) {
+        console.error("Error fetching area:", error);
         toast({
           title: "Error",
           description: "Error al cargar el área",

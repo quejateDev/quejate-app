@@ -55,6 +55,7 @@ export function DeparmentsTable({ departments }: DeparmentsTableProps) {
         const newData = await getDepartmentsService();
         setData(newData);
       } catch (error) {
+        console.error(error);
         toast({
           title: "Error",
           description: "Error al eliminar el área",

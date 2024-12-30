@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { PQRCard } from "@/components/PQRCard";
-import { getAllPQRS } from "@/services/api/pqr.service";
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 import { Prisma, PQRSStatus, PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
@@ -18,8 +16,6 @@ interface PageProps {
 }
 
 export default async function PQRS({ searchParams }: PageProps) {
-  const session = await getServerSession();
-
   // Fetch entities and departments for filters
   const entities = await prisma.entity.findMany({
     select: {
