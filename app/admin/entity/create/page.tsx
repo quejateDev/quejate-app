@@ -12,24 +12,104 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { createEntity } from "@/services/api/entity.service";
+import { createEntity, getCategories } from "@/services/api/entity.service";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Category } from "@prisma/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function CreateEntityPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    image: null as File | null,
+    categoryId: "",
   });
+
+  useEffect(() => {
+    // Fetch categories when component mounts
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error",
+          description: "Error al cargar las categorías",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, image: file }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.categoryId) {
+      toast({
+        title: "Error",
+        description: "Por favor seleccione una categoría",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      await createEntity(formData);
+      // Upload image first if present
+      let imageUrl = null;
+      if (formData.image) {
+        const imageFormData = new FormData();
+        imageFormData.append("file", formData.image);
+        
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: imageFormData,
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload image");
+        }
+        
+        const uploadData = await uploadResponse.json();
+        imageUrl = uploadData.path;
+      }
+
+      // Create entity with image URL if uploaded
+      await createEntity({
+        name: formData.name,
+        description: formData.description,
+        imageUrl,
+        categoryId: formData.categoryId,
+      });
+
       toast({
         title: "Entidad creada",
         description: "La entidad ha sido creada exitosamente",
@@ -81,6 +161,46 @@ export default function CreateEntityPage() {
                   }))
                 }
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoría</Label>
+              <Select
+                value={formData.categoryId}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, categoryId: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="image">Logo o Imagen</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="cursor-pointer"
+              />
+              {imagePreview && (
+                <div className="mt-2 relative w-32 h-32">
+                  <Image
+                    src={imagePreview}
+                    alt="Preview"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
+              )}
             </div>
             <div className="flex justify-end space-x-4">
               <Button

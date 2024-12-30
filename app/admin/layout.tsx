@@ -24,7 +24,7 @@ export default function RootLayout({
         <Toaster />
         <main className="flex-1 flex-col">
           <NavbarDashboard />
-          <SidebarTrigger />
+          <SidebarTrigger className="fixed" />
           <div className="flex-1 flex-col px-6 py-4">{children}</div>
         </main>
       </SidebarProvider>

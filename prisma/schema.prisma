@@ -51,7 +51,22 @@ model Entity {
   description String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  imageUrl    String?
   Department  Department[]
+  categoryId  String
+  category    Category     @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+}
+
+model Category {
+  id          String       @id @default(uuid())
+  name        String      @unique
+  description String?
+  imageUrl    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  entities    Entity[]
 }
 
 model PQRS {

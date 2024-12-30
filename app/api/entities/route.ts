@@ -7,6 +7,13 @@ export async function GET() {
       orderBy: {
         name: "asc",
       },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
     return NextResponse.json(entities);
   } catch (error) {
@@ -21,12 +28,28 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description } = body;
+    const { name, description, imageUrl, categoryId } = body;
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { error: "Category ID is required" },
+        { status: 400 }
+      );
+    }
 
     const entity = await prisma.entity.create({
       data: {
         name,
         description,
+        imageUrl,
+        categoryId,
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
