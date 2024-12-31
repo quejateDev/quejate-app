@@ -1,5 +1,4 @@
 "use client";
-import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -21,7 +20,7 @@ export default async function PQRDetailPage({
   const pqr = await getPQRSById(id);
 
   if (!pqr) {
-    notFound();
+    return;
   }
 
   return (

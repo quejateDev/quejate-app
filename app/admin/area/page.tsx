@@ -4,7 +4,15 @@ import { getDepartmentsService } from "@/services/api/Department.service";
 import { DeparmentsTable } from "@/components/DeparmentsTable";
 
 export default async function AreasPage() {
-  const departments = await getDepartmentsService();
+  console.log("departments");
+  let departments: any[] = [];
+  
+  try {
+    departments = await getDepartmentsService();
+    
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+  }
 
   return (
     <div className="container mx-auto py-10">
