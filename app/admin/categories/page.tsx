@@ -12,6 +12,7 @@ interface Category {
   createdAt: Date;
   updatedAt: Date;
   entities: any[];
+  imageUrl: string | null;
 }
 
 export default function CategoriesPage() {

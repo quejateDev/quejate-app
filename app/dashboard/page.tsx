@@ -6,12 +6,12 @@ import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     type?: string;
     status?: string;
     entity?: string;
     department?: string;
-  };
+  }>;
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
@@ -31,25 +31,27 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     },
   });
 
+  const { department, entity, type, status } = await searchParams;
+
   // Build where clause based on search params
   const where: any = {};
 
-  if (searchParams.type && searchParams.type !== "all") {
-    where.type = searchParams.type as PQRSType;
+  if (type && type !== "all") {
+    where.type = type as PQRSType;
   }
 
-  if (searchParams.status && searchParams.status !== "all") {
-    where.status = searchParams.status;
+  if (status && status !== "all") {
+    where.status = status;
   }
 
-  if (searchParams.entity && searchParams.entity !== "all") {
+  if (entity && entity !== "all") {
     where.department = {
-      entityId: searchParams.entity,
+      entityId: entity,
     };
   }
 
-  if (searchParams.department && searchParams.department !== "all") {
-    where.departmentId = searchParams.department;
+  if (department && department !== "all") {
+    where.departmentId = department;
   }
 
   // Fetch PQRs
@@ -108,22 +110,21 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             </Link>
           </div>
 
-          <PQRFilters 
-            entities={entities}
-            departments={departments}
-          />
+          <PQRFilters entities={entities} departments={departments} />
 
           <div className="space-y-6">
             {pqrs.map((pqr) => (
-              <PQRCard 
-                key={pqr.id} 
-                pqr={pqr} 
+              <PQRCard
+                key={pqr.id}
+                pqr={pqr}
                 initialLiked={pqr.likes?.length > 0}
               />
             ))}
             {pqrs.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No hay PQRS para mostrar</p>
+                <p className="text-muted-foreground">
+                  No hay PQRS para mostrar
+                </p>
               </div>
             )}
           </div>

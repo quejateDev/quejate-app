@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any 
 ) {
   const { id } = await params;
   const employee = await prisma.user.findUnique({
@@ -18,7 +18,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any 
 ) {
   const { password, ...otherData } = await request.json();
   const { id } = await params;

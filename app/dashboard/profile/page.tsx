@@ -10,7 +10,7 @@ import usePQR from '@/hooks/usePQR';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const { pqr, pqrs, fetchUserPQRS } = usePQR();
+  const { pqrs, fetchUserPQRS } = usePQR();
 
   useEffect(() => {
     if (user?.id) {

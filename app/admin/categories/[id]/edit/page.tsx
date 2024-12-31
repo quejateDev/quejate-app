@@ -1,30 +1,29 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import CategoryForm from "@/components/categories/category-form";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import { useParams } from "next/navigation";
 
-interface Category {
+type Category = {
   id: string;
   name: string;
   description: string | null;
-}
+  imageUrl: string | null;
+};
 
-export default function EditCategoryPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function EditCategoryPage() {
   const router = useRouter();
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { id } = useParams();
+
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const response = await fetch(`/api/category/${params.id}`);
+        const response = await fetch(`/api/category/${id}`);
         if (!response.ok) throw new Error("Failed to fetch category");
         const data = await response.json();
         setCategory(data);
@@ -41,7 +40,7 @@ export default function EditCategoryPage({
     };
 
     fetchCategory();
-  }, [params.id, router]);
+  }, [id, router]);
 
   if (isLoading) {
     return (

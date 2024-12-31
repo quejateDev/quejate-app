@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(request: Request, params: { params: { id: string } }) {
+export async function GET(request: Request, params: any ) {
   try {
     const userId = await params.params.id;
 

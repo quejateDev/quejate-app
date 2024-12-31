@@ -74,6 +74,7 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
         description: "Imagen subida correctamente",
       });
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Error al subir la imagen",
@@ -107,6 +108,7 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
       });
       onSuccess();
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Error al guardar la categoria",

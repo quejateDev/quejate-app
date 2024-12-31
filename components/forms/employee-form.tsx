@@ -43,7 +43,6 @@ const formSchema = z.object({
 
 interface InitialData {
   id?: string;
-  username: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -69,7 +68,6 @@ export default function EmployeeForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: initialData?.username || "",
       password: "",
       firstName: initialData?.firstName || "",
       lastName: initialData?.lastName || "",

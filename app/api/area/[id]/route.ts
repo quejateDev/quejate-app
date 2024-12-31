@@ -4,10 +4,9 @@ import prisma from "@/lib/prisma";
 // GET endpoint to fetch a specific area by ID
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
-
     const { id } = await params;
     const area = await prisma.department.findUnique({
       where: {
@@ -42,7 +41,7 @@ export async function GET(
 // DELETE endpoint to remove a specific area by ID
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const area = await prisma.department.delete({
@@ -64,7 +63,7 @@ export async function DELETE(
 // PATCH endpoint to update a specific area by ID
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const body = await request.json();

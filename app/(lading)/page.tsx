@@ -8,14 +8,18 @@ import Link from "next/link";
 import { PQRCard } from "@/components/PQRCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart } from "lucide-react";
+import { PQRSType } from "@prisma/client";
 
 interface TopPQR {
   id: string;
-  type: string;
+  type: PQRSType;
   status: string;
   createdAt: string;
+  updatedAt: string;
   dueDate: string;
   anonymous: boolean;
+  creatorId: string;
+  departmentId: string;
   department: {
     name: string;
     entity: {
@@ -246,6 +250,7 @@ export default function Home() {
                       <Heart className="h-4 w-4 fill-current" />
                       {pqr._count.likes}
                     </div>
+                  {/* @ts-ignore */}
                     <PQRCard pqr={pqr} initialLiked={false} />
                   </div>
                 ))}

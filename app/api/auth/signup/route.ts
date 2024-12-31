@@ -33,7 +33,6 @@ export async function POST(request: Request) {
         phone,
         password: hashedPassword,
         role: 'CLIENT',
-        username: email, // Using email as username for simplicity
       },
     })
 

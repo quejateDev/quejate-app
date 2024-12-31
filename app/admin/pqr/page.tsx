@@ -1,14 +1,10 @@
-"use client";
-
 import PqrVsDepartmentChart from "@/components/charts/pqr/pqr-vs-deparment";
 import { PqrVsTimeChart } from "@/components/charts/pqr/pqr-vs-time";
 import PqrTable from "@/components/pqrTable";
 import { getPQRS } from "@/services/api/pqr.service";
 
-const pqrs = await getPQRS();
-
-export default function PQRPage() {
-  
+export default async function PQRPage() {
+  const pqrs = await getPQRS();
 
   return (
     <div className="flex flex-col gap-4">

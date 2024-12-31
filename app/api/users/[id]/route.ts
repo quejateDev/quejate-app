@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any 
 ) {
   try {
     const { id } = await params;
@@ -19,14 +19,12 @@ export async function GET(
       where: { id },
       select: {
         id: true,
-        username: true,
         firstName: true,
         lastName: true,
         email: true,
         followers: {
           select: {
             id: true,
-            username: true,
             firstName: true,
             lastName: true,
           }
@@ -34,7 +32,6 @@ export async function GET(
         following: {
           select: {
             id: true,
-            username: true,
             firstName: true,
             lastName: true,
           }

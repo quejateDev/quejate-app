@@ -1,3 +1,4 @@
+"use client";
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -14,7 +15,7 @@ import { getPQRSById } from "@/services/api/pqr.service";
 export default async function PQRDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: any;
 }) {
   const { id } = await params;
   const pqr = await getPQRSById(id);

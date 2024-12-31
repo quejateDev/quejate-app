@@ -1,5 +1,4 @@
 import { NewPQRForm } from "@/components/forms/new-pqr";
-const { useParams } = require("next/navigation");
 
 export default async function NewPQR({ params }: any) {
   const { entityId} = await params;

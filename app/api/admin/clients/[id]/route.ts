@@ -3,12 +3,13 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: any 
 ) {
+  const { id } = await params;
   try {
     const client = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id,
         role: "CLIENT",
       },
       select: {
@@ -41,14 +42,15 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
+  const { id } = await params;
   try {
     const body = await req.json();
 
     const client = await prisma.user.update({
       where: {
-        id: params.id,
+        id,
         role: "CLIENT",
       },
       data: {
@@ -72,12 +74,13 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params } : any
 ) {
+  const { id } = await params;
   try {
     await prisma.user.delete({
       where: {
-        id: params.id,
+        id,
         role: "CLIENT",
       },
     });

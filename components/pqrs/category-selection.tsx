@@ -1,6 +1,6 @@
 "use client";
 
-import { Category, Entity } from "@prisma/client";
+import { Category } from "@prisma/client";
 import { useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
