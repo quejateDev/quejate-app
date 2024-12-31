@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 
-export default function EditEntityPage({ params }: { params: { id: string } }) {
+export default function EditEntityPage({ params }: any) {
   const [entity, setEntity] = useState<Entity | null>(null);
   const { id } = params;
   const router = useRouter();

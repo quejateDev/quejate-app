@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const entity = await prisma.entity.findUnique({
@@ -26,7 +26,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     const body = await request.json();
@@ -51,7 +51,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   try {
     await prisma.entity.delete({

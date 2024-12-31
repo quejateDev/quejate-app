@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { Department } from "@prisma/client";
 
-export default function EditAreaPage({ params }: { params: { id: string } }) {
+export default function EditAreaPage({ params }: any) {
   const [area, setArea] = useState<Department | null>(null);
   const { id } = params;
 
