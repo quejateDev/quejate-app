@@ -42,12 +42,9 @@ export function verifyToken(req: Request): null | { id: string; role: string } {
   if (!bearerToken) {
     return null;
   }
-
-  console.log(bearerToken);
-
+  
   try {
     const decodedToken = jwt.verify(bearerToken, JWT_SECRET);
-    console.log("decodedToken ", decodedToken);
     return decodedToken as { id: string; role: string };
   } catch (error) {
     console.error("Error verifying token:", error);

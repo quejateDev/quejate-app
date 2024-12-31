@@ -44,7 +44,11 @@ type PQRSForm = {
   isAnonymous: boolean;
 };
 
-export function NewPQRForm() {
+type NewPQRFormProps = {
+  entityId: string;
+};
+
+export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const { user } = useAuthStore();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -71,6 +75,7 @@ export function NewPQRForm() {
     try {
       const response = await getEntities();
       setEntities(response);
+      setSelectedEntityId(entityId);
     } catch (error) {
       console.error(error);
       toast({
@@ -96,7 +101,7 @@ export function NewPQRForm() {
   }, [selectedEntityId]);
 
   async function fetchDepartments() {
-    try {
+      try {
       const response = await getDepartmentsService();
       // Filter departments by selected entity
       const filteredDepartments = selectedEntityId
@@ -108,15 +113,15 @@ export function NewPQRForm() {
       if (pqr.departmentId && !filteredDepartments.find(d => d.id === pqr.departmentId)) {
         setPqr(prev => ({ ...prev, departmentId: "" }));
       }
-    } catch (error) {
+      } catch (error) {
       console.error(error);
-      toast({
-        title: "Error",
+        toast({
+          title: "Error",
         description: "Error al cargar los departamentos",
-        variant: "destructive",
-      });
+          variant: "destructive",
+        });
+      }
     }
-  }
 
   async function fetchCustomFields(departmentId: string) {
     try {

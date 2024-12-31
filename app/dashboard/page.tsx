@@ -1,20 +1,20 @@
-import { Button } from "@/components/ui/button";
 import { PQRCard } from "@/components/PQRCard";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Prisma, PQRSType } from "@prisma/client";
+import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 
 interface PageProps {
   searchParams: {
     type?: string;
-    sort?: string;
+    status?: string;
     entity?: string;
     department?: string;
   };
 }
 
-export default async function PQRS({ searchParams }: PageProps) {
+export default async function DashboardPage({ searchParams }: PageProps) {
   // Fetch entities and departments for filters
   const entities = await prisma.entity.findMany({
     select: {
@@ -30,65 +30,81 @@ export default async function PQRS({ searchParams }: PageProps) {
       entityId: true,
     },
   });
-  
-  const where: Prisma.PQRSWhereInput = {};
-  
+
+  // Build where clause based on search params
+  const where: any = {};
+
   if (searchParams.type && searchParams.type !== "all") {
     where.type = searchParams.type as PQRSType;
   }
-  
+
+  if (searchParams.status && searchParams.status !== "all") {
+    where.status = searchParams.status;
+  }
+
   if (searchParams.entity && searchParams.entity !== "all") {
     where.department = {
       entityId: searchParams.entity,
     };
   }
-  
+
   if (searchParams.department && searchParams.department !== "all") {
     where.departmentId = searchParams.department;
   }
 
-  // Determine sort order
-  let orderBy: any = { createdAt: "desc" };
-  if (searchParams.sort === "date-asc") {
-    orderBy = { createdAt: "asc" };
-  } else if (searchParams.sort === "likes-desc") {
-    orderBy = {
-      likes: {
-        _count: "desc",
-      },
-    };
-  }
-
+  // Fetch PQRs
   const pqrs = await prisma.pQRS.findMany({
     where,
-    orderBy,
     include: {
-      department: {
-        include: {
-          entity: true,
+      creator: {
+        select: {
+          firstName: true,
+          lastName: true,
         },
       },
-      customFieldValues: true,
+      department: {
+        select: {
+          name: true,
+          entity: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      likes: {
+        where: {
+          userId: "user-id", // TODO: Replace with actual user ID
+        },
+        select: {
+          id: true,
+        },
+      },
+      customFieldValues: {
+        select: {
+          name: true,
+          value: true,
+        },
+      },
       _count: {
         select: {
           likes: true,
         },
       },
-      likes: true,
-      creator: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto p-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">
-              PQRS Recientes
-            </h1>
-            <Link href="/dashboard/pqrs/new">
-              <Button>Crear PQRS</Button>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Mis PQRs</h1>
+            <Link href="/dashboard/pqrs/create">
+              <Button>Crear PQR</Button>
             </Link>
           </div>
 

@@ -1,6 +1,10 @@
 import { NewPQRForm } from "@/components/forms/new-pqr";
+const { useParams } = require("next/navigation");
 
-export default function NewPQR() {
+export default async function NewPQR({ params }: any) {
+  const { entityId} = await params;
+
+  console.log(entityId);
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto p-8">
@@ -8,7 +12,7 @@ export default function NewPQR() {
           <h1 className="text-3xl font-bold mb-8 text-center">
             Crear Nueva PQRS
           </h1>
-          <NewPQRForm />
+          <NewPQRForm entityId={entityId} />
         </div>
       </main>
     </div>
