@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getDepartmentsService } from "@/services/api/Department.service";
 import { DeparmentsTable } from "@/components/DeparmentsTable";
 import prisma from "@/lib/prisma";
+export const dynamic = 'force-dynamic';
+
 
 export default async function AreasPage() {
   const departments = await prisma.department.findMany({

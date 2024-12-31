@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 interface EntitiesTableProps {
   entities: (Entity & {
@@ -88,6 +90,7 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
               <TableHead>Categoría</TableHead>
               <TableHead>Fecha de Creación</TableHead>
               <TableHead>Última Actualización</TableHead>
+              <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -117,6 +120,13 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                 </TableCell>
                 <TableCell>
                   {new Date(entity.updatedAt).toLocaleDateString("es-ES")}
+                </TableCell>
+                <TableCell>
+                  <Link href={`/admin/entity/${entity.id}/edit`}>
+                    <Button variant="outline" size="sm">
+                      Editar
+                    </Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

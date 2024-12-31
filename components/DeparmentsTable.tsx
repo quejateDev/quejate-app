@@ -89,7 +89,7 @@ export function DeparmentsTable({ departments }: DeparmentsTableProps) {
               <TableCell>{new Date(department.updatedAt).toLocaleDateString("es-ES")}</TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Link href={`/admin/area/${department.id}`}>
+                  <Link href={`/admin/area/${department.id}/edit`}>
                     <Button variant="outline" size="sm">
                       Editar
                     </Button>
