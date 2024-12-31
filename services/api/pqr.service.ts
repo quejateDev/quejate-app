@@ -1,4 +1,4 @@
-import { Department, PQRS, Prisma, User } from "@prisma/client";
+import { Department, PQRS, User } from "@prisma/client";
 
 import { Client } from "./Client";
 import { getGetPQRDTO } from "@/dto/pqr.dto";
