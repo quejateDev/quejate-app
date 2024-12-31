@@ -1,18 +1,19 @@
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getDepartmentsService } from "@/services/api/Department.service";
 import { DeparmentsTable } from "@/components/DeparmentsTable";
+import prisma from "@/lib/prisma";
 
 export default async function AreasPage() {
-  console.log("departments");
-  let departments: any[] = [];
-  
-  try {
-    departments = await getDepartmentsService();
-    
-  } catch (error) {
-    console.error("Error fetching departments:", error);
-  }
+  const departments = await prisma.department.findMany({
+    include: {
+      entity: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
 
   return (
     <div className="container mx-auto py-10">
