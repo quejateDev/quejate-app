@@ -24,7 +24,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
@@ -38,13 +38,13 @@ export async function PATCH(
         name,
         description,
         categoryId,
-        imageUrl,
+        imageUrl: imageUrl || undefined,
       },
     });
 
     return NextResponse.json(entity);
   } catch (error) {
-    console.error("[ENTITY_PATCH]", error);
+    console.error("[ENTITY_PUT]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

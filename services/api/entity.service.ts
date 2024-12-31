@@ -16,6 +16,13 @@ type CreateEntityDTO = {
   imageUrl?: string;
 };
 
+type UpdateEntityDTO = {
+  name: string;
+  description: string;
+  categoryId: string;
+  imageUrl?: string;
+};
+
 export async function getEntities() {
   const response = await Client.get("/entities");
   return response.data;
@@ -30,5 +37,10 @@ export async function getCategories(): Promise<Category[]> {
 export async function createEntity(data: CreateEntityDTO): Promise<Entity> {
   console.log("hola");
   const response = await Client.post("/entities", data);
+  return response.data;
+}
+
+export async function updateEntity(id: string, data: UpdateEntityDTO): Promise<Entity> {
+  const response = await Client.put(`/entities/${id}`, data);
   return response.data;
 }

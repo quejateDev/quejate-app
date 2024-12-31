@@ -1,6 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 
-import type { Metadata } from "next";
 import "../globals.css";
 import NavbarDashboard from "@/components/Navbar/NavbarDashboard";
 
