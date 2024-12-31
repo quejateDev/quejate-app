@@ -122,7 +122,7 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                   {new Date(entity.updatedAt).toLocaleDateString("es-ES")}
                 </TableCell>
                 <TableCell>
-                  <Link href={`/admin/entity/${entity.id}/edit`}>
+                  <Link href={`/admin/entity/${entity.id}`}>
                     <Button variant="outline" size="sm">
                       Editar
                     </Button>
