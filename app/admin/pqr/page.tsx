@@ -1,4 +1,3 @@
-"use client";
 import PqrVsDepartmentChart from "@/components/charts/pqr/pqr-vs-deparment";
 import { PqrVsTimeChart } from "@/components/charts/pqr/pqr-vs-time";
 import PqrTable from "@/components/pqrTable";

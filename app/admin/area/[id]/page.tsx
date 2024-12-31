@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { AreaForm } from "@/components/forms/area-form";
-import { Client } from "@/services/api/Client";
 import { toast } from "@/hooks/use-toast";
 import {
   Card,
@@ -15,6 +14,7 @@ import { useParams } from "next/navigation";
 import { PQRConfigForm } from "@/components/forms/pqr-config-form";
 import { DepartmentWithConfig } from "@/dto/deparment/department-with-config.dto";
 import PqrFieldsForm from "@/components/forms/pqr-fields-form";
+import axios from "axios";
 
 const AreaPage = () => {
   const [area, setArea] = useState<DepartmentWithConfig | null>(null);
@@ -23,7 +23,7 @@ const AreaPage = () => {
   useEffect(() => {
     const fetchArea = async () => {
       try {
-        const response = await Client.get(`/area/${id}`);
+        const response = await axios.get(`/api/area/${id}`);
         setArea(response.data);
       } catch (error) {
         console.error("Error fetching area:", error);

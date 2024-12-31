@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 
 interface User {
   id: string;
-  username: string;
+  email: string;
   firstName: string;
   lastName: string;
   role: string;
@@ -58,14 +58,14 @@ export default function SocialPage() {
   const filteredUsers = users.filter(user => {
     const searchLower = debouncedSearch.toLowerCase();
     return (
-      user.username.toLowerCase().includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower) ||
       user.firstName.toLowerCase().includes(searchLower) ||
       user.lastName.toLowerCase().includes(searchLower)
     );
   });
 
   const UserCard = ({ user }: { user: User }) => (
-    <Link href={`/dashboard/profile/${user.username}`}>
+    <Link href={`/dashboard/profile/${user.id}`}>
       <Card className="hover:bg-accent transition-colors">
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
@@ -78,7 +78,7 @@ export default function SocialPage() {
               <h3 className="text-lg font-semibold">
                 {user.firstName} {user.lastName}
               </h3>
-              <p className="text-sm text-muted-foreground">@{user.username}</p>
+              <p className="text-sm text-muted-foreground">@{user.email}</p>
               <div className="flex gap-4 mt-2 text-sm">
                 <span className="text-muted-foreground">
                   {user._count.followers} seguidores
@@ -141,7 +141,7 @@ export default function SocialPage() {
                   {popularUsers.map((user, index) => (
                     <div key={user.id}>
                       <Link
-                        href={`/dashboard/profile/${user.username}`}
+                        href={`/dashboard/profile/${user.id}`}
                         className="flex items-center gap-3 hover:bg-accent rounded-lg p-2 transition-colors"
                       >
                         <Avatar className="h-10 w-10">

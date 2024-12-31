@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import CategoryList from "@/components/categories/category-list";
 import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface Category {
   id: string;
@@ -54,6 +56,10 @@ export default function CategoriesPage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Lista de Categorias</h1>
+
+        <Link href="/admin/categories/create">
+          <Button variant={"success"}>Crear Nueva Categoria</Button>
+        </Link>
       </div>
       <Card className="p-6">
         <CategoryList categories={categories} />

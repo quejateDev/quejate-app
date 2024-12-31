@@ -16,7 +16,6 @@ import useAuthStore from "@/store/useAuthStore";
 import {
   Users,
   Building2,
-  Settings,
   LogOut,
   MessageCircle,
   Building,
@@ -121,14 +120,6 @@ export function AppSidebar() {
           <SidebarGroupLabel>Sistema</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="/admin/settings">
-                    <Settings />
-                    <span>Configuración</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton className="bg-red-500 text-white hover rounded-lg hover:bg-red-600 hover:text-white" onClick={handleLogout}>
                   <LogOut />

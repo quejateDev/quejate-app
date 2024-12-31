@@ -3,7 +3,6 @@ import { NewPQRForm } from "@/components/forms/new-pqr";
 export default async function NewPQR({ params }: any) {
   const { entityId} = await params;
 
-  console.log(entityId);
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto p-8">

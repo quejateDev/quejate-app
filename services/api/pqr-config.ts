@@ -1,5 +1,13 @@
-import { Client } from "./Client";
 import { PQRConfigFormValues } from "@/types/pqr-config";
+import axios from "axios";
+
+const Client = axios.create({
+  baseURL: "/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 10000, // 10 seconds
+});
 
 interface PQRConfigData {
   allowAnonymous: boolean;

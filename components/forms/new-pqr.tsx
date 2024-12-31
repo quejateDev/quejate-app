@@ -197,6 +197,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
           title: "PQR creado",
           description: "El PQR ha sido creado exitosamente",
         });
+
+        window.location.href = `/dashboard`;
       }
     } catch (error) {
       console.error(error);

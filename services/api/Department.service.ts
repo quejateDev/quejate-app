@@ -1,5 +1,13 @@
 import { Department, Prisma } from "@prisma/client";
-import { Client } from "./Client";
+import axios from "axios";
+
+const Client = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000, // 10 seconds
+});
 
 // Define the extended Department type with relations
 type DepartmentWithRelations = Prisma.DepartmentGetPayload<{
