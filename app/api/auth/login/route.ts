@@ -15,8 +15,19 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Credenciales inválidas' },
         { status: 401 }
+      )
+    }
+
+    // Check if email is verified
+    if (user.role === "CLIENT" && !user.emailVerified) {
+      return NextResponse.json(
+        { 
+          error: 'Email no verificado',
+          message: 'Por favor verifica tu correo electrónico antes de iniciar sesión'
+        },
+        { status: 403 }
       )
     }
 
@@ -25,7 +36,7 @@ export async function POST(request: Request) {
 
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Credenciales inválidas' },
         { status: 401 }
       )
     }
@@ -33,9 +44,9 @@ export async function POST(request: Request) {
     // Create JWT token
     const token = signToken(user.id, user.role);
 
-    // Remove password from response
+    // Remove password and verification token from response
     // @ts-ignore
-    const { password: _, ...userWithoutPassword } = user
+    const { password: _, verificationToken: __, ...userWithoutPassword } = user
 
     return NextResponse.json({
       user: userWithoutPassword,
@@ -44,8 +55,8 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Error logging in' },
+      { error: 'Error al iniciar sesión' },
       { status: 500 }
     )
   }
-} 
+}
