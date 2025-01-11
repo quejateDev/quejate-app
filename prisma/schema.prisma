@@ -51,6 +51,7 @@ model Entity {
   id          String       @id @default(uuid())
   name        String
   description String?
+  email       String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   imageUrl    String?

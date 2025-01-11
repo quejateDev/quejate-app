@@ -23,6 +23,8 @@ const categories = await prisma.category.findMany({
   },
 });
 
+console.log(entities);
+
 
 export default async function EntitiesPage() {
   return (

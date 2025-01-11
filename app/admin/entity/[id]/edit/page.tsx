@@ -129,6 +129,7 @@ export default function EditEntityPage({ params }: any) {
         description: formData.description,
         imageUrl ,
         categoryId: formData.categoryId,
+        email: entity?.email || "",
       });
 
       toast({

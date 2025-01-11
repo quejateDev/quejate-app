@@ -9,12 +9,14 @@ import { Mail, Lock, LogIn } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import { EmailNotVerifiedModal } from "@/components/modals/email-not-verified-modal";
 
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { login, user } = useAuthStore();
   const router = useRouter();
 
@@ -27,6 +29,7 @@ export default function Login() {
       }
     }
   }, [user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -37,6 +40,7 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
 
+      console.log(response.status);
       if (response.ok) {
         const userData = await response.json();
 
@@ -54,8 +58,11 @@ export default function Login() {
           description: "Bienvenido de nuevo!",
           variant: "default",
         });
+      } else if (response.status === 403) {
+        // Show verification modal if email is not verified
+        setShowVerificationModal(true);
       } else {
-        // Handle error
+        // Handle other errors
         toast({
           title: "Error",
           description: "Credenciales inválidas",
@@ -71,6 +78,7 @@ export default function Login() {
       });
     }
   };
+
   return (
     <main
       className="flex grow bg-white"
@@ -148,6 +156,11 @@ export default function Login() {
           </CardContent>
         </Card>
       </div>
+      <EmailNotVerifiedModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        email={formData.email}
+      />
     </main>
   );
 }

@@ -28,7 +28,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, imageUrl, categoryId } = body;
+    const { name, description, imageUrl, categoryId, email } = body;
 
     if (!categoryId) {
       return NextResponse.json(
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         description,
         imageUrl,
         categoryId,
+        email,
       },
       include: {
         category: {

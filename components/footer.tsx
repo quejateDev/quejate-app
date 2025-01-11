@@ -1,3 +1,5 @@
+import { FacebookIcon, InstagramIcon } from "lucide-react";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-12 mt-20">
@@ -12,15 +14,20 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-4">Contacto</h3>
             <p className="text-gray-400">
-              Email: contacto@tuqueja.com
+              Email: soporte@qujate.com.co
               <br />
-              Tel: +57 (1) 123 4567
             </p>
           </div>
           <div>
             <h3 className="text-xl font-bold mb-4">Síguenos</h3>
             <div className="flex space-x-4">
-              {/* Aquí puedes agregar íconos de redes sociales */}
+              <a href="https://www.instagram.com/qujateco/" target="_blank" rel="noopener noreferrer">
+                <InstagramIcon className="w-6 h-6" />
+              </a>
+              <a href="https://www.facebook.com/qujateco/" target="_blank" rel="noopener noreferrer">
+                <FacebookIcon className="w-6 h-6" />
+              </a>
+              
             </div>
           </div>
         </div>

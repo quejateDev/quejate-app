@@ -14,6 +14,7 @@ type CreateEntityDTO = {
   description: string;
   categoryId: string;
   imageUrl?: string;
+  email: string;
 };
 
 type UpdateEntityDTO = {
@@ -21,6 +22,7 @@ type UpdateEntityDTO = {
   description: string;
   categoryId: string;
   imageUrl?: string;
+  email: string;
 };
 
 export async function getEntities() {

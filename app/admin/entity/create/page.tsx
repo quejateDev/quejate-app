@@ -35,6 +35,7 @@ export default function CreateEntityPage() {
     description: "",
     image: null as File | null,
     categoryId: "",
+    email: "",
   });
 
   useEffect(() => {
@@ -107,8 +108,9 @@ export default function CreateEntityPage() {
       await createEntity({
         name: formData.name,
         description: formData.description,
-        imageUrl,
         categoryId: formData.categoryId,
+        imageUrl: imageUrl,
+        email: formData.email,
       });
 
       toast({
@@ -145,11 +147,26 @@ export default function CreateEntityPage() {
                 id="name"
                 value={formData.name}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  setFormData({ ...formData, name: e.target.value })
                 }
                 required
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="correo@entidad.com"
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="description">Descripción</Label>
               <Textarea

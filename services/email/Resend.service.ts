@@ -13,7 +13,7 @@ export async function sendPQRCreationEmail(
   pqrLink: string
 ) {
   const { data, error } = await resend.emails.send({
-    from: "onboarding@resend.dev",
+    from: "noresponder@quejate.com.co",
     to: [email],
     subject: subject,
     react: PqrCreationEmail({
@@ -29,8 +29,8 @@ export async function sendPQRCreationEmail(
 
 export async function sendVerificationEmail(email: string, token: string) {
   const { data, error } = await resend.emails.send({
-    from: "onboarding@resend.dev",
-    to: ["luisevilla588@gmail.com"],
+    from: "noresponder@quejate.com.co",
+    to: [email],
     subject: "Verifique su correo electr&oacute;nico",
     react: VerificationEmail({ userName: email, token: token }),
   });
