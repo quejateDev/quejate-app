@@ -25,11 +25,11 @@ import { useRouter } from "next/navigation";
 
 // Menu items.
 const InternalManagement = [
-  // {
-  //   title: "Empleados",
-  //   url: "/admin/employee",
-  //   icon: Users,
-  // },
+  {
+    title: "Categories",
+    url: "/admin/categories",
+    icon: Tags,
+  },
   {
     title: "Entidades",
     url: "/admin/entity",
@@ -39,11 +39,6 @@ const InternalManagement = [
     title: "Areas",
     url: "/admin/area",
     icon: Building2,
-  },
-  {
-    title: "Categories",
-    url: "/admin/categories",
-    icon: Tags,
   },
   {
     title: "PQRs",
