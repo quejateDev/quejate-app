@@ -34,7 +34,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   const { department, entity, type, status } = await searchParams;
 
   // Build where clause based on search params
-  const where: any = {};
+  const where: any = {
+    private: false
+  };
 
   if (type && type !== "all") {
     where.type = type as PQRSType;

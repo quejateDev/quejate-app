@@ -8,32 +8,29 @@ datasource db {
 }
 
 model User {
-  id           String      @id @default(uuid())
-  password     String
-  firstName    String
-  lastName     String
-  email        String      @unique
-  phone        String
-  role         UserRole
-  emailVerified DateTime?
-  verificationToken String? @unique
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  departmentId String?
-  Like         Like[]
-  PQRS         PQRS[]
-  department   Department? @relation(fields: [departmentId], references: [id])
-  notifications Notification[]
-
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  
-  // Following relationship
-  following    User[]      @relation("UserFollows")
-  followers    User[]      @relation("UserFollows")
+  id                String              @id @default(uuid())
+  password          String
+  firstName         String
+  lastName          String
+  email             String              @unique
+  phone             String
+  role              UserRole
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  departmentId      String?
+  emailVerified     DateTime?
+  verificationToken String?             @unique
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  EmailVerification EmailVerification[]
+  Like              Like[]
+  notifications     Notification[]
+  PQRS              PQRS[]
+  department        Department?         @relation(fields: [departmentId], references: [id])
+  User_A            User[]              @relation("UserFollows")
+  User_B            User[]              @relation("UserFollows")
 
   @@index([departmentId])
-  EmailVerification EmailVerification[]
 }
 
 model Department {
@@ -55,24 +52,24 @@ model Entity {
   id          String       @id @default(uuid())
   name        String
   description String?
-  email       String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  imageUrl    String?
-  Department  Department[]
   categoryId  String
+  imageUrl    String?
+  email       String?
+  Department  Department[]
   category    Category     @relation(fields: [categoryId], references: [id])
 
   @@index([categoryId])
 }
 
 model Category {
-  id          String       @id @default(uuid())
-  name        String      @unique
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   imageUrl    String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
   entities    Entity[]
 }
 
@@ -86,6 +83,7 @@ model PQRS {
   updatedAt         DateTime           @updatedAt
   creatorId         String
   departmentId      String
+  private           Boolean            @default(false)
   attachments       Attachment[]
   customFieldValues CustomFieldValue[]
   likes             Like[]
@@ -127,13 +125,13 @@ model PQRCustomField {
 
 model Attachment {
   id        String   @id @default(uuid())
-  name      String
-  size      Int
-  type      String
   url       String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name      String
   pqrId     String
+  size      Int
+  type      String
+  updatedAt DateTime @updatedAt
   pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
 
   @@index([pqrId])

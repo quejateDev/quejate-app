@@ -14,7 +14,8 @@ export async function GET(request: Request, params: any ) {
 
     const userPQRs = await prisma.pQRS.findMany({
       where: {
-        creatorId: userId
+        creatorId: userId,
+        private: false
       },
       include: {
         likes: true,

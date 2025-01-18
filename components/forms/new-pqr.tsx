@@ -59,6 +59,7 @@ type PQRSForm = {
   dueDate: Date;
   customFields: CustomFieldValue[];
   isAnonymous: boolean;
+  isPrivate: boolean;
   attachments: File[];
 };
 
@@ -78,6 +79,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     dueDate: new Date(),
     customFields: [],
     isAnonymous: false,
+    isPrivate: false,
     attachments: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<string>("");
@@ -475,6 +477,20 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 }
               />
               <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isPrivate"
+                checked={pqr.isPrivate}
+                onCheckedChange={(checked) =>
+                  setPqr((prev) => ({
+                    ...prev,
+                    isPrivate: checked as boolean,
+                  }))
+                }
+              />
+              <Label htmlFor="isPrivate">Es privada</Label>
             </div>
 
             <Button type="submit" disabled={isLoading}>

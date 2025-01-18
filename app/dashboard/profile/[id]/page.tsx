@@ -104,6 +104,7 @@ export default function ProfilePage() {
           <h3 className="text-lg font-semibold mb-4">PQRs Recientes</h3>
           <div className="space-y-4">
             {pqrs?.length && pqrs.length > 0 ? (
+              // @ts-ignore
               pqrs?.map((pqr) => <PQRCard key={pqr.id} pqr={pqr} />)
             ) : (
               <p className="text-muted-foreground">No hay PQRs publicadas</p>

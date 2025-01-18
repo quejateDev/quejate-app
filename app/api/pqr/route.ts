@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
             required: field.required,
           })),
         },
+        private: body.isPrivate || false
       },
       include: {
         department: true,
