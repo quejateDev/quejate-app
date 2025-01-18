@@ -21,14 +21,14 @@ export function FollowButton({
 }: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
 
   const handleFollow = async () => {
     if (!user || user.id === userId) return;
 
     setIsLoading(true);
     try {
-      const { followed, counts } = await followUserService(userId);
+      const { followed, counts } = await followUserService(userId, token as string);
       setIsFollowing(followed);
       onFollowChange?.(followed, counts);
     } catch (error) {
