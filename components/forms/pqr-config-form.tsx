@@ -127,7 +127,7 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="notifyEmail"
               render={({ field }) => (
@@ -147,9 +147,9 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
                   </div>
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="autoAssign"
               render={({ field }) => (
@@ -168,7 +168,7 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
                   </div>
                 </FormItem>
               )}
-            />
+            /> */}
 
             <div className="flex justify-end">
               <Button type="submit">Guardar configuración</Button>

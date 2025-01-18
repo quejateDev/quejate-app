@@ -34,7 +34,14 @@ import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Combobox } from "../ui/combobox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
 import { cn } from "@/lib/utils";
 
 type CustomFieldValue = {
@@ -52,6 +59,7 @@ type PQRSForm = {
   dueDate: Date;
   customFields: CustomFieldValue[];
   isAnonymous: boolean;
+  attachments: File[];
 };
 
 type NewPQRFormProps = {
@@ -70,6 +78,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     dueDate: new Date(),
     customFields: [],
     isAnonymous: false,
+    attachments: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -195,18 +204,34 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     });
   };
 
+  const handleFileChange = (files: File[]) => {
+    setPqr((prev) => ({
+      ...prev,
+      attachments: [...prev.attachments, ...files],
+    }));
+  };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { customFields: customFieldValues, ...pqrData } = pqr;
+      const { customFields: customFieldValues, attachments, ...pqrData } = pqr;
 
-      // // First create the PQRS
-      const response = await createPQRS({
-        ...pqrData,
-        customFields: customFieldValues,
+      const formData = new FormData();
+      formData.append(
+        "data",
+        JSON.stringify({
+          ...pqrData,
+          customFields: customFieldValues,
+        })
+      );
+
+      attachments.forEach((file, index) => {
+        formData.append(`attachment-${index}`, file);
       });
+
+      const response = await createPQRS(formData);
 
       if (response) {
         toast({
@@ -248,7 +273,11 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
         <CardTitle>Envía tu PQRS</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+          encType="multipart/form-data"
+        >
           <div className="grid gap-4">
             <div>
               <Label>Tipo de Solicitud</Label>
@@ -281,7 +310,9 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     className="w-full justify-between"
                   >
                     {selectedEntityId
-                      ? entities.find((entity) => entity.id === selectedEntityId)?.name
+                      ? entities.find(
+                          (entity) => entity.id === selectedEntityId
+                        )?.name
                       : "Seleccione una entidad..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -290,7 +321,9 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   <Command className="w-full">
                     <CommandInput placeholder="Buscar entidad..." />
                     <CommandList className="max-h-[300px] w-full overflow-y-auto">
-                      <CommandEmpty>No se encontro ninguna entidad.</CommandEmpty>
+                      <CommandEmpty>
+                        No se encontro ninguna entidad.
+                      </CommandEmpty>
                       <CommandGroup className="w-full">
                         {entities.map((entity) => (
                           <CommandItem
@@ -341,7 +374,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
                   <Command className="w-full">
                     <CommandInput placeholder="Buscar area..." />
-                    <CommandList className="max-h-[300px] w-full overflow-y-auto"> 
+                    <CommandList className="max-h-[300px] w-full overflow-y-auto">
                       <CommandEmpty>No se encontro ninguna area.</CommandEmpty>
                       <CommandGroup className="w-full">
                         {departments.map((department) => (
@@ -412,6 +445,23 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   return <TextField key={field.name} {...commonProps} />;
               }
             })}
+
+            <div className="space-y-2">
+              <Label>Archivos adjuntos</Label>
+              <input
+                type="file"
+                multiple
+                onChange={(e) =>
+                  handleFileChange(Array.from(e.target.files || []))
+                }
+                className="w-full"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              />
+              <p className="text-sm text-muted-foreground">
+                Formatos permitidos: PDF, DOC, DOCX, JPG, PNG. Tamaño máximo:
+                5MB por archivo
+              </p>
+            </div>
 
             <div className="flex items-center space-x-2">
               <Checkbox

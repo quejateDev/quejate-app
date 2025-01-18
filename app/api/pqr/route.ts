@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
-
 import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
+import path from "path";
+import { uploadObject } from "@/services/storage/s3.service";
+
+interface FormFile extends File {
+  arrayBuffer(): Promise<ArrayBuffer>;
+}
 
 export async function GET() {
   try {
@@ -13,6 +18,7 @@ export async function GET() {
       include: {
         department: true,
         customFieldValues: true,
+        attachments: true
       },
     });
 
@@ -35,14 +41,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
-
-    if (!body) {
+    const formData = await req.formData();
+    const jsonData = formData.get('data');
+    
+    if (!jsonData) {
       return NextResponse.json(
-        { error: "Failed to parse request body" },
+        { error: "Missing PQR data" },
         { status: 400 }
       );
     }
+
+    const body = JSON.parse(jsonData as string);
 
     // Validate required fields
     if (
@@ -54,6 +63,14 @@ export async function POST(req: NextRequest) {
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    // Get files from form data
+    const files: File[] = [];
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith('attachment-') && value instanceof File) {
+        files.push(value);
+      }
     }
 
     const pqrConfig = await prisma.pQRConfig.findFirst({
@@ -76,43 +93,85 @@ export async function POST(req: NextRequest) {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + pqrConfig.maxResponseTime);
 
-    const response = await prisma.pQRS.create({
+    // Create PQR with attachments
+    const pqr = await prisma.pQRS.create({
       data: {
         type: body.type,
         dueDate,
-        anonymous: body.isAnonymous,
+        anonymous: body.isAnonymous || false,
+        departmentId: body.departmentId,
+        creatorId: body.creatorId,
         customFieldValues: {
-          createMany: {
-            data: body.customFields,
-          },
-        },
-        department: {
-          connect: {
-            id: body.departmentId,
-          },
-        },
-        creator: {
-          connect: {
-            id: body.creatorId,
-          },
+          create: body.customFields.map((field: any) => ({
+            name: field.name,
+            value: field.value,
+            type: field.type,
+            placeholder: field.placeholder,
+            required: field.required,
+          })),
         },
       },
       include: {
-        creator: true,
+        department: true,
         customFieldValues: true,
+        attachments: true,
+        creator: true,
       },
     });
 
-    await sendPQRCreationEmail(
-      response.creator?.email || "luisevilla588@gmail.com",
-      response.creator?.firstName || "John Doe",
-      "Registro exitoso de PQR @tuqueja.com.co",
-      response.id.toString(),
-      new Date(response.createdAt).toLocaleString('es-CO', { timeZone: 'America/Bogota' }),
-      `https://tuqueja.com.co/pqr/${response.id}`
+    const attachments: {
+      name: string;
+      url: string;
+      type: string;
+      size: number;
+    }[] = [];
+    // upload attachments to s3 
+    await Promise.all(
+      files.map(async (file: FormFile) => {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const filePath = `pqr/${pqr.id}/attachments/${file.name}`;
+        const s3file = await uploadObject(filePath, buffer);
+        attachments.push({
+          name: file.name,
+          url: filePath,
+          type: file.type,
+          size: file.size
+        });
+      })
     );
 
-    return NextResponse.json(response);
+    if (attachments.length > 0) {
+      await prisma.pQRS.update({
+        where: {
+          id: pqr.id,
+        },
+        data: {
+          attachments: {
+            createMany: {
+              data: attachments.map((attachment) => ({
+                name: attachment.name,
+                url: attachment.url,
+                type: attachment.type,
+                size: attachment.size
+              })),
+            },
+          },
+        },
+      });
+    }
+
+    // Send email notification
+    await sendPQRCreationEmail(
+      pqr.creator?.email || "luisevilla588@gmail.com",
+      pqr.creator?.firstName || "John Doe",
+      "Registro exitoso de PQR @tuqueja.com.co",
+      pqr.id.toString(),
+      new Date(pqr.createdAt).toLocaleString('es-CO', { timeZone: 'America/Bogota' }),
+      `https://tuqueja.com.co/pqr/${pqr.id}`
+    );
+
+    return NextResponse.json(pqr);
   } catch (error: any) {
     console.error("Error in POST /api/pqr:", error.stack);
     return NextResponse.json(

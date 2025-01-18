@@ -1,15 +1,16 @@
 "use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PQRS } from "@prisma/client";
-import { Heart, Clock } from "lucide-react";
+import { Heart, Clock, Paperclip } from "lucide-react";
 import { useState } from "react";
 import { toggleLike } from "@/services/api/pqr.service";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import Image from "next/image";
 
 type PQRCardProps = {
   pqr: PQRS & {
@@ -26,6 +27,12 @@ type PQRCardProps = {
     customFieldValues: {
       name: string;
       value: string;
+    }[];
+    attachments: {
+      name: string;
+      url: string;
+      type: string;
+      size: number;
     }[];
     _count?: {
       likes: number;
@@ -61,6 +68,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const [likeCount, setLikeCount] = useState(pqr._count?.likes || 0);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuthStore();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const status = statusMap[pqr.status as keyof typeof statusMap];
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
@@ -82,18 +90,18 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const handleLike = async () => {
     if (!user || !user.id) {
       toast({
-        title: "Inicia sesión",
+        title: "Error",
         description: "Debes iniciar sesión para dar like",
         variant: "destructive",
       });
       return;
     }
 
-    setIsLoading(true);
     try {
-      const response = await toggleLike(pqr.id, user.id);
-      setLiked(response.liked);
-      setLikeCount(response.likes);
+      setIsLoading(true);
+      await toggleLike(pqr.id, user.id);
+      setLiked(!liked);
+      setLikeCount(prev => liked ? prev - 1 : prev + 1);
     } catch (error) {
       console.error("Error toggling like:", error);
       toast({
@@ -106,66 +114,157 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
     }
   };
 
+  const hasImages = pqr.attachments?.some(attachment => 
+    attachment.type.startsWith('image/')
+  );
+
+  const getFullUrl = (url: string) => {
+    return `https://quejate.s3.us-east-2.amazonaws.com/${url}`;
+  };
+
+  const imageAttachments = pqr.attachments?.filter(att => att.type.startsWith('image/')) || [];
+  const otherAttachments = pqr.attachments?.filter(att => !att.type.startsWith('image/')) || [];
+
   return (
     <Card>
-      <CardHeader className="space-y-1">
+      <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-xl font-bold">
+            <CardTitle className="text-lg font-bold">
               {typeMap[pqr.type as keyof typeof typeMap]}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Por: {creatorName} • {formattedDate}
-            </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Para: {pqr.department.entity.name} - {pqr.department.name}
+              Por {creatorName}
             </p>
-            <div className="flex items-center gap-2 mt-2">
+          </div>
+          <Badge variant={status.variant as any}>
+            {status.label}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {pqr.department.entity.name} - {pqr.department.name}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {formattedDate}
+            </p>
+          </div>
+
+          {/* Custom Fields */}
+          {pqr.customFieldValues.length > 0 && (
+            <div className="space-y-2">
+              {pqr.customFieldValues.map((field) => (
+                <p key={field.name} className="text-sm">
+                  <span className="font-medium">{field.name}:</span> {field.value}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {/* Image Attachments - Instagram/Facebook Style */}
+          {imageAttachments.length > 0 && (
+            <div className={cn(
+              "grid gap-1 -mx-6",
+              imageAttachments.length === 1 && "grid-cols-1",
+              imageAttachments.length === 2 && "grid-cols-2",
+              imageAttachments.length >= 3 && "grid-cols-3",
+              imageAttachments.length === 4 && "grid-cols-2 grid-rows-2"
+            )}>
+              {imageAttachments.slice(0, 4).map((attachment, index) => (
+                <Dialog key={attachment.url}>
+                  <DialogTrigger asChild>
+                    <div className={cn(
+                      "relative cursor-pointer group",
+                      imageAttachments.length === 1 ? "h-96" : "h-48",
+                      imageAttachments.length === 4 && index === 0 && "col-span-2 row-span-2"
+                    )}>
+                      <Image
+                        src={getFullUrl(attachment.url)}
+                        alt={attachment.name}
+                        fill
+                        className="object-cover"
+                      />
+                      {index === 3 && imageAttachments.length > 4 && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <span className="text-white text-xl font-medium">
+                            +{imageAttachments.length - 4}
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl">
+                    <div className="relative h-[80vh]">
+                      <Image
+                        src={getFullUrl(attachment.url)}
+                        alt={attachment.name}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ))}
+            </div>
+          )}
+
+          {/* Other Attachments */}
+          {otherAttachments.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {otherAttachments.map((attachment) => (
+                <a
+                  key={attachment.url}
+                  href={getFullUrl(attachment.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary rounded-md hover:bg-secondary/80 transition-colors text-sm"
+                >
+                  <Paperclip className="w-4 h-4" />
+                  {attachment.name}
+                </a>
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-between items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={handleLike}
+              disabled={isLoading}
+            >
+              <Heart
+                className={cn(
+                  "w-4 h-4",
+                  liked ? "fill-current text-red-500" : "text-gray-500"
+                )}
+              />
+              <span>{likeCount}</span>
+            </Button>
+
+            <div className="flex items-center gap-2">
               <Clock className={cn(
-                "h-4 w-4",
-                isExpired && "text-red-500",
-                isUrgent && "text-yellow-500",
-                !isExpired && !isUrgent && "text-green-500"
+                "w-4 h-4",
+                isExpired ? "text-red-500" : isUrgent ? "text-yellow-500" : "text-green-500"
               )} />
               <span className={cn(
-                "text-sm font-medium",
-                isExpired && "text-red-500",
-                isUrgent && "text-yellow-500",
-                !isExpired && !isUrgent && "text-green-500"
+                "text-sm",
+                isExpired ? "text-red-500" : isUrgent ? "text-yellow-500" : "text-green-500"
               )}>
-                {isExpired 
+                {isExpired
                   ? "Vencido"
-                  : `${remainingDays} ${remainingDays === 1 ? 'día' : 'días'} restantes`
-                }
+                  : isUrgent
+                    ? `${remainingDays} días restantes`
+                    : `${remainingDays} días restantes`}
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLike}
-              disabled={isLoading}
-              className={liked ? "text-red-500" : ""}
-            >
-              <Heart className={liked ? "fill-current" : ""} />
-              <span className="ml-2">{likeCount}</span>
-            </Button>
-            <Badge variant={status.variant as "default" | "warning" | "success" | "destructive"}>
-              {status.label}
-            </Badge>
-          </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {pqr.customFieldValues.map((field) => (
-          <div key={field.name} className="space-y-1">
-            <h4 className="text-sm font-medium">{field.name}</h4>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {field.value || "No especificado"}
-            </p>
-          </div>
-        ))}
       </CardContent>
     </Card>
   );

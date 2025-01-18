@@ -25,8 +25,13 @@ type createPQRS = {
 
 
 
-export async function createPQRS(data: createPQRS) {
-  const response = await Client.post("/pqr", data);
+export async function createPQRS(formData: FormData) {
+  const response = await axios.post("/api/pqr", formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    timeout: 30000, // 30 seconds for file uploads
+  });
   return response.data;
 }
 

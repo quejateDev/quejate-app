@@ -88,6 +88,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           value: true,
         },
       },
+      attachments: true,
       _count: {
         select: {
           likes: true,

@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.726.1",
+    "@aws-sdk/client-s3": "^3.731.1",
     "@aws-sdk/s3-request-presigner": "^3.726.1",
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "6.0.1",
@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "date-fns": "^4.1.0",
+    "formidable": "^3.5.2",
     "framer-motion": "^11.15.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
@@ -44,6 +45,7 @@
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.5",
     "react-hook-form": "^7.54.1",
     "recharts": "^2.15.0",
     "resend": "^4.0.1",

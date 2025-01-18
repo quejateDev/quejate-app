@@ -137,7 +137,7 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
                                   <SelectItem value="phone">Teléfono</SelectItem>
                                   <SelectItem value="text">Texto</SelectItem>
                                   <SelectItem value="textarea">Texto Largo</SelectItem>
-                                  <SelectItem value="file">Archivo</SelectItem>
+                                  {/* <SelectItem value="file">Archivo</SelectItem> */}
                                   <SelectItem value="number">Número</SelectItem>
                                 </SelectContent>
                               </Select>

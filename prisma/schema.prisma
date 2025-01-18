@@ -127,11 +127,16 @@ model PQRCustomField {
 
 model Attachment {
   id        String   @id @default(uuid())
-  filename  String
+  name      String
+  size      Int
+  type      String
   url       String
   createdAt DateTime @default(now())
-  pqrsId    String
-  pqrs      PQRS     @relation(fields: [pqrsId], references: [id])
+  updatedAt DateTime @updatedAt
+  pqrId     String
+  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+
+  @@index([pqrId])
 }
 
 model PQRConfig {
