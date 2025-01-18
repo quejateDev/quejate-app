@@ -144,14 +144,25 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-xs md:text-sm text-muted-foreground">
-              No tienes una cuenta?{" "}
-              <Link
-                href="/signup"
-                className="underline-offset-4 hover:underline text-blue-500 font-bold hover:text-blue-600"
-              >
-                Crear cuenta
-              </Link>
+            <div className="flex flex-col space-y-4 mt-4">
+              <div className="text-center text-xs md:text-sm text-muted-foreground">
+                <Link
+                  href="/reset-password/request"
+                  className="underline-offset-4 hover:underline text-blue-500 font-bold hover:text-blue-600"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+
+              <div className="text-center text-xs md:text-sm text-muted-foreground">
+                ¿No tienes una cuenta?{" "}
+                <Link
+                  href="/signup"
+                  className="underline-offset-4 hover:underline text-blue-500 font-bold hover:text-blue-600"
+                >
+                  Crear cuenta
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>

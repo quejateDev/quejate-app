@@ -24,6 +24,10 @@ model User {
   PQRS         PQRS[]
   department   Department? @relation(fields: [departmentId], references: [id])
   notifications Notification[]
+
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  
   // Following relationship
   following    User[]      @relation("UserFollows")
   followers    User[]      @relation("UserFollows")

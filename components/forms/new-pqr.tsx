@@ -13,7 +13,13 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { getDepartmentsService } from "@/services/api/Department.service";
-import { Entity, Department, PQRSType, User, CustomField } from "@prisma/client";
+import {
+  Entity,
+  Department,
+  PQRSType,
+  User,
+  CustomField,
+} from "@prisma/client";
 import { useEffect, useState } from "react";
 import { TextField } from "../fields/TextField";
 import { TextAreaField } from "../fields/TextAreaField";
@@ -24,8 +30,12 @@ import { NumberField } from "../fields/NumberField";
 import { createPQRS } from "@/services/api/pqr.service";
 import { getEntities } from "@/services/api/entity.service";
 import useAuthStore from "@/store/useAuthStore";
-import { Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import { Combobox } from "../ui/combobox";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import { cn } from "@/lib/utils";
 
 type CustomFieldValue = {
   name: string;
@@ -65,6 +75,9 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 
+  const [openDepartment, setOpenDepartment] = useState(false);
+  const [openEntity, setOpenEntity] = useState(false);
+
   useEffect(() => {
     if (user) {
       setPqr((prev) => ({ ...prev, creatorId: user?.id || "" }));
@@ -101,27 +114,30 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
   }, [selectedEntityId]);
 
   async function fetchDepartments() {
-      try {
+    try {
       const response = await getDepartmentsService();
       // Filter departments by selected entity
       const filteredDepartments = selectedEntityId
         ? response.filter((dept) => dept.entityId === selectedEntityId)
         : [];
       setDepartments(filteredDepartments);
-      
+
       // Clear department selection when entity changes
-      if (pqr.departmentId && !filteredDepartments.find(d => d.id === pqr.departmentId)) {
-        setPqr(prev => ({ ...prev, departmentId: "" }));
+      if (
+        pqr.departmentId &&
+        !filteredDepartments.find((d) => d.id === pqr.departmentId)
+      ) {
+        setPqr((prev) => ({ ...prev, departmentId: "" }));
       }
-      } catch (error) {
+    } catch (error) {
       console.error(error);
-        toast({
-          title: "Error",
+      toast({
+        title: "Error",
         description: "Error al cargar los departamentos",
-          variant: "destructive",
-        });
-      }
+        variant: "destructive",
+      });
     }
+  }
 
   async function fetchCustomFields(departmentId: string) {
     try {
@@ -256,43 +272,107 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
 
             <div>
               <Label>Entidad</Label>
-              <Select
-                value={selectedEntityId}
-                onValueChange={(value: string) => setSelectedEntityId(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione una entidad" />
-                </SelectTrigger>
-                <SelectContent>
-                  {entities.map((entity) => (
-                    <SelectItem key={entity.id} value={entity.id}>
-                      {entity.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={openEntity} onOpenChange={setOpenEntity}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openEntity}
+                    className="w-full justify-between"
+                  >
+                    {selectedEntityId
+                      ? entities.find((entity) => entity.id === selectedEntityId)?.name
+                      : "Seleccione una entidad..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                  <Command className="w-full">
+                    <CommandInput placeholder="Buscar entidad..." />
+                    <CommandList className="max-h-[300px] w-full overflow-y-auto">
+                      <CommandEmpty>No se encontro ninguna entidad.</CommandEmpty>
+                      <CommandGroup className="w-full">
+                        {entities.map((entity) => (
+                          <CommandItem
+                            key={entity.id}
+                            value={entity.name}
+                            onSelect={() => {
+                              setSelectedEntityId(entity.id);
+                              setOpenEntity(false);
+                            }}
+                            className="w-full"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedEntityId === entity.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {entity.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
               <Label>Área</Label>
-              <Select
-                value={pqr.departmentId}
-                onValueChange={(value: string) =>
-                  setPqr((prev) => ({ ...prev, departmentId: value }))
-                }
-                disabled={!selectedEntityId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione un área" />
-                </SelectTrigger>
-                <SelectContent>
-                  {departments.map((department) => (
-                    <SelectItem key={department.id} value={department.id}>
-                      {department.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openDepartment}
+                    className="w-full justify-between"
+                  >
+                    {pqr.departmentId
+                      ? departments.find(
+                          (department) => department.id === pqr.departmentId
+                        )?.name
+                      : "Seleccione un area..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                  <Command className="w-full">
+                    <CommandInput placeholder="Buscar area..." />
+                    <CommandList className="max-h-[300px] w-full overflow-y-auto"> 
+                      <CommandEmpty>No se encontro ninguna area.</CommandEmpty>
+                      <CommandGroup className="w-full">
+                        {departments.map((department) => (
+                          <CommandItem
+                            key={department.id}
+                            value={department.name}
+                            onSelect={() => {
+                              setPqr((prev) => ({
+                                ...prev,
+                                departmentId: department.id,
+                              }));
+                              setOpenDepartment(false);
+                            }}
+                            className="w-full"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                pqr.departmentId === department.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {department.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {customFields.map((field) => {
@@ -301,8 +381,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 label: field.name,
                 placeholder: field.placeholder || "",
                 value:
-                  pqr.customFields.find((cf) => cf.name === field.name)?.value ||
-                  "",
+                  pqr.customFields.find((cf) => cf.name === field.name)
+                    ?.value || "",
                 onChange: (value: string) =>
                   handleCustomFieldChange(field.name, value),
                 required: field.required,
@@ -338,7 +418,10 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 id="isAnonymous"
                 checked={pqr.isAnonymous}
                 onCheckedChange={(checked) =>
-                  setPqr((prev) => ({ ...prev, isAnonymous: checked as boolean }))
+                  setPqr((prev) => ({
+                    ...prev,
+                    isAnonymous: checked as boolean,
+                  }))
                 }
               />
               <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
@@ -351,7 +434,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   Enviando...
                 </>
               ) : (
-                'Enviar PQRS'
+                "Enviar PQRS"
               )}
             </Button>
           </div>
