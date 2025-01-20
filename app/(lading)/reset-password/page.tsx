@@ -1,9 +1,8 @@
 "use client";
+import { Suspense } from "react";
 import { ResetPasswordForm } from "./reset-password-form";
-import { useSearchParams } from "next/navigation";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
@@ -16,7 +15,13 @@ export default function ResetPasswordPage() {
             Ingresa tu nueva contraseña a continuación
           </p>
         </div>
-        <ResetPasswordForm token={searchParams.get("token") as string} />
+        <Suspense
+          fallback={
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          }
+        >
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -34,14 +34,14 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-interface ResetPasswordFormProps {
-  token?: string;
-}
-
-export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export function ResetPasswordForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+
+  const token = searchParams.get("token") as string
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

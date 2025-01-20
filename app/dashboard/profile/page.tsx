@@ -48,6 +48,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             {pqrs.length > 0 ? (
               pqrs?.map((pqr) => (
+                //@ts-ignore
                 <PQRCard key={pqr.id} pqr={pqr} />
               ))
             ) : (

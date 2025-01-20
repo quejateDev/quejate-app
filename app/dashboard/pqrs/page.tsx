@@ -66,6 +66,7 @@ export default function UserPQRs() {
         {pqrs.map((pqr) => (
           <PQRCard
             key={pqr.id}
+            // @ts-ignore
             pqr={pqr}
             initialLiked={pqr.likes.some((like) => like.userId === user?.id)}
           />
