@@ -9,6 +9,14 @@ export default async function PQRPage() {
   const pqrs = await prisma.pQRS.findMany({
     orderBy: {
       createdAt: "desc",
+    },
+    include: {
+      department: {
+        include: {
+          entity: true,
+        },
+      },
+      creator: true,
     }
   })
 

@@ -1,10 +1,10 @@
+"use client";
 import { ResetPasswordForm } from "./reset-password-form";
+import { useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: { token?: string };
-}) {
+export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
+
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
@@ -16,7 +16,7 @@ export default function ResetPasswordPage({
             Ingresa tu nueva contraseña a continuación
           </p>
         </div>
-        <ResetPasswordForm token={searchParams.token} />
+        <ResetPasswordForm token={searchParams.get("token") as string} />
       </div>
     </div>
   );

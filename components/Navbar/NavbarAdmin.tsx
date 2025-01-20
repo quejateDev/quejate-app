@@ -2,8 +2,9 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import {
-  NavigationMenu, NavigationMenuItem,
-  NavigationMenuList
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
 } from "../ui/navigation-menu";
 
 export default function NavbarAdmin() {
@@ -15,7 +16,7 @@ export default function NavbarAdmin() {
             <NavigationMenuList>
               <NavigationMenuItem>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarImage src="" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               </NavigationMenuItem>

@@ -221,7 +221,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                   href={getFullUrl(attachment.url)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary rounded-md hover:bg-secondary/80 transition-colors text-sm"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md hover:bg-secondary/80 transition-colors text-sm"
                 >
                   <Paperclip className="w-4 h-4" />
                   {attachment.name}

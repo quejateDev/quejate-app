@@ -1,8 +1,14 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
-import {LineChart, CartesianGrid, XAxis, YAxis, Line } from "recharts";
+import { LineChart, CartesianGrid, XAxis, YAxis, Line } from "recharts";
 
 export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
   function getPqrsByDate() {
@@ -14,7 +20,7 @@ export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
 
     return Object.entries(pqrsByDate).map(([date, count]) => ({
       name: date,
-      count,
+      Registros: count,
     }));
   }
 
@@ -33,7 +39,7 @@ export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
             <XAxis dataKey="name" />
             <YAxis />
             <ChartTooltip />
-            <Line type="natural" dataKey="count" stroke="#8884d8" />
+            <Line type="natural" dataKey="Registros" stroke="#8884d8" />
           </LineChart>
         </ChartContainer>
       </CardContent>

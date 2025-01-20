@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
 
@@ -14,13 +14,17 @@ export default function PqrVsDepartmentChart({ pqrs }: { pqrs: any }) {
 
     return Object.entries(pqrsByDepartment).map(([department, count]) => ({
       name: department,
-      count,
+      Registros: count,
     }));
   }
+
   return (
     <Card className="w-1/2">
       <CardHeader>
         <CardTitle>PQRS por departamento</CardTitle>
+        <CardDescription>
+          Observa la cantidad de PQRS por departamento
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={{}}>
@@ -29,7 +33,7 @@ export default function PqrVsDepartmentChart({ pqrs }: { pqrs: any }) {
             <XAxis dataKey="name" />
             <YAxis />
             <ChartTooltip />
-            <Bar dataKey="count" fill="#8884d8" />
+            <Bar dataKey="Registros" fill="#8884d8" />
           </BarChart>
         </ChartContainer>
       </CardContent>

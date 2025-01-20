@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 // Menu items.
 const InternalManagement = [
   {
-    title: "Categories",
+    title: "Categorias",
     url: "/admin/categories",
     icon: Tags,
   },

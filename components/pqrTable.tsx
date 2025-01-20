@@ -17,7 +17,7 @@ import {
   CardContent,
 } from "./ui/card";
 import {
-    Table,
+  Table,
   TableHeader,
   TableRow,
   TableHead,
@@ -60,11 +60,11 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Tipo</TableHead>
-              <TableHead>Asunto</TableHead>
-              <TableHead>Descripción</TableHead>
+              <TableHead>Categoría</TableHead>
+              <TableHead>Entidad</TableHead>
               <TableHead>Departamento</TableHead>
               <TableHead>Creador</TableHead>
-              <TableHead>Tiempo para responder</TableHead>
+              <TableHead className="text-center">Tiempo para responder</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -72,17 +72,30 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
             {pqrs.map(
               (
                 pqr: Prisma.PQRSGetPayload<{
-                  include: { department: true; creator: true };
+                  include: {
+                    department: {
+                      include: {
+                        entity: {
+                          include: {
+                            category: true;
+                          };
+                        };
+                      };
+                    };
+                    creator: true;
+                  };
                 }>
               ) => (
                 <TableRow key={pqr.id}>
                   <TableCell>{pqr.id.slice(0, 6)}</TableCell>
                   <TableCell>{pqr.type}</TableCell>
-                  <TableCell>{pqr.department?.name}</TableCell>
                   <TableCell>
-                    {pqr.creator?.email}
+                    {pqr.department?.entity?.category?.name}
                   </TableCell>
-                  <TableCell className="flex justify-center">
+                  <TableCell>{pqr.department?.entity?.name}</TableCell>
+                  <TableCell>{pqr.department?.name}</TableCell>
+                  <TableCell>{pqr.creator?.email}</TableCell>
+                  <TableCell className="flex justify-center w-full">
                     {getRemainingTimeBadge(pqr.createdAt)}
                   </TableCell>
                   <TableCell>
