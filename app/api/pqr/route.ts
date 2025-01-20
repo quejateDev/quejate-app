@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const filePath = `pqr/${pqr.id}/attachments/${file.name}`;
+        //@ts-ignore
         const s3file = await uploadObject(filePath, buffer);
         attachments.push({
           name: file.name,

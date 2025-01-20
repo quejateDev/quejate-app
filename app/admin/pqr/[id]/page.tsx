@@ -1,4 +1,3 @@
-"use client";
 import {
   Card,
   CardContent,
@@ -9,7 +8,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getPQRSById } from "@/services/api/pqr.service";
-
+import prisma from "@/lib/prisma";
+import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 
 export default async function PQRDetailPage({
   params,
@@ -17,14 +17,24 @@ export default async function PQRDetailPage({
   params: any;
 }) {
   const { id } = await params;
-  const pqr = await getPQRSById(id);
+  const pqr = await prisma.pQRS.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      department: true,
+      creator: true,
+      customFieldValues: true,
+      attachments: true
+    },
+  });
 
   if (!pqr) {
     return;
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Detalles de la PQR</CardTitle>
@@ -100,6 +110,9 @@ export default async function PQRDetailPage({
         
         </CardContent>
       </Card>
+
+      {/* Attachments Section */}
+      <PQRAttachments attachments={pqr.attachments} />
     </div>
   );
 }
