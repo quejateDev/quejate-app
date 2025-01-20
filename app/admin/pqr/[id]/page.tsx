@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getPQRSById } from "@/services/api/pqr.service";
 import prisma from "@/lib/prisma";
-import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 
 export default async function PQRDetailPage({
   params,
@@ -112,7 +111,7 @@ export default async function PQRDetailPage({
       </Card>
 
       {/* Attachments Section */}
-      <PQRAttachments attachments={pqr.attachments} />
+      {/* <PQRAttachments attachments={pqr.attachments} /> */}
     </div>
   );
 }
