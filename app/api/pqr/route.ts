@@ -18,7 +18,7 @@ export async function GET() {
       include: {
         department: true,
         customFieldValues: true,
-        attachments: true
+        attachments: true,
       },
     });
 
@@ -27,10 +27,7 @@ export async function GET() {
     return NextResponse.json(pqrs);
   } catch (error) {
     console.error("Error fetching PQRs:", error);
-    return NextResponse.json(
-      { error: "Error fetching PQRs" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error fetching PQRs" }, { status: 500 });
   }
 }
 
@@ -44,35 +41,20 @@ export async function POST(req: NextRequest) {
     }
 
     const formData = await req.formData();
-    const jsonData = formData.get('data');
-    
+    const jsonData = formData.get("data");
+
     if (!jsonData) {
-      return NextResponse.json(
-        { error: "Missing PQR data" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing PQR data" }, { status: 400 });
     }
 
     const body = JSON.parse(jsonData as string);
 
     // Validate required fields
-    if (
-      !body.type ||
-      !body.departmentId ||
-      !body.creatorId
-    ) {
+    if (!body.type || !body.departmentId || !body.creatorId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
-    }
-
-    // Get files from form data
-    const files: File[] = [];
-    for (const [key, value] of formData.entries()) {
-      if (key.startsWith('attachment-') && value instanceof File) {
-        files.push(value);
-      }
     }
 
     const pqrConfig = await prisma.pQRConfig.findFirst({
@@ -112,7 +94,7 @@ export async function POST(req: NextRequest) {
             required: field.required,
           })),
         },
-        private: body.isPrivate || false
+        private: body.isPrivate || false,
       },
       include: {
         department: true,
@@ -122,30 +104,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const attachments: {
-      name: string;
-      url: string;
-      type: string;
-      size: number;
-    }[] = [];
-    // upload attachments to s3 
-    await Promise.all(
-      files.map(async (file: FormFile) => {
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const filePath = `pqr/${pqr.id}/attachments/${file.name}`;
-        //@ts-ignore
-        const s3file = await uploadObject(filePath, buffer);
-        attachments.push({
-          name: file.name,
-          url: filePath,
-          type: file.type,
-          size: file.size
-        });
-      })
-    );
-
-    if (attachments.length > 0) {
+    if (body.attachments && body.attachments.length > 0) {
       await prisma.pQRS.update({
         where: {
           id: pqr.id,
@@ -153,11 +112,11 @@ export async function POST(req: NextRequest) {
         data: {
           attachments: {
             createMany: {
-              data: attachments.map((attachment) => ({
+              data: body.attachments.map((attachment: any) => ({
                 name: attachment.name,
                 url: attachment.url,
                 type: attachment.type,
-                size: attachment.size
+                size: attachment.size,
               })),
             },
           },
@@ -171,7 +130,9 @@ export async function POST(req: NextRequest) {
       pqr.creator?.firstName || "John Doe",
       "Registro exitoso de PQR @tuqueja.com.co",
       pqr.id.toString(),
-      new Date(pqr.createdAt).toLocaleString('es-CO', { timeZone: 'America/Bogota' }),
+      new Date(pqr.createdAt).toLocaleString("es-CO", {
+        timeZone: "America/Bogota",
+      }),
       `https://tuqueja.com.co/pqr/${pqr.id}`
     );
 

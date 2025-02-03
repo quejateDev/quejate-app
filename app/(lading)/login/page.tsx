@@ -26,7 +26,7 @@ export default function Login() {
       if (user.role === "ADMIN") {
         router.push("/admin");
       } else {
-        router.push("/dashboard/pqrs");
+        router.push("/dashboard/pqr");
       }
     }
   }, [user]);

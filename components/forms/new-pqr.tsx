@@ -43,6 +43,14 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
+import { FileUpload } from "../ui/file-upload";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "@/components/ui/form"
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type CustomFieldValue = {
   name: string;
@@ -67,6 +75,18 @@ type NewPQRFormProps = {
   entityId: string;
 };
 
+const formSchema = z.object({
+  type: z.enum(["PETITION", "COMPLAINT", "CLAIM", "SUGGESTION"]),
+  departmentId: z.string().min(1, "Debe seleccionar un área"),
+  customFields: z.record(z.string()),
+  isAnonymous: z.boolean(),
+  isPrivate: z.boolean(),
+  attachments: z.array(z.object({
+    url: z.string(),
+    size: z.number()
+  })),
+})
+
 export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const { user } = useAuthStore();
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -88,6 +108,20 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
 
   const [openDepartment, setOpenDepartment] = useState(false);
   const [openEntity, setOpenEntity] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      type: "PETITION",
+      departmentId: "",
+      customFields: {},
+      isAnonymous: false,
+      isPrivate: false,
+      attachments: [],
+    },
+  })
+
+  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -178,10 +212,23 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
   }
 
   useEffect(() => {
-    if (pqr.departmentId) {
-      fetchCustomFields(pqr.departmentId);
+    if (selectedEntityId) {
+      fetchDepartments();
+      // Inicializar los custom fields en el formulario
+      const defaultCustomFields = customFields.reduce((acc, field) => ({
+        ...acc,
+        [field.name]: ''
+      }), {});
+      
+      form.setValue('customFields', defaultCustomFields);
     }
-  }, [pqr.departmentId]);
+  }, [selectedEntityId, customFields, form]);
+
+  useEffect(() => {
+    if (form.getValues('departmentId')) {
+      fetchCustomFields(form.getValues('departmentId'));
+    }
+  }, [form.getValues('departmentId')]);
 
   const handleCustomFieldChange = (name: string, value: string) => {
     setPqr((prev) => {
@@ -213,25 +260,49 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     }));
   };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
 
     try {
-      const { customFields: customFieldValues, attachments, ...pqrData } = pqr;
-
       const formData = new FormData();
-      formData.append(
-        "data",
-        JSON.stringify({
-          ...pqrData,
-          customFields: customFieldValues,
-        })
-      );
+      
+      // Preparar los custom fields
+      const customFieldsData = customFields.map(field => ({
+        name: field.name,
+        value: values.customFields[field.name] || '',
+        type: field.type,
+        required: field.required,
+        placeholder: field.placeholder || ''
+      }));
 
-      attachments.forEach((file, index) => {
-        formData.append(`attachment-${index}`, file);
+      // Preparar los archivos adjuntos
+      const attachmentsData = values.attachments.map(attachment => {
+        const extension = attachment.url
+          .split('.')
+          .pop()
+          ?.toLowerCase() || 'unknown';
+
+        return {
+          url: attachment.url,
+          name: attachment.url.split('/').pop() || '',
+          type: extension,
+          size: attachment.size || 0,
+        };
       });
+
+      formData.append('data', JSON.stringify({
+        type: values.type,
+        departmentId: values.departmentId,
+        creatorId: user?.id,
+        dueDate: new Date(),
+        customFields: customFieldsData,
+        entityId: selectedEntityId,
+        isAnonymous: values.isAnonymous,
+        isPrivate: values.isPrivate,
+        attachments: attachmentsData,
+        title: values.customFields['Título'] || '',
+        description: values.customFields['Descripción'] || '',
+      }));
 
       const response = await createPQRS(formData);
 
@@ -240,8 +311,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
           title: "PQR creado",
           description: "El PQR ha sido creado exitosamente",
         });
-
-        window.location.href = `/dashboard`;
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error(error);
@@ -253,7 +323,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   if (isLoadingInitial) {
     return (
@@ -275,236 +345,242 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
         <CardTitle>Envía tu PQRS</CardTitle>
       </CardHeader>
       <CardContent>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
-          encType="multipart/form-data"
-        >
-          <div className="grid gap-4">
-            <div>
-              <Label>Tipo de Solicitud</Label>
-              <Select
-                value={pqr.type}
-                onValueChange={(value: PQRSType) =>
-                  setPqr((prev) => ({ ...prev, type: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccione el tipo de solicitud" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PETITION">Petición</SelectItem>
-                  <SelectItem value="COMPLAINT">Queja</SelectItem>
-                  <SelectItem value="CLAIM">Reclamo</SelectItem>
-                  <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+            encType="multipart/form-data"
+          >
+            <div className="grid gap-4">
+              <div>
+                <Label>Tipo de Solicitud</Label>
+                <Select
+                  value={pqr.type}
+                  onValueChange={(value: PQRSType) =>
+                    setPqr((prev) => ({ ...prev, type: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccione el tipo de solicitud" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PETITION">Petición</SelectItem>
+                    <SelectItem value="COMPLAINT">Queja</SelectItem>
+                    <SelectItem value="CLAIM">Reclamo</SelectItem>
+                    <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label>Entidad</Label>
-              <Popover open={openEntity} onOpenChange={setOpenEntity}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openEntity}
-                    className="w-full justify-between"
-                  >
-                    {selectedEntityId
-                      ? entities.find(
-                          (entity) => entity.id === selectedEntityId
-                        )?.name
-                      : "Seleccione una entidad..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                  <Command className="w-full">
-                    <CommandInput placeholder="Buscar entidad..." />
-                    <CommandList className="max-h-[300px] w-full overflow-y-auto">
-                      <CommandEmpty>
-                        No se encontro ninguna entidad.
-                      </CommandEmpty>
-                      <CommandGroup className="w-full">
-                        {entities.map((entity) => (
-                          <CommandItem
-                            key={entity.id}
-                            value={entity.name}
-                            onSelect={() => {
-                              setSelectedEntityId(entity.id);
-                              setOpenEntity(false);
-                            }}
-                            className="w-full"
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                selectedEntityId === entity.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {entity.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
+              <div>
+                <Label>Entidad</Label>
+                <Popover open={openEntity} onOpenChange={setOpenEntity}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openEntity}
+                      className="w-full justify-between"
+                    >
+                      {selectedEntityId
+                        ? entities.find(
+                            (entity) => entity.id === selectedEntityId
+                          )?.name
+                        : "Seleccione una entidad..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                    <Command className="w-full">
+                      <CommandInput placeholder="Buscar entidad..." />
+                      <CommandList className="max-h-[300px] w-full overflow-y-auto">
+                        <CommandEmpty>
+                          No se encontro ninguna entidad.
+                        </CommandEmpty>
+                        <CommandGroup className="w-full">
+                          {entities.map((entity) => (
+                            <CommandItem
+                              key={entity.id}
+                              value={entity.name}
+                              onSelect={() => {
+                                setSelectedEntityId(entity.id);
+                                setOpenEntity(false);
+                              }}
+                              className="w-full"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedEntityId === entity.id
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {entity.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-            <div>
-              <Label>Área</Label>
-              <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openDepartment}
-                    className="w-full justify-between"
-                  >
-                    {pqr.departmentId
-                      ? departments.find(
-                          (department) => department.id === pqr.departmentId
-                        )?.name
-                      : "Seleccione un area..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                  <Command className="w-full">
-                    <CommandInput placeholder="Buscar area..." />
-                    <CommandList className="max-h-[300px] w-full overflow-y-auto">
-                      <CommandEmpty>No se encontro ninguna area.</CommandEmpty>
-                      <CommandGroup className="w-full">
-                        {departments.map((department) => (
-                          <CommandItem
-                            key={department.id}
-                            value={department.name}
-                            onSelect={() => {
-                              setPqr((prev) => ({
-                                ...prev,
-                                departmentId: department.id,
-                              }));
-                              setOpenDepartment(false);
-                            }}
-                            className="w-full"
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                pqr.departmentId === department.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {department.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {customFields.map((field) => {
-              const commonProps = {
-                id: field.name,
-                label: field.name,
-                placeholder: field.placeholder || "",
-                value:
-                  pqr.customFields.find((cf) => cf.name === field.name)
-                    ?.value || "",
-                onChange: (value: string) =>
-                  handleCustomFieldChange(field.name, value),
-                required: field.required,
-              };
-
-              switch (field.type) {
-                case "text":
-                  return <TextField key={field.name} {...commonProps} />;
-                case "textarea":
-                  return <TextAreaField key={field.name} {...commonProps} />;
-                case "phone":
-                  return <PhoneField key={field.name} {...commonProps} />;
-                case "email":
-                  return <EmailField key={field.name} {...commonProps} />;
-                case "file":
-                  return (
-                    <FileField
-                      key={field.name}
-                      {...commonProps}
-                      accept="image/*,application/pdf"
-                      maxSize={5}
-                    />
-                  );
-                case "number":
-                  return <NumberField key={field.name} {...commonProps} />;
-                default:
-                  return <TextField key={field.name} {...commonProps} />;
-              }
-            })}
-
-            <div className="space-y-2">
-              <Label>Archivos adjuntos</Label>
-              <input
-                type="file"
-                multiple
-                onChange={(e) =>
-                  handleFileChange(Array.from(e.target.files || []))
-                }
-                className="w-full"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              <FormField
+                control={form.control}
+                name="departmentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Área</FormLabel>
+                    <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openDepartment}
+                          className="w-full justify-between"
+                        >
+                          {field.value
+                            ? departments.find((department) => department.id === field.value)?.name
+                            : "Seleccione un área..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                        <Command className="w-full">
+                          <CommandInput placeholder="Buscar área..." />
+                          <CommandList className="max-h-[300px] w-full overflow-y-auto">
+                            <CommandEmpty>No se encontró ningún área.</CommandEmpty>
+                            <CommandGroup className="w-full">
+                              {departments.map((department) => (
+                                <CommandItem
+                                  key={department.id}
+                                  value={department.name}
+                                  onSelect={() => {
+                                    field.onChange(department.id);
+                                    fetchCustomFields(department.id);
+                                    setOpenDepartment(false);
+                                  }}
+                                  className="w-full"
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === department.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {department.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <p className="text-sm text-muted-foreground">
-                Formatos permitidos: PDF, DOC, DOCX, JPG, PNG. Tamaño máximo:
-                5MB por archivo
-              </p>
-            </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isAnonymous"
-                checked={pqr.isAnonymous}
-                onCheckedChange={(checked) =>
-                  setPqr((prev) => ({
-                    ...prev,
-                    isAnonymous: checked as boolean,
-                  }))
-                }
-              />
-              <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
-            </div>
+              {customFields.map((field) => (
+                <FormField
+                  key={field.name}
+                  control={form.control}
+                  name={`customFields.${field.name}`}
+                  render={({ field: formField }) => (
+                    <FormItem>
+                      <FormLabel>{field.name}</FormLabel>
+                      <FormControl>
+                        {field.type === "textarea" ? (
+                          <Textarea
+                            {...formField}
+                            placeholder={field.placeholder || ''}
+                            required={field.required}
+                          />
+                        ) : field.type === "email" ? (
+                          <Input
+                            type="email"
+                            {...formField}
+                            placeholder={field.placeholder || ''}
+                            required={field.required}
+                          />
+                        ) : field.type === "phone" ? (
+                          <Input
+                            type="tel"
+                            {...formField}
+                            placeholder={field.placeholder || ''}
+                            required={field.required}
+                          />
+                        ) : (
+                          <Input
+                            {...formField}
+                            type={field.type}
+                            placeholder={field.placeholder || ''}
+                            required={field.required}
+                          />
+                        )}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isPrivate"
-                checked={pqr.isPrivate}
-                onCheckedChange={(checked) =>
-                  setPqr((prev) => ({
-                    ...prev,
-                    isPrivate: checked as boolean,
-                  }))
-                }
-              />
-              <Label htmlFor="isPrivate">Es privada</Label>
-            </div>
+              <div className="space-y-2">
+                <FileUpload 
+                  form={form} 
+                  name="attachments" 
+                  label="Archivos Adjuntos"
+                  folder="pqr"
+                  multiple={true}
+                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                  maxSize={10}
+                />
+              </div>
 
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                "Enviar PQRS"
-              )}
-            </Button>
-          </div>
-        </form>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isAnonymous"
+                  checked={pqr.isAnonymous}
+                  onCheckedChange={(checked) =>
+                    setPqr((prev) => ({
+                      ...prev,
+                      isAnonymous: checked as boolean,
+                    }))
+                  }
+                />
+                <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isPrivate"
+                  checked={pqr.isPrivate}
+                  onCheckedChange={(checked) =>
+                    setPqr((prev) => ({
+                      ...prev,
+                      isPrivate: checked as boolean,
+                    }))
+                  }
+                />
+                <Label htmlFor="isPrivate">Es privada</Label>
+              </div>
+
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  "Enviar PQRS"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

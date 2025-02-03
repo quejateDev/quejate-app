@@ -1,3 +1,4 @@
+"use client";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -28,38 +29,57 @@ import { PQRFieldsFormValues, PqrFieldsSchema } from "@/types/pqr-config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function PqrFieldsForm({ areaId, initialData }: { areaId: string, initialData: PQRFieldsFormValues }) {
+export default function PqrFieldsForm({
+  areaId,
+  initialData,
+}: {
+  areaId: string;
+  initialData: PQRFieldsFormValues;
+}) {
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
+
   const form = useForm<PQRFieldsFormValues>({
     resolver: zodResolver(PqrFieldsSchema),
     defaultValues: initialData,
   });
-  
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "customFields",
   });
 
-  const onSubmit = async (data: PQRFieldsFormValues) => {
+  const onSubmit = async (values: PQRFieldsFormValues) => {
     try {
-      await fetch(`/api/area/${areaId}/pqr-config/fields`, {
+      setIsSaving(true);
+      const response = await fetch(`/api/area/${areaId}/pqr-config/fields`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(values),
       });
+
+      if (!response.ok) throw new Error("Error al guardar los campos");
+
       toast({
-        title: "Campos actualizados",
-        description: "Los campos personalizados han sido actualizados exitosamente",
+        title: "Éxito",
+        description: "Campos personalizados actualizados correctamente",
       });
+
+      router.refresh();
     } catch (error) {
-      console.error("Error submitting:", error);
+      console.error(error);
       toast({
         title: "Error",
-        description: "Error al actualizar los campos personalizados",
+        description: "Error al guardar los campos",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -110,7 +130,10 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
                             <FormItem>
                               <FormLabel>Texto de Ayuda (Opcional)</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Ej: Ingrese su número de documento" />
+                                <Input
+                                  {...field}
+                                  placeholder="Ej: Ingrese su número de documento"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -133,10 +156,16 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="email">Correo Electrónico</SelectItem>
-                                  <SelectItem value="phone">Teléfono</SelectItem>
+                                  <SelectItem value="email">
+                                    Correo Electrónico
+                                  </SelectItem>
+                                  <SelectItem value="phone">
+                                    Teléfono
+                                  </SelectItem>
                                   <SelectItem value="text">Texto</SelectItem>
-                                  <SelectItem value="textarea">Texto Largo</SelectItem>
+                                  <SelectItem value="textarea">
+                                    Texto Largo
+                                  </SelectItem>
                                   {/* <SelectItem value="file">Archivo</SelectItem> */}
                                   <SelectItem value="number">Número</SelectItem>
                                 </SelectContent>
@@ -178,9 +207,11 @@ export default function PqrFieldsForm({ areaId, initialData }: { areaId: string,
                 </Card>
               ))}
             </div>
-            <Button type="submit" className="mt-4">
-              Guardar Campos
-            </Button>
+            <div className="flex justify-end">
+              <Button type="submit" isLoading={isSaving}>
+                Guardar Campos
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>

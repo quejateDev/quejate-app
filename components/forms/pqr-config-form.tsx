@@ -27,8 +27,13 @@ import {
   CardDescription, CardHeader,
   CardTitle
 } from "../ui/card";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
+
   const form = useForm<PQRConfigFormValues>({
     resolver: zodResolver(pqrConfigSchema),
     defaultValues: initialData || {
@@ -42,18 +47,22 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
 
   const onSubmit = async (data: PQRConfigFormValues) => {
     try {
+      setIsSaving(true);
       await Client.put(`/area/${areaId}/pqr-config`, data);
       toast({
-        title: "Configuración actualizada",
-        description: "La configuración de PQR ha sido actualizada exitosamente",
+        title: "Éxito",
+        description: "Configuración actualizada correctamente",
       });
+      router.refresh();
     } catch (error) {
       console.error("Error submitting:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la configuración",
+        description: "Error al guardar la configuración",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -171,7 +180,9 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
             /> */}
 
             <div className="flex justify-end">
-              <Button type="submit">Guardar configuración</Button>
+              <Button type="submit" isLoading={isSaving}>
+                Guardar Configuración
+              </Button>
             </div>
           </form>
         </Form>

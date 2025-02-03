@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +19,19 @@ import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
+import { useS3Upload } from "@/hooks/use-s3-upload";
+import { ImageIcon } from "lucide-react";
 
 const formSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
-  description: z.string().optional(),
-  imageUrl: z.string().optional(),
+  name: z.string().min(2, {
+    message: "El nombre debe tener al menos 2 caracteres.",
+  }),
+  description: z.string().min(10, {
+    message: "La descripción debe tener al menos 10 caracteres.",
+  }),
+  imageUrl: z.string().url({
+    message: "Debe ser una URL válida",
+  }),
 });
 
 interface CategoryFormProps {
@@ -36,10 +46,20 @@ interface CategoryFormProps {
 
 export default function CategoryForm({ category, onSuccess }: CategoryFormProps) {
   const router = useRouter();
-  const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(
-    category?.imageUrl || null
-  );
+  const [preview, setPreview] = useState<string | null>(category?.imageUrl || null);
+  const { upload, isUploading } = useS3Upload({
+    onSuccess: (url) => {
+      form.setValue("imageUrl", url);
+      setPreview(url);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Error al subir la imagen",
+        variant: "destructive",
+      });
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,34 +74,30 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
     const file = e.target.files?.[0];
     if (!file) return;
 
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("Error uploading image");
-
-      const data = await response.json();
-      form.setValue("imageUrl", data.path);
-      setPreviewUrl(data.path);
-      toast({
-        title: "Éxito",
-        description: "Imagen subida correctamente",
-      });
-    } catch (error) {
-      console.error(error);
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
       toast({
         title: "Error",
-        description: "Error al subir la imagen",
+        description: "Solo se permiten imágenes",
         variant: "destructive",
       });
-    } finally {
-      setIsUploading(false);
+      return;
+    }
+
+    // Validate file size (e.g., 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "La imagen no debe superar los 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await upload(file);
+    } catch (error) {
+      console.error('Upload error:', error);
     }
   };
 
@@ -119,7 +135,7 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="name"
@@ -127,7 +143,7 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
             <FormItem>
               <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input placeholder="Nombre de la categoria" {...field} />
+                <Input placeholder="Nombre de la categoría" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,7 +158,8 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
               <FormLabel>Descripción</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Descripción de la categoria"
+                  placeholder="Describe la categoría"
+                  className="resize-none"
                   {...field}
                 />
               </FormControl>
@@ -158,27 +175,32 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
             <FormItem>
               <FormLabel>Imagen</FormLabel>
               <FormControl>
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   <Input
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
                     disabled={isUploading}
+                    className="cursor-pointer"
                   />
                   {isUploading && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Subiendo imagen...</span>
+                      Subiendo imagen...
                     </div>
                   )}
-                  {previewUrl && (
-                    <div className="relative w-40 h-40">
+                  {preview ? (
+                    <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg">
                       <Image
-                        src={previewUrl}
+                        src={preview}
                         alt="Preview"
                         fill
-                        className="object-cover rounded-md"
+                        className="object-cover"
                       />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-video w-full max-w-sm items-center justify-center rounded-lg border border-dashed">
+                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
                     </div>
                   )}
                   <Input type="hidden" {...field} />
@@ -198,7 +220,14 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
             Cancelar
           </Button>
           <Button type="submit" disabled={isUploading}>
-            {category ? "Actualizar" : "Crear"}
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Subiendo...
+              </>
+            ) : (
+              "Actualizar"
+            )}
           </Button>
         </div>
       </form>

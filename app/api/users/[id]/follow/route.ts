@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/utils";
 
 export async function POST(
-  req: Request,
+  req: NextRequest,
   { params }: any
 ) {
   try {
@@ -16,7 +16,15 @@ export async function POST(
       );
     }
 
-    const currentUser = verifyToken(req);
+    const token = req.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: "No token provided" },
+        { status: 401 }
+      );
+    }
+
+    const currentUser = await verifyToken(token);
 
     if (!currentUser) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

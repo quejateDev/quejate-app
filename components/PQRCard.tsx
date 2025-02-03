@@ -114,16 +114,17 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
     }
   };
 
-  const hasImages = pqr.attachments?.some(attachment => 
-    attachment.type.startsWith('image/')
-  );
+  const mediaExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+  const imageAttachments = pqr.attachments?.filter(att => 
+    mediaExtensions.includes(att.type.toLowerCase())
+  ) || [];
+  const otherAttachments = pqr.attachments?.filter(att => 
+    !mediaExtensions.includes(att.type.toLowerCase())
+  ) || [];
 
   const getFullUrl = (url: string) => {
-    return `https://quejate.s3.us-east-2.amazonaws.com/${url}`;
+    return `${url}`;
   };
-
-  const imageAttachments = pqr.attachments?.filter(att => att.type.startsWith('image/')) || [];
-  const otherAttachments = pqr.attachments?.filter(att => !att.type.startsWith('image/')) || [];
 
   return (
     <Card>

@@ -17,51 +17,51 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import axios from "axios";
 
 // Define the form schema
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Department name must be at least 2 characters.",
-  }),
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
 });
 
 interface AreaFormProps {
-  initialData?: {
+  initialData: {
     id: string;
     name: string;
   };
   isEditing?: boolean;
 }
 
-export function AreaForm({ initialData, isEditing = false }: AreaFormProps) {
+export function AreaForm({ initialData, isEditing }: AreaFormProps) {
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: "",
+    defaultValues: {
+      name: initialData?.name || "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setIsLoading(true);
+      setIsSaving(true);
+      const url = isEditing ? `/api/area/${initialData.id}` : "/api/area";
+      const method = isEditing ? "PATCH" : "POST";
 
-      if (isEditing) {
-        await axios.patch(`/api/area/${initialData?.id}`, values);
-        toast({
-          title: "Success",
-          description: "Área actualizada correctamente",
-        });
-      } else {
-        await axios.post("/api/area", values);
-        toast({
-          title: "Success",
-          description: "Área creada correctamente",
-        });
-      }
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) throw new Error("Error al guardar el área");
+
+      toast({
+        title: "Éxito",
+        description: isEditing
+          ? "Área actualizada correctamente"
+          : "Área creada correctamente",
+      });
 
       router.push("/admin/area");
       router.refresh();
@@ -69,13 +69,13 @@ export function AreaForm({ initialData, isEditing = false }: AreaFormProps) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Algo salió mal. Por favor, inténtalo de nuevo.",
+        description: "Error al guardar el área",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -85,23 +85,28 @@ export function AreaForm({ initialData, isEditing = false }: AreaFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre de la área</FormLabel>
+              <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input placeholder="Nombre de la área" {...field} />
+                <Input {...field} disabled={isSaving} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading
-            ? isEditing
-              ? "Actualizando..."
-              : "Creando..."
-            : isEditing
-            ? "Actualizar Área"
-            : "Crear Área"}
-        </Button>
+
+        <div className="flex justify-end space-x-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/admin/area")}
+            disabled={isSaving}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" isLoading={isSaving}>
+            {isEditing ? "Actualizar" : "Crear"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

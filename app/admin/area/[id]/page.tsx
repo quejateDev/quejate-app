@@ -1,57 +1,31 @@
-"use client";
+import { AreaForm } from "@/components/forms/area-form"
+import { PQRConfigForm } from "@/components/forms/pqr-config-form"
+import PqrFieldsForm from "@/components/forms/pqr-fields-form"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import prisma from "@/lib/prisma"
+import { notFound } from "next/navigation"
 
-import { useEffect, useState } from "react";
-import { AreaForm } from "@/components/forms/area-form";
-import { toast } from "@/hooks/use-toast";
-import {
-  Card,
-  CardTitle,
-  CardDescription,
-  CardHeader,
-  CardContent,
-} from "@/components/ui/card";
-import { useParams } from "next/navigation";
-import { PQRConfigForm } from "@/components/forms/pqr-config-form";
-import { DepartmentWithConfig } from "@/dto/deparment/department-with-config.dto";
-import PqrFieldsForm from "@/components/forms/pqr-fields-form";
-import axios from "axios";
+interface AreaPageProps {
+  params: Promise<{
+    id: string
+  }>
+}
 
-const AreaPage = () => {
-  const [area, setArea] = useState<DepartmentWithConfig | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { id } = useParams();
-  useEffect(() => {
-    const fetchArea = async () => {
-      try {
-        const response = await axios.get(`/api/area/${id}`);
-        setArea(response.data);
-      } catch (error) {
-        console.error("Error fetching area:", error);
-        toast({
-          title: "Error",
-          description: "Error al cargar el área",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchArea();
-  }, [id]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">Cargando...</div>
-    );
-  }
+export default async function AreaPage({ params }: AreaPageProps) {
+  const { id } = await params;
+  const area = await prisma.department.findUnique({
+    where: { id },
+    include: {
+      pqrConfig: {
+        include: {
+          customFields: true
+        }
+      },
+    },
+  })
 
   if (!area) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        Área no encontrada
-      </div>
-    );
+    notFound()
   }
 
   return (
@@ -74,24 +48,27 @@ const AreaPage = () => {
         </CardContent>
       </Card>
 
-      <PQRConfigForm areaId={id as string} initialData={{
-        allowAnonymous: area.pqrConfig?.allowAnonymous || false,
-        requireEvidence: area.pqrConfig?.requireEvidence || false,
-        maxResponseTime: area.pqrConfig?.maxResponseTime ? area.pqrConfig.maxResponseTime.toString() : "15",
-        notifyEmail: area.pqrConfig?.notifyEmail || true,
-        autoAssign: area.pqrConfig?.autoAssign || false,
-        // customFields: area.pqrConfig?.customFields || [],
-      }} />
+      <PQRConfigForm 
+        areaId={area.id} 
+        initialData={{
+          allowAnonymous: area.pqrConfig?.allowAnonymous || false,
+          requireEvidence: area.pqrConfig?.requireEvidence || false,
+          maxResponseTime: area.pqrConfig?.maxResponseTime ? area.pqrConfig.maxResponseTime.toString() : "15",
+          notifyEmail: area.pqrConfig?.notifyEmail || true,
+          autoAssign: area.pqrConfig?.autoAssign || false,
+        }} 
+      />
 
-      <PqrFieldsForm areaId={id as string} initialData={{
-        customFields: area.pqrConfig?.customFields?.map(field => ({
-          name: field.name,
-          required: field.required,
-          type: field.type as "text" | "email" | "phone"
-        })) || [],
-      }} />
+      <PqrFieldsForm 
+        areaId={area.id} 
+        initialData={{
+          customFields: area.pqrConfig?.customFields?.map(field => ({
+            name: field.name,
+            required: field.required,
+            type: field.type as "text" | "email" | "phone"
+          })) || [],
+        }} 
+      />
     </div>
-  );
-};
-
-export default AreaPage;
+  )
+}
