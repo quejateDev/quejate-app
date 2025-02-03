@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 import path from "path";
 import { uploadObject } from "@/services/storage/s3.service";
+import { sendPQRNotificationEmail } from "@/services/email/sendPQRNotification";
 
 interface FormFile extends File {
   arrayBuffer(): Promise<ArrayBuffer>;
@@ -124,17 +125,35 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Send email notification
-    await sendPQRCreationEmail(
-      pqr.creator?.email || "luisevilla588@gmail.com",
-      pqr.creator?.firstName || "John Doe",
-      "Registro exitoso de PQR @tuqueja.com.co",
-      pqr.id.toString(),
-      new Date(pqr.createdAt).toLocaleString("es-CO", {
-        timeZone: "America/Bogota",
-      }),
-      `https://tuqueja.com.co/pqr/${pqr.id}`
-    );
+    const entity = await prisma.entity.findUnique({
+      where: { id: body.entityId },
+      select: { name: true, email: true }
+    });
+
+    // Enviar emails en paralelo
+    const emails = await Promise.all([
+      // Email a la entidad
+      entity?.email && sendPQRNotificationEmail(
+        entity.email,
+        entity.name,
+        pqr,
+        pqr.creator,
+        pqr.customFieldValues,
+        pqr.attachments
+      ),
+      
+      // Email al creador
+      sendPQRCreationEmail(
+        pqr.creator?.email || "noreply@quejate.com.co",
+        pqr.creator?.firstName || "John Doe",
+        "Registro exitoso de PQR @quejate.com.co",
+        pqr.id.toString(),
+        new Date(pqr.createdAt).toLocaleString("es-CO", {
+          timeZone: "America/Bogota",
+        }),
+        `https://quejate.com.co/dashboard/pqr/${pqr.id}`
+      )
+    ].filter(Boolean)); // Filtramos los undefined (cuando no hay email de entidad)
 
     return NextResponse.json(pqr);
   } catch (error: any) {

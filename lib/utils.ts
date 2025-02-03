@@ -7,16 +7,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date | string) {
-  const parsedDate = new Date(date);
-
-  if (isNaN(parsedDate.getTime())) {
-    return date;
-  }
-  return new Intl.DateTimeFormat("es-ES", {
-    month: "short",
-    day: "numeric",
-  }).format(parsedDate);
+export function formatDate(date: Date | string): string {
+  return new Date(date).toLocaleDateString('es-CO', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
 
 export async function signToken(id: string, role: string) {
