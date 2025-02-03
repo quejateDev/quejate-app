@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from 'jose'
 import { JWT_SECRET } from "./config";
 
 export function cn(...inputs: ClassValue[]) {
@@ -19,35 +19,30 @@ export function formatDate(date: Date | string) {
   }).format(parsedDate);
 }
 
-export function signToken(id: string, role: string) {
-  return jwt.sign({ id, role }, JWT_SECRET, { expiresIn: "7d" });
+export async function signToken(id: string, role: string) {
+  const secret = new TextEncoder().encode(JWT_SECRET)
+  return new SignJWT({ id, role })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(secret)
 }
 
+interface JWTPayload {
+  id: string;
+  role: string;
+}
 
-//** verify user token and return the id
-/*
- * 
- * @param req 
- * @returns 
- */
-export function verifyToken(req: Request): null | { id: string; role: string } {
-  const token = req.headers.get("Authorization");
-
-  if (!token) {
-    return null;
-  }
-
-  // get token from bearer
-  const bearerToken = token.split(" ")[1];
-  if (!bearerToken) {
-    return null;
-  }
-  
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const decodedToken = jwt.verify(bearerToken, JWT_SECRET);
-    return decodedToken as { id: string; role: string };
+    const secret = new TextEncoder().encode(JWT_SECRET)
+    const { payload } = await jwtVerify(token, secret)
+    return {
+      id: payload.id as string,
+      role: payload.role as string
+    }
   } catch (error) {
-    console.error("Error verifying token:", error);
-    return null;
+    console.log('Token verification error:', error)
+    return null
   }
 }

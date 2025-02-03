@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ export default function Login() {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { login, user } = useAuthStore();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -32,6 +33,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -40,17 +42,19 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
 
-      console.log(response.status);
       if (response.ok) {
         const userData = await response.json();
 
         // Store user data in Zustand
-        login({
-          id: userData.user.id,
-          email: userData.user.email,
-          name: userData.user.name,
-          role: userData.user.role,
-        }, userData.token);
+        login(
+          {
+            id: userData.user.id,
+            email: userData.user.email,
+            name: userData.user.name,
+            role: userData.user.role,
+          },
+          userData.token
+        );
 
         // Optional: Show success message
         toast({
@@ -76,6 +80,8 @@ export default function Login() {
         description: "Error al iniciar sesión",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,7 +90,10 @@ export default function Login() {
       className="flex grow bg-white"
       style={{ minHeight: "calc(100vh - 65px)" }}
     >
-      <img className="w-1/2 border-none my-auto hidden md:block" src="/login-banner.svg"></img>
+      <img
+        className="w-1/2 border-none my-auto hidden md:block"
+        src="/login-banner.svg"
+      ></img>
       <div className="w-full md:w-1/2 rounded min-h-full flex items-center grow px-6">
         <Card className="rounded-none w-full">
           <CardHeader className="space-y-2">
@@ -136,7 +145,10 @@ export default function Login() {
 
               <div className="text-xs text-muted-foreground text-center mb-4">
                 Al iniciar sesión, aceptas nuestros{" "}
-                <Link href="/terms" className="text-blue-500 hover:text-blue-600 hover:underline underline-offset-4">
+                <Link
+                  href="/terms"
+                  className="text-blue-500 hover:text-blue-600 hover:underline underline-offset-4"
+                >
                   términos y condiciones
                 </Link>
               </div>
@@ -146,6 +158,8 @@ export default function Login() {
                 type="submit"
                 className="w-full h-12 text-sm md:text-base"
                 onClick={handleSubmit}
+                disabled={isLoading}
+                isLoading={isLoading}
               >
                 <LogIn className="mr-2 h-4 w-4" /> Iniciar sesión
               </Button>

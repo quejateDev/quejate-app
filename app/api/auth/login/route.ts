@@ -42,16 +42,29 @@ export async function POST(request: Request) {
     }
 
     // Create JWT token
-    const token = signToken(user.id, user.role);
+    const token = await signToken(user.id, user.role)
 
     // Remove password and verification token from response
     // @ts-ignore
     const { password: _, verificationToken: __, ...userWithoutPassword } = user
 
-    return NextResponse.json({
+    // Create response with cookie
+    const response = NextResponse.json({
       user: userWithoutPassword,
       token,
     })
+
+    // Set token cookie
+    response.cookies.set({
+      name: 'token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    })
+
+    return response
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(

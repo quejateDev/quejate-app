@@ -1,6 +1,6 @@
 import { S3Client, ListBucketsCommand, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-import { AWS_ACCESS_KEY_ID, AWS_REGION, AWS_SECRET_ACCESS_KEY } from "@/lib/config";
+import { AWS_ACCESS_KEY_ID, AWS_REGION, AWS_SECRET_ACCESS_KEY, AWS_BUCKET } from "@/lib/config";
 import { Buffer } from "buffer";
 
 
@@ -18,7 +18,7 @@ export async function listBuckets() {
     return response.Buckets;
 }
 
-export async function uploadObject(key: string, body: ArrayBuffer, bucket = "quejate") {
+export async function uploadObject(key: string, body: ArrayBuffer, bucket = AWS_BUCKET) {
     const command = new PutObjectCommand({
         Bucket: bucket,
         Key: key,
@@ -30,7 +30,7 @@ export async function uploadObject(key: string, body: ArrayBuffer, bucket = "que
     return { message: "Object uploaded" };
 }
 
-export async function getObjectPresignedUrl(key: string, bucket = "quejate") {
+export async function getObjectPresignedUrl(key: string, bucket = AWS_BUCKET) {
     const command = new GetObjectCommand({
         Bucket: bucket,
         Key: key
@@ -41,7 +41,7 @@ export async function getObjectPresignedUrl(key: string, bucket = "quejate") {
     return url;
 }
 
-export async function deleteObject(key: string, bucket = "quejate") {
+export async function deleteObject(key: string, bucket = AWS_BUCKET) {
     const command = new DeleteObjectCommand({
         Bucket: bucket,
         Key: key
