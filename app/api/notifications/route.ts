@@ -4,7 +4,15 @@ import { verifyToken } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   try {
-    const decoded = verifyToken(req);
+    const token = req.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: "No token provided" },
+        { status: 401 }
+      );
+    }
+
+    const decoded = await verifyToken(token);
     if (!decoded) {
       return NextResponse.json(
         { error: "Invalid token" },
@@ -34,7 +42,14 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const decoded = verifyToken(req);
+    const token = req.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: "No token provided" },
+        { status: 401 }
+      );
+    }
+    const decoded = await verifyToken(token);
     if (!decoded) {
       return NextResponse.json(
         { error: "Invalid token" },

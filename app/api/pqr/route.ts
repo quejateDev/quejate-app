@@ -22,6 +22,8 @@ export async function GET() {
       },
     });
 
+    console.log("pqrs", pqrs);
+
     return NextResponse.json(pqrs);
   } catch (error) {
     console.error("Error fetching PQRs:", error);

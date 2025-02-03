@@ -34,11 +34,6 @@ export default function Signup() {
       setLoading(true);
       // check that passwords match
       if (formData.password !== formData.confirmPassword) {
-      passwordRef.current?.setCustomValidity("Las contrasenas no coinciden");
-      confirmPasswordRef.current?.setCustomValidity("Las contrasenas no coinciden");
-      passwordRef.current?.reportValidity();
-      confirmPasswordRef.current?.reportValidity();
-        
         return toast({
           title: "Error",
           description: "Las contrasenas no coinciden",

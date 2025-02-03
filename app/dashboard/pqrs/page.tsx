@@ -19,6 +19,8 @@ export default function UserPQRs() {
         const response = await fetch(`/api/pqr/user?userId=${user.id}`);
         if (response.ok) {
           const data = await response.json();
+
+          console.log(data)
           setPqrs(data);
         }
       } catch (error) {
@@ -48,7 +50,7 @@ export default function UserPQRs() {
     );
   }
 
-  if (pqrs.length === 0) {
+  if (!pqrs || pqrs?.length === 0) {
     return (
       <div className="container mx-auto py-8">
         <h1 className="text-2xl font-bold mb-6">Mis Quejas y Reclamos</h1>

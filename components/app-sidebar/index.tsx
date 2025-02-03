@@ -49,8 +49,8 @@ const InternalManagement = [
 
 const ExternalManagement = [
   {
-    title: "Clientes",
-    url: "/admin/clients",
+    title: "Usuarios",
+    url: "/admin/users",
     icon: Users,
   },
 ];
@@ -61,7 +61,7 @@ export function AppSidebar() {
 
   function handleLogout() {
     logout();
-    router.push("/auth/login");
+    router.push("/login");
   }
 
   return (
