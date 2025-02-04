@@ -76,14 +76,17 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
     month: "long",
     day: "numeric",
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
   });
 
-  const remainingDays = calculateRemainingDays(new Date(pqr.createdAt), new Date(pqr.dueDate));
+  const remainingDays = calculateRemainingDays(
+    new Date(pqr.createdAt),
+    new Date(pqr.dueDate)
+  );
   const isExpired = remainingDays <= 0;
   const isUrgent = remainingDays <= 3 && remainingDays > 0;
 
-  const creatorName = !pqr.anonymous 
+  const creatorName = !pqr.anonymous
     ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
     : "Anónimo";
 
@@ -101,7 +104,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
       setIsLoading(true);
       await toggleLike(pqr.id, user.id);
       setLiked(!liked);
-      setLikeCount(prev => liked ? prev - 1 : prev + 1);
+      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
     } catch (error) {
       console.error("Error toggling like:", error);
       toast({
@@ -114,13 +117,28 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
     }
   };
 
-  const mediaExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
-  const imageAttachments = pqr.attachments?.filter(att => 
-    mediaExtensions.includes(att.type.toLowerCase())
-  ) || [];
-  const otherAttachments = pqr.attachments?.filter(att => 
-    !mediaExtensions.includes(att.type.toLowerCase())
-  ) || [];
+  const mediaExtensions = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "mp4",
+    "mov",
+    "avi",
+    "wmv",
+    "flv",
+    "mkv",
+    "webm",
+  ];
+  const imageAttachments =
+    pqr.attachments?.filter((att) =>
+      mediaExtensions.includes(att.type.toLowerCase())
+    ) || [];
+  const otherAttachments =
+    pqr.attachments?.filter(
+      (att) => !mediaExtensions.includes(att.type.toLowerCase())
+    ) || [];
 
   const getFullUrl = (url: string) => {
     return `${url}`;
@@ -138,9 +156,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
               Por {creatorName}
             </p>
           </div>
-          <Badge variant={status.variant as any}>
-            {status.label}
-          </Badge>
+          <Badge variant={status.variant as any}>{status.label}</Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -149,9 +165,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
             <p className="text-sm text-muted-foreground">
               {pqr.department.entity.name} - {pqr.department.name}
             </p>
-            <p className="text-sm text-muted-foreground">
-              {formattedDate}
-            </p>
+            <p className="text-sm text-muted-foreground">{formattedDate}</p>
           </div>
 
           {/* Custom Fields */}
@@ -159,7 +173,8 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
             <div className="space-y-2">
               {pqr.customFieldValues.map((field) => (
                 <p key={field.name} className="text-sm">
-                  <span className="font-medium">{field.name}:</span> {field.value}
+                  <span className="font-medium">{field.name}:</span>{" "}
+                  {field.value}
                 </p>
               ))}
             </div>
@@ -167,27 +182,43 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
 
           {/* Image Attachments - Instagram/Facebook Style */}
           {imageAttachments.length > 0 && (
-            <div className={cn(
-              "grid gap-1 -mx-6",
-              imageAttachments.length === 1 && "grid-cols-1",
-              imageAttachments.length === 2 && "grid-cols-2",
-              imageAttachments.length >= 3 && "grid-cols-3",
-              imageAttachments.length === 4 && "grid-cols-2 grid-rows-2"
-            )}>
+            <div
+              className={cn(
+                "grid gap-1 -mx-6",
+                imageAttachments.length === 1 && "grid-cols-1",
+                imageAttachments.length === 2 && "grid-cols-2",
+                imageAttachments.length >= 3 && "grid-cols-3",
+                imageAttachments.length === 4 && "grid-cols-2 grid-rows-2"
+              )}
+            >
               {imageAttachments.slice(0, 4).map((attachment, index) => (
                 <Dialog key={attachment.url}>
                   <DialogTrigger asChild>
-                    <div className={cn(
-                      "relative cursor-pointer group",
-                      imageAttachments.length === 1 ? "h-96" : "h-48",
-                      imageAttachments.length === 4 && index === 0 && "col-span-2 row-span-2"
-                    )}>
-                      <Image
-                        src={getFullUrl(attachment.url)}
-                        alt={attachment.name}
-                        fill
-                        className="object-cover"
-                      />
+                    <div
+                      className={cn(
+                        "relative cursor-pointer group",
+                        imageAttachments.length === 1 ? "h-96" : "h-48",
+                        imageAttachments.length === 4 &&
+                          index === 0 &&
+                          "col-span-2 row-span-2"
+                      )}
+                    >
+                      {attachment.type.includes("mp4") ? (
+                        <video
+                          src={attachment.url}
+                          alt={attachment.name}
+                          className="object-cover"
+                          controls
+                          autoPlay
+                        />
+                      ) : (
+                        <Image
+                          src={attachment.url}
+                          alt={attachment.name}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
                       {index === 3 && imageAttachments.length > 4 && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                           <span className="text-white text-xl font-medium">
@@ -200,12 +231,22 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl">
                     <div className="relative h-[80vh]">
-                      <Image
-                        src={getFullUrl(attachment.url)}
-                        alt={attachment.name}
-                        fill
-                        className="object-contain"
-                      />
+                      {attachment.type.includes("mp4") ? (
+                        <video
+                          src={attachment.url}
+                          alt={attachment.name}
+                          className="object-contain"
+                          controls
+                          autoPlay
+                        />
+                      ) : (
+                        <Image
+                          src={attachment.url}
+                          alt={attachment.name}
+                          fill
+                          className="object-contain"
+                        />
+                      )}
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -249,14 +290,26 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
             </Button>
 
             <div className="flex items-center gap-2">
-              <Clock className={cn(
-                "w-4 h-4",
-                isExpired ? "text-red-500" : isUrgent ? "text-yellow-500" : "text-green-500"
-              )} />
-              <span className={cn(
-                "text-sm",
-                isExpired ? "text-red-500" : isUrgent ? "text-yellow-500" : "text-green-500"
-              )}>
+              <Clock
+                className={cn(
+                  "w-4 h-4",
+                  isExpired
+                    ? "text-red-500"
+                    : isUrgent
+                      ? "text-yellow-500"
+                      : "text-green-500"
+                )}
+              />
+              <span
+                className={cn(
+                  "text-sm",
+                  isExpired
+                    ? "text-red-500"
+                    : isUrgent
+                      ? "text-yellow-500"
+                      : "text-green-500"
+                )}
+              >
                 {isExpired
                   ? "Vencido"
                   : isUrgent

@@ -52,7 +52,7 @@ export default function PQRNotificationEmail({
       <Head />
       <Preview>Nueva PQR recibida - {entityName}</Preview>
       <Body style={main}>
-        <Container>
+        <Container style={container}>
           <Heading style={h1}>Nueva PQR Recibida</Heading>
 
           <Section style={section}>
@@ -135,6 +135,15 @@ export default function PQRNotificationEmail({
 const main = {
   backgroundColor: '#f6f9fc',
   padding: '40px 0',
+  width: '100%',
+  maxWidth: '600px',
+  margin: '0 auto',
+};
+
+const container = {
+  maxWidth: '580px',
+  margin: '0 auto',
+  padding: '0 10px',
 };
 
 const h1 = {
@@ -156,6 +165,8 @@ const section = {
   borderRadius: '5px',
   margin: '20px 0',
   padding: '20px',
+  width: '100%',
+  maxWidth: '560px',
 };
 
 const description = {

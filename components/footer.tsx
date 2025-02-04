@@ -14,7 +14,7 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-4">Contacto</h3>
             <p className="text-gray-400">
-              Email: soporte@qujate.com.co
+              Email: admin@quejate.com.co
               <br />
             </p>
           </div>
