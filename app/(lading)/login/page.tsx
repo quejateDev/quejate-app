@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, LogIn, Loader2 } from "lucide-react";
+import { Mail, Lock, LogIn } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ export default function Login() {
       if (user.role === "ADMIN") {
         router.push("/admin");
       } else {
-        router.push("/dashboard/pqr");
+        router.push("/dashboard");
       }
     }
   }, [user]);
