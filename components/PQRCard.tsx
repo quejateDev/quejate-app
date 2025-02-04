@@ -206,7 +206,6 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                       {attachment.type.includes("mp4") ? (
                         <video
                           src={attachment.url}
-                          alt={attachment.name}
                           className="object-cover"
                           controls
                           autoPlay
@@ -234,7 +233,6 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                       {attachment.type.includes("mp4") ? (
                         <video
                           src={attachment.url}
-                          alt={attachment.name}
                           className="object-contain"
                           controls
                           autoPlay
