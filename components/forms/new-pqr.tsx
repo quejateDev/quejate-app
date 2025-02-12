@@ -340,10 +340,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Envía tu PQRS</CardTitle>
-      </CardHeader>
+    <Card className="max-w-lg mx-auto">
       <CardContent>
         <Form {...form}>
           <form
@@ -351,7 +348,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
             className="space-y-4"
             encType="multipart/form-data"
           >
-            <div className="grid gap-4">
+            <div className="grid gap-4 pt-6">
               <div>
                 <Label>Tipo de Solicitud</Label>
                 <Select
@@ -540,32 +537,38 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isAnonymous"
-                  checked={pqr.isAnonymous}
-                  onCheckedChange={(checked) =>
-                    setPqr((prev) => ({
-                      ...prev,
-                      isAnonymous: checked as boolean,
-                    }))
-                  }
-                />
-                <Label htmlFor="isAnonymous">Hacer PQR anónima</Label>
+              <div className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isAnonymous"
+                    checked={pqr.isAnonymous}
+                    onCheckedChange={(checked) =>
+                      setPqr((prev) => ({
+                        ...prev,
+                        isAnonymous: checked as boolean,
+                      }))
+                    }
+                  />
+                  <Label htmlFor="isAnonymous">¿Desea enviar esta PQR de forma anónima?</Label>
+                </div>
+                <p className="text-xs text-gray-500">Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios.</p>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isPrivate"
-                  checked={pqr.isPrivate}
-                  onCheckedChange={(checked) =>
-                    setPqr((prev) => ({
-                      ...prev,
-                      isPrivate: checked as boolean,
-                    }))
-                  }
-                />
-                <Label htmlFor="isPrivate">Es privada</Label>
+              <div className="flex flex-col space-y-1 mb-6">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isPrivate"
+                    checked={pqr.isPrivate}
+                    onCheckedChange={(checked) =>
+                      setPqr((prev) => ({
+                        ...prev,
+                        isPrivate: checked as boolean,
+                      }))
+                    }
+                  />
+                  <Label htmlFor="isPrivate">¿Desea publicar esta PQR en el muro público?</Label>
+                </div>
+                <p className="text-xs text-gray-500">Si marca esta opción, su queja será visible para otras personas en la sección de denuncias públicas.</p>
               </div>
 
               <Button type="submit" disabled={isLoading}>
