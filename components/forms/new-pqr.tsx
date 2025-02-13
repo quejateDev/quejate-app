@@ -368,61 +368,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div>
-                <Label>Entidad</Label>
-                <Popover open={openEntity} onOpenChange={setOpenEntity}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openEntity}
-                      className="w-full justify-between"
-                    >
-                      {selectedEntityId
-                        ? entities.find(
-                            (entity) => entity.id === selectedEntityId
-                          )?.name
-                        : "Seleccione una entidad..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                    <Command className="w-full">
-                      <CommandInput placeholder="Buscar entidad..." />
-                      <CommandList className="max-h-[300px] w-full overflow-y-auto">
-                        <CommandEmpty>
-                          No se encontro ninguna entidad.
-                        </CommandEmpty>
-                        <CommandGroup className="w-full">
-                          {entities.map((entity) => (
-                            <CommandItem
-                              key={entity.id}
-                              value={entity.name}
-                              onSelect={() => {
-                                setSelectedEntityId(entity.id);
-                                setOpenEntity(false);
-                              }}
-                              className="w-full"
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  selectedEntityId === entity.id
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {entity.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
               <FormField
                 control={form.control}
                 name="departmentId"
