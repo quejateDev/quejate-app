@@ -24,7 +24,7 @@ export default function ProfilePage() {
 
     fetchUser(id as string);
     fetchUserPQRS(id as string);
-  }, [id]);
+  }, [id, fetchUser, fetchUserPQRS]);
 
   if (isLoading) {
     return (
