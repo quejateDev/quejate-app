@@ -8,16 +8,13 @@ import { PQRCustomFields } from "@/components/pqrs/pqr-custom-fields";
 import { PQRTimeline } from "@/components/pqrs/pqr-timeline";
 
 interface PQRDetailPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
-  const { id } = await params;
-  
+  const resolvedParams = await params;
   const pqr = await prisma.pQRS.findUnique({
-    where: { id },
+    where: { id: resolvedParams.id },
     include: {
       department: {
         include: {
