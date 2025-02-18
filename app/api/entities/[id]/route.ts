@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(
-  request: Request,
-  { params }: any
-) {
+export async function GET(request: Request, { params }: any) {
   try {
     const entity = await prisma.entity.findUnique({
       where: { id: params.id },
@@ -24,13 +21,10 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: any
-) {
+export async function PUT(request: Request, { params }: any) {
   try {
     const body = await request.json();
-    const { name, description, categoryId, imageUrl } = body;
+    const { name, description, categoryId, imageUrl, email } = body;
 
     const entity = await prisma.entity.update({
       where: { id: params.id },
@@ -39,6 +33,7 @@ export async function PUT(
         description,
         categoryId,
         imageUrl: imageUrl || undefined,
+        email: email || undefined,
       },
     });
 
@@ -49,10 +44,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: any
-) {
+export async function DELETE(request: Request, { params }: any) {
   try {
     await prisma.entity.delete({
       where: { id: params.id },
