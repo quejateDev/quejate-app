@@ -82,10 +82,7 @@ export function CategorySelection({
 
       {!selectedCategory && (
         <p className="text-sm text-gray-600">
-          Explora las categorías disponibles y encuentra lo que necesitas. Si no
-          estás seguro de a qué categoría pertenece una entidad, usa la barra de
-          búsqueda para encontrarla con palabras clave en su nombre o
-          descripción.
+          Descubre las categorías disponibles y encuentra exactamente lo que buscas. Si no sabes a qué categoría pertenece una entidad, utiliza la barra de búsqueda e ingresa palabras clave relacionadas con su nombre o descripción para localizarla fácilmente.
         </p>
       )}
 
