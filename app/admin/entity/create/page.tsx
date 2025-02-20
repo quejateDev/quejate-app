@@ -16,7 +16,7 @@ import { createEntity, getCategories } from "@/services/api/entity.service";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Category } from "@prisma/client";
+import { Category, Municipality } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -24,22 +24,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getMunicipalitiesByDepartment, getRegionalDepartments } from "@/services/api/location.service";
 
 export default function CreateEntityPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const [municipalities, setMunicipalities] = useState<{ id: string; name: string }[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     image: null as File | null,
     categoryId: "",
     email: "",
+    municipalityId: "",
   });
 
   useEffect(() => {
-    // Fetch categories when component mounts
     const fetchCategories = async () => {
       try {
         console.log("categories ", process.env.BASE_URL);
@@ -57,6 +62,38 @@ export default function CreateEntityPage() {
 
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const data = await getRegionalDepartments();
+        setDepartments(data);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+  
+    fetchDepartments();
+  }, []);
+  
+  useEffect(() => {
+    if (!selectedDepartment) {
+      setMunicipalities([]);
+      return;
+    }
+  
+    const fetchMunicipalities = async () => {
+      try {
+        const data = await getMunicipalitiesByDepartment(selectedDepartment);
+        setMunicipalities(data);
+      } catch (error) {
+        console.error("Error fetching municipalities:", error);
+      }
+    };
+  
+    fetchMunicipalities();
+  }, [selectedDepartment]);
+  
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,7 +122,6 @@ export default function CreateEntityPage() {
     setLoading(true);
 
     try {
-      // Upload image first if present
       let imageUrl = null;
       if (formData.image) {
         const imageFormData = new FormData();
@@ -111,6 +147,7 @@ export default function CreateEntityPage() {
         categoryId: formData.categoryId,
         imageUrl: imageUrl,
         email: formData.email,
+        municipalityId: formData.municipalityId
       });
 
       toast({
@@ -200,6 +237,52 @@ export default function CreateEntityPage() {
                 </SelectContent>
               </Select>
             </div>
+             
+            <div className="space-y-2">
+              <Label htmlFor="department">Departamento</Label>
+              <Select
+                value={selectedDepartment || ""}
+                onValueChange={(value) => {
+                  setSelectedDepartment(value);
+                  setFormData((prev) => ({ ...prev, municipalityId: "" })); 
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione un departamento" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem key={department.id} value={department.id}>
+                      {department.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="municipality">Ciudad / Municipio</Label>
+              <Select
+                value={formData.municipalityId}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, municipalityId: value }))
+                }
+                disabled={!selectedDepartment}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione un municipio" />
+                </SelectTrigger>
+                <SelectContent>
+                  {municipalities.map((municipality) => (
+                    <SelectItem key={municipality.id} value={municipality.id}>
+                      {municipality.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+
             <div className="space-y-2">
               <Label htmlFor="image">Logo o Imagen</Label>
               <Input
