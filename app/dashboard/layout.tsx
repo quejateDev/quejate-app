@@ -17,9 +17,9 @@ export default function RootLayout({
           <div className="flex-1 flex-col px-6 py-4">
             {children}
           </div>
-          <Footer />
         </main>
       </SidebarProvider>
+      <Footer />
     </>
   );
 }
