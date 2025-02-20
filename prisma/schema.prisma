@@ -27,8 +27,8 @@ model User {
   notifications     Notification[]
   PQRS              PQRS[]
   department        Department?         @relation(fields: [departmentId], references: [id])
-  User_A            User[]              @relation("UserFollows")
-  User_B            User[]              @relation("UserFollows")
+  following         User[]              @relation("UserFollows")
+  followers         User[]              @relation("UserFollows")
 
   @@index([departmentId])
 }

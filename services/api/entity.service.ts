@@ -6,7 +6,7 @@ const Client = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds
+  timeout: 10000,
 });
 
 type CreateEntityDTO = {
@@ -15,6 +15,7 @@ type CreateEntityDTO = {
   categoryId: string;
   imageUrl?: string;
   email: string;
+  municipalityId: string;
 };
 
 type UpdateEntityDTO = {
@@ -23,6 +24,7 @@ type UpdateEntityDTO = {
   categoryId: string;
   imageUrl?: string;
   email: string;
+  municipalityId: string;
 };
 
 export async function getEntities() {
@@ -37,7 +39,6 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function createEntity(data: CreateEntityDTO): Promise<Entity> {
-  console.log("hola");
   const response = await Client.post("/entities", data);
   return response.data;
 }
