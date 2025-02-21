@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(request: Request, { params }: any) {
+interface Params {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(request: Request, { params }: Params) {
+  if (!params.id) {
+    return new NextResponse("ID is required", { status: 400 });
+  }
   try {
     const entity = await prisma.entity.findUnique({
       where: { id: params.id },
@@ -21,10 +30,13 @@ export async function GET(request: Request, { params }: any) {
   }
 }
 
-export async function PUT(request: Request, { params }: any) {
+export async function PUT(request: Request, { params }: Params) {
+  if (!params.id) {
+    return new NextResponse("ID is required", { status: 400 });
+  }
   try {
     const body = await request.json();
-    const { name, description, categoryId, imageUrl, email } = body;
+    const { name, description, categoryId, imageUrl, email, municipalityId } = body;
 
     const entity = await prisma.entity.update({
       where: { id: params.id },
@@ -32,8 +44,9 @@ export async function PUT(request: Request, { params }: any) {
         name,
         description,
         categoryId,
-        imageUrl: imageUrl || undefined,
-        email: email || undefined,
+        imageUrl: imageUrl || null,
+        email: email || null,
+        municipalityId: municipalityId || null,
       },
     });
 
@@ -44,7 +57,11 @@ export async function PUT(request: Request, { params }: any) {
   }
 }
 
-export async function DELETE(request: Request, { params }: any) {
+export async function DELETE(request: Request, { params }: Params) {
+  if (!params.id) {
+    return new NextResponse("ID is required", { status: 400 });
+  }
+
   try {
     await prisma.entity.delete({
       where: { id: params.id },
