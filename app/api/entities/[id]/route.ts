@@ -3,8 +3,9 @@ import prisma from "@/lib/prisma";
 
 export async function GET(request: Request, { params }: any) {
   try {
+    const { id } = await params
     const entity = await prisma.entity.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         category: true,
       },
@@ -23,17 +24,18 @@ export async function GET(request: Request, { params }: any) {
 
 export async function PUT(request: Request, { params }: any) {
   try {
+    const { id } = await params
     const body = await request.json();
-    const { name, description, categoryId, imageUrl, email } = body;
-
+    const { name, description, categoryId, imageUrl, email, municipalityId } = body;
     const entity = await prisma.entity.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         description,
         categoryId,
         imageUrl: imageUrl || undefined,
         email: email || undefined,
+        municipalityId: municipalityId || undefined,
       },
     });
 
@@ -46,8 +48,9 @@ export async function PUT(request: Request, { params }: any) {
 
 export async function DELETE(request: Request, { params }: any) {
   try {
+    const { id } = await params
     await prisma.entity.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return new NextResponse(null, { status: 204 });

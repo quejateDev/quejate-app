@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Form } from "@/components/ui/form"
 import { ImageUpload } from "@/components/ui/image-upload"
-import { Entity, Category } from "@prisma/client"
+import { Entity, Category, Department, Municipality } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Loader2 } from "lucide-react"
+import { getMunicipalitiesByDepartment, getRegionalDepartments } from "@/services/api/location.service";
 
 const formSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -29,6 +29,7 @@ const formSchema = z.object({
   imageUrl: z.string().url().optional(),
   categoryId: z.string().min(1, "Debe seleccionar una categoría"),
   email: z.string().email().optional().or(z.literal("")),
+  municipalityId: z.string().min(1, "Debe seleccionar un municipio"),
 })
 
 interface EntityFormProps {
@@ -38,7 +39,11 @@ interface EntityFormProps {
 export function EntityForm({ entity }: EntityFormProps) {
   const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([])
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,26 +53,73 @@ export function EntityForm({ entity }: EntityFormProps) {
       imageUrl: entity?.imageUrl || "",
       categoryId: entity?.categoryId || "",
       email: entity?.email || "",
+      municipalityId: entity?.municipalityId || "",
     },
   })
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await axios.get("/api/category")
-        setCategories(response.data)
+        setIsLoading(true)
+        
+        const categoriesResponse = await fetch("/api/category")
+        const categoriesData = await categoriesResponse.json()
+        setCategories(categoriesData)
+
+        const departmentsData = await getRegionalDepartments()
+        setDepartments(departmentsData)
+
+        if (entity?.municipalityId) {
+          for (const department of departmentsData) {
+            const municipalities = await getMunicipalitiesByDepartment(department.id)
+            const foundMunicipality = municipalities.find(
+              (m: Municipality) => m.id === entity.municipalityId
+            )
+            
+            if (foundMunicipality) {
+              setSelectedDepartment(department.id)
+              setMunicipalities(municipalities)
+              break
+            }
+          }
+        }
       } catch (error) {
-        console.error("Error fetching categories:", error)
+        console.error("Error fetching initial data:", error)
         toast({
           title: "Error",
-          description: "No se pudieron cargar las categorías",
+          description: "Error al cargar los datos iniciales",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInitialData()
+  }, [entity])
+
+  useEffect(() => {
+    if (!selectedDepartment) {
+      setMunicipalities([])
+      return
+    }
+
+    const fetchMunicipalities = async () => {
+      try {
+        const municipalitiesData = await getMunicipalitiesByDepartment(selectedDepartment)
+        setMunicipalities(municipalitiesData)
+      } catch (error) {
+        console.error("Error fetching municipalities:", error)
+        toast({
+          title: "Error",
+          description: "Error al cargar los municipios",
           variant: "destructive",
         })
       }
     }
 
-    fetchCategories()
-  }, [])
+    fetchMunicipalities()
+  }, [selectedDepartment])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -106,6 +158,10 @@ export function EntityForm({ entity }: EntityFormProps) {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  if (isLoading) {
+    return <div>Cargando...</div>
   }
 
   return (
@@ -178,6 +234,59 @@ export function EntityForm({ entity }: EntityFormProps) {
           )}
         />
 
+        <div className="space-y-4">
+          <div>
+            <FormLabel>Departamento</FormLabel>
+            <Select
+              value={selectedDepartment || ""}
+              onValueChange={(value) => {
+                setSelectedDepartment(value)
+                form.setValue("municipalityId", "")
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccione un departamento" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((department) => (
+                  <SelectItem key={department.id} value={department.id}>
+                    {department.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <FormField
+            control={form.control}
+            name="municipalityId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Municipio</FormLabel>
+                <Select
+                  disabled={!selectedDepartment}
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione un municipio" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {municipalities.map((municipality) => (
+                      <SelectItem key={municipality.id} value={municipality.id}>
+                        {municipality.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <ImageUpload 
           form={form} 
           name="imageUrl" 
@@ -194,11 +303,11 @@ export function EntityForm({ entity }: EntityFormProps) {
           >
             Cancelar
           </Button>
-          <Button type="submit" isLoading={isSaving}>
+          <Button type="submit" disabled={isSaving}>
             {isSaving ? "Guardando..." : entity ? "Actualizar" : "Crear"}
           </Button>
         </div>
       </form>
     </Form>
   )
-} 
+}

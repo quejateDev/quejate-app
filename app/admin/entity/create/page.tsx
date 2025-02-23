@@ -16,7 +16,7 @@ import { createEntity, getCategories } from "@/services/api/entity.service";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Category, Municipality } from "@prisma/client";
+import { Category} from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -281,7 +281,6 @@ export default function CreateEntityPage() {
                 </SelectContent>
               </Select>
             </div>
-
 
             <div className="space-y-2">
               <Label htmlFor="image">Logo o Imagen</Label>
