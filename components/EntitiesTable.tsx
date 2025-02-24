@@ -21,6 +21,8 @@ import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import ConfirmationModal from "./modals/ConfirmationModal";
+import { toast } from "@/hooks/use-toast";
 
 interface EntitiesTableProps {
   entities: (Entity & {
@@ -35,6 +37,8 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [filteredEntities, setFilteredEntities] = useState(entities);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [entityToDelete, setEntityToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     const filtered = entities.filter((entity) => {
@@ -51,6 +55,41 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
 
     setFilteredEntities(filtered);
   }, [searchTerm, selectedCategory, entities]);
+
+  const handleDeleteClick = (entityId: string) => {
+    setEntityToDelete(entityId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (entityToDelete) {
+      try {
+        const response = await fetch(`/api/entities/${entityToDelete}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) throw new Error("Failed to delete entity");
+
+        setIsDeleteModalOpen(false);
+        setEntityToDelete(null);
+        
+        toast({
+          title: "Entidad eliminada correctamente",
+          description: "La entidad ha sido eliminada correctamente",
+        });
+        const newDataResponse = await fetch("/api/entities");
+        const newData = await newDataResponse.json();
+        setFilteredEntities(newData);
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: "Error",
+          description: "Error al eliminar la entidad",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -122,17 +161,34 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                   {new Date(entity.updatedAt).toLocaleDateString("es-ES")}
                 </TableCell>
                 <TableCell>
-                  <Link href={`/admin/entity/${entity.id}/edit`}>
-                    <Button variant="outline" size="sm">
-                      Editar
+                  <div className="flex gap-2">
+                    <Link href={`/admin/entity/${entity.id}/edit`}>
+                      <Button variant="outline" size="sm">
+                        Editar
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteClick(entity.id)}
+                    >
+                      Eliminar
                     </Button>
-                  </Link>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Card>
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Eliminar Entidad"
+        description="¿Está seguro que desea eliminar esta entidad? Esta acción no se puede deshacer."
+      />
     </div>
   );
 }
