@@ -47,6 +47,7 @@ interface CategoryFormProps {
 export default function CategoryForm({ category, onSuccess }: CategoryFormProps) {
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(category?.imageUrl || null);
+  const [isSaving, setIsSaving] = useState(false);
   const { upload, isUploading } = useS3Upload({
     onSuccess: (url) => {
       form.setValue("imageUrl", url);
@@ -103,9 +104,8 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const url = category
-        ? `/api/category/${category.id}`
-        : "/api/category";
+      setIsSaving(true); 
+      const url = category ? `/api/category/${category.id}` : "/api/category";
       const method = category ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -130,6 +130,8 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
         description: "Error al guardar la categoria",
         variant: "destructive",
       });
+    } finally {
+        setIsSaving(false); // Desactivar estado de guardado
     }
   };
 
@@ -219,16 +221,26 @@ export default function CategoryForm({ category, onSuccess }: CategoryFormProps)
           >
             Cancelar
           </Button>
-          <Button type="submit" disabled={isUploading}>
-            {isUploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Subiendo...
-              </>
-            ) : (
-              "Actualizar"
-            )}
-          </Button>
+          <Button
+          type="submit"
+          disabled={isUploading || isSaving} // Deshabilitar si se está subiendo o guardando
+        >
+          {isUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Subiendo...
+            </>
+          ) : isSaving ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Guardando...
+            </>
+          ) : category ? (
+            "Actualizar"
+          ) : (
+            "Crear"
+          )}
+        </Button>
         </div>
       </form>
     </Form>

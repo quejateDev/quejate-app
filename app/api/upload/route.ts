@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { uploadObject } from "@/services/storage/s3.service";
+import { AWS_BUCKET } from "@/lib/config";
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +25,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       success: true,
-      path: `https://quejate.s3.us-east-2.amazonaws.com/${filename}`
+      path: `https://${AWS_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${filename}`
+
     });
   } catch (error) {
     console.error('Error uploading file:', error);
