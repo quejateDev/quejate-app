@@ -11,6 +11,10 @@ const PROTECTED_PATHS = ['/dashboard']
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value
 
+  if (request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   // Redirect /dashboard to /dashboard/pqrs
   if (request.nextUrl.pathname === '/admin') {
     return NextResponse.redirect(new URL('/admin/pqr', request.url))
@@ -68,6 +72,7 @@ export async function middleware(request: NextRequest) {
 // Configure paths that trigger the middleware
 export const config = {
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/admin/:path*',
     '/api/admin/:path*',
