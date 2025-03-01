@@ -107,7 +107,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       <main className="container mx-auto p-8">
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Mis PQRs</h1>
+            <h1 className="text-2xl font-bold">PQRs</h1>
             <Link href="/dashboard/pqrs/create">
               <Button>Crear PQR</Button>
             </Link>

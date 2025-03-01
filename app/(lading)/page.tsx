@@ -9,6 +9,7 @@ import { PQRCard } from "@/components/PQRCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart } from "lucide-react";
 import { PQRSType } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 interface TopPQR {
   id: string;
@@ -70,6 +71,8 @@ const steps = [
 ];
 
 export default function Home() {
+  redirect("/dashboard");
+  return null;
   const [topPQRs, setTopPQRs] = useState<TopPQR[]>([]);
   const [loading, setLoading] = useState(true);
 
