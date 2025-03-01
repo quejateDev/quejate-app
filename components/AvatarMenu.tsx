@@ -10,12 +10,18 @@ import {
 } from "./ui/dropdown-menu";
 import { LogIn, LogOut, User } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
+import { toast } from "@/hooks/use-toast";
 
 export default function AvatarMenu() {
   const { user } = useAuthStore();
 
   function handleLogout() {
     useAuthStore.getState().logout();
+    toast({
+      title: "Cierre de sesión exitoso",
+      description: "Has cerrado sesión correctamente.",
+      variant: "default",
+    });
   }
 
   return (
