@@ -1,9 +1,28 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const departmentId = searchParams.get("departmentId");
+    const municipalityId = searchParams.get("municipalityId");
+
+    let whereClause = {};
+
+    if (municipalityId) {
+      whereClause = {
+        municipalityId: municipalityId,
+      };
+    } else if (departmentId) {
+      whereClause = {
+        Municipality: {
+          regionalDepartmentId: departmentId,
+        },
+      };
+    }
+
     const entities = await prisma.entity.findMany({
+      where: whereClause,
       orderBy: {
         name: "asc",
       },
@@ -13,8 +32,19 @@ export async function GET() {
             name: true,
           },
         },
+        Municipality: {
+          select: {
+            name: true,
+            RegionalDepartment: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
+
     return NextResponse.json(entities);
   } catch (error) {
     console.error("Error fetching entities:", error);

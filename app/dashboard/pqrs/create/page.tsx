@@ -14,6 +14,7 @@ export default async function CreatePQRPage() {
           name: true,
           description: true,
           imageUrl: true,
+          municipalityId: true,
         },
       },
     },

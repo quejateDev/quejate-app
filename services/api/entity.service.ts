@@ -27,8 +27,18 @@ type UpdateEntityDTO = {
   municipalityId: string;
 };
 
-export async function getEntities() {
-  const response = await Client.get("/entities");
+export async function getEntities(params?: { departmentId?: string; municipalityId?: string }) {
+  const queryParams = new URLSearchParams();
+
+  if (params?.municipalityId) {
+    queryParams.append("municipalityId", params.municipalityId);
+  } else if (params?.departmentId) {
+    queryParams.append("departmentId", params.departmentId);
+  }
+
+  const url = queryParams.toString() ? `/entities?${queryParams.toString()}` : "/entities";
+
+  const response = await Client.get(url);
   return response.data;
 }
 
