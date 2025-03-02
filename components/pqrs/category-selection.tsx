@@ -141,7 +141,7 @@ export function CategorySelection({
 
       {selectedCategory && (
         <>
-          <div className="relative w-64">
+          <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               type="text"
@@ -152,8 +152,8 @@ export function CategorySelection({
             />
           </div>
 
-          <div className="flex gap-4">
-            <div className="w-64">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="w-full md:w-64">
               <Select
                 value={selectedDepartmentId || ""}
                 onValueChange={(value) => {
@@ -175,7 +175,7 @@ export function CategorySelection({
             </div>
 
             {selectedDepartmentId && (
-              <div className="w-64">
+              <div className="w-full md:w-64">
                 <Select
                   value={selectedMunicipalityId || ""}
                   onValueChange={(value) => setSelectedMunicipalityId(value || null)}
