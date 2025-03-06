@@ -1,16 +1,28 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PQRS } from "@prisma/client";
-import { Heart, Clock, Paperclip } from "lucide-react";
+import { Heart, Paperclip, User } from "lucide-react";
 import { useState } from "react";
 import { toggleLike } from "@/services/api/pqr.service";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Image from "next/image";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./ui/carousel";
 
 type PQRCardProps = {
   pqr: PQRS & {
@@ -42,17 +54,29 @@ type PQRCardProps = {
 };
 
 const statusMap = {
-  PENDING: { label: "Pendiente", variant: "default" },
-  IN_PROGRESS: { label: "En Proceso", variant: "warning" },
-  RESOLVED: { label: "Resuelto", variant: "success" },
-  REJECTED: { label: "Rechazado", variant: "destructive" },
+  PENDING: {
+    label: "Pendiente",
+    variant: "pending",
+  },
+  IN_PROGRESS: {
+    label: "En Proceso",
+    variant: "in_progress",
+  },
+  RESOLVED: {
+    label: "Resuelto",
+    variant: "resolved",
+  },
+  CLOSED: {
+    label: "Cerrado",
+    variant: "rejected",
+  },
 } as const;
 
 const typeMap = {
-  PETITION: "Petición",
-  COMPLAINT: "Queja",
-  CLAIM: "Reclamo",
-  SUGGESTION: "Sugerencia",
+  PETITION: { label: "Petición", color: "text-blue-600" },
+  COMPLAINT: { label: "Queja", color: "text-red-800" },
+  CLAIM: { label: "Reclamo", color: "text-orange-800" },
+  SUGGESTION: { label: "Sugerencia", color: "text-green-800" },
 } as const;
 
 const calculateRemainingDays = (createdAt: Date, dueDate: Date) => {
@@ -68,23 +92,21 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const [likeCount, setLikeCount] = useState(pqr._count?.likes || 0);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuthStore();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const status = pqr.status;
+  const statusInfo = statusMap[status as keyof typeof statusMap];
 
-  const status = statusMap[pqr.status as keyof typeof statusMap];
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
     year: "numeric",
     month: "long",
     day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    // hour: "2-digit",
+    // minute: "2-digit",
   });
 
   const remainingDays = calculateRemainingDays(
     new Date(pqr.createdAt),
     new Date(pqr.dueDate)
   );
-  const isExpired = remainingDays <= 0;
-  const isUrgent = remainingDays <= 3 && remainingDays > 0;
 
   const creatorName = !pqr.anonymous
     ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
@@ -143,113 +165,119 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const getFullUrl = (url: string) => {
     return `${url}`;
   };
-
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-6">
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg font-bold">
-              {typeMap[pqr.type as keyof typeof typeMap]}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Por {creatorName}
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100">
+              {user ? (
+                <span className="text-md">
+                  {creatorName.charAt(0).toUpperCase()}
+                </span>
+              ) : (
+                <User className="h-6 w-6 stroke-1 text-gray-500" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-semibold">{creatorName}</p>
+              <p className="text-xs text-muted-foreground">
+                {formattedDate} •{" "}
+                <span
+                  className={typeMap[pqr.type as keyof typeof typeMap].color}
+                >
+                  {typeMap[pqr.type as keyof typeof typeMap].label}
+                </span>
+              </p>
+            </div>
           </div>
-          <Badge variant={status.variant as any}>{status.label}</Badge>
+          <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <p className="text-sm text-muted-foreground">
-              {pqr.department.entity.name} - {pqr.department.name}
+            <h1 className="font-semibold text-md">
+              {pqr.customFieldValues.find(
+                (field) => field.name === "Titulo" || "Titulo "
+              )?.value || "No Title"}
+            </h1>
+            <p className="text-xs text-muted-foreground mb-5">
+              Entidad: {pqr.department.entity.name}
             </p>
-            <p className="text-sm text-muted-foreground">{formattedDate}</p>
+            <p className="text-sm">
+              {pqr.customFieldValues.find(
+                (field) => field.name === "Descripción"
+              )?.value || "No Description"}
+            </p>
           </div>
 
-          {/* Custom Fields */}
-          {pqr.customFieldValues.length > 0 && (
-            <div className="space-y-2">
-              {pqr.customFieldValues.map((field) => (
-                <p key={field.name} className="text-sm">
-                  <span className="font-medium">{field.name}:</span>{" "}
-                  {field.value}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {/* Image Attachments - Instagram/Facebook Style */}
           {imageAttachments.length > 0 && (
-            <div
-              className={cn(
-                "grid gap-1 -mx-6",
-                imageAttachments.length === 1 && "grid-cols-1",
-                imageAttachments.length === 2 && "grid-cols-2",
-                imageAttachments.length >= 3 && "grid-cols-3",
-                imageAttachments.length === 4 && "grid-cols-2 grid-rows-2"
+            <Carousel className="w-full max-w-md mx-auto relative">
+              <CarouselContent>
+                {imageAttachments.map((attachment, index) => (
+                  <CarouselItem key={attachment.url}>
+                    <div className="p-1">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="relative cursor-pointer group h-60">
+                            {attachment.type.includes("mp4") ? (
+                              <video
+                                src={attachment.url}
+                                className="object-cover w-full h-full"
+                                controls
+                                autoPlay
+                              />
+                            ) : (
+                              <Image
+                                src={attachment.url}
+                                alt={attachment.name}
+                                fill
+                                className="object-contain"
+                              />
+                            )}
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogTitle></DialogTitle>
+                          <div className="relative h-[80vh]">
+                            {attachment.type.includes("mp4") ? (
+                              <video
+                                src={attachment.url}
+                                className="object-contain"
+                                controls
+                                autoPlay
+                              />
+                            ) : (
+                              <Image
+                                src={attachment.url}
+                                alt={attachment.name}
+                                fill
+                                className="object-contain"
+                              />
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+
+              {imageAttachments.length > 1 && (
+                <div className="flex justify-center mt-4 md:hidden">
+                  <CarouselPrevious className="static mr-2 translate-y-0" />
+                  <CarouselNext className="static ml-2 translate-y-0" />
+                </div>
               )}
-            >
-              {imageAttachments.slice(0, 4).map((attachment, index) => (
-                <Dialog key={attachment.url}>
-                  <DialogTrigger asChild>
-                    <div
-                      className={cn(
-                        "relative cursor-pointer group",
-                        imageAttachments.length === 1 ? "h-96" : "h-48",
-                        imageAttachments.length === 4 &&
-                          index === 0 &&
-                          "col-span-2 row-span-2"
-                      )}
-                    >
-                      {attachment.type.includes("mp4") ? (
-                        <video
-                          src={attachment.url}
-                          className="object-cover"
-                          controls
-                          autoPlay
-                        />
-                      ) : (
-                        <Image
-                          src={attachment.url}
-                          alt={attachment.name}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                      {index === 3 && imageAttachments.length > 4 && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                          <span className="text-white text-xl font-medium">
-                            +{imageAttachments.length - 4}
-                          </span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl">
-                    <div className="relative h-[80vh]">
-                      {attachment.type.includes("mp4") ? (
-                        <video
-                          src={attachment.url}
-                          className="object-contain"
-                          controls
-                          autoPlay
-                        />
-                      ) : (
-                        <Image
-                          src={attachment.url}
-                          alt={attachment.name}
-                          fill
-                          className="object-contain"
-                        />
-                      )}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              ))}
-            </div>
+
+              {imageAttachments.length > 1 && (
+                <div className="hidden md:block">
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </div>
+              )}
+            </Carousel>
           )}
 
           {/* Other Attachments */}
@@ -274,47 +302,20 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2"
+              className="gap-2 pl-0 hover:bg-transparent hover:text-current"
               onClick={handleLike}
               disabled={isLoading}
             >
               <Heart
                 className={cn(
                   "w-4 h-4",
-                  liked ? "fill-current text-red-500" : "text-gray-500"
+                  liked
+                    ? "fill-current text-red-500"
+                    : "text-gray-500 stroke-red-500"
                 )}
               />
               <span>{likeCount}</span>
             </Button>
-
-            <div className="flex items-center gap-2">
-              <Clock
-                className={cn(
-                  "w-4 h-4",
-                  isExpired
-                    ? "text-red-500"
-                    : isUrgent
-                      ? "text-yellow-500"
-                      : "text-green-500"
-                )}
-              />
-              <span
-                className={cn(
-                  "text-sm",
-                  isExpired
-                    ? "text-red-500"
-                    : isUrgent
-                      ? "text-yellow-500"
-                      : "text-green-500"
-                )}
-              >
-                {isExpired
-                  ? "Vencido"
-                  : isUrgent
-                    ? `${remainingDays} días restantes`
-                    : `${remainingDays} días restantes`}
-              </span>
-            </div>
           </div>
         </div>
       </CardContent>
