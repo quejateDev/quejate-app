@@ -15,10 +15,6 @@ export default function NavbarAdmin() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src="" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
