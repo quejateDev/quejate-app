@@ -154,7 +154,7 @@ export default function Login() {
               </div>
 
               <Button
-                variant="success"
+                variant="default"
                 type="submit"
                 className="w-full h-12 text-sm md:text-base"
                 onClick={handleSubmit}

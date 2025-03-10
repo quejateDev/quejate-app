@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,19 +20,12 @@ import {
   User,
   CustomField,
 } from "@prisma/client";
-import { useEffect, useState } from "react";
-import { TextField } from "../fields/TextField";
-import { TextAreaField } from "../fields/TextAreaField";
-import { PhoneField } from "../fields/PhoneField";
-import { EmailField } from "../fields/EmailField";
-import { FileField } from "../fields/FileField";
-import { NumberField } from "../fields/NumberField";
+import { useCallback, useEffect, useState } from "react";
 import { createPQRS } from "@/services/api/pqr.service";
 import { getEntities } from "@/services/api/entity.service";
 import useAuthStore from "@/store/useAuthStore";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
-import { Combobox } from "../ui/combobox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
@@ -266,7 +259,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     try {
       const formData = new FormData();
       
-      // Preparar los custom fields
       const customFieldsData = customFields.map(field => ({
         name: field.name,
         value: values.customFields[field.name] || '',
@@ -352,10 +344,11 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
               <div>
                 <Label>Tipo de Solicitud</Label>
                 <Select
-                  value={pqr.type}
-                  onValueChange={(value: PQRSType) =>
-                    setPqr((prev) => ({ ...prev, type: value }))
-                  }
+                  value={form.getValues("type")}
+                  onValueChange={(value: PQRSType) => {
+                    form.setValue("type", value);
+                    setPqr((prev) => ({ ...prev, type: value }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccione el tipo de solicitud" />

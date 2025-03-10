@@ -124,7 +124,7 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
               name="maxResponseTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tiempo máximo de respuesta (horas)</FormLabel>
+                  <FormLabel>Tiempo máximo de respuesta (días hábiles)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>

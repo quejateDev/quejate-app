@@ -74,9 +74,9 @@ const statusMap = {
 
 const typeMap = {
   PETITION: { label: "Petición", color: "text-blue-600" },
-  COMPLAINT: { label: "Queja", color: "text-red-800" },
-  CLAIM: { label: "Reclamo", color: "text-orange-800" },
-  SUGGESTION: { label: "Sugerencia", color: "text-green-800" },
+  COMPLAINT: { label: "Queja", color: "text-red-600" },
+  CLAIM: { label: "Reclamo", color: "text-orange-600" },
+  SUGGESTION: { label: "Sugerencia", color: "text-green-600" },
 } as const;
 
 const calculateRemainingDays = (createdAt: Date, dueDate: Date) => {
@@ -197,8 +197,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
               <div>
                 <h1 className="font-semibold text-md">
                   {pqr.customFieldValues.find(
-                    (field) => field.name === "Titulo" || "Titulo "
-                  )?.value || "No Title"}
+                    (field) => field.name === "Título" || "Titulo")?.value || "No Title"}
                 </h1>
                 <p className="text-xs text-muted-foreground mb-5">
                   Entidad: {pqr.department.entity.name}
