@@ -218,11 +218,11 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                           <Dialog>
                             <DialogTrigger asChild>
                               <div className="relative cursor-pointer group h-60">
-                                {attachment.type.includes("mp4") ? (
+                                {attachment.type.includes("mp4") || attachment.type.includes("mov") ? (
                                   <video
                                     src={attachment.url}
                                     className="object-cover w-full h-full"
-                                    controls
+                                    controls 
                                     autoPlay
                                   />
                                 ) : (
@@ -238,7 +238,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                             <DialogContent className="max-w-4xl">
                               <DialogTitle></DialogTitle>
                               <div className="relative h-[80vh]">
-                                {attachment.type.includes("mp4") ? (
+                                {attachment.type.includes("mp4") || attachment.type.includes("mov")? (
                                   <video
                                     src={attachment.url}
                                     className="object-contain"
@@ -362,7 +362,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                       <Dialog>
                         <DialogTrigger asChild>
                           <div className="relative cursor-pointer group h-48">
-                            {attachment.type.includes("mp4") ? (
+                            {attachment.type.includes("mp4") || attachment.type.includes("mov") ? (
                               <video
                                 src={attachment.url}
                                 className="object-cover w-full h-full"
@@ -382,7 +382,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                         <DialogContent className="max-w-full">
                           <DialogTitle></DialogTitle>
                           <div className="relative h-[80vh]">
-                            {attachment.type.includes("mp4") ? (
+                            {attachment.type.includes("mp4") || attachment.type.includes("mov") ? (
                               <video
                                 src={attachment.url}
                                 className="object-contain"
