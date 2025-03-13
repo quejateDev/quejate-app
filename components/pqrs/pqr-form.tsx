@@ -11,7 +11,6 @@ const formSchema = z.object({
   description: z.string().min(10),
   attachments: z.array(z.string().url()),
   departmentId: z.string(),
-  // ... otros campos
 })
 
 export function PQRForm() {
