@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toggleLike } from "@/services/api/pqr.service";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
+import { mediaExtensions, videoExtensions } from "../constants/mediaExtensions";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -98,9 +99,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
     year: "numeric",
     month: "long",
-    day: "numeric",
-    // hour: "2-digit",
-    // minute: "2-digit",
+    day: "numeric"
   });
 
   const remainingDays = calculateRemainingDays(
@@ -139,20 +138,6 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
     }
   };
 
-  const mediaExtensions = [
-    "jpg",
-    "jpeg",
-    "png",
-    "gif",
-    "webp",
-    "mp4",
-    "mov",
-    "avi",
-    "wmv",
-    "flv",
-    "mkv",
-    "webm",
-  ];
   const imageAttachments =
     pqr.attachments?.filter((att) =>
       mediaExtensions.includes(att.type.toLowerCase())
@@ -218,7 +203,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                           <Dialog>
                             <DialogTrigger asChild>
                               <div className="relative cursor-pointer group h-60">
-                                {attachment.type.includes("mp4") || attachment.type.includes("mov") ? (
+                                {videoExtensions.includes(attachment.type.toLowerCase()) ? (
                                   <video
                                     src={attachment.url}
                                     className="object-cover w-full h-full"
@@ -238,7 +223,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                             <DialogContent className="max-w-4xl">
                               <DialogTitle></DialogTitle>
                               <div className="relative h-[80vh]">
-                                {attachment.type.includes("mp4") || attachment.type.includes("mov")? (
+                                {videoExtensions.includes(attachment.type.toLowerCase())? (
                                   <video
                                     src={attachment.url}
                                     className="object-contain"
@@ -362,7 +347,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                       <Dialog>
                         <DialogTrigger asChild>
                           <div className="relative cursor-pointer group h-48">
-                            {attachment.type.includes("mp4") || attachment.type.includes("mov") ? (
+                            {videoExtensions.includes(attachment.type.toLowerCase()) ? (
                               <video
                                 src={attachment.url}
                                 className="object-cover w-full h-full"
@@ -382,7 +367,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                         <DialogContent className="max-w-full">
                           <DialogTitle></DialogTitle>
                           <div className="relative h-[80vh]">
-                            {attachment.type.includes("mp4") || attachment.type.includes("mov") ? (
+                            {videoExtensions.includes(attachment.type.toLowerCase()) ? (
                               <video
                                 src={attachment.url}
                                 className="object-contain"
