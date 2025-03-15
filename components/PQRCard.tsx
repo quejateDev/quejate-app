@@ -256,19 +256,21 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   
               {/* Other Attachments */}
               {otherAttachments.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {otherAttachments.map((attachment) => (
-                    <a
-                      key={attachment.url}
-                      href={getFullUrl(attachment.url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md hover:bg-secondary/80 transition-colors text-sm"
-                    >
-                      <Paperclip className="w-4 h-4" />
-                      {attachment.name}
-                    </a>
-                  ))}
+                <div>
+                  <p className="text-xs my-2">Archivos adjuntos</p>
+                  <div className="flex flex-wrap gap-2">
+                    {otherAttachments.map((attachment) => (
+                      <a
+                        key={attachment.url}
+                        href={getFullUrl(attachment.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md border border-gray-100"
+                      >
+                        <Paperclip className="w-4 h-4 no-hover" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
   
