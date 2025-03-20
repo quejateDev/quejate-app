@@ -95,11 +95,17 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const { user } = useAuthStore();
   const status = pqr.status;
   const statusInfo = statusMap[status as keyof typeof statusMap];
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const videoRefsDesktop = useRef<(HTMLVideoElement | null)[]>([]);
+  const videoRefsMobile = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
-      videoRefs.current.forEach((video) => {
+      videoRefsDesktop.current.forEach((video) => {
+        if (video && !video.paused) {
+          video.pause();
+        }
+      });
+      videoRefsMobile.current.forEach((video) => {
         if (video && !video.paused) {
           video.pause();
         }
@@ -108,9 +114,9 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
 
     window.addEventListener("scroll", handleScroll);
 
-  return () => {
-    window.removeEventListener("scroll", handleScroll);
-  };
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
@@ -217,51 +223,42 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                     {imageAttachments.map((attachment, index) => (
                       <CarouselItem key={attachment.url}>
                         <div className="p-1">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <div className="relative cursor-pointer group h-60">
-                                {videoExtensions.includes(attachment.type.toLowerCase()) ? (
-                                  <video
-                                    ref={(el) => {
-                                      videoRefs.current[index] = el;
-                                    }}
-                                    src={attachment.url}
-                                    className="object-cover w-full h-full"
-                                    controls
-                                  />
-                                ) : (
+                          {videoExtensions.includes(attachment.type.toLowerCase()) ? (
+                            <div className="relative cursor-pointer group h-60">
+                              <video
+                                ref={(el) => {
+                                  videoRefsDesktop.current[index] = el;
+                                }}
+                                src={attachment.url}
+                                className="object-cover w-full h-full"
+                                controls
+                              />
+                            </div>
+                          ) : (
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <div className="relative cursor-pointer group h-60">
                                   <Image
                                     src={attachment.url}
                                     alt={attachment.name}
                                     fill
                                     className="object-contain border border-gray-200 rounded-md"
                                   />
-                                )}
-                              </div>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-4xl">
-                              <DialogTitle></DialogTitle>
-                              <div className="relative h-[80vh]">
-                                {videoExtensions.includes(attachment.type.toLowerCase())? (
-                                  <video
-                                  ref={(el) => {
-                                    videoRefs.current[index] = el;
-                                  }}
-                                    src={attachment.url}
-                                    className="object-contain"
-                                    controls
-                                  />
-                                ) : (
+                                </div>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl">
+                                <DialogTitle></DialogTitle>
+                                <div className="relative h-[80vh]">
                                   <Image
                                     src={attachment.url}
                                     alt={attachment.name}
                                     fill
                                     className="object-contain border border-gray-200 rounded-md"
                                   />
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          )}
                         </div>
                       </CarouselItem>
                     ))}
@@ -367,56 +364,47 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                 {imageAttachments.map((attachment, index) => (
                   <CarouselItem key={attachment.url}>
                     <div className="p-1">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <div className="relative cursor-pointer group h-48">
-                            {videoExtensions.includes(attachment.type.toLowerCase()) ? (
-                              <video
-                              ref={(el) => {
-                                videoRefs.current[index] = el;
-                              }}
-                                src={attachment.url}
-                                className="object-cover w-full h-full"
-                                controls
-                              />
-                            ) : (
+                      {videoExtensions.includes(attachment.type.toLowerCase()) ? (
+                        <div className="relative cursor-pointer group h-48">
+                          <video
+                            ref={(el) => {
+                              videoRefsMobile.current[index] = el;
+                            }}
+                            src={attachment.url}
+                            className="object-cover w-full h-full"
+                            controls
+                          />
+                        </div>
+                      ) : (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <div className="relative cursor-pointer group h-48">
                               <Image
                                 src={attachment.url}
                                 alt={attachment.name}
                                 fill
                                 className="object-contain border border-gray-200 rounded-md"
                               />
-                            )}
-                          </div>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-full">
-                          <DialogTitle></DialogTitle>
-                          <div className="relative h-[80vh]">
-                            {videoExtensions.includes(attachment.type.toLowerCase()) ? (
-                              <video
-                              ref={(el) => {
-                                videoRefs.current[index] = el;
-                              }}
-                                src={attachment.url}
-                                className="object-contain"
-                                controls
-                              />
-                            ) : (
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-full">
+                            <DialogTitle></DialogTitle>
+                            <div className="relative h-[80vh]">
                               <Image
                                 src={attachment.url}
                                 alt={attachment.name}
                                 fill
                                 className="object-contain border border-gray-200 rounded-md"
                               />
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      )}
                     </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
-  
+
               {imageAttachments.length > 1 && (
                 <div className="flex justify-center mt-2">
                   <CarouselPrevious className="static mr-2 translate-y-0 h-8 w-8" />
