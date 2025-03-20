@@ -1,10 +1,10 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PQRS } from "@prisma/client";
 import { Heart, Paperclip } from "lucide-react";
-import { useState } from "react";
 import { toggleLike } from "@/services/api/pqr.service";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
@@ -95,6 +95,23 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const { user } = useAuthStore();
   const status = pqr.status;
   const statusInfo = statusMap[status as keyof typeof statusMap];
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      videoRefs.current.forEach((video) => {
+        if (video && !video.paused) {
+          video.pause();
+        }
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+  }, []);
 
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
     year: "numeric",
@@ -205,10 +222,12 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                               <div className="relative cursor-pointer group h-60">
                                 {videoExtensions.includes(attachment.type.toLowerCase()) ? (
                                   <video
+                                    ref={(el) => {
+                                      videoRefs.current[index] = el;
+                                    }}
                                     src={attachment.url}
                                     className="object-cover w-full h-full"
-                                    controls 
-                                    autoPlay
+                                    controls
                                   />
                                 ) : (
                                   <Image
@@ -225,10 +244,12 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                               <div className="relative h-[80vh]">
                                 {videoExtensions.includes(attachment.type.toLowerCase())? (
                                   <video
+                                  ref={(el) => {
+                                    videoRefs.current[index] = el;
+                                  }}
                                     src={attachment.url}
                                     className="object-contain"
                                     controls
-                                    autoPlay
                                   />
                                 ) : (
                                   <Image
@@ -343,7 +364,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
           {imageAttachments.length > 0 && (
             <Carousel className="w-full relative">
               <CarouselContent>
-                {imageAttachments.map((attachment) => (
+                {imageAttachments.map((attachment, index) => (
                   <CarouselItem key={attachment.url}>
                     <div className="p-1">
                       <Dialog>
@@ -351,10 +372,12 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                           <div className="relative cursor-pointer group h-48">
                             {videoExtensions.includes(attachment.type.toLowerCase()) ? (
                               <video
+                              ref={(el) => {
+                                videoRefs.current[index] = el;
+                              }}
                                 src={attachment.url}
                                 className="object-cover w-full h-full"
                                 controls
-                                autoPlay
                               />
                             ) : (
                               <Image
@@ -371,10 +394,12 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                           <div className="relative h-[80vh]">
                             {videoExtensions.includes(attachment.type.toLowerCase()) ? (
                               <video
+                              ref={(el) => {
+                                videoRefs.current[index] = el;
+                              }}
                                 src={attachment.url}
                                 className="object-contain"
                                 controls
-                                autoPlay
                               />
                             ) : (
                               <Image
