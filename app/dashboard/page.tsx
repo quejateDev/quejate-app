@@ -110,13 +110,13 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           <div className="bg-primary/10 p-4 rounded-lg">
             <div className="container mx-auto flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div>
-                <h2 className="font-semibold">¿Tienes alguna petición, queja, reclamo o sugerencia?</h2>
-                <p className="text-sm text-muted-foreground">Crea y envía tu PQR fácilmente a través de nuestra plataforma.</p>
+                <h2 className="font-semibold">¿Tienes alguna petición, queja, reclamo, sugerencia o denuncia?</h2>
+                <p className="text-sm text-muted-foreground">Crea y envía tu PQRSD fácilmente a través de nuestra plataforma.</p>
               </div>
               <Link href="/dashboard/pqrs/create">
                 <Button className="bg-primary hover:bg-primary/90 flex items-center gap-2">
                   <PlusIcon className="h-4 w-4" />
-                  <span>Crear PQRS</span>
+                  <span>Crear PQRSD</span>
                 </Button>
               </Link>
             </div>
