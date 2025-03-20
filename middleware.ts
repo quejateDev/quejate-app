@@ -5,9 +5,6 @@ import { verifyToken } from '@/lib/utils'
 // Define which paths require admin authentication
 const ADMIN_PATHS = ['/admin']
 
-// Define which paths require authentication
-const PROTECTED_PATHS = ['/dashboard']
-
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value
 
@@ -18,13 +15,6 @@ export async function middleware(request: NextRequest) {
   // Redirect /dashboard to /dashboard/pqrs
   if (request.nextUrl.pathname === '/admin') {
     return NextResponse.redirect(new URL('/admin/pqr', request.url))
-  }
-
-  // If no token and trying to access protected route, redirect to login
-  if (!token && PROTECTED_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', request.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
   }
 
   // If there's a token, verify it
