@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Zap, BarChart2, Shield, CheckCircle, Clock, Users, ArrowRight, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { PQRCard } from "@/components/PQRCard";
+import { PQRCard } from "@/components/pqr/PQRCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart } from "lucide-react";
 import { PQRSType } from "@prisma/client";
