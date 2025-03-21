@@ -1,4 +1,4 @@
-import { PQRCard } from "@/components/PQRCard";
+import { PQRCard } from "@/components/pqr/PQRCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PQRSType } from "@prisma/client";
@@ -128,7 +128,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             {pqrs.map((pqr) => (
               <PQRCard
                 key={pqr.id}
-                pqr={pqr}
+                pqr={{ ...pqr, dueDate: pqr.dueDate.toISOString() }}
                 initialLiked={pqr.likes?.length > 0}
               />
             ))}
