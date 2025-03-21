@@ -1,8 +1,9 @@
 export const typeMap = {
   PETITION: { label: "Petición", color: "text-blue-600" },
   COMPLAINT: { label: "Queja", color: "text-red-600" },
-  CLAIM: { label: "Reclamo", color: "text-orange-600" },
+  CLAIM: { label: "Reclamo", color: "text-orange-800" },
   SUGGESTION: { label: "Sugerencia", color: "text-green-600" },
+  REPORT: { label: "Denuncia", color: "text-yellow-600" },
 } as const;
 
 export const statusMap = {
