@@ -26,6 +26,7 @@ model User {
   Like              Like[]
   notifications     Notification[]
   PQRS              PQRS[]
+  comments          Comment[]
   department        Department?         @relation(fields: [departmentId], references: [id])
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
@@ -88,6 +89,7 @@ model PQRS {
   private           Boolean            @default(false)
   attachments       Attachment[]
   customFieldValues CustomFieldValue[]
+  comments          Comment[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
   creator           User               @relation(fields: [creatorId], references: [id])
@@ -107,8 +109,22 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([pqrId, userId])
-  @@index([pqrId])
+  @@index([pqrId])                                                                                                                                                                                                                                                                                                                                                                                                   
   @@index([userId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String   
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   
+  pqrId     String  
+  user      User     @relation(fields: [userId], references: [id]) 
+  pqr       PQRS     @relation(fields: [pqrId], references: [id]) 
+
+  @@index([userId]) 
+  @@index([pqrId])  
 }
 
 model PQRCustomField {
