@@ -69,7 +69,7 @@ type NewPQRFormProps = {
 };
 
 const formSchema = z.object({
-  type: z.enum(["PETITION", "COMPLAINT", "CLAIM", "SUGGESTION"]),
+  type: z.enum(["PETITION", "COMPLAINT", "CLAIM", "SUGGESTION", "REPORT"]),
   departmentId: z.string().min(1, "Debe seleccionar un área"),
   customFields: z.record(z.string()),
   isAnonymous: z.boolean(),
@@ -358,6 +358,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     <SelectItem value="COMPLAINT">Queja</SelectItem>
                     <SelectItem value="CLAIM">Reclamo</SelectItem>
                     <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
+                    <SelectItem value="REPORT">Denuncia</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
