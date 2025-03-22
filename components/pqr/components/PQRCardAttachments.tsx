@@ -17,15 +17,11 @@ type PQRCardAttachmentsProps = {
 };
 
 export function PQRCardAttachments({
-  attachments = [],
+  attachments,
   videoRefsDesktop,
   videoRefsMobile,
   isMobile = false,
 }: PQRCardAttachmentsProps) {
-  if (!Array.isArray(attachments)) {
-    console.error("attachments no es un array:", attachments);
-    return null;
-  }
 
   const imageAttachments = attachments.filter((att) =>
     mediaExtensions.includes(att.type.toLowerCase())
