@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Prisma } from "@prisma/client";
 
