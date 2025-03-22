@@ -3,9 +3,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-  const resolvedParams = await params;
-  const pqrId = resolvedParams.id;
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const pqrId = (await params).id
   
   const { text, userId } = await request.json();
   
@@ -24,9 +23,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const resolvedParams = await params;
-  const pqrId = resolvedParams.id;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const pqrId = (await params).id
 
   try {
     const comments = await prisma.comment.findMany({

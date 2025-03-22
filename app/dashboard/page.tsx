@@ -95,6 +95,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       _count: {
         select: {
           likes: true,
+          comments: true, 
         },
       },
     },
@@ -129,8 +130,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               <PQRCard
                 key={pqr.id}
                 pqr={{ ...pqr, dueDate: pqr.dueDate.toISOString() }}
-                initialLiked={pqr.likes?.length > 0}
-              />
+                initialLiked={pqr.likes?.length > 0} user={{
+                  id: "",
+                  firstName: "",
+                  lastName: "",
+                  avatarUrl: undefined
+                }}              />
             ))}
             {pqrs.length === 0 && (
               <div className="text-center py-12">
