@@ -1,17 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type PQRCardActionsProps = {
   liked: boolean;
   likeCount: number;
   isLoading: boolean;
+  commentCount: number; 
   handleLike: () => void;
+  onCommentClick: () => void;
 };
 
-export function PQRCardActions({ liked, likeCount, isLoading, handleLike }: PQRCardActionsProps) {
+export function PQRCardActions({
+  liked,
+  likeCount,
+  isLoading,
+  commentCount,
+  handleLike,
+  onCommentClick,
+}: PQRCardActionsProps) {
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex items-center">
       <Button
         variant="ghost"
         size="sm"
@@ -26,6 +35,15 @@ export function PQRCardActions({ liked, likeCount, isLoading, handleLike }: PQRC
           )}
         />
         <span>{likeCount}</span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="gap-2 pl-0 hover:bg-transparent hover:text-current"
+        onClick={onCommentClick}
+      >
+        <MessageCircle className="w-4 h-4 text-gray-500" />
+        <span>{commentCount}</span>
       </Button>
     </div>
   );
