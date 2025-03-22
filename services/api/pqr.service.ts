@@ -7,7 +7,7 @@ const Client = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 60000, 
+  timeout: 30000, 
 });
 
 type createPQRS = {
