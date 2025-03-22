@@ -15,7 +15,7 @@ export async function sendPQRNotificationEmail(
     const { data, error } = await resend.emails.send({
       from: 'PQR System <notificaciones@quejate.com.co>',
       to: entityEmail,
-      subject: `Nueva PQR Recibida - ${entityName}`,
+      subject: `Nueva PQRSD Recibida - ${entityName}`,
       react: PQRNotificationEmail({
         entityName,
         pqrInfo: {
@@ -40,12 +40,12 @@ export async function sendPQRNotificationEmail(
     });
 
     if (error) {
-      console.error('Error sending PQR notification email:', error);
+      console.error('Error sending PQRSD notification email:', error);
     }
 
     return data;
   } catch (error) {
-    console.error('Error sending PQR notification email:', error);
+    console.error('Error sending PQRSD notification email:', error);
     throw error;
   }
 } 

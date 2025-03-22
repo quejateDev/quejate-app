@@ -300,8 +300,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
 
       if (response) {
         toast({
-          title: "PQR creado",
-          description: "El PQR ha sido creado exitosamente",
+          title: "PQRSD creado",
+          description: "El PQRSD ha sido creado exitosamente",
         });
         router.push("/dashboard");
       }
@@ -488,7 +488,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                       }))
                     }
                   />
-                  <Label htmlFor="isAnonymous">¿Desea enviar esta PQR de forma anónima?</Label>
+                  <Label htmlFor="isAnonymous">¿Desea enviar esta PQRSD de forma anónima?</Label>
                 </div>
                 <p className="text-xs text-gray-500">Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios.</p>
               </div>
@@ -505,7 +505,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                       }))
                     }
                   />
-                  <Label htmlFor="isPrivate">¿Desea publicar esta PQR en el muro público?</Label>
+                  <Label htmlFor="isPrivate">¿Desea publicar esta PQRSD en el muro público?</Label>
                 </div>
                 <p className="text-xs text-gray-500">Si marca esta opción, su queja será visible para otras personas en la sección de denuncias públicas.</p>
               </div>

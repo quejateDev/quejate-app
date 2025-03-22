@@ -27,15 +27,15 @@ export const PqrCreationEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>Tu PQR ha sido registrada correctamente</Preview>
+      <Preview>Tu PQRSD ha sido registrada correctamente</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={heading}>Confirmación de PQR</Heading>
+          <Heading style={heading}>Confirmación de PQRSD</Heading>
 
           <Text style={paragraph}>Estimado {userName},</Text>
 
           <Text style={paragraph}>
-            Le informamos que su solicitud de PQR ha sido registrada
+            Le informamos que su solicitud de PQRSD ha sido registrada
             correctamente en nuestro sistema.
           </Text>
 
@@ -47,7 +47,7 @@ export const PqrCreationEmail = ({
 
           <Text style={paragraph}>
             Procesaremos su solicitud y le responderemos lo antes posible. Puede
-            seguir el estado de su PQR utilizando el número de referencia
+            seguir el estado de su PQRSD utilizando el número de referencia
             anterior.
           </Text>
 
