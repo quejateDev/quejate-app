@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
 import { getCommentsService } from "@/services/api/pqr.service";
 
 export function useComments(pqrId: string, initialCommentCount: number = 0) {
@@ -18,11 +17,6 @@ export function useComments(pqrId: string, initialCommentCount: number = 0) {
       setCommentCount(comments.length);
     } catch (error) {
       console.error("Error fetching comment count:", error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los comentarios",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
