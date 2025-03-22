@@ -16,7 +16,17 @@ type PQRCardAttachmentsProps = {
   isMobile?: boolean;
 };
 
-export function PQRCardAttachments({ attachments, videoRefsDesktop, videoRefsMobile, isMobile = false }: PQRCardAttachmentsProps) {
+export function PQRCardAttachments({
+  attachments = [],
+  videoRefsDesktop,
+  videoRefsMobile,
+  isMobile = false,
+}: PQRCardAttachmentsProps) {
+  if (!Array.isArray(attachments)) {
+    console.error("attachments no es un array:", attachments);
+    return null;
+  }
+
   const imageAttachments = attachments.filter((att) =>
     mediaExtensions.includes(att.type.toLowerCase())
   );
@@ -45,6 +55,8 @@ export function PQRCardAttachments({ attachments, videoRefsDesktop, videoRefsMob
                         src={attachment.url}
                         className="object-cover w-full h-full"
                         controls
+                        autoPlay
+                        muted
                       />
                     </div>
                   ) : (
