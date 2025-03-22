@@ -9,12 +9,12 @@ export function useVideoPlayback() {
     const handleScroll = () => {
       videoRefsDesktop.current.forEach((video) => {
         if (video && !video.paused) {
-          video.pause();
+          video.muted = true;
         }
       });
       videoRefsMobile.current.forEach((video) => {
         if (video && !video.paused) {
-          video.pause();
+          video.muted = true;
         }
       });
     };
