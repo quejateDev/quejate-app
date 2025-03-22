@@ -19,6 +19,8 @@ export async function GET(request: Request, params: any ) {
       },
       include: {
         likes: true,
+        attachments: true,
+        comments: true,
         _count: {
           select: {
             likes: true,
