@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       sendPQRCreationEmail(
         pqr.creator?.email || "noreply@quejate.com.co",
         pqr.creator?.firstName || "John Doe",
-        "Registro exitoso de PQR @quejate.com.co",
+        "Registro exitoso de PQRSD @quejate.com.co",
         pqr.id.toString(),
         new Date(pqr.createdAt).toLocaleString("es-CO", {
           timeZone: "America/Bogota",
