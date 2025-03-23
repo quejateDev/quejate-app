@@ -481,16 +481,20 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   <Checkbox
                     id="isAnonymous"
                     checked={pqr.isAnonymous}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={(checked) => {
+                      const isAnonymous = checked as boolean;
                       setPqr((prev) => ({
                         ...prev,
-                        isAnonymous: checked as boolean,
-                      }))
-                    }
+                        isAnonymous: isAnonymous,
+                      }));
+                      form.setValue("isAnonymous", isAnonymous);
+                    }}
                   />
                   <Label htmlFor="isAnonymous">¿Desea enviar esta PQRSD de forma anónima?</Label>
                 </div>
-                <p className="text-xs text-gray-500">Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios.</p>
+                <p className="text-xs text-gray-500">
+                  Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios.
+                </p>
               </div>
 
               <div className="flex flex-col space-y-1 mb-6">

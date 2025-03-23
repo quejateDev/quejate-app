@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { typeMap, statusMap } from "../../../constants/pqrMaps";
+import { User } from "lucide-react";
 
 type PQRCardHeaderProps = {
   pqr: {
@@ -34,7 +35,13 @@ export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100">
-              <span className="text-md">{creatorName.charAt(0).toUpperCase()}</span>
+              {pqr.anonymous ? (
+                <User className="h-6 w-6 stroke-1" />
+              ) : (
+                <span className="text-md">
+                  {creatorName.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <div>
               <p className="text-sm font-semibold">{creatorName}</p>
@@ -52,7 +59,13 @@ export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100">
-              <span className="text-md">{creatorName.charAt(0).toUpperCase()}</span>
+              {pqr.anonymous ? (
+                <User className="h-6 w-6 stroke-1" />
+              ) : (
+                <span className="text-md">
+                  {creatorName.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <div>
               <p className="text-sm font-semibold">{creatorName}</p>
@@ -62,9 +75,7 @@ export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
               </p>
             </div>
           </div>
-          <Badge variant={statusInfo.variant as any} className="text-xs">
-            {statusInfo.label}
-          </Badge>
+          <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
         </div>
       </div>
     </>
