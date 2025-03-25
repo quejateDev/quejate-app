@@ -46,6 +46,7 @@ const statusMap = {
   IN_PROGRESS: { label: "En Proceso", variant: "warning" },
   RESOLVED: { label: "Resuelto", variant: "success" },
   REJECTED: { label: "Rechazado", variant: "destructive" },
+  CLOSED: { label: "Cerrado", variant: "default" },
 } as const;
 
 const typeMap = {

@@ -27,6 +27,7 @@ export async function sendPQRNotificationEmail(
             timeZone: 'America/Bogota',
           }),
           status: pqrData.status,
+          isAnonymous: pqrData.anonymous,
         },
         creatorInfo: {
           name: `${creatorData.firstName} ${creatorData.lastName}`,

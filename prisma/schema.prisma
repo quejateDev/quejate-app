@@ -228,6 +228,8 @@ enum PQRSType {
   PETITION
   COMPLAINT
   CLAIM
+  REPORT
+  SUGGESTION
 }
 
 enum PQRSStatus {
