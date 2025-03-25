@@ -5,6 +5,7 @@ const Client = axios.create({
   baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
+    'cache-control': 'no-store',
   },
   timeout: 10000,
 });

@@ -23,6 +23,9 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import ConfirmationModal from "./Modals/ConfirmationModal";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "./ui/badge";
+import { Switch } from "./ui/switch";
+import axios from "axios";
 
 interface EntitiesTableProps {
   entities: (Entity & {
@@ -91,6 +94,43 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
     }
   };
 
+  const handleVerifyEntity = async (entityId: string) => {
+    try {
+      const entity = filteredEntities.find((entity) => entity.id === entityId);
+      if (!entity) {
+        toast({
+          title: "Error",
+          description: "Entidad no encontrada",
+          variant: "destructive",
+        });
+        return;
+      }
+      await axios.put(
+        `/api/entities/${entityId}`,
+        {
+          isVerified: !entity.isVerified,
+        }
+      );
+
+      setFilteredEntities(filteredEntities.map((e) =>
+          e.id === entityId ? { ...e, isVerified: !e.isVerified } : e
+        )
+      );
+
+      toast({
+        title: "Entidad verificada correctamente",
+        description: "La entidad ha sido verificada correctamente",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Error al verificar la entidad",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex gap-4">
@@ -127,6 +167,7 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
               <TableHead>Nombre</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead>Categoría</TableHead>
+              <TableHead>Verificada</TableHead>
               <TableHead>Fecha de Creación</TableHead>
               <TableHead>Última Actualización</TableHead>
               <TableHead>Acciones</TableHead>
@@ -154,6 +195,12 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                 <TableCell className="font-medium">{entity.name}</TableCell>
                 <TableCell>{entity.description || "Sin descripción"}</TableCell>
                 <TableCell>{entity.category.name}</TableCell>
+                <TableCell>
+                  <Switch
+                    checked={entity.isVerified}
+                    onCheckedChange={() => handleVerifyEntity(entity.id)}
+                  />
+                </TableCell>
                 <TableCell>
                   {new Date(entity.createdAt).toLocaleDateString("es-ES")}
                 </TableCell>
