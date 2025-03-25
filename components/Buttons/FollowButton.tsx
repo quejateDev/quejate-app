@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { followUserService } from "@/services/api/User.service";
 import useAuthStore from "@/store/useAuthStore";
+import { useLoginModal } from "@/providers/LoginModalProivder";
 
 interface FollowButtonProps {
   userId: string;
@@ -22,9 +23,13 @@ export function FollowButton({
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
   const { user, token } = useAuthStore();
+  const { setIsOpen } = useLoginModal();
 
   const handleFollow = async () => {
-    if (!user || user.id === userId) return;
+    if (!user || user.id === userId) {
+      setIsOpen(true);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -37,8 +42,6 @@ export function FollowButton({
       setIsLoading(false);
     }
   };
-
-  if (!user || user.id === userId) return null;
 
   return (
     <Button

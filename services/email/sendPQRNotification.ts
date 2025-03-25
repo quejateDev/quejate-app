@@ -30,9 +30,9 @@ export async function sendPQRNotificationEmail(
           isAnonymous: pqrData.anonymous,
         },
         creatorInfo: {
-          name: `${creatorData.firstName} ${creatorData.lastName}`,
-          email: creatorData.email,
-          phone: creatorData.phone,
+          name: creatorData ? `${creatorData?.firstName} ${creatorData?.lastName}` : 'Anónimo',
+          email: creatorData ? creatorData?.email : 'Anónimo',
+          phone: creatorData ? creatorData?.phone : 'Anónimo',
         },
         customFields,
         attachments,

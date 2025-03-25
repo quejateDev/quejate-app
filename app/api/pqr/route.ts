@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const body = JSON.parse(jsonData as string);
 
     // Validate required fields
-    if (!body.type || !body.departmentId || !body.creatorId) {
+    if (!body.type || !body.departmentId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -133,12 +133,13 @@ export async function POST(req: NextRequest) {
           ),
 
         // Email al creador
-        sendPQRCreationEmail(
-          pqr.creator?.email || "noreply@quejate.com.co",
-          pqr.creator?.firstName || "John Doe",
-          "Registro exitoso de PQR @quejate.com.co",
-          pqr.id.toString(),
-          new Date(pqr.createdAt).toLocaleString("es-CO", {
+        pqr.creator?.email &&
+          sendPQRCreationEmail(
+            pqr.creator?.email,
+            pqr.creator?.firstName || "John Doe",
+            "Registro exitoso de PQR @quejate.com.co",
+            pqr.id.toString(),
+            new Date(pqr.createdAt).toLocaleString("es-CO", {
             timeZone: "America/Bogota",
           }),
           `https://quejate.com.co/dashboard/pqr/${pqr.id}`

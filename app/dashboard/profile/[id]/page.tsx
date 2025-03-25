@@ -6,7 +6,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserCircle } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
-import { FollowButton } from "@/components/FollowButton";
+import { FollowButton } from "@/components/Buttons/FollowButton";
 import { FollowStats } from "@/components/FollowStats";
 import { useParams } from "next/navigation";
 import UseUser from "@/hooks/useUser";
@@ -24,7 +24,7 @@ export default function ProfilePage() {
 
     fetchUser(id as string);
     fetchUserPQRS(id as string);
-  }, [id, fetchUser, fetchUserPQRS]);
+  }, [id]);
 
   if (isLoading) {
     return (

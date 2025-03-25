@@ -10,7 +10,6 @@ const PROTECTED_PATHS = ['/dashboard']
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value
-
   if (request.nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
@@ -21,11 +20,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // If no token and trying to access protected route, redirect to login
-  if (!token && PROTECTED_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', request.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
-  }
+  // if (!token && PROTECTED_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
+  //   const loginUrl = new URL('/login', request.url)
+  //   loginUrl.searchParams.set('from', request.nextUrl.pathname)
+  //   return NextResponse.redirect(loginUrl)
+  // }
 
   // If there's a token, verify it
   if (token) {
@@ -33,7 +32,6 @@ export async function middleware(request: NextRequest) {
       const decoded = await verifyToken(token)
       
       if (!decoded) {
-        console.log('Token is invalid', token)
         const response = NextResponse.redirect(new URL('/login', request.url))
         response.cookies.delete('token')
         return response
@@ -73,7 +71,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
-    '/dashboard/:path*',
+    // '/dashboard/:path*',
     '/admin/:path*',
     '/api/admin/:path*',
   ]

@@ -21,7 +21,7 @@ import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import ConfirmationModal from "./modals/ConfirmationModal";
+import ConfirmationModal from "./Modals/ConfirmationModal";
 import { toast } from "@/hooks/use-toast";
 
 interface EntitiesTableProps {

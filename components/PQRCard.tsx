@@ -1,16 +1,11 @@
-"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { PQRS } from "@prisma/client";
-import { Heart, Clock, Paperclip } from "lucide-react";
-import { useState } from "react";
-import { toggleLike } from "@/services/api/pqr.service";
-import useAuthStore from "@/store/useAuthStore";
-import { toast } from "@/hooks/use-toast";
+import { Clock, Paperclip } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
+import LikeButton from "./Buttons/LikeButton";
 
 type PQRCardProps = {
   pqr: PQRS & {
@@ -20,10 +15,10 @@ type PQRCardProps = {
         name: string;
       };
     };
-    creator: {
+    creator?: {
       firstName: string;
       lastName: string;
-    };
+    } | null;
     customFieldValues: {
       name: string;
       value: string;
@@ -65,12 +60,6 @@ const calculateRemainingDays = (createdAt: Date, dueDate: Date) => {
 };
 
 export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
-  const [liked, setLiked] = useState(initialLiked);
-  const [likeCount, setLikeCount] = useState(pqr._count?.likes || 0);
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuthStore();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
   const status = statusMap[pqr.status as keyof typeof statusMap];
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
     year: "numeric",
@@ -87,36 +76,9 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const isExpired = remainingDays <= 0;
   const isUrgent = remainingDays <= 3 && remainingDays > 0;
 
-  const creatorName = !pqr.anonymous
+  const creatorName = !pqr.anonymous && pqr.creator
     ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
     : "Anónimo";
-
-  const handleLike = async () => {
-    if (!user || !user.id) {
-      toast({
-        title: "Error",
-        description: "Debes iniciar sesión para dar like",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await toggleLike(pqr.id, user.id);
-      setLiked(!liked);
-      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
-    } catch (error) {
-      console.error("Error toggling like:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo procesar tu like",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const mediaExtensions = [
     "jpg",
@@ -272,21 +234,11 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
           )}
 
           <div className="flex justify-between items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2"
-              onClick={handleLike}
-              disabled={isLoading}
-            >
-              <Heart
-                className={cn(
-                  "w-4 h-4",
-                  liked ? "fill-current text-red-500" : "text-gray-500"
-                )}
-              />
-              <span>{likeCount}</span>
-            </Button>
+            <LikeButton
+              initialLiked={initialLiked}
+              pqrId={pqr.id}
+              likes={pqr._count?.likes || 0}
+            />
 
             <div className="flex items-center gap-2">
               <Clock
