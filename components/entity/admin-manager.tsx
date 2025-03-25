@@ -65,21 +65,6 @@ export function AdminManager({ entityId }: AdminManagerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<EntityUser | null>(null);
   const { toast } = useToast();
-  const { user } = useAuthStore();
-
-  const fetchDepartments = async () => {
-    try {
-      const response = await axios.get(`/api/admin/entities/${entityId}/departments`);
-      setDepartments(response.data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los departamentos",
-        variant: "destructive",
-      });
-    }
-  };
-
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`/api/admin/entities/${entityId}/users`);
@@ -96,7 +81,6 @@ export function AdminManager({ entityId }: AdminManagerProps) {
   useEffect(() => {
     if (isOpen) {
       fetchUsers();
-      fetchDepartments();
     }
   }, [isOpen, entityId]);
 
