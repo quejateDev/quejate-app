@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
-import path from "path";
-import { uploadObject } from "@/services/storage/s3.service";
 import { sendPQRNotificationEmail } from "@/services/email/sendPQRNotification";
 
 interface FormFile extends File {
@@ -23,8 +21,6 @@ export async function GET() {
       },
     });
 
-    console.log("pqrs", pqrs);
-
     return NextResponse.json(pqrs);
   } catch (error) {
     console.error("Error fetching PQRs:", error);
@@ -33,14 +29,16 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    if (!req.body) {
-      return NextResponse.json(
-        { error: "Request body is missing" },
-        { status: 400 }
-      );
-    }
+  if (!req.body) {
+    return NextResponse.json(
+      { error: "Request body is missing" },
+      { status: 400 }
+    );
+  }
 
+  let pqr: any;
+
+  try {
     const formData = await req.formData();
     const jsonData = formData.get("data");
 
@@ -79,7 +77,7 @@ export async function POST(req: NextRequest) {
     dueDate.setDate(dueDate.getDate() + pqrConfig.maxResponseTime);
 
     // Create PQR with attachments
-    const pqr = await prisma.pQRS.create({
+    pqr = await prisma.pQRS.create({
       data: {
         type: body.type,
         dueDate,
@@ -96,6 +94,16 @@ export async function POST(req: NextRequest) {
           })),
         },
         private: body.isPrivate || false,
+        attachments: {
+          createMany: {
+            data: body.attachments.map((attachment: any) => ({
+              name: attachment.name,
+              url: attachment.url,
+              type: attachment.type,
+              size: attachment.size,
+            })),
+          },
+        },
       },
       include: {
         department: true,
@@ -105,59 +113,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (body.attachments && body.attachments.length > 0) {
-      await prisma.pQRS.update({
-        where: {
-          id: pqr.id,
-        },
-        data: {
-          attachments: {
-            createMany: {
-              data: body.attachments.map((attachment: any) => ({
-                name: attachment.name,
-                url: attachment.url,
-                type: attachment.type,
-                size: attachment.size,
-              })),
-            },
-          },
-        },
-      });
-    }
-
     const entity = await prisma.entity.findUnique({
       where: { id: body.entityId },
-      select: { name: true, email: true }
+      select: { name: true, email: true },
     });
 
     // Enviar emails en paralelo
-    const emails = await Promise.all([
-      // Email a la entidad
-      entity?.email && sendPQRNotificationEmail(
-        entity.email,
-        entity.name,
-        pqr,
-        pqr.creator,
-        pqr.customFieldValues,
-        pqr.attachments
-      ),
-      
-      // Email al creador
-      sendPQRCreationEmail(
-        pqr.creator?.email || "noreply@quejate.com.co",
-        pqr.creator?.firstName || "John Doe",
-        "Registro exitoso de PQR @quejate.com.co",
-        pqr.id.toString(),
-        new Date(pqr.createdAt).toLocaleString("es-CO", {
-          timeZone: "America/Bogota",
-        }),
-        `https://quejate.com.co/dashboard/pqr/${pqr.id}`
-      )
-    ].filter(Boolean)); // Filtramos los undefined (cuando no hay email de entidad)
+    await Promise.all(
+      [
+        // Email a la entidad
+        entity?.email &&
+          sendPQRNotificationEmail(
+            entity.email,
+            entity.name,
+            pqr,
+            pqr.creator,
+            pqr.customFieldValues,
+            pqr.attachments
+          ),
+
+        // Email al creador
+        sendPQRCreationEmail(
+          pqr.creator?.email || "noreply@quejate.com.co",
+          pqr.creator?.firstName || "John Doe",
+          "Registro exitoso de PQR @quejate.com.co",
+          pqr.id.toString(),
+          new Date(pqr.createdAt).toLocaleString("es-CO", {
+            timeZone: "America/Bogota",
+          }),
+          `https://quejate.com.co/dashboard/pqr/${pqr.id}`
+        ),
+      ].filter(Boolean)
+    ); // Filtramos los undefined (cuando no hay email de entidad)
 
     return NextResponse.json(pqr);
   } catch (error: any) {
     console.error("Error in POST /api/pqr:", error.stack);
+
+    if (pqr && pqr.id) {
+      await prisma.pQRS.delete({
+        where: {
+          id: pqr.id,
+        },
+      });
+    }
+
     return NextResponse.json(
       { error: "Internal server error", details: error.message },
       { status: 500 }
