@@ -59,9 +59,9 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
           <div>
             <h3 className="font-semibold mb-2">Creado por</h3>
             <p>
-              {pqr.anonymous
+              {pqr.anonymous || !pqr.creator
                 ? "Anónimo"
-                : `${pqr.creator.firstName} ${pqr.creator.lastName}`}
+                : `${pqr.creator?.firstName} ${pqr.creator?.lastName}`}
             </p>
             <p className="text-sm text-muted-foreground">
               {formatDate(pqr.createdAt)}

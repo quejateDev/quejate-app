@@ -17,7 +17,7 @@ const LoginModalProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <LoginModalContext.Provider value={{ isOpen, setIsOpen }}>
       {children}
-      <LoginModal isOpen={isOpen} onOpenChange={setIsOpen} />
+      <LoginModal/>
     </LoginModalContext.Provider>
   );
 };

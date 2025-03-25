@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function POST(
-  request: NextRequest,
-  { params }: any 
-) {
+export async function POST(request: NextRequest, { params }: any) {
   try {
     const { userId } = await request.json();
     const { id: pqrId } = await params;
@@ -57,19 +54,19 @@ export async function POST(
         },
         creator: {
           select: {
+            id: true,
             firstName: true,
-            lastName: true
-          }
-        }
+            lastName: true,
+          },
+        },
       },
     });
 
-
-    if (updatedPQR && !existingLike) {
+    if (updatedPQR && !existingLike && updatedPQR.creator) {
       await prisma.notification.create({
         data: {
           type: "like",
-          userId: updatedPQR?.creatorId,
+          userId: updatedPQR?.creator?.id,
           message: `A ${updatedPQR.creator.firstName} ${updatedPQR.creator.lastName} le gusta tu PQR`,
           data: {
             pqrId: pqrId,
@@ -87,9 +84,6 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error toggling like:", error);
-    return NextResponse.json(
-      { error: "Error toggling like" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error toggling like" }, { status: 500 });
   }
 }
