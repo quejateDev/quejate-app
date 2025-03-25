@@ -72,7 +72,7 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
 
         setIsDeleteModalOpen(false);
         setEntityToDelete(null);
-        
+
         toast({
           title: "Entidad eliminada correctamente",
           description: "La entidad ha sido eliminada correctamente",
@@ -162,8 +162,17 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Link href={`/admin/entity/${entity.id}/edit`}>
+                    <Link href={`/admin/entity/${entity.id}/management`}>
                       <Button variant="outline" size="sm">
+                        Administrar
+                      </Button>
+                    </Link>
+                    <Link href={`/admin/entity/${entity.id}/edit`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
+                      >
                         Editar
                       </Button>
                     </Link>
