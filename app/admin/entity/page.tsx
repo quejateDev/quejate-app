@@ -23,9 +23,6 @@ const categories = await prisma.category.findMany({
   },
 });
 
-console.log(entities);
-
-
 export default async function EntitiesPage() {
   return (
     <div className="container mx-auto py-10">

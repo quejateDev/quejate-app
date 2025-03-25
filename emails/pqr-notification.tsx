@@ -20,6 +20,7 @@ interface PQRNotificationEmailProps {
     createdAt: string;
     status: string;
     isAnonymous: boolean;
+    consecutiveCode: string;
   };
   creatorInfo: {
     name: string;
@@ -65,7 +66,7 @@ export default function PQRNotificationEmail({
 
           <Section style={section}>
             <Heading style={h2}>Información de la Solicitud</Heading>
-            <Text>Número de Radicado: #{pqrInfo.id}</Text>
+            <Text>Número de Radicado: {pqrInfo.consecutiveCode}</Text>
             <Text>Tipo de Solicitud: {pqrInfo.type}</Text>
             <Text>Estado Actual: {pqrInfo.status}</Text>
             <Text>Fecha de Radicación: {pqrInfo.createdAt}</Text>

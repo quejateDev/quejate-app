@@ -43,7 +43,6 @@ export async function getEntities(params?: { departmentId?: string; municipality
 }
 
 export async function getCategories(): Promise<Category[]> {
-  console.log("categories", process.env.BASE_URL);
   const response = await Client.get("/category");
   return response.data;
 }

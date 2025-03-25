@@ -76,42 +76,64 @@ export async function POST(req: NextRequest) {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + pqrConfig.maxResponseTime);
 
-    // Create PQR with attachments
-    pqr = await prisma.pQRS.create({
-      data: {
-        type: body.type,
-        dueDate,
-        anonymous: body.isAnonymous || false,
-        departmentId: body.departmentId,
-        creatorId: body.creatorId,
-        customFieldValues: {
-          create: body.customFields.map((field: any) => ({
-            name: field.name,
-            value: field.value,
-            type: field.type,
-            placeholder: field.placeholder,
-            required: field.required,
-          })),
-        },
-        private: body.isPrivate || false,
-        attachments: {
-          createMany: {
-            data: body.attachments.map((attachment: any) => ({
-              name: attachment.name,
-              url: attachment.url,
-              type: attachment.type,
-              size: attachment.size,
-            })),
-          },
-        },
-      },
-      include: {
-        department: true,
-        customFieldValues: true,
-        attachments: true,
-        creator: true,
+    const consecutiveCode = await prisma.entityConsecutive.findFirst({
+      where: {
+        entityId: body.entityId,
       },
     });
+
+    if (!consecutiveCode) {
+      return NextResponse.json(
+        { error: "No consecutive code found for this entity" },
+        { status: 400 }
+      );
+    }
+
+    // Create PQR with attachments
+    const [pqr, entityConsecutive] = await prisma.$transaction([
+      prisma.pQRS.create({
+        data: {
+          type: body.type,
+          dueDate,
+          anonymous: body.isAnonymous || false,
+          departmentId: body.departmentId,
+          creatorId: body.creatorId,
+          customFieldValues: {
+            create: body.customFields.map((field: any) => ({
+              name: field.name,
+              value: field.value,
+              type: field.type,
+              placeholder: field.placeholder,
+              required: field.required,
+            })),
+          },
+          private: body.isPrivate || false,
+          attachments: {
+            createMany: {
+              data: body.attachments.map((attachment: any) => ({
+                name: attachment.name,
+                url: attachment.url,
+                type: attachment.type,
+                size: attachment.size,
+              })),
+            },
+          },
+          consecutiveCode: `${consecutiveCode.code}-${consecutiveCode.consecutive}`,
+        },
+        include: {
+          department: true,
+          customFieldValues: true,
+          attachments: true,
+          creator: true,
+        },
+      }),
+      prisma.entityConsecutive.update({
+        where: { id: consecutiveCode.id },
+        data: {
+          consecutive: consecutiveCode.consecutive + 1,
+        },
+      }),
+    ]);
 
     const entity = await prisma.entity.findUnique({
       where: { id: body.entityId },
@@ -129,7 +151,8 @@ export async function POST(req: NextRequest) {
             pqr,
             pqr.creator,
             pqr.customFieldValues,
-            pqr.attachments
+            pqr.attachments,
+            pqr.consecutiveCode || ""
           ),
 
         // Email al creador
@@ -140,10 +163,10 @@ export async function POST(req: NextRequest) {
             "Registro exitoso de PQR @quejate.com.co",
             pqr.id.toString(),
             new Date(pqr.createdAt).toLocaleString("es-CO", {
-            timeZone: "America/Bogota",
-          }),
-          `https://quejate.com.co/dashboard/pqr/${pqr.id}`
-        ),
+              timeZone: "America/Bogota",
+            }),
+            `https://quejate.com.co/dashboard/pqr/${pqr.id}`
+          ),
       ].filter(Boolean)
     ); // Filtramos los undefined (cuando no hay email de entidad)
 
@@ -152,11 +175,19 @@ export async function POST(req: NextRequest) {
     console.error("Error in POST /api/pqr:", error.stack);
 
     if (pqr && pqr.id) {
-      await prisma.pQRS.delete({
-        where: {
-          id: pqr.id,
-        },
-      });
+      await prisma.$transaction([
+        prisma.pQRS.delete({
+          where: {
+            id: pqr.id,
+          },
+        }),
+        prisma.entityConsecutive.update({
+          where: { id: pqr.entityConsecutiveId },
+          data: {
+            consecutive: pqr.entityConsecutive.consecutive - 1,
+          },
+        }),
+      ]);
     }
 
     return NextResponse.json(

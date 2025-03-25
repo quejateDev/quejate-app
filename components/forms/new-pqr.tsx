@@ -270,8 +270,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
         };
       });
 
-      console.log("values", values);
-
       formData.append(
         "data",
         JSON.stringify({

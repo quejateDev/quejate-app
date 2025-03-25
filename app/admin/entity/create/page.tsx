@@ -47,7 +47,6 @@ export default function CreateEntityPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        console.log("categories ", process.env.BASE_URL);
         const categoriesData = await getCategories();
         setCategories(categoriesData);
       } catch (error) {

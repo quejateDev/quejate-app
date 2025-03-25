@@ -67,6 +67,27 @@ export async function POST(request: Request) {
       );
     }
 
+    // for consecutive code initiality take the first 2 letter of the name
+    let consecutiveCode = name.split(" ").map((word: string) => word[0]).join("").toUpperCase();
+
+    let codeExists = true;
+
+    while (codeExists) {
+      // check if code is already in use
+      const entityWithCode = await prisma.entityConsecutive.findFirst({
+        where: {
+          code: consecutiveCode,
+        },
+      });
+
+      if (!entityWithCode) {
+        codeExists = false;
+      } else {
+        // if code is already in use, add another letter
+        consecutiveCode = `${consecutiveCode}${name.split(" ").map((word: string) => word[0]).join("").toUpperCase()}`;
+      }
+    }
+
     const entity = await prisma.entity.create({
       data: {
         name,
@@ -74,6 +95,11 @@ export async function POST(request: Request) {
         imageUrl,
         categoryId,
         email,
+        EntityConsecutive: {
+          create: {
+            code: consecutiveCode,
+          },
+        },
       },
       include: {
         category: {

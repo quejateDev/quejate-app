@@ -31,10 +31,6 @@ export async function POST(request: Request) {
       expiresIn: 3600,
     })
 
-    console.log('Generated URL:', url)
-    console.log('Bucket:', process.env.AWS_BUCKET)
-    console.log('Key:', key)
-
     return NextResponse.json({
       url,
       key,
