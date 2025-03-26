@@ -75,19 +75,16 @@ export default function PQRNotificationEmail({
             </Text>
           </Section>
 
-          <Section style={section}>
-            <Heading style={h2}>Información del Solicitante</Heading>
-            {!pqrInfo.isAnonymous && (
-              <>
-                <Text>Nombre Completo: {creatorInfo.name}</Text>
-                {creatorInfo.phone && (
-                  <Text>Teléfono de Contacto: {creatorInfo.phone}</Text>
-                )}
-              </>
-            )}
-
-            <Text>Correo Electrónico: {creatorInfo.email}</Text>
-          </Section>
+          {!pqrInfo.isAnonymous && (
+            <Section style={section}>
+              <Heading style={h2}>Información del Solicitante</Heading>
+              <Text>Nombre Completo: {creatorInfo.name}</Text>
+              {creatorInfo.phone && (
+                <Text>Teléfono de Contacto: {creatorInfo.phone}</Text>
+              )}
+              <Text>Correo Electrónico: {creatorInfo.email}</Text>
+            </Section>
+          )}
 
           {customFields.length > 0 && (
             <Section style={section}>
