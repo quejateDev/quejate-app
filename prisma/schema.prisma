@@ -24,7 +24,6 @@ model User {
   resetTokenExpiry  DateTime?
   isVerified        Boolean             @default(false)
 
-  Comment           Comment[]
   EmailVerification EmailVerification[]
   Like              Like[]
   notifications     Notification[]
@@ -119,7 +118,6 @@ model PQRS {
   departmentId      String
   private           Boolean            @default(false)
   attachments       Attachment[]
-  Comment           Comment[]
   customFieldValues CustomFieldValue[]
   comments          Comment[]
   likes             Like[]
@@ -265,20 +263,6 @@ model RegionalDepartment {
   name         String         @unique(map: "regionaldepartment_name_key")
   createdat    DateTime?      @default(now()) @db.Timestamp(6)
   Municipality Municipality[]
-}
-
-model Comment {
-  id        String   @id
-  text      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  userId    String
-  pqrId     String
-  PQRS      PQRS     @relation(fields: [pqrId], references: [id])
-  User      User     @relation(fields: [userId], references: [id])
-
-  @@index([pqrId])
-  @@index([userId])
 }
 
 enum UserRole {
