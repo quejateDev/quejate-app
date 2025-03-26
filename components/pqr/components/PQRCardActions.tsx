@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import LikeButton from "@/components/Buttons/LikeButton";
 
 type PQRCardActionsProps = {
   liked: boolean;
@@ -9,6 +10,7 @@ type PQRCardActionsProps = {
   commentCount: number; 
   handleLike: () => void;
   onCommentClick: () => void;
+  pqrId: string;
 };
 
 export function PQRCardActions({
@@ -18,24 +20,15 @@ export function PQRCardActions({
   commentCount,
   handleLike,
   onCommentClick,
+  pqrId,
 }: PQRCardActionsProps) {
   return (
     <div className="flex items-center">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="gap-2 pl-0 hover:bg-transparent hover:text-current"
-        onClick={handleLike}
-        disabled={isLoading}
-      >
-        <Heart
-          className={cn(
-            "w-4 h-4",
-            liked ? "fill-current text-red-500" : "text-gray-500 stroke-red-500"
-          )}
-        />
-        <span>{likeCount}</span>
-      </Button>
+      <LikeButton
+        likes={likeCount}
+        initialLiked={liked}
+        pqrId={pqrId}
+      />
       <Button
         variant="ghost"
         size="sm"

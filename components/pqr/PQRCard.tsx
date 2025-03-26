@@ -15,7 +15,7 @@ type PQRCardProps = {
   pqr: {
     id: string;
     creator: {
-      firstName: string ;
+      firstName: string;
       lastName: string;
       avatarUrl?: string;
     } | null;
@@ -56,9 +56,17 @@ type PQRCardProps = {
 export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
   const { user } = useAuthStore();
 
-  const { liked, likeCount, isLoading, handleLike } = useLike(pqr.id, initialLiked, pqr._count?.likes || 0);
-  const { commentCount, isVisible: showComments, toggleComments,incrementCount: incrementCommentCount  } = useComments(pqr.id, pqr._count?.comments ?? 0); // ✅ Usa `?? 0` para manejar `undefined`
-  
+  const { liked, likeCount, isLoading, handleLike } = useLike(
+    pqr.id,
+    initialLiked,
+    pqr._count?.likes || 0
+  );
+  const {
+    commentCount,
+    isVisible: showComments,
+    toggleComments,
+    incrementCount: incrementCommentCount,
+  } = useComments(pqr.id, pqr._count?.comments ?? 0); // ✅ Usa `?? 0` para manejar `undefined`
 
   const { videoRefsDesktop, videoRefsMobile } = useVideoPlayback();
 
@@ -91,15 +99,16 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
                 isLoading={isLoading}
                 handleLike={handleLike}
                 onCommentClick={toggleComments}
+                pqrId={pqr.id}
               />
             </div>
             {showComments && (
               <CommentSection
-              pqrId={pqr.id}
-              user={user}
-              onCommentSubmit={handleCommentSubmit}
-            />
-          )}
+                pqrId={pqr.id}
+                user={user}
+                onCommentSubmit={handleCommentSubmit}
+              />
+            )}
           </CardContent>
         </Card>
       </div>
@@ -121,6 +130,7 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
             isLoading={isLoading}
             handleLike={handleLike}
             onCommentClick={toggleComments}
+            pqrId={pqr.id}
           />
         </div>
         {showComments && (
