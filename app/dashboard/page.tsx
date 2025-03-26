@@ -1,9 +1,10 @@
-import { PQRCard } from "@/components/PQRCard";
+import { PQRCard } from "@/components/pqr/PQRCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
+import { PlusIcon } from "lucide-react";
 
 interface PageProps {
   searchParams: Promise<{
@@ -94,6 +95,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       _count: {
         select: {
           likes: true,
+          comments: true, 
         },
       },
     },
@@ -106,11 +108,19 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto p-8">
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">PQRs</h1>
-            <Link href="/dashboard/pqrs/create">
-              <Button>Crear PQR</Button>
-            </Link>
+          <div className="bg-primary/10 p-4 rounded-lg">
+            <div className="container mx-auto flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+              <div>
+                <h2 className="font-semibold">¿Tienes alguna petición, queja, reclamo, sugerencia o denuncia?</h2>
+                <p className="text-sm text-muted-foreground">Crea y envía tu PQRSD fácilmente a través de nuestra plataforma.</p>
+              </div>
+              <Link href="/dashboard/pqrs/create">
+                <Button className="bg-primary hover:bg-primary/90 flex items-center gap-2">
+                  <PlusIcon className="h-4 w-4" />
+                  <span>Crear PQRSD</span>
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <PQRFilters entities={entities} departments={departments} />
@@ -119,9 +129,13 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             {pqrs.map((pqr) => (
               <PQRCard
                 key={pqr.id}
-                pqr={pqr}
-                initialLiked={pqr.likes?.length > 0}
-              />
+                pqr={{ ...pqr, dueDate: pqr.dueDate.toISOString() }}
+                initialLiked={pqr.likes?.length > 0} user={{
+                  id: "",
+                  firstName: "",
+                  lastName: "",
+                  avatarUrl: undefined
+                }}              />
             ))}
             {pqrs.length === 0 && (
               <div className="text-center py-12">

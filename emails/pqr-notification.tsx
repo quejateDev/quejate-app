@@ -50,10 +50,10 @@ export default function PQRNotificationEmail({
   return (
     <Html>
       <Head />
-      <Preview>Nueva PQR recibida - {entityName}</Preview>
+      <Preview>Nueva PQRSD recibida - {entityName}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>Nueva PQR Recibida</Heading>
+          <Heading style={h1}>Nueva PQRSD Recibida</Heading>
 
           <Section style={section}>
             <Text style={intro}>Estimado equipo de {entityName},</Text>

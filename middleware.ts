@@ -5,9 +5,6 @@ import { verifyToken } from '@/lib/utils'
 // Define which paths require admin authentication
 const ADMIN_PATHS = ['/admin']
 
-// Define which paths require authentication
-const PROTECTED_PATHS = ['/dashboard']
-
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value
   if (request.nextUrl.pathname === "/") {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
-import { PQRCard } from '@/components/PQRCard';
+import { PQRCard } from '@/components/pqr/PQRCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getGetPQRDTO } from '@/dto/pqr.dto';
 

@@ -1,4 +1,4 @@
-import { Department, PQRS, User } from "@prisma/client";
+import { Department, PQRS, User, Comment } from "@prisma/client";
 import { getGetPQRDTO } from "@/dto/pqr.dto";
 import axios from "axios";
 
@@ -7,7 +7,7 @@ const Client = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 seconds
+  timeout: 10000, 
 });
 
 type createPQRS = {
@@ -69,3 +69,14 @@ export async function toggleLike(pqrId: string, userId: string) {
   const response = await Client.post(`/pqr/${pqrId}/like`, { userId });
   return response.data;
 }
+
+export async function createCommentService(comment: {text: string; userId: string; pqrId: string; }): Promise<Comment> {
+  const response = await Client.post(`/pqr/${comment.pqrId}/comments`, comment);
+  return response.data;
+}
+
+export async function getCommentsService(pqrId: string): Promise<Comment[]> {
+  const response = await Client.get(`/pqr/${pqrId}/comments`);
+  return response.data;
+}
+

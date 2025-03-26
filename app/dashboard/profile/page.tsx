@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { PQRCard } from '@/components/PQRCard';
+import { PQRCard } from '@/components/pqr/PQRCard';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserCircle } from 'lucide-react';
@@ -44,7 +44,7 @@ export default function ProfilePage() {
           </Card>
         </div>
         <div className="md:col-span-8">
-          <h3 className="text-lg font-semibold mb-4">Mis PQRs Recientes</h3>
+          <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
           <div className="space-y-4">
             {pqrs.length > 0 ? (
               pqrs?.map((pqr) => (

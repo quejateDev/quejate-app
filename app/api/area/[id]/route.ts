@@ -9,9 +9,7 @@ export async function GET(
   try {
     const { id } = await params;
     const area = await prisma.department.findUnique({
-      where: {
-        id
-      },
+      where: { id },
       include: {
         pqrConfig: {
           include: {
@@ -67,10 +65,10 @@ export async function PATCH(
 ) {
   try {
     const body = await request.json();
-
+    const { id } = await params
     const area = await prisma.department.update({
       where: {
-        id: params.id,
+        id
       },
       data: {
         ...body,

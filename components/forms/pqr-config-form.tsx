@@ -89,9 +89,9 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Permitir PQR anónimos</FormLabel>
+                    <FormLabel>Permitir PQRSD anónimos</FormLabel>
                     <FormDescription>
-                      Permite que los usuarios envíen PQR sin identificarse
+                      Permite que los usuarios envíen PQRSD sin identificarse
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -124,7 +124,7 @@ export function PQRConfigForm({ areaId, initialData }: PQRConfigFormProps) {
               name="maxResponseTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tiempo máximo de respuesta (horas)</FormLabel>
+                  <FormLabel>Tiempo máximo de respuesta (días hábiles)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
