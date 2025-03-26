@@ -51,14 +51,11 @@ export default function EntityManagementPage() {
   const { toast } = useToast();
 
   const params = useParams();
-
-  if (!params.id) {
-    return <div>No se encontró la entidad</div>;
-  }
+  const { id } = params;
 
   const fetchEntityData = async () => {
     try {
-      const response = await axios.get(`/api/admin/entities/${params.id}`);
+      const response = await axios.get(`/api/admin/entities/${id}`);
       setEntity(response.data);
     } catch (error) {
       toast({
@@ -73,7 +70,7 @@ export default function EntityManagementPage() {
 
   useEffect(() => {
     fetchEntityData();
-  }, [params.id]);
+  }, [id]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
@@ -94,6 +91,11 @@ export default function EntityManagementPage() {
       });
     }
   };
+
+
+  if (!id) {
+    return <div>No se encontró la entidad</div>;
+  }
 
   if (isLoading) {
     return (

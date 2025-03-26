@@ -1,44 +1,17 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-// import { authOptions } from "@/lib/auth";
 
-// Get all users for an entity
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ADMIN")) {
-    //   return NextResponse.json(
-    //     { error: "Unauthorized" },
-    //     { status: 401 }
-    //   );
-    // }
-
-    // If user is an ADMIN, verify they belong to this entity
-    // if (session.user.role === "ADMIN") {
-    //   const isEntityAdmin = await prisma.entityHasUser.findFirst({
-    //     where: {
-    //       entityId: params.id,
-    //       userId: session.user.id,
-    //     },
-    //   });
-
-    //   if (!isEntityAdmin) {
-    //     return NextResponse.json(
-    //       { error: "Unauthorized" },
-    //       { status: 401 }
-    //     );
-    //   }
-    // }
-
+    const { id } = await params;
     const users = await prisma.user.findMany({
       where: {
         EntityHasUser: {
           some: {
-            entityId: params.id,
+            entityId: id,
           },
         },
       },
@@ -71,17 +44,10 @@ export async function GET(
 // Add a new user to an entity
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ADMIN")) {
-    //   return NextResponse.json(
-    //     { error: "Unauthorized" },
-    //     { status: 401 }
-    //   );
-    // }
-
+    const { id } = await params;
     const { email, role = "EMPLOYEE" } = await request.json();
 
     // Find user by email
@@ -102,7 +68,7 @@ export async function POST(
       data: {
         EntityHasUser: {
           create: {
-            entityId: params.id,
+            entityId: id,
             role,
           },
         },
