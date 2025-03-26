@@ -89,6 +89,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const fechaConsecutivo = new Date().toISOString().split("T")[0].replace(/-/g, "");
+
     // Create PQR with attachments
     const [pqr, entityConsecutive] = await prisma.$transaction([
       prisma.pQRS.create({
@@ -118,10 +120,10 @@ export async function POST(req: NextRequest) {
               })),
             },
           },
-          consecutiveCode: `${consecutiveCode.code}-${new Date().toLocaleDateString()}-${consecutiveCode.consecutive}`,
+          consecutiveCode: `${consecutiveCode.code}-${fechaConsecutivo}-${consecutiveCode.consecutive}`,
         },
         include: {
-          department: true,
+          department: true, 
           customFieldValues: true,
           attachments: true,
           creator: true,
