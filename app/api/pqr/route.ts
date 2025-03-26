@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
               })),
             },
           },
-          consecutiveCode: `${consecutiveCode.code}-${consecutiveCode.consecutive}`,
+          consecutiveCode: `${consecutiveCode.code}-${new Date().toLocaleDateString()}-${consecutiveCode.consecutive}`,
         },
         include: {
           department: true,
