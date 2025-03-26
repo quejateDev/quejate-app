@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ConfirmationModal from "./Modals/ConfirmationModal";
+import ConfirmationModal from "./modals/ConfirmationModal";
 import {
     Table,
     TableCell,

@@ -9,7 +9,7 @@ import { Mail, Lock, LogIn } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { EmailNotVerifiedModal } from "@/components/Modals/email-not-verified-modal";
+import { EmailNotVerifiedModal } from "@/components/modals/email-not-verified-modal";
 
 export default function Login() {
   const [formData, setFormData] = useState({

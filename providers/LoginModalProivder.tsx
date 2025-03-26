@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import LoginModal from "@/components/Modals/LoginModal";
+import LoginModal from "@/components/modals/LoginModal";
 
 const LoginModalContext = createContext<{
   isOpen: boolean;

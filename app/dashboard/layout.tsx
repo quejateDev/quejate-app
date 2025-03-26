@@ -4,7 +4,7 @@ import "../globals.css";
 import NavbarDashboard from "@/components/Navbar/NavbarDashboard";
 import Footer from "@/components/footer";
 import LoginModalProvider from "@/providers/LoginModalProivder";
-import LoginModal from "@/components/Modals/LoginModal";
+import LoginModal from "@/components/modals/LoginModal";
 
 export default function RootLayout({
   children,

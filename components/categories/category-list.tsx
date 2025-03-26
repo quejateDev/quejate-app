@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
-import ConfirmationModal from "@/components/Modals/ConfirmationModal";
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import Image from "next/image";
 
 interface Category {

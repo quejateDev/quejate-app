@@ -16,7 +16,7 @@ import { Department } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import ConfirmationModal from "./Modals/ConfirmationModal";
+import ConfirmationModal from "./modals/ConfirmationModal";
 
 interface DeparmentsTableProps {
   departments: (Department & {
