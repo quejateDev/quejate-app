@@ -140,35 +140,36 @@ export async function POST(req: NextRequest) {
       select: { name: true, email: true },
     });
 
-    // Enviar emails en paralelo
-    await Promise.all(
-      [
-        // Email a la entidad
-        entity?.email &&
-          sendPQRNotificationEmail(
-            entity.email,
-            entity.name,
-            pqr,
-            pqr.creator,
-            pqr.customFieldValues,
-            pqr.attachments,
-            pqr.consecutiveCode || ""
-          ),
+    if (!pqr.consecutiveCode) {
+      throw new Error("No consecutive code found for this PQR");
+    }
 
-        // Email al creador
-        pqr.creator?.email &&
-          sendPQRCreationEmail(
-            pqr.creator?.email,
-            pqr.creator?.firstName || "John Doe",
-            "Registro exitoso de PQR @quejate.com.co",
-            pqr.id.toString(),
-            new Date(pqr.createdAt).toLocaleString("es-CO", {
-              timeZone: "America/Bogota",
-            }),
-            `https://quejate.com.co/dashboard/pqr/${pqr.id}`
-          ),
-      ].filter(Boolean)
-    ); // Filtramos los undefined (cuando no hay email de entidad)
+    if (entity?.email) {
+      await sendPQRNotificationEmail(
+        entity.email,
+        entity.name,
+        pqr,
+        pqr.creator,
+        pqr.customFieldValues,
+        pqr.attachments,
+        pqr.consecutiveCode
+      );
+    } else {
+      throw new Error("No email found for this entity");
+    }
+
+    if (pqr.creator?.email) {
+      await sendPQRCreationEmail(
+        pqr.creator?.email,
+        pqr.creator?.firstName || "John Doe",
+        "Registro exitoso de PQR @quejate.com.co",
+        pqr.consecutiveCode,
+        new Date(pqr.createdAt).toLocaleString("es-CO", {
+          timeZone: "America/Bogota",
+        }),
+        `https://quejate.com.co/dashboard/pqr/${pqr.id}`
+      );
+    }
 
     return NextResponse.json(pqr);
   } catch (error: any) {
