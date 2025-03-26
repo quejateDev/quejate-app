@@ -10,6 +10,7 @@ export async function sendPQRNotificationEmail(
   creatorData: any,
   customFields: any[],
   attachments: any[],
+  consecutiveCode: string
 ) {
   try {
     const { data, error } = await resend.emails.send({
@@ -27,11 +28,13 @@ export async function sendPQRNotificationEmail(
             timeZone: 'America/Bogota',
           }),
           status: pqrData.status,
+          isAnonymous: pqrData.anonymous,
+          consecutiveCode: consecutiveCode,
         },
         creatorInfo: {
-          name: `${creatorData.firstName} ${creatorData.lastName}`,
-          email: creatorData.email,
-          phone: creatorData.phone,
+          name: creatorData ? `${creatorData?.firstName} ${creatorData?.lastName}` : 'Anónimo',
+          email: creatorData ? creatorData?.email : 'Anónimo',
+          phone: creatorData ? creatorData?.phone : 'Anónimo',
         },
         customFields,
         attachments,

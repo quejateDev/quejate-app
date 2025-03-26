@@ -8,9 +8,7 @@ import {
   Preview,
   Section,
   Text,
-  Row,
-  Column,
-} from '@react-email/components';
+} from "@react-email/components";
 
 interface PQRNotificationEmailProps {
   entityName: string;
@@ -21,6 +19,8 @@ interface PQRNotificationEmailProps {
     description: string;
     createdAt: string;
     status: string;
+    isAnonymous: boolean;
+    consecutiveCode: string;
   };
   creatorInfo: {
     name: string;
@@ -56,31 +56,35 @@ export default function PQRNotificationEmail({
           <Heading style={h1}>Nueva PQRSD Recibida</Heading>
 
           <Section style={section}>
-            <Text style={intro}>
-              Estimado equipo de {entityName},
-            </Text>
+            <Text style={intro}>Estimado equipo de {entityName},</Text>
             <Text style={description}>
-              Se ha registrado una nueva {pqrInfo.type} en el sistema de PQRS. 
-              Este mensaje es para notificarle que debe dar seguimiento y respuesta 
-              dentro de los plazos establecidos.
+              Se ha registrado una nueva {pqrInfo.type} en el sistema de PQRS.
+              Este mensaje es para notificarle que debe dar seguimiento y
+              respuesta dentro de los plazos establecidos.
             </Text>
-          </Section>
-          
-          <Section style={section}>
-            <Heading style={h2}>Información de la Solicitud</Heading>
-            <Text>Número de Radicado: #{pqrInfo.id}</Text>
-            <Text>Tipo de Solicitud: {pqrInfo.type}</Text>
-            <Text>Estado Actual: {pqrInfo.status}</Text>
-            <Text>Fecha de Radicación: {pqrInfo.createdAt}</Text>
-            <Text style={description}>Descripción de la Solicitud: {pqrInfo.description}</Text>
           </Section>
 
           <Section style={section}>
-            <Heading style={h2}>Información del Solicitante</Heading>
-            <Text>Nombre Completo: {creatorInfo.name}</Text>
-            <Text>Correo Electrónico: {creatorInfo.email}</Text>
-            {creatorInfo.phone && <Text>Teléfono de Contacto: {creatorInfo.phone}</Text>}
+            <Heading style={h2}>Información de la Solicitud</Heading>
+            <Text>Número de Radicado: {pqrInfo.consecutiveCode}</Text>
+            <Text>Tipo de Solicitud: {pqrInfo.type}</Text>
+            <Text>Estado Actual: {pqrInfo.status}</Text>
+            <Text>Fecha de Radicación: {pqrInfo.createdAt}</Text>
+            <Text style={description}>
+              Descripción de la Solicitud: {pqrInfo.description}
+            </Text>
           </Section>
+
+          {!pqrInfo.isAnonymous && (
+            <Section style={section}>
+              <Heading style={h2}>Información del Solicitante</Heading>
+              <Text>Nombre Completo: {creatorInfo.name}</Text>
+              {creatorInfo.phone && (
+                <Text>Teléfono de Contacto: {creatorInfo.phone}</Text>
+              )}
+              <Text>Correo Electrónico: {creatorInfo.email}</Text>
+            </Section>
+          )}
 
           {customFields.length > 0 && (
             <Section style={section}>
@@ -97,7 +101,8 @@ export default function PQRNotificationEmail({
             <Section style={section}>
               <Heading style={h2}>Documentos Adjuntos</Heading>
               <Text style={description}>
-                El solicitante ha proporcionado los siguientes documentos de soporte:
+                El solicitante ha proporcionado los siguientes documentos de
+                soporte:
               </Text>
               {attachments.map((file) => (
                 <Link key={file.url} href={file.url} style={link}>
@@ -109,7 +114,7 @@ export default function PQRNotificationEmail({
 
           <Section style={section}>
             <Text style={description}>
-              Para dar respuesta a esta solicitud, por favor ingrese al sistema 
+              Para dar respuesta a esta solicitud, por favor ingrese al sistema
               haciendo clic en el siguiente botón:
             </Text>
             <Link href={pqrUrl} style={button}>
@@ -119,11 +124,13 @@ export default function PQRNotificationEmail({
 
           <Section style={footer}>
             <Text style={description}>
-              Recuerde que es importante dar respuesta oportuna a las solicitudes 
-              para mantener la calidad del servicio y cumplir con los tiempos establecidos.
+              Recuerde que es importante dar respuesta oportuna a las
+              solicitudes para mantener la calidad del servicio y cumplir con
+              los tiempos establecidos.
             </Text>
             <Text style={description}>
-              Este es un mensaje automático, por favor no responda a este correo.
+              Este es un mensaje automático, por favor no responda a este
+              correo.
             </Text>
           </Section>
         </Container>
@@ -133,76 +140,76 @@ export default function PQRNotificationEmail({
 }
 
 const main = {
-  backgroundColor: '#f6f9fc',
-  padding: '40px 0',
-  width: '100%',
-  maxWidth: '600px',
-  margin: '0 auto',
+  backgroundColor: "#f6f9fc",
+  padding: "40px 0",
+  width: "100%",
+  maxWidth: "600px",
+  margin: "0 auto",
 };
 
 const container = {
-  maxWidth: '580px',
-  margin: '0 auto',
-  padding: '0 10px',
+  maxWidth: "580px",
+  margin: "0 auto",
+  padding: "0 10px",
 };
 
 const h1 = {
-  color: '#333',
-  fontSize: '24px',
-  textAlign: 'center' as const,
-  margin: '30px 0',
+  color: "#333",
+  fontSize: "24px",
+  textAlign: "center" as const,
+  margin: "30px 0",
 };
 
 const h2 = {
-  color: '#444',
-  fontSize: '20px',
-  margin: '20px 0',
+  color: "#444",
+  fontSize: "20px",
+  margin: "20px 0",
 };
 
 const section = {
-  backgroundColor: '#ffffff',
-  border: '1px solid #eee',
-  borderRadius: '5px',
-  margin: '20px 0',
-  padding: '20px',
-  width: '100%',
-  maxWidth: '560px',
+  backgroundColor: "#ffffff",
+  border: "1px solid #eee",
+  borderRadius: "5px",
+  margin: "20px 0",
+  padding: "20px",
+  width: "100%",
+  maxWidth: "560px",
 };
 
 const description = {
-  color: '#666',
-  lineHeight: '1.5',
-  whiteSpace: 'pre-wrap' as const,
+  color: "#666",
+  lineHeight: "1.5",
+  whiteSpace: "pre-wrap" as const,
 };
 
 const link = {
-  color: '#2563eb',
-  display: 'block',
-  marginBottom: '10px',
-  textDecoration: 'none',
+  color: "#2563eb",
+  display: "block",
+  marginBottom: "10px",
+  textDecoration: "none",
 };
 
 const button = {
-  backgroundColor: '#2563eb',
-  borderRadius: '5px',
-  color: '#fff',
-  display: 'inline-block',
-  padding: '12px 20px',
-  textDecoration: 'none',
-  textAlign: 'center' as const,
-  margin: '20px 0',
+  backgroundColor: "#2563eb",
+  borderRadius: "5px",
+  color: "#fff",
+  display: "inline-block",
+  padding: "12px 20px",
+  textDecoration: "none",
+  textAlign: "center" as const,
+  margin: "20px 0",
 };
 
 const intro = {
-  fontSize: '16px',
-  lineHeight: '1.5',
-  color: '#333',
-  marginBottom: '20px',
+  fontSize: "16px",
+  lineHeight: "1.5",
+  color: "#333",
+  marginBottom: "20px",
 };
 
 const footer = {
-  backgroundColor: '#f8f9fa',
-  padding: '20px',
-  borderRadius: '5px',
-  marginTop: '30px',
-}; 
+  backgroundColor: "#f8f9fa",
+  padding: "20px",
+  borderRadius: "5px",
+  marginTop: "30px",
+};

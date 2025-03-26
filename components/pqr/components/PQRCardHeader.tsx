@@ -7,7 +7,7 @@ type PQRCardHeaderProps = {
     creator: {
       firstName: string;
       lastName: string;
-    };
+    } | null;
     anonymous: boolean;
     createdAt: Date;
     type: keyof typeof typeMap;
@@ -16,7 +16,7 @@ type PQRCardHeaderProps = {
 };
 
 export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
-  const creatorName = !pqr.anonymous
+  const creatorName = !pqr.anonymous && pqr.creator
     ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
     : "Anónimo";
 

@@ -8,7 +8,10 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { getMunicipalitiesByDepartment, getRegionalDepartments } from "@/services/api/location.service";
+import {
+  getMunicipalitiesByDepartment,
+  getRegionalDepartments,
+} from "@/services/api/location.service";
 import {
   Select,
   SelectContent,
@@ -16,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "../ui/badge";
+import { VerificationBadge } from "../ui/verification-badge";
 
 interface SimpleEntity {
   id: string;
@@ -23,6 +28,7 @@ interface SimpleEntity {
   description: string | null;
   imageUrl: string | null;
   municipalityId: string | null;
+  isVerified: boolean;
 }
 
 interface CategorySelectionProps {
@@ -36,13 +42,19 @@ export function CategorySelection({
   categories,
   onEntitySelect,
 }: CategorySelectionProps) {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [entitySearchQuery, setEntitySearchQuery] = useState("");
   const [departments, setDepartments] = useState<RegionalDepartment[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
-  const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<string | null>(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
+    string | null
+  >(null);
+  const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -60,7 +72,8 @@ export function CategorySelection({
     if (selectedDepartmentId) {
       const fetchMunicipalities = async () => {
         try {
-          const data = await getMunicipalitiesByDepartment(selectedDepartmentId);
+          const data =
+            await getMunicipalitiesByDepartment(selectedDepartmentId);
           setMunicipalities(data);
         } catch (error) {
           console.error("Error fetching municipalities:", error);
@@ -73,8 +86,12 @@ export function CategorySelection({
   }, [selectedDepartmentId]);
 
   const filteredCategories = categories.filter((category) => {
-    const matchesName = category.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDescription = category.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesName = category.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesDescription = category.description
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const hasEntities = category.entities.length > 0;
     return (matchesName || matchesDescription) && hasEntities;
   });
@@ -83,15 +100,25 @@ export function CategorySelection({
     ? categories
         .find((cat) => cat.id === selectedCategory.id)
         ?.entities.filter((entity) => {
-          const matchesName = entity.name.toLowerCase().includes(entitySearchQuery.toLowerCase());
-          const matchesDescription = entity.description?.toLowerCase().includes(entitySearchQuery.toLowerCase());
+          const matchesName = entity.name
+            .toLowerCase()
+            .includes(entitySearchQuery.toLowerCase());
+          const matchesDescription = entity.description
+            ?.toLowerCase()
+            .includes(entitySearchQuery.toLowerCase());
           const matchesDepartment = selectedDepartmentId
-            ? entity.municipalityId && municipalities.some((m) => m.id === entity.municipalityId)
+            ? entity.municipalityId &&
+              municipalities.some((m) => m.id === entity.municipalityId)
             : true;
           const matchesMunicipality = selectedMunicipalityId
             ? entity.municipalityId === selectedMunicipalityId
             : true;
-          return matchesName && matchesDescription && matchesDepartment && matchesMunicipality;
+          return (
+            matchesName &&
+            matchesDescription &&
+            matchesDepartment &&
+            matchesMunicipality
+          );
         })
     : [];
 
@@ -122,7 +149,10 @@ export function CategorySelection({
 
       {!selectedCategory && (
         <p className="text-sm text-gray-600">
-          Descubre las categorías disponibles y encuentra exactamente lo que buscas. Si no sabes a qué categoría pertenece una entidad, utiliza la barra de búsqueda e ingresa palabras clave relacionadas con su nombre o descripción para localizarla fácilmente.
+          Descubre las categorías disponibles y encuentra exactamente lo que
+          buscas. Si no sabes a qué categoría pertenece una entidad, utiliza la
+          barra de búsqueda e ingresa palabras clave relacionadas con su nombre
+          o descripción para localizarla fácilmente.
         </p>
       )}
 
@@ -178,7 +208,9 @@ export function CategorySelection({
               <div className="w-full md:w-64">
                 <Select
                   value={selectedMunicipalityId || ""}
-                  onValueChange={(value) => setSelectedMunicipalityId(value || null)}
+                  onValueChange={(value) =>
+                    setSelectedMunicipalityId(value || null)
+                  }
                   disabled={!selectedDepartmentId}
                 >
                   <SelectTrigger>
@@ -224,7 +256,10 @@ export function CategorySelection({
                     </div>
                   )}
                 </div>
-                <h3 className="font-semibold text-center">{entity.name}</h3>
+                <div className="flex items-center justify-center gap-2">
+                  <h3 className="font-semibold text-center">{entity.name}</h3>
+                  {entity.isVerified && <VerificationBadge />}
+                </div>
                 {entity.description && (
                   <p className="text-xs text-gray-500 text-center line-clamp-2 px-2">
                     {entity.description}

@@ -4,29 +4,25 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 export const dynamic = 'force-dynamic';
 
-const entities = await prisma.entity.findMany({
-  orderBy: {
-    name: "asc",
-  },
-  include: {
-    category: {
-      select: {
-        name: true,
+export default async function EntitiesPage() {
+  const entities = await prisma.entity.findMany({
+    orderBy: {
+      name: "asc",
+    },
+    include: {
+      category: {
+        select: {
+          name: true,
+        },
       },
     },
-  },
-});
+  });
 
-const categories = await prisma.category.findMany({
-  orderBy: {
-    name: "asc",
-  },
-});
-
-console.log(entities);
-
-
-export default async function EntitiesPage() {
+  const categories = await prisma.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-8">

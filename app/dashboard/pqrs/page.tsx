@@ -20,7 +20,6 @@ export default function UserPQRs() {
         if (response.ok) {
           const data = await response.json();
 
-          console.log(data)
           setPqrs(data);
         }
       } catch (error) {

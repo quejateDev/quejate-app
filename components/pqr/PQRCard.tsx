@@ -15,10 +15,10 @@ type PQRCardProps = {
   pqr: {
     id: string;
     creator: {
-      firstName: string;
+      firstName: string ;
       lastName: string;
       avatarUrl?: string;
-    };
+    } | null;
     anonymous: boolean;
     createdAt: Date;
     type: keyof typeof typeMap;
@@ -47,8 +47,8 @@ type PQRCardProps = {
   initialLiked?: boolean;
   user: {
     id: string;
-    firstName: string;
-    lastName: string;
+    firstName?: string;
+    lastName?: string;
     avatarUrl?: string;
   };
 };

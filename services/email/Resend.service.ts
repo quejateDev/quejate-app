@@ -25,7 +25,11 @@ export async function sendPQRCreationEmail(
     }),
   });
 
-  return email;
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
 }
 
 export async function sendVerificationEmail(email: string, token: string) {
@@ -35,6 +39,10 @@ export async function sendVerificationEmail(email: string, token: string) {
     subject: "Verifique su correo electr&oacute;nico",
     react: VerificationEmail({ userName: email, token: token }),
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }
@@ -46,6 +54,10 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     subject: "Restablece tu contraseña - Quejate",
     react: ResetPasswordEmail({ userName: email, token: token }),
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

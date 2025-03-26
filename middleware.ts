@@ -7,7 +7,6 @@ const ADMIN_PATHS = ['/admin']
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value
-
   if (request.nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
@@ -17,13 +16,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/admin/pqr', request.url))
   }
 
+  // If no token and trying to access protected route, redirect to login
+  // if (!token && PROTECTED_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
+  //   const loginUrl = new URL('/login', request.url)
+  //   loginUrl.searchParams.set('from', request.nextUrl.pathname)
+  //   return NextResponse.redirect(loginUrl)
+  // }
+
   // If there's a token, verify it
   if (token) {
     try {
       const decoded = await verifyToken(token)
       
       if (!decoded) {
-        console.log('Token is invalid', token)
         const response = NextResponse.redirect(new URL('/login', request.url))
         response.cookies.delete('token')
         return response
@@ -32,7 +37,7 @@ export async function middleware(request: NextRequest) {
       // Check if user is trying to access admin routes
       if (ADMIN_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
         // If not admin, redirect to dashboard
-        if (decoded.role !== 'ADMIN') {
+        if (decoded.role !== 'ADMIN' && decoded.role !== 'SUPER_ADMIN') {
           return NextResponse.redirect(new URL('/dashboard', request.url))
         }
       }
@@ -63,7 +68,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
-    '/dashboard/:path*',
+    // '/dashboard/:path*',
     '/admin/:path*',
     '/api/admin/:path*',
   ]

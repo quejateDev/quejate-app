@@ -13,7 +13,6 @@ export async function getUserService(id: string) {
 }
 
 export async function followUserService(id: string, token: string) {
-    console.log(token)
     const response = await Client.post(`/users/${id}/follow`, null, {
         headers: {
             Authorization: `Bearer ${token}`,

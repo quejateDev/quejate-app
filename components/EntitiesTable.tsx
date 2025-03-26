@@ -21,8 +21,11 @@ import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import ConfirmationModal from "./modals/ConfirmationModal";
+import ConfirmationModal from "./Modals/ConfirmationModal";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "./ui/badge";
+import { Switch } from "./ui/switch";
+import axios from "axios";
 
 interface EntitiesTableProps {
   entities: (Entity & {
@@ -72,7 +75,7 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
 
         setIsDeleteModalOpen(false);
         setEntityToDelete(null);
-        
+
         toast({
           title: "Entidad eliminada correctamente",
           description: "La entidad ha sido eliminada correctamente",
@@ -88,6 +91,43 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
           variant: "destructive",
         });
       }
+    }
+  };
+
+  const handleVerifyEntity = async (entityId: string) => {
+    try {
+      const entity = filteredEntities.find((entity) => entity.id === entityId);
+      if (!entity) {
+        toast({
+          title: "Error",
+          description: "Entidad no encontrada",
+          variant: "destructive",
+        });
+        return;
+      }
+      await axios.put(
+        `/api/entities/${entityId}`,
+        {
+          isVerified: !entity.isVerified,
+        }
+      );
+
+      setFilteredEntities(filteredEntities.map((e) =>
+          e.id === entityId ? { ...e, isVerified: !e.isVerified } : e
+        )
+      );
+
+      toast({
+        title: "Entidad verificada correctamente",
+        description: "La entidad ha sido verificada correctamente",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Error al verificar la entidad",
+        variant: "destructive",
+      });
     }
   };
 
@@ -127,6 +167,7 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
               <TableHead>Nombre</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead>Categoría</TableHead>
+              <TableHead>Verificada</TableHead>
               <TableHead>Fecha de Creación</TableHead>
               <TableHead>Última Actualización</TableHead>
               <TableHead>Acciones</TableHead>
@@ -155,6 +196,12 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                 <TableCell>{entity.description || "Sin descripción"}</TableCell>
                 <TableCell>{entity.category.name}</TableCell>
                 <TableCell>
+                  <Switch
+                    checked={entity.isVerified}
+                    onCheckedChange={() => handleVerifyEntity(entity.id)}
+                  />
+                </TableCell>
+                <TableCell>
                   {new Date(entity.createdAt).toLocaleDateString("es-ES")}
                 </TableCell>
                 <TableCell>
@@ -162,8 +209,17 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Link href={`/admin/entity/${entity.id}/edit`}>
+                    <Link href={`/admin/entity/${entity.id}/management`}>
                       <Button variant="outline" size="sm">
+                        Administrar
+                      </Button>
+                    </Link>
+                    <Link href={`/admin/entity/${entity.id}/edit`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
+                      >
                         Editar
                       </Button>
                     </Link>

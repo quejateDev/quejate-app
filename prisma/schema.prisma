@@ -22,6 +22,8 @@ model User {
   verificationToken String?             @unique
   resetToken        String?
   resetTokenExpiry  DateTime?
+  isVerified        Boolean             @default(false)
+
   EmailVerification EmailVerification[]
   Like              Like[]
   notifications     Notification[]
@@ -32,6 +34,19 @@ model User {
   followers         User[]              @relation("UserFollows")
 
   @@index([departmentId])
+  EntityHasUser EntityHasUser[]
+}
+
+model EntityHasUser {
+  entityId  String 
+  userId    String
+  role      UserRole
+  entity    Entity   @relation(fields: [entityId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@id([entityId, userId])
+  @@index([entityId])
+  @@index([userId])
 }
 
 model Department {
@@ -50,20 +65,35 @@ model Department {
 }
 
 model Entity {
-  id             String        @id @default(uuid())
-  name           String
-  description    String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  categoryId     String
-  imageUrl       String?
-  email          String?
-  municipalityId String?
-  Department     Department[]
-  category       Category      @relation(fields: [categoryId], references: [id])
-  Municipality   Municipality? @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
+  id                String              @id @default(uuid())
+  name              String
+  description       String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  categoryId        String
+  imageUrl          String?
+  email             String?
+  municipalityId    String?
+  isVerified        Boolean             @default(false)
+  Department        Department[]
+  EntityConsecutive EntityConsecutive[]
+  category          Category            @relation(fields: [categoryId], references: [id])
+  Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
 
   @@index([categoryId])
+  EntityHasUser EntityHasUser[]
+}
+
+model EntityConsecutive {
+  id          String    @id @default(uuid())
+  entityId    String
+  entity      Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  code        String    @unique
+  consecutive Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  @@index([entityId])
 }
 
 model Category {
@@ -84,7 +114,7 @@ model PQRS {
   anonymous         Boolean            @default(false)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
-  creatorId         String
+  creatorId         String?
   departmentId      String
   private           Boolean            @default(false)
   attachments       Attachment[]
@@ -92,9 +122,10 @@ model PQRS {
   comments          Comment[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
-  creator           User               @relation(fields: [creatorId], references: [id])
+  creator           User?              @relation(fields: [creatorId], references: [id])
   department        Department         @relation(fields: [departmentId], references: [id])
   customFields      CustomField[]      @relation("CustomFieldToPQRS")
+  consecutiveCode   String?
 
   @@index([creatorId])
   @@index([departmentId])
@@ -235,6 +266,7 @@ model RegionalDepartment {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
   EMPLOYEE
   CLIENT

@@ -9,7 +9,7 @@ import { UserPlus, Mail, Phone, Lock, User } from "lucide-react";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import VerificationModal from "@/components/modals/verification-modal";
+import VerificationModal from "@/components/Modals/verification-modal";
 
 export default function Signup() {
   const router = useRouter();

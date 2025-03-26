@@ -41,9 +41,6 @@ export async function POST(request: Request) {
         verificationToken,
       },
     })
-
-    // Send verification email
-    console.log('sendVerificationEmail', process.env.NEXT_PUBLIC_APP_URL)
     
     await sendVerificationEmail(email, verificationToken)
 

@@ -40,7 +40,7 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
       role: payload.role as string
     }
   } catch (error) {
-    console.log('Token verification error:', error)
+    console.error('Token verification error:', error)
     return null
   }
 }
