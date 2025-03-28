@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { PQRAttachments } from "@/components/pqrs/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqrs/pqr-custom-fields";
-import { PQRTimeline } from "@/components/pqrs/pqr-timeline";
 
 interface PQRDetailPageProps {
   params: Promise<{ id: string }>;

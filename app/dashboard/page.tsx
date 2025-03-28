@@ -148,7 +148,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
                   firstName: "",
                   lastName: "",
                   avatarUrl: undefined
-                }}              />
+                }}/>
             ))}
             {pqrs.length === 0 && (
               <div className="text-center py-12">
