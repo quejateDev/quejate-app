@@ -67,6 +67,19 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           lastName: true,
         },
       },
+      comments: {
+        select: {
+          id: true,
+          text: true,
+          createdAt: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
       department: {
         select: {
           name: true,
@@ -103,7 +116,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       createdAt: "desc",
     },
   });
-
+ 
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto p-8">
