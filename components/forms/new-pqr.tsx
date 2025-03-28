@@ -101,7 +101,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     dueDate: new Date(),
     customFields: [],
     isAnonymous: false,
-    isPrivate: false,
+    isPrivate: true,
     attachments: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<string>("");
@@ -118,7 +118,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
       departmentId: "",
       customFields: {},
       isAnonymous: false,
-      isPrivate: false,
+      isPrivate: true 
+      ,
       attachments: [],
     },
   });
@@ -483,7 +484,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         />
                       </FormControl>
                       <FormLabel>
-                        ¿Desea enviar esta PQR de forma anónima?
+                        ¿Desea enviar esta PQRSD de forma anónima?
                       </FormLabel>
                     </FormItem>
                   )}
@@ -497,23 +498,18 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
               <div className="flex flex-col space-y-1 mb-6">
                 <FormField
                   control={form.control}
-                  name="isAnonymous"
+                  name="isPrivate"
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl className="m-0">
-                        <Checkbox
-                          id="isPrivate"
-                          checked={pqr.isPrivate}
-                          onCheckedChange={(checked) =>
-                            setPqr((prev) => ({
-                              ...prev,
-                              isPrivate: checked as boolean,
-                            }))
-                          }
-                        />
+                      <Checkbox
+                        id="isPrivate"
+                        checked={!field.value}
+                        onCheckedChange={(checked) => field.onChange(!checked)}
+                      />
                       </FormControl>
                       <FormLabel>
-                        ¿Desea publicar esta PQR en el muro público?
+                        ¿Desea publicar esta PQRSD en el muro público?
                       </FormLabel>
                     </FormItem>
                   )}
@@ -531,7 +527,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     Enviando...
                   </>
                 ) : (
-                  "Enviar PQRS"
+                  "Enviar PQRSD"
                 )}
               </Button>
             </div>

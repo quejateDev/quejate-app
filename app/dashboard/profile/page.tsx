@@ -52,7 +52,7 @@ export default function ProfilePage() {
                 <PQRCard key={pqr.id} pqr={pqr} />
               ))
             ) : (
-              <p className="text-muted-foreground">Aún no has creado ninguna PQR</p>
+              <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>
             )}
           </div>
         </div>
