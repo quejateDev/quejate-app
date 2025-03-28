@@ -1,52 +1,31 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { getCommentsService } from "@/services/api/pqr.service";
+import { useState, useCallback } from "react";
 
-export function useComments(pqrId: string, initialCommentCount: number = 0) {
-  const [commentCount, setCommentCount] = useState(initialCommentCount);
-  const [isLoading, setIsLoading] = useState(false);
+export function useComments(initialComments: any[] = []) {
+  const [commentCount, setCommentCount] = useState(initialComments.length);
   const [isVisible, setIsVisible] = useState(false);
-
-  const fetchCommentCount = useCallback(async () => {
-    if (!pqrId) return;
-    
-    setIsLoading(true);
-    try {
-      const comments = await getCommentsService(pqrId);
-      setCommentCount(comments.length);
-    } catch (error) {
-      console.error("Error fetching comment count:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [pqrId]);
+  const [localComments, setLocalComments] = useState(initialComments);
 
   const toggleComments = useCallback(() => {
-    const newVisibility = !isVisible;
-    setIsVisible(newVisibility);
-    
-    if (newVisibility) {
-      fetchCommentCount();
-    }
-  }, [isVisible, fetchCommentCount]);
+    setIsVisible(prev => !prev);
+  }, []);
 
   const incrementCount = useCallback(() => {
     setCommentCount(prev => prev + 1);
   }, []);
 
-  useEffect(() => {
-    if (initialCommentCount === 0) {
-      fetchCommentCount();
-    }
-  }, [initialCommentCount, fetchCommentCount]);
+  const addLocalComment = useCallback((newComment: any) => {
+    setLocalComments(prev => [newComment, ...prev]);
+    incrementCount();
+  }, [incrementCount]);
 
   return {
     commentCount,
-    isLoading,
     isVisible,
     toggleComments,
     incrementCount,
-    fetchCommentCount
+    localComments,
+    addLocalComment
   };
 }

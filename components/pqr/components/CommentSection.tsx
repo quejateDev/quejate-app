@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
 import { Send, User } from "lucide-react";
-import { createCommentService, getCommentsService } from "@/services/api/pqr.service";
+import { createCommentService } from "@/services/api/pqr.service";
 import { getUserService } from "@/services/api/User.service";
 
 type Comment = {
   id: string;
   text: string;
   createdAt: string | Date;
-  updatedAt: string | Date;
-  userId: string;
-  pqrId: string;
-  user?: {
-    id: string;
+  user: {
     firstName: string;
     lastName: string;
   };
@@ -26,15 +21,26 @@ type CommentSectionProps = {
     email: string;
     name?: string;
   } | null;
+  initialComments: Comment[];
   onCommentSubmit: (text: string) => void;
+  onCommentCreated: (comment: Comment) => void;
 };
 
-export function CommentSection({ pqrId, user, onCommentSubmit }: CommentSectionProps) {
+export function CommentSection({ 
+  pqrId, 
+  user, 
+  initialComments, 
+  onCommentSubmit,
+  onCommentCreated 
+}: CommentSectionProps) {
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [userData, setUserData] = useState<{ firstName: string; lastName: string } | null>(null);
 
+  useEffect(() => {
+    setComments(initialComments);
+  }, [initialComments]);
 
   useEffect(() => {
     if (user?.id) {
@@ -53,44 +59,34 @@ export function CommentSection({ pqrId, user, onCommentSubmit }: CommentSectionP
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      setIsLoading(true);
-      try {
-        const fetchedComments = await getCommentsService(pqrId);
-        setComments(fetchedComments);
-      } catch (error) {
-        console.error("Error al cargar comentarios:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchComments();
-  }, [pqrId]);
-
   const handleSubmit = async () => {
-    if (commentText.trim() && user?.id && userData) {
-      try {
-        const newComment = await createCommentService({
-          text: commentText,
-          userId: user.id,
-          pqrId: pqrId,
-        });
-        const commentWithUser = {
-          ...newComment,
-          user: {
-            id: user.id,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-          },
-        };
-        setComments((prevComments) => [commentWithUser, ...prevComments]);
-        onCommentSubmit(commentText);
-        setCommentText("");
-      } catch (error) {
-        console.error("Error submitting comment:", error);
-      }
+    if (!commentText.trim() || !user?.id || !userData) return;
+
+    setIsSubmitting(true);
+    try {
+      const newComment = await createCommentService({
+        text: commentText,
+        userId: user.id,
+        pqrId: pqrId,
+      });
+      
+      const commentWithUser = {
+        ...newComment,
+        user: {
+          id: user.id,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+        },
+      };
+      
+      setComments(prev => [commentWithUser, ...prev]);
+      onCommentCreated(commentWithUser);
+      onCommentSubmit(commentText);
+      setCommentText("");
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -116,55 +112,58 @@ export function CommentSection({ pqrId, user, onCommentSubmit }: CommentSectionP
                 handleSubmit();
               }
             }}
+            disabled={isSubmitting}
           />
           <button
             onClick={handleSubmit}
             className="p-1.5 rounded-full hover:bg-gray-200 transition-colors ml-1 shrink-0"
             aria-label="Enviar comentario"
-            disabled={isLoading || !commentText.trim()}
+            disabled={isSubmitting || !commentText.trim()}
           >
-            <Send className="w-4 h-4 text-gray-500" />
+            {isSubmitting ? (
+              <span className="animate-spin">⟳</span>
+            ) : (
+              <Send className="w-4 h-4 text-gray-500" />
+            )}
           </button>
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-3 text-sm">
-          <div className="inline-block animate-spin mr-2">⟳</div>
-          Cargando comentarios...
-        </div>
-      ) : (
-        <div className="space-y-3 mt-3">
-          {comments.length > 0 ? (
-            comments.map((comment) => (
-              <div key={comment.id} className="flex gap-2">
-                <Avatar className="w-8 h-8 sm:w-8 sm:h-8 shrink-0 mt-1">
-                  <AvatarFallback>
-                  {comment.user?.firstName?.charAt(0) || <User className="h-8 w-8 stroke-1" />}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="bg-gray-100 p-2 sm:p-3 rounded-lg break-words">
-                    <p className="font-semibold text-xs sm:text-sm">
-                      {comment.user?.firstName} {comment.user?.lastName}
-                    </p>
-                    <p className="text-xs sm:text-sm mt-1">{comment.text}</p>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {new Date(comment.createdAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-2 text-gray-500 text-sm">
-              No hay comentarios. ¡Sé el primero en comentar!
-            </div>
-          )}
-        </div>
-      )}
+      <div className="space-y-3 mt-3">
+        {comments.length > 0 ? (
+          comments.map((comment) => (
+            <CommentItem key={comment.id} comment={comment} />
+          ))
+        ) : (
+          <div className="text-center py-2 text-gray-500 text-sm">
+            No hay comentarios. ¡Sé el primero en comentar!
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default CommentSection;
+
+function CommentItem({ comment }: { comment: Comment }) {
+  return (
+    <div className="flex gap-2">
+      <Avatar className="w-8 h-8 sm:w-8 sm:h-8 shrink-0 mt-1">
+        <AvatarFallback>
+          {comment.user?.firstName?.charAt(0) || <User className="h-8 w-8 stroke-1" />}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1 min-w-0">
+        <div className="bg-gray-100 p-2 sm:p-3 rounded-lg break-words">
+          <p className="font-semibold text-xs sm:text-sm">
+            {comment.user?.firstName} {comment.user?.lastName}
+          </p>
+          <p className="text-xs sm:text-sm mt-1">{comment.text}</p>
+        </div>
+        <p className="text-xs text-gray-500 mt-0.5">
+          {new Date(comment.createdAt).toLocaleString()}
+        </p>
+      </div>
+    </div>
+  );
+}

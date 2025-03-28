@@ -75,8 +75,4 @@ export async function createCommentService(comment: {text: string; userId: strin
   return response.data;
 }
 
-export async function getCommentsService(pqrId: string): Promise<Comment[]> {
-  const response = await Client.get(`/pqr/${pqrId}/comments`);
-  return response.data;
-}
 

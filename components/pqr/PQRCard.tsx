@@ -38,6 +38,15 @@ type PQRCardProps = {
       type: string;
       size: number;
     }[];
+    comments: {
+      id: string;
+      text: string;
+      createdAt: Date;
+      user: {
+        firstName: string;
+        lastName: string;
+      };
+    }[];
     _count?: {
       likes: number;
       comments: number;
@@ -54,25 +63,26 @@ type PQRCardProps = {
 };
 
 export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
-  const { user } = useAuthStore();
+  const { user } = useAuthStore(); 
 
   const { liked, likeCount, isLoading, handleLike } = useLike(
     pqr.id,
     initialLiked,
     pqr._count?.likes || 0
   );
+  
   const {
     commentCount,
     isVisible: showComments,
     toggleComments,
-    incrementCount: incrementCommentCount,
-  } = useComments(pqr.id, pqr._count?.comments ?? 0); // ✅ Usa `?? 0` para manejar `undefined`
+    localComments,
+    addLocalComment
+  } = useComments(pqr.comments);
 
   const { videoRefsDesktop, videoRefsMobile } = useVideoPlayback();
 
   const handleCommentSubmit = async (text: string) => {
     console.log("Comentario enviado:", text);
-    incrementCommentCount();
   };
 
   return (
@@ -106,9 +116,11 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
               <CommentSection
                 pqrId={pqr.id}
                 user={user}
+                initialComments={localComments}
                 onCommentSubmit={handleCommentSubmit}
+                onCommentCreated={addLocalComment}
               />
-            )}
+          )}
           </CardContent>
         </Card>
       </div>
@@ -135,11 +147,15 @@ export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
         </div>
         {showComments && (
           <div className="mb-6">
+            {showComments && (
             <CommentSection
               pqrId={pqr.id}
               user={user}
+              initialComments={localComments}
               onCommentSubmit={handleCommentSubmit}
+              onCommentCreated={addLocalComment}
             />
+          )}
           </div>
         )}
       </div>
