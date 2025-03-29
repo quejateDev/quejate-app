@@ -1,4 +1,4 @@
-import { typeMap } from "@/constants/pqrMaps";
+import { statusMap, typeMap } from "@/constants/pqrMaps";
 import {
   Body,
   Container,
@@ -50,6 +50,7 @@ export default function PQRNotificationEmail({
 }: PQRNotificationEmailProps) {
 
   const pqrTypeLabel = typeMap[pqrInfo.type as keyof typeof typeMap]?.label || pqrInfo.type;
+  const statusLabel = statusMap[pqrInfo.status as keyof typeof statusMap]?.label || pqrInfo.status;
   
   return (
     <Html>
@@ -72,7 +73,7 @@ export default function PQRNotificationEmail({
             <Heading style={h2}>Información de la Solicitud</Heading>
             <Text>Número de Radicado: {pqrInfo.consecutiveCode}</Text>
             <Text>Tipo de Solicitud: {pqrTypeLabel}</Text>
-            <Text>Estado Actual: {pqrInfo.status}</Text>
+            <Text>Estado Actual: {statusLabel}</Text>
             <Text>Fecha de Radicación: {pqrInfo.createdAt}</Text>
             <Text style={description}>
               Descripción de la Solicitud: {pqrInfo.description}
