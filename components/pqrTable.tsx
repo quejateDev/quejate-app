@@ -26,6 +26,7 @@ import {
 } from "./ui/table";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { typeMap } from "@/constants/pqrMaps";
 
 export default function PqrTable({ pqrs }: { pqrs: any }) {
   function getRemainingTimeBadge(createdAt: Date) {
@@ -88,7 +89,7 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
               ) => (
                 <TableRow key={pqr.id}>
                   <TableCell>{pqr.id.slice(0, 6)}</TableCell>
-                  <TableCell>{pqr.type}</TableCell>
+                  <TableCell>{typeMap[pqr.type].label}</TableCell>
                   <TableCell>
                     {pqr.department?.entity?.category?.name}
                   </TableCell>
