@@ -84,7 +84,7 @@ export default function SocialPage() {
                   {user._count.followers} seguidores
                 </span>
                 <span className="text-muted-foreground">
-                  {user._count.PQRS} PQRs
+                  {user._count.PQRS} PQRSD
                 </span>
               </div>
             </div>

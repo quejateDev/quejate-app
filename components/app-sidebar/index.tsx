@@ -41,7 +41,7 @@ const InternalManagement = [
     icon: Building2,
   },
   {
-    title: "PQRs",
+    title: "PQRSD",
     url: "/admin/pqr",
     icon: MessageCircle,
   },

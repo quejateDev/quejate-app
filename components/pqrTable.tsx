@@ -49,9 +49,9 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>PQRS</CardTitle>
+        <CardTitle>PQRSD</CardTitle>
         <CardDescription>
-          Gestiona las PQRS creadas por los usuarios
+          Gestiona las PQRSD creadas por los usuarios
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -109,7 +109,7 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
                           </a>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Ver PQRS</p>
+                          <p>Ver PQRSD</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
