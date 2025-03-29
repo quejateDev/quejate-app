@@ -8,7 +8,6 @@ import { CommentSection } from "./components/CommentSection";
 import { useLike } from "./hooks/useLike";
 import { useVideoPlayback } from "./hooks/useVideoPlayback";
 import { typeMap, statusMap } from "@/constants/pqrMaps";
-import useAuthStore from "@/store/useAuthStore";
 import { useComments } from "./hooks/useComments";
 
 type PQRCardProps = {
@@ -51,19 +50,17 @@ type PQRCardProps = {
       likes: number;
       comments: number;
     };
-    dueDate: string;
+    dueDate: Date;
   };
   initialLiked?: boolean;
   user: {
-    id: string;
+    id?: string;
     firstName?: string;
     lastName?: string;
-    avatarUrl?: string;
-  };
+  } | null;
 };
 
-export function PQRCard({ pqr, initialLiked = false }: PQRCardProps) {
-  const { user } = useAuthStore(); 
+export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
 
   const { liked, likeCount, isLoading, handleLike } = useLike(
     pqr.id,

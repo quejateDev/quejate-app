@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getPQRSById } from "@/services/api/pqr.service";
 import prisma from "@/lib/prisma";
 
 export default async function PQRDetailPage({
@@ -36,9 +35,9 @@ export default async function PQRDetailPage({
     <div className="container mx-auto p-6 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Detalles de la PQR</CardTitle>
+          <CardTitle>Detalles de la PQRSD</CardTitle>
           <CardDescription>
-            Ver información detallada sobre esta solicitud PQR
+            Ver información detallada sobre esta solicitud PQRSD
           </CardDescription>
         </CardHeader>
 

@@ -5,6 +5,7 @@ import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 import { PlusIcon } from "lucide-react";
+import PQRList from "@/components/pqrs/pqrsd-list";
 
 interface PageProps {
   searchParams: Promise<{
@@ -138,26 +139,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
           <PQRFilters entities={entities} departments={departments} />
 
-          <div className="space-y-6">
-            {pqrs.map((pqr) => (
-              <PQRCard
-                key={pqr.id}
-                pqr={{ ...pqr, dueDate: pqr.dueDate.toISOString() }}
-                initialLiked={pqr.likes?.length > 0} user={{
-                  id: "",
-                  firstName: "",
-                  lastName: "",
-                  avatarUrl: undefined
-                }}/>
-            ))}
-            {pqrs.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">
-                  No hay PQRS para mostrar
-                </p>
-              </div>
-            )}
-          </div>
+          <PQRList pqrs={pqrs} />
         </div>
       </main>
     </div>

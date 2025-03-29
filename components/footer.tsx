@@ -6,9 +6,9 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Tu queja</h3>
+            <h3 className="text-xl font-bold mb-4">Quejate</h3>
             <p className="text-gray-400">
-              Solución integral para la gestión de PQRS en tu organización
+              Solución integral para la gestión de PQRSD en tu organización
             </p>
           </div>
           <div>
