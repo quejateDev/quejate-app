@@ -47,10 +47,12 @@ export default function ProfilePage() {
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
           <div className="space-y-4">
             {pqrs.length > 0 ? (
-              pqrs?.map((pqr) => (
-                //@ts-ignore
-                <PQRCard key={pqr.id} pqr={pqr} />
-              ))
+              pqrs
+                ?.filter(pqr => !pqr.anonymous)
+                .map((pqr) => (
+                  //@ts-ignore
+                  <PQRCard key={pqr.id} pqr={pqr} />
+                ))
             ) : (
               <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>
             )}
