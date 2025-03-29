@@ -67,7 +67,7 @@ export async function POST(request: NextRequest, { params }: any) {
         data: {
           type: "like",
           userId: updatedPQR?.creator?.id,
-          message: `A ${updatedPQR.creator.firstName} ${updatedPQR.creator.lastName} le gusta tu PQR`,
+          message: `A ${updatedPQR.creator.firstName} ${updatedPQR.creator.lastName} le gusta tu PQRSD`,
           data: {
             pqrId: pqrId,
             followerId: userId,

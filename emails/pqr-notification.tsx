@@ -1,3 +1,4 @@
+import { typeMap } from "@/constants/pqrMaps";
 import {
   Body,
   Container,
@@ -47,6 +48,9 @@ export default function PQRNotificationEmail({
   attachments,
   pqrUrl,
 }: PQRNotificationEmailProps) {
+
+  const pqrTypeLabel = typeMap[pqrInfo.type as keyof typeof typeMap]?.label || pqrInfo.type;
+  
   return (
     <Html>
       <Head />
@@ -58,7 +62,7 @@ export default function PQRNotificationEmail({
           <Section style={section}>
             <Text style={intro}>Estimado equipo de {entityName},</Text>
             <Text style={description}>
-              Se ha registrado una nueva {pqrInfo.type} en el sistema de PQRS.
+              Se ha registrado una nueva {pqrTypeLabel} en el sistema de PQRSD.
               Este mensaje es para notificarle que debe dar seguimiento y
               respuesta dentro de los plazos establecidos.
             </Text>
@@ -67,7 +71,7 @@ export default function PQRNotificationEmail({
           <Section style={section}>
             <Heading style={h2}>Información de la Solicitud</Heading>
             <Text>Número de Radicado: {pqrInfo.consecutiveCode}</Text>
-            <Text>Tipo de Solicitud: {pqrInfo.type}</Text>
+            <Text>Tipo de Solicitud: {pqrTypeLabel}</Text>
             <Text>Estado Actual: {pqrInfo.status}</Text>
             <Text>Fecha de Radicación: {pqrInfo.createdAt}</Text>
             <Text style={description}>

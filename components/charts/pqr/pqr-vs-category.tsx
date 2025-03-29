@@ -31,9 +31,9 @@ export function PqrVsCategoryChart({ pqrs }: { pqrs: any }) {
   return (
     <Card className="w-1/2">
       <CardHeader>
-        <CardTitle>PQRS por Categoría</CardTitle>
+        <CardTitle>PQRSD por Categoría</CardTitle>
         <CardDescription>
-          Observa la cantidad de PQRS por categoría de entidad
+          Observa la cantidad de PQRSD por categoría de entidad
         </CardDescription>
       </CardHeader>
       <CardContent>

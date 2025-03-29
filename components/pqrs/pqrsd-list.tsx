@@ -20,8 +20,7 @@ export default function PQRList({ pqrs }: PQRListProps) {
     }
   }, [authUser]);
 
-  if (isLoading) return <p className="text-center">Cargando...</p>;
-  if (!currentUser) return <p className="text-center">No se encontró el usuario.</p>;
+  if (isLoading && authUser) return <p className="text-center">Cargando...</p>;
 
   return (
     <div className="space-y-6">
@@ -30,7 +29,7 @@ export default function PQRList({ pqrs }: PQRListProps) {
           key={pqr.id}
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
-          user={currentUser}
+          user={currentUser || null}
         />
       ))}
       {pqrs.length === 0 && (
