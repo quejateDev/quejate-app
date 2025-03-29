@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, User } from "lucide-react";
 import { createCommentService } from "@/services/api/pqr.service";
-import { getUserService } from "@/services/api/User.service";
 
 type Comment = {
   id: string;
@@ -18,8 +17,8 @@ type CommentSectionProps = {
   pqrId: string;
   user: {
     id?: string;
-    email: string;
-    name?: string;
+    firstName?: string;
+    lastName?: string;
   } | null;
   initialComments: Comment[];
   onCommentSubmit: (text: string) => void;
@@ -36,46 +35,27 @@ export function CommentSection({
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userData, setUserData] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
     setComments(initialComments);
   }, [initialComments]);
 
-  useEffect(() => {
-    if (user?.id) {
-      const fetchUserData = async () => {
-        try {
-          const userDetails = await getUserService(user.id!);
-          setUserData({
-            firstName: userDetails.firstName,
-            lastName: userDetails.lastName,
-          });
-        } catch (error) {
-          console.error("Error al cargar los datos del usuario:", error);
-        }
-      };
-      fetchUserData();
-    }
-  }, [user?.id]);
-
   const handleSubmit = async () => {
-    if (!commentText.trim() || !user?.id || !userData) return;
+    if (!commentText.trim() || !user) return;
 
     setIsSubmitting(true);
     try {
       const newComment = await createCommentService({
         text: commentText,
-        userId: user.id,
+        userId: user.id || "",
         pqrId: pqrId,
       });
       
       const commentWithUser = {
         ...newComment,
         user: {
-          id: user.id,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
+          firstName: user.firstName || "Usuario", 
+          lastName: user.lastName || "",        
         },
       };
       
@@ -95,7 +75,7 @@ export function CommentSection({
       <div className="flex items-center gap-2 mt-3">
         <Avatar className="w-8 h-8 shrink-0">
           <AvatarFallback>
-            {userData?.firstName ? userData.firstName.charAt(0) : <User className="h-6 w-6 stroke-1" />}
+            {user?.firstName ? user.firstName.charAt(0) : <User className="h-6 w-6 stroke-1" />}
           </AvatarFallback>
         </Avatar>
         
