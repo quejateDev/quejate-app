@@ -1,8 +1,6 @@
 "use client";
 
-import { getGetPQRDTO } from "@/dto/pqr.dto";
 import { getUserService } from "@/services/api/User.service";
-import { User } from "@prisma/client";
 import { useState } from "react";
 
 interface UserProfile {
@@ -24,6 +22,7 @@ interface UserProfile {
     firstName: string;
     lastName: string;
   }>;
+  profilePicture: string | null;
   _count: {
     followers: number;
     following: number;

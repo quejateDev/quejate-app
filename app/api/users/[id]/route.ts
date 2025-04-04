@@ -22,6 +22,7 @@ export async function GET(
         firstName: true,
         lastName: true,
         email: true,
+        profilePicture: true,
         followers: {
           select: {
             id: true,

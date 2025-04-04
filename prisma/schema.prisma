@@ -23,7 +23,7 @@ model User {
   resetToken        String?
   resetTokenExpiry  DateTime?
   isVerified        Boolean             @default(false)
-
+  profilePicture    String?
   EmailVerification EmailVerification[]
   Like              Like[]
   notifications     Notification[]
