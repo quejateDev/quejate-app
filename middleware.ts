@@ -23,6 +23,9 @@ export async function middleware(request: NextRequest) {
   //   return NextResponse.redirect(loginUrl)
   // }
 
+  // Define which paths require dashboard access
+  const DASHBOARD_PATHS = ['/dashboard'];
+  
   // If there's a token, verify it
   if (token) {
     try {
@@ -40,6 +43,11 @@ export async function middleware(request: NextRequest) {
         if (decoded.role !== 'ADMIN' && decoded.role !== 'SUPER_ADMIN') {
           return NextResponse.redirect(new URL('/dashboard', request.url))
         }
+      }
+
+      if (DASHBOARD_PATHS.some(path => request.nextUrl.pathname.startsWith(path)) && 
+          (decoded.role === 'ADMIN' || decoded.role === 'SUPER_ADMIN')) {
+        return NextResponse.redirect(new URL('/admin', request.url))
       }
 
       // Add user info to headers for use in server components
@@ -68,7 +76,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
-    // '/dashboard/:path*',
+    '/dashboard/:path*',
     '/admin/:path*',
     '/api/admin/:path*',
   ]
