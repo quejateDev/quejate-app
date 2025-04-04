@@ -63,20 +63,7 @@ export async function POST(request: NextRequest, { params }: any) {
     });
 
     if (updatedPQR && !existingLike && updatedPQR.creator) {
-      if (userId === updatedPQR.creator.id) {
-        await prisma.notification.create({
-          data: {
-            type: "self_like",
-            userId: updatedPQR.creator.id,
-            message: "Le diste like a tu propia PQRSD",
-            data: {
-              pqrId: pqrId,
-              isSelfLike: true
-            },
-          },
-        });
-      } 
-      else {
+      if (userId !== updatedPQR.creator.id) {
         const likingUser = await prisma.user.findUnique({
           where: { id: userId },
           select: { firstName: true, lastName: true }
