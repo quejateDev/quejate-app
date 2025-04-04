@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { PQRCard } from "@/components/pqr/PQRCard";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserCircle } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 import { FollowButton } from "@/components/Buttons/FollowButton";
@@ -50,18 +50,22 @@ export default function ProfilePage() {
         <div className="md:col-span-4">
           <Card>
             <CardHeader className="text-center">
-              <Avatar className="h-24 w-24 mx-auto mb-4">
-                <AvatarFallback>
-                  <UserCircle className="h-12 w-12" />
+            <div className="flex flex-col items-center justify-center text-center">
+              <Avatar className="h-28 w-28 border-2 border-muted">
+                {userProfile?.profilePicture ? (
+                  <AvatarImage src={userProfile.profilePicture} alt={userProfile.firstName} />
+                ) : null}
+                <AvatarFallback className="bg-muted-foreground/10">
+                  <UserCircle className="h-16 w-16 text-muted-foreground" />
                 </AvatarFallback>
               </Avatar>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="text-2xl font-semibold mt-4">
                 {userProfile.firstName} {userProfile.lastName}
               </h2>
               <p className="text-sm text-muted-foreground">
-                @{userProfile.username}
+                @{userProfile.email}
               </p>
-
+            </div>
               {!isOwnProfile && (
                 <div className="mt-4">
                   <FollowButton
