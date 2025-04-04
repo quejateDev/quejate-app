@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserCircle, Users2 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User, Users2 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -15,6 +15,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  profilePicture?: string | null;
   role: string;
   _count: {
     followers: number;
@@ -69,9 +70,12 @@ export default function SocialPage() {
       <Card className="hover:bg-accent transition-colors">
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
-            <Avatar className="h-12 w-12">
-              <AvatarFallback>
-                <UserCircle className="h-6 w-6" />
+            <Avatar className="h-32 w-32 border-2 border-muted">
+              {user?.profilePicture ? (
+                <AvatarImage src={user.profilePicture} alt={user.firstName}/>
+              ) : null}
+              <AvatarFallback className="bg-muted-foreground/10">
+                {<User className="h-16 w-16 stroke-1" />}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col flex-1">
@@ -144,9 +148,12 @@ export default function SocialPage() {
                         href={`/dashboard/profile/${user.id}`}
                         className="flex items-center gap-3 hover:bg-accent rounded-lg p-2 transition-colors"
                       >
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback>
-                            <UserCircle className="h-5 w-5" />
+                        <Avatar className="h-16 w-16 border-2 border-muted">
+                          {user?.profilePicture ? (
+                            <AvatarImage src={user.profilePicture} alt={user.firstName}/>
+                          ) : null}
+                          <AvatarFallback className="bg-muted-foreground/10">
+                            {<User className="h-8 w-8 stroke-1" />}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col flex-1">
