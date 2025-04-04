@@ -21,9 +21,9 @@ export default function PqrVsDepartmentChart({ pqrs }: { pqrs: any }) {
   return (
     <Card className="w-1/2">
       <CardHeader>
-        <CardTitle>PQRS por departamento</CardTitle>
+        <CardTitle>PQRSD por departamento</CardTitle>
         <CardDescription>
-          Observa la cantidad de PQRS por departamento
+          Observa la cantidad de PQRSD por departamento
         </CardDescription>
       </CardHeader>
       <CardContent>

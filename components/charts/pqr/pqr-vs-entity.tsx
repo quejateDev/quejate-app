@@ -32,9 +32,9 @@ export function PqrVsEntityChart({ pqrs }: { pqrs: any }) {
   return (
     <Card className="w-1/2">
       <CardHeader>
-        <CardTitle>PQRS por Entidad</CardTitle>
+        <CardTitle>PQRSD por Entidad</CardTitle>
         <CardDescription>
-          Observa la cantidad de PQRS por entidad (Top 10)
+          Observa la cantidad de PQRSD por entidad (Top 10)
         </CardDescription>
       </CardHeader>
       <CardContent>

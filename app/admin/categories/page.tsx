@@ -58,7 +58,7 @@ export default function CategoriesPage() {
         <h1 className="text-3xl font-bold">Lista de Categorias</h1>
 
         <Link href="/admin/categories/create">
-          <Button variant={"success"}>Crear Nueva Categoria</Button>
+          <Button variant={"default"}>Crear Nueva Categoría</Button>
         </Link>
       </div>
       <Card className="p-6">

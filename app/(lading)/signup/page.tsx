@@ -200,7 +200,7 @@ export default function Signup() {
               </div>
 
               <Button
-                variant="success"
+                variant="default"
                 className="w-full h-12 text-sm md:text-base"
                 type="submit"
                 isLoading={loading}

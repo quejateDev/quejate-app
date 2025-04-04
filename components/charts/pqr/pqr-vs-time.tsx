@@ -27,9 +27,9 @@ export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
   return (
     <Card className="w-1/2">
       <CardHeader>
-        <CardTitle>PQRS creados a lo largo del tiempo</CardTitle>
+        <CardTitle>PQRSD creados a lo largo del tiempo</CardTitle>
         <CardDescription>
-          Observa la cantidad de PQRS creados a lo largo del tiempo
+          Observa la cantidad de PQRSD creados a lo largo del tiempo
         </CardDescription>
       </CardHeader>
       <CardContent>

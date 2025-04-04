@@ -21,7 +21,7 @@ export default async function AreasPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Áreas Registradas</h1>
         <Link href="/admin/area/create">
-          <Button className="bg-green-500 hover:bg-green-600">
+          <Button variant={"default"}>
             Crear Nueva Área
           </Button>
         </Link>

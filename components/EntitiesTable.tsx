@@ -218,7 +218,6 @@ export function EntitiesTable({ entities, categories }: EntitiesTableProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
                       >
                         Editar
                       </Button>
