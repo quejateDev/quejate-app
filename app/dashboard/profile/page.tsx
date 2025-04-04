@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PQRCard } from '@/components/pqr/PQRCard';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserCircle, Upload } from 'lucide-react';
+import { Upload, User } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
 import usePQR from '@/hooks/usePQR';
 import UseUser from '@/hooks/useUser';
@@ -124,7 +124,7 @@ export default function ProfilePage() {
                     <AvatarImage src={currentUser.profilePicture} alt={getFullName()} />
                   ) : null}
                   <AvatarFallback className="bg-muted-foreground/10">
-                    <UserCircle className="h-16 w-16 text-muted-foreground" />
+                    {<User className="h-16 w-16 stroke-1" />}
                   </AvatarFallback>
                 </Avatar>
                 
@@ -164,9 +164,7 @@ export default function ProfilePage() {
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
           <div className="space-y-4">
             {pqrs.length > 0 ? (
-              pqrs
-                ?.filter(pqr => !pqr.anonymous)
-                .map((pqr) => (
+              pqrs?.map((pqr) => (
                   //@ts-ignore
                   <PQRCard key={pqr.id} pqr={pqr} />
                 ))

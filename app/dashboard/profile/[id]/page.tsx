@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { PQRCard } from "@/components/pqr/PQRCard";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserCircle } from "lucide-react";
+import { User } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 import { FollowButton } from "@/components/Buttons/FollowButton";
 import { FollowStats } from "@/components/FollowStats";
@@ -56,7 +56,7 @@ export default function ProfilePage() {
                   <AvatarImage src={userProfile.profilePicture} alt={userProfile.firstName} />
                 ) : null}
                 <AvatarFallback className="bg-muted-foreground/10">
-                  <UserCircle className="h-16 w-16 text-muted-foreground" />
+                {<User className="h-16 w-16 stroke-1" />}
                 </AvatarFallback>
               </Avatar>
               <h2 className="text-2xl font-semibold mt-4">
@@ -109,7 +109,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             {pqrs?.length && pqrs.length > 0 ? (
               // @ts-ignore
-              pqrs?.map((pqr) => <PQRCard key={pqr.id} pqr={pqr} />)
+              pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} />)
             ) : (
               <p className="text-muted-foreground">No hay PQRSD publicadas</p>
             )}
