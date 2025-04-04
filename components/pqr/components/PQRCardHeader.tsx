@@ -9,7 +9,7 @@ type PQRCardHeaderProps = {
     creator: {
       firstName: string;
       lastName: string;
-      profilePicture?: string;
+      profilePicture?: string | null;
     } | null;
     anonymous: boolean;
     createdAt: Date;
