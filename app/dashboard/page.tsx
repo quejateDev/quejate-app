@@ -121,7 +121,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
  
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto p-8">
+      <main className="container mx-auto p-4">
         <div className="space-y-6">
           <div className="bg-primary/10 p-4 rounded-lg">
             <div className="container mx-auto flex flex-col md:flex-row md:justify-between md:items-center gap-4">
