@@ -63,19 +63,40 @@ export async function POST(request: NextRequest, { params }: any) {
     });
 
     if (updatedPQR && !existingLike && updatedPQR.creator) {
-      await prisma.notification.create({
-        data: {
-          type: "like",
-          userId: updatedPQR?.creator?.id,
-          message: `A ${updatedPQR.creator.firstName} ${updatedPQR.creator.lastName} le gusta tu PQRSD`,
+      if (userId === updatedPQR.creator.id) {
+        await prisma.notification.create({
           data: {
-            pqrId: pqrId,
-            followerId: userId,
-            followerName: `${userId}`,
-            // followerImage: `${userId}`,
+            type: "self_like",
+            userId: updatedPQR.creator.id,
+            message: "Le diste like a tu propia PQRSD",
+            data: {
+              pqrId: pqrId,
+              isSelfLike: true
+            },
           },
-        },
-      });
+        });
+      } 
+      else {
+        const likingUser = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { firstName: true, lastName: true }
+        });
+    
+        if (likingUser) {
+          await prisma.notification.create({
+            data: {
+              type: "like",
+              userId: updatedPQR.creator.id,
+              message: `A ${likingUser.firstName} ${likingUser.lastName} le gusta tu PQRSD`,
+              data: {
+                pqrId: pqrId,
+                followerId: userId,
+                followerName: `${likingUser.firstName} ${likingUser.lastName}`,
+              },
+            },
+          });
+        }
+      }
     }
 
     return NextResponse.json({
