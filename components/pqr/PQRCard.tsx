@@ -16,7 +16,7 @@ type PQRCardProps = {
     creator: {
       firstName: string;
       lastName: string;
-      avatarUrl?: string;
+      profilePicture?: string;
     } | null;
     anonymous: boolean;
     createdAt: Date;
@@ -57,6 +57,7 @@ type PQRCardProps = {
     id?: string;
     firstName?: string;
     lastName?: string;
+    profilePicture?: string;
   } | null;
 };
 

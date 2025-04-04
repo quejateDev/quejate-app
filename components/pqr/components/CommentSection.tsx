@@ -10,6 +10,7 @@ type Comment = {
   user: {
     firstName: string;
     lastName: string;
+    profilePicture?: string;
   };
 };
 
@@ -19,6 +20,7 @@ type CommentSectionProps = {
     id?: string;
     firstName?: string;
     lastName?: string;
+    profilePicture?: string;
   } | null;
   initialComments: Comment[];
   onCommentSubmit: (text: string) => void;
@@ -73,9 +75,19 @@ export function CommentSection({
   return (
     <div className="sm:px-4">
       <div className="flex items-center gap-2 mt-3">
-        <Avatar className="w-8 h-8 shrink-0">
-          <AvatarFallback>
-            {user?.firstName ? user.firstName.charAt(0) : <User className="h-6 w-6 stroke-1" />}
+      <Avatar className="w-8 h-8 shrink-0">
+          {user?.profilePicture ? (
+            <AvatarImage 
+              src={user.profilePicture} 
+              alt={`${user.firstName} ${user.lastName}`} 
+            />
+          ) : null}
+          <AvatarFallback className="bg-gray-200 text-gray-700">
+            {user?.firstName ? (
+              user.firstName.charAt(0).toUpperCase()
+            ) : (
+              <User className="h-4 w-4 stroke-1" />
+            )}
           </AvatarFallback>
         </Avatar>
         
@@ -129,8 +141,16 @@ function CommentItem({ comment }: { comment: Comment }) {
   return (
     <div className="flex gap-2">
       <Avatar className="w-8 h-8 sm:w-8 sm:h-8 shrink-0 mt-1">
-        <AvatarFallback>
-          {comment.user?.firstName?.charAt(0) || <User className="h-8 w-8 stroke-1" />}
+        {comment.user?.profilePicture ? (
+          <AvatarImage 
+            src={comment.user.profilePicture} 
+            alt={`${comment.user.firstName} ${comment.user.lastName}`}
+          />
+        ) : null}
+        <AvatarFallback className="bg-gray-200 text-gray-700">
+          {comment.user?.firstName?.charAt(0).toUpperCase() || (
+            <User className="h-4 w-4 stroke-1" />
+          )}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">

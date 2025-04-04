@@ -55,7 +55,19 @@ export default function Login() {
           },
           userData.token
         );
-
+        document.cookie = `auth-storage=${JSON.stringify({
+          state: { 
+            user: {
+              id: userData.user.id,
+              email: userData.user.email,
+              name: userData.user.name,
+              role: userData.user.role,
+            },
+            token: userData.token
+          }
+        })}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+  
+        document.cookie = `token=${userData.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
         // Optional: Show success message
         toast({
           title: "Inicio de sesión exitoso",

@@ -66,6 +66,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         select: {
           firstName: true,
           lastName: true,
+          profilePicture: true,
         },
       },
       comments: {
@@ -77,6 +78,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             select: {
               firstName: true,
               lastName: true,
+              profilePicture: true,
             },
           },
         },
