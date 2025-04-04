@@ -1,19 +1,14 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getUserIdFromToken } from "@/lib/auth";
 
 export async function GET(
   request: Request,
-  { params }: any 
+  { params }: any
 ) {
   try {
     const { id } = await params;
-
-    // Get auth token from cookies
-    const cookieStore = await cookies();
-    const authCookie = cookieStore.get('auth-storage');
-    const currentUser = authCookie ? JSON.parse(authCookie.value).state.user : null;
-    const currentUserId = currentUser?.id;
+    const currentUserId = await getUserIdFromToken();
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -22,6 +17,7 @@ export async function GET(
         firstName: true,
         lastName: true,
         email: true,
+        profilePicture: true,
         followers: {
           select: {
             id: true,
@@ -53,7 +49,6 @@ export async function GET(
       );
     }
 
-    // Check if the current user is following this user
     let isFollowing = false;
     if (currentUserId) {
       const followCheck = await prisma.user.findFirst({
@@ -69,12 +64,83 @@ export async function GET(
       isFollowing = !!followCheck;
     }
 
-    return NextResponse.json({ ...user, isFollowing });
+    return NextResponse.json({ 
+      ...user,
+      isFollowing 
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=60'
+      }
+    });
+
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return NextResponse.json(
       { error: "Error al obtener el perfil del usuario" },
       { status: 500 }
     );
+  }
+
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: any
+) {
+  try {
+    const { id } = await params;
+    const { profilePicture } = await request.json();
+    const currentUserId = await getUserIdFromToken();;
+    
+    if (!currentUserId) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      );
+    }
+
+    if (currentUserId !== id) {
+      return NextResponse.json(
+        { error: "No tienes permiso para actualizar este perfil" },
+        { status: 403 }
+      );
+    }
+
+    if (!profilePicture || !isValidUrl(profilePicture)) {
+      return NextResponse.json(
+        { error: "URL de imagen no válida" },
+        { status: 400 }
+      );
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: { profilePicture },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        profilePicture: true
+      }
+    });
+
+    return NextResponse.json(updatedUser);
+
+  } catch (error) {
+    console.error("Error updating profile picture:", error);
+    return NextResponse.json(
+      { error: "Error al actualizar la foto de perfil" },
+      { status: 500 }
+    );
+  }
+}
+
+function isValidUrl(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
   }
 }

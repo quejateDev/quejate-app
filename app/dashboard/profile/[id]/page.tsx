@@ -95,19 +95,19 @@ export default function ProfilePage() {
               />
 
               <div className="mt-4 text-sm text-muted-foreground">
-                <p>{userProfile._count.PQRS} PQRs publicadas</p>
+                <p>{userProfile._count.PQRS} PQRSD publicadas</p>
               </div>
             </CardHeader>
           </Card>
         </div>
         <div className="md:col-span-8">
-          <h3 className="text-lg font-semibold mb-4">PQRs Recientes</h3>
+          <h3 className="text-lg font-semibold mb-4">PQRSD Recientes</h3>
           <div className="space-y-4">
             {pqrs?.length && pqrs.length > 0 ? (
               // @ts-ignore
               pqrs?.map((pqr) => <PQRCard key={pqr.id} pqr={pqr} />)
             ) : (
-              <p className="text-muted-foreground">No hay PQRs publicadas</p>
+              <p className="text-muted-foreground">No hay PQRSD publicadas</p>
             )}
           </div>
         </div>

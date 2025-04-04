@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import {
   NavigationMenu,
   NavigationMenuItem,

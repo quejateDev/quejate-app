@@ -30,7 +30,7 @@ export default function AvatarMenu() {
       <Avatar className="cursor-pointer">
         <AvatarImage src={user ? "/user-avatar.png" : ""} />
         <AvatarFallback>
-          {user ? user.email.charAt(0).toUpperCase() : <User className="h-6 w-6 stroke-1" />}
+          {<User className="h-6 w-6 stroke-1" />}
         </AvatarFallback>
       </Avatar>
       </DropdownMenuTrigger>

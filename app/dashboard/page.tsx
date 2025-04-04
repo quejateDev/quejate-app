@@ -1,4 +1,3 @@
-import { PQRCard } from "@/components/pqr/PQRCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PQRSType } from "@prisma/client";
@@ -66,6 +65,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         select: {
           firstName: true,
           lastName: true,
+          profilePicture: true,
         },
       },
       comments: {
@@ -77,6 +77,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             select: {
               firstName: true,
               lastName: true,
+              profilePicture: true,
             },
           },
         },
