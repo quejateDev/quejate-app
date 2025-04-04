@@ -1,4 +1,3 @@
-import { PQRCard } from "@/components/pqr/PQRCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PQRSType } from "@prisma/client";
