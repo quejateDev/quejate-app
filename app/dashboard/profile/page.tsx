@@ -75,9 +75,11 @@ export default function ProfilePage() {
       if (!updateResponse.ok) {
         throw new Error(updateData.error || 'Error al actualizar el perfil');
       }
-
-      await fetchUser(user.id);
-  
+      
+      await Promise.all([
+        fetchUser(user.id),
+        fetchUserPQRS(user.id)
+      ]);
       toast({
         title: 'Éxito',
         description: 'Foto de perfil actualizada correctamente',

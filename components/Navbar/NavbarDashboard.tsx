@@ -18,6 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { NotificationDropdown } from "../NotificationDropdown";
+import Image from "next/image";
 
 export default function NavbarDashboard() {
   const NavItems = () => (
@@ -42,13 +43,12 @@ export default function NavbarDashboard() {
 
   return (
     <nav className="border-b bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl px-8 sm:pl-8 md:pl-12 lg:pl-12 xl:pl-16">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/dashboard" className="flex-shrink-0">
-              <img src="/logo.png" alt="Logo" className="h-8" />
+              <Image src="/logo2.png" alt="Logo" width={128} height={128} />
             </Link>
-            
             <div className="hidden md:block ml-4">
               <UserSearchCommand />
             </div>
