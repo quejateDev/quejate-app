@@ -15,10 +15,12 @@ export default function RootLayout({
     <>
       <SidebarProvider>
         <main className="flex-1 flex-col">
-          <LoginModalProvider>
-            <NavbarDashboard />
-            <div className="flex-1 flex-col px-6 py-4">
-            <LoginModal />
+        <LoginModalProvider>
+            <div className="w-full"> 
+              <NavbarDashboard />
+            </div>
+            <div className="flex-1 px-6 py-4 w-full max-w-7xl mx-auto">
+              <LoginModal />
               {children}
             </div>
           </LoginModalProvider>

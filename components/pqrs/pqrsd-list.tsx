@@ -1,6 +1,6 @@
 "use client";
 
-import UseUser from "@/hooks/useUser";
+import useUser from "@/hooks/useUser";
 import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
 import { PQRCard } from "../pqr/PQRCard";
@@ -12,7 +12,7 @@ interface PQRListProps {
 
 export default function PQRList({ pqrs }: PQRListProps) {
   const { user: authUser } = useAuthStore();
-  const { user: currentUser, fetchUser, isLoading } = UseUser();
+  const { user: currentUser, fetchUser, isLoading } = useUser();
 
   useEffect(() => {
     if (authUser?.id) {

@@ -11,9 +11,18 @@ import {
 import { LogIn, LogOut, User } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "@/hooks/use-toast";
+import { useEffect } from "react";
+import useUser from "@/hooks/useUser";
 
 export default function AvatarMenu() {
   const { user } = useAuthStore();
+  const { user: userProfile, fetchUser} = useUser();
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchUser(user.id);
+    }
+  }, [user]);
 
   function handleLogout() {
     useAuthStore.getState().logout();
@@ -27,12 +36,15 @@ export default function AvatarMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-      <Avatar className="cursor-pointer">
-        <AvatarImage src={user ? "/user-avatar.png" : ""} />
-        <AvatarFallback>
-          {<User className="h-6 w-6 stroke-1" />}
-        </AvatarFallback>
-      </Avatar>
+        <Avatar className="h-10 w-10 border-2 border-muted cursor-pointer">
+          <AvatarImage
+            src={user && userProfile?.profilePicture ? userProfile.profilePicture : undefined}
+            alt={user && userProfile?.firstName ? userProfile.firstName : "User"}
+          />
+          <AvatarFallback className="bg-muted-foreground/10">
+            <User className="h-6 w-6 stroke-1" />
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="px-4 py-3">
         {user ? (

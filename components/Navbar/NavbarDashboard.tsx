@@ -42,21 +42,26 @@ export default function NavbarDashboard() {
   );
 
   return (
-    <nav className="border-b bg-white">
-      <div className="max-w-7xl px-8 sm:pl-8 md:pl-12 lg:pl-12 xl:pl-16">
+    <nav className="border-b bg-white w-full">
+      <div className="w-full px-8 sm:px-8 lg:px-12 mx-auto">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <Link href="/dashboard" className="flex-shrink-0">
-              <Image src="/logo2.png" alt="Logo" width={128} height={128} />
+              <Image 
+                src="/logo2.png" 
+                alt="Logo" 
+                width={128} 
+                height={128}
+                className="h-16 w-auto"
+              />
             </Link>
-            <div className="hidden md:block ml-4">
+            <div className="hidden md:block pl-4">
               <UserSearchCommand />
             </div>
           </div>
 
-          <div className="ml-auto flex items-center gap-4">
-            {/* Desktop Navigation */}
-            <div className="hidden md:block">
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block mx-4">
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavItems />
@@ -64,7 +69,10 @@ export default function NavbarDashboard() {
               </NavigationMenu>
             </div>
 
-            {/* Mobile Navigation */}
+            <div className="flex items-center gap-2">
+              <NotificationDropdown />
+              <AvatarMenu />
+            </div>
             <div className="md:hidden">
               <Sheet>
                 <SheetTrigger asChild>
@@ -86,9 +94,6 @@ export default function NavbarDashboard() {
                 </SheetContent>
               </Sheet>
             </div>
-
-            <NotificationDropdown />
-            <AvatarMenu />
           </div>
         </div>
       </div>

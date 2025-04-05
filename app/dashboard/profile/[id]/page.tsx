@@ -9,14 +9,14 @@ import useAuthStore from "@/store/useAuthStore";
 import { FollowButton } from "@/components/Buttons/FollowButton";
 import { FollowStats } from "@/components/FollowStats";
 import { useParams } from "next/navigation";
-import UseUser from "@/hooks/useUser";
+import useUser from "@/hooks/useUser";
 import usePQR from "@/hooks/usePQR";
 
 export default function ProfilePage() {
   const { user: currentUser } = useAuthStore();
   const params = useParams();
   const { id } = params;
-  const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = UseUser();
+  const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = useUser();
   const { pqrs, fetchUserPQRS } = usePQR();
 
   useEffect(() => {

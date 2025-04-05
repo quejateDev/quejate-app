@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Upload, User } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
 import usePQR from '@/hooks/usePQR';
-import UseUser from '@/hooks/useUser';
+import useUser from '@/hooks/useUser';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export default function ProfilePage() {
   const { user } = useAuthStore();
   const { pqrs, fetchUserPQRS } = usePQR();
-  const { user: currentUser, fetchUser } = UseUser();
+  const { user: currentUser, fetchUser } = useUser();
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);

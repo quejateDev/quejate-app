@@ -11,7 +11,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserCircle } from 'lucide-react';
+import { Search, UserCircle } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 
 interface User {
@@ -71,14 +71,12 @@ export function UserSearchCommand() {
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
-        className="relative h-9 w-full max-w-[400px] rounded-md bg-background px-4 py-2 text-sm text-muted-foreground border border-input hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
-      >
-        <span>Buscar usuarios...</span>
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">⌘</span>K
-        </kbd>
-      </button>
+      onClick={() => setIsOpen(true)}
+      className="relative h-9 w-full max-w-[400px] rounded-md bg-background px-4 py-2 text-sm text-muted-foreground border border-input hover:bg-accent hover:text-accent-foreground flex items-center justify-between gap-2"
+    >
+      <span className="truncate">Buscar usuarios...</span>
+      <Search className="h-4 w-4 flex-shrink-0" />
+    </button>
       <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
         <CommandInput
           placeholder="Buscar usuarios..."

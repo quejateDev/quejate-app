@@ -30,8 +30,8 @@ interface UserProfile {
   };
 }
 
-export default function UseUser() {
-  const [user, setUser] = useState<UserProfile>();
+export default function useUser() {
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   async function fetchUser(id: string) {
     try {
@@ -55,11 +55,17 @@ export default function UseUser() {
     }
   }
 
+  const clearUser = () => {
+    setUser(null);
+    setIsLoading(true);
+  };
+
   return {
     fetchUser,
     fetchUserPQRS,
     user,
     setUser,
     isLoading,
+    clearUser,
   };
 }
