@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { hash } from "bcryptjs";
 
 export async function GET(
   req: Request,
@@ -48,17 +49,19 @@ export async function PATCH(
   try {
     const body = await req.json();
 
+    let newPassword = undefined;
+
+    if (body.password) {
+      newPassword = await hash(body.password, 10);
+    }
+
     const client = await prisma.user.update({
       where: {
-        id,
-        role: "CLIENT",
+        id
       },
       data: {
-        email: body.email,
-        firstName: body.firstName,
-        lastName: body.lastName,
-        phone: body.phone,
-        ...(body.password ? { password: body.password } : {}),
+        ...body,
+        ...(newPassword ? { password: newPassword } : {}),
       },
     });
 

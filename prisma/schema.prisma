@@ -15,6 +15,7 @@ model User {
   email             String              @unique
   phone             String
   role              UserRole
+  isActive          Boolean             @default(true)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   departmentId      String?
@@ -37,7 +38,6 @@ model User {
   Entity            Entity?             @relation(fields: [entityId], references: [id])
 
   @@index([departmentId])
-
 }
 
 model Department {
