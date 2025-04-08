@@ -1,6 +1,6 @@
 "use client";
 
-import { Prisma } from "@prisma/client";
+import { PQRS, Prisma } from "@prisma/client";
 import {
   Tooltip,
   TooltipProvider,
@@ -28,7 +28,24 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { typeMap } from "@/constants/pqrMaps";
 
-export default function PqrTable({ pqrs }: { pqrs: any }) {
+export default function PqrTable({
+  pqrs,
+}: {
+  pqrs: Prisma.PQRSGetPayload<{
+    include: {
+      department: {
+        include: {
+          entity: {
+            include: {
+              category: true;
+            };
+          };
+        };
+      };
+      creator: true;
+    };
+  }>[];
+}) {
   function getRemainingTimeBadge(createdAt: Date) {
     const RESPONSE_LIMIT_DAYS = 15;
     const remainingTime =
@@ -59,65 +76,48 @@ export default function PqrTable({ pqrs }: { pqrs: any }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              <TableHead>Consecutivo</TableHead>
               <TableHead>Tipo</TableHead>
-              <TableHead>Categoría</TableHead>
-              <TableHead>Entidad</TableHead>
+              {/* <TableHead>Categoría</TableHead> */}
+              {/* <TableHead>Entidad</TableHead> */}
               <TableHead>Departamento</TableHead>
               <TableHead>Creador</TableHead>
-              <TableHead className="text-center">Tiempo para responder</TableHead>
+              <TableHead className="text-center">
+                Tiempo para responder
+              </TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pqrs.map(
-              (
-                pqr: Prisma.PQRSGetPayload<{
-                  include: {
-                    department: {
-                      include: {
-                        entity: {
-                          include: {
-                            category: true;
-                          };
-                        };
-                      };
-                    };
-                    creator: true;
-                  };
-                }>
-              ) => (
-                <TableRow key={pqr.id}>
-                  <TableCell>{pqr.id.slice(0, 6)}</TableCell>
-                  <TableCell>{typeMap[pqr.type].label}</TableCell>
-                  <TableCell>
-                    {pqr.department?.entity?.category?.name}
-                  </TableCell>
-                  <TableCell>{pqr.department?.entity?.name}</TableCell>
-                  <TableCell>{pqr.department?.name}</TableCell>
-                  <TableCell>{pqr.creator?.email}</TableCell>
-                  <TableCell className="flex justify-center w-full">
-                    {getRemainingTimeBadge(pqr.createdAt)}
-                  </TableCell>
-                  <TableCell>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <a href={`/admin/pqr/${pqr.id}`}>
-                            <Button variant="outline" size="icon">
-                              <EyeIcon className="w-4 h-4" />
-                            </Button>
-                          </a>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Ver PQRSD</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                </TableRow>
-              )
-            )}
+            {pqrs.map((pqr) => (
+              <TableRow key={pqr.id}>
+                <TableCell>{pqr.consecutiveCode}</TableCell>
+                <TableCell>{typeMap[pqr.type].label}</TableCell>
+                {/* <TableCell>{pqr.department?.entity?.category?.name}</TableCell> */}
+                {/* <TableCell>{pqr.department?.entity?.name}</TableCell> */}
+                <TableCell>{pqr.department?.name}</TableCell>
+                <TableCell>{pqr.creator?.email}</TableCell>
+                <TableCell className="flex justify-center w-full">
+                  {getRemainingTimeBadge(pqr.createdAt)}
+                </TableCell>
+                <TableCell>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <a href={`/admin/pqr/${pqr.id}`}>
+                          <Button variant="outline" size="icon">
+                            <EyeIcon className="w-4 h-4" />
+                          </Button>
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Ver PQRSD</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>

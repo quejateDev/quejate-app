@@ -25,16 +25,16 @@ import { useRouter } from "next/navigation";
 
 // Menu items.
 const InternalManagement = [
-  {
-    title: "Categorias",
-    url: "/admin/categories",
-    icon: Tags,
-  },
-  {
-    title: "Entidades",
-    url: "/admin/entity",
-    icon: Building,
-  },
+  // {
+  //   title: "Categorias",
+  //   url: "/admin/categories",
+  //   icon: Tags,
+  // },
+  // {
+  //   title: "Entidades",
+  //   url: "/admin/entity",
+  //   icon: Building,
+  // },
   {
     title: "Areas",
     url: "/admin/area",
@@ -45,16 +45,12 @@ const InternalManagement = [
     url: "/admin/pqr",
     icon: MessageCircle,
   },
-];
-
-const ExternalManagement = [
   {
     title: "Usuarios",
     url: "/admin/users",
     icon: Users,
   },
 ];
-
 export function AppSidebar() {
   const { logout } = useAuthStore();
   const router = useRouter();
@@ -83,24 +79,6 @@ export function AppSidebar() {
                     <a href={item.url}>
                       <item.icon className="text-blue-500" />
                       <span className={``}>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Gestión Externa</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {ExternalManagement.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon className="text-green-500" />
-                      <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

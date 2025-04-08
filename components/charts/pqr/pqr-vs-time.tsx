@@ -8,7 +8,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
-import { LineChart, CartesianGrid, XAxis, YAxis, Line } from "recharts";
+import { LineChart, CartesianGrid, XAxis, YAxis, Line, ResponsiveContainer } from "recharts";
 
 export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
   function getPqrsByDate() {
@@ -25,15 +25,15 @@ export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
   }
 
   return (
-    <Card className="w-1/2">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>PQRSD creados a lo largo del tiempo</CardTitle>
         <CardDescription>
           Observa la cantidad de PQRSD creados a lo largo del tiempo
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={{}}>
+      <CardContent className="h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart data={getPqrsByDate()} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="name" />
@@ -41,7 +41,7 @@ export function PqrVsTimeChart({ pqrs }: { pqrs: any }) {
             <ChartTooltip />
             <Line type="natural" dataKey="Registros" stroke="#8884d8" />
           </LineChart>
-        </ChartContainer>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );

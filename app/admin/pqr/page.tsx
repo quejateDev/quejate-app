@@ -5,111 +5,132 @@ import { PqrVsTimeChart } from "@/components/charts/pqr/pqr-vs-time";
 import { PqrFilters } from "@/components/pqr/pqr-filters";
 import PqrTable from "@/components/pqrTable";
 import prisma from "@/lib/prisma";
+import { verifyToken } from "@/lib/utils";
+import { getCookie } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-
-interface Entity {
-  id: string;
-  name: string;
-  category: {
-    id: string;
-    name: string;
-  };
-  departments: {
-    id: string;
-    name: string;
-  }[];
-}
-
-interface RawEntity {
-  id: string;
-  name: string;
-  category: {
-    name: string;
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    imageUrl: string | null;
-  };
-  Department: {
-    name: string;
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    entityId: string;
-  }[];
-}
 
 interface PageProps {
   searchParams: Promise<{
     categoryId?: string;
     entityId?: string;
     departmentId?: string;
+    startDate?: string;
+    endDate?: string;
   }>;
 }
 
 export default async function PQRPage({ searchParams }: PageProps) {
-  // First, get all entities for the filters
-  const categories = await prisma.category.findMany({
-    include: {
-      entities: {
-        include: {
-          Department: true,
-        },
-      },
-    },
-  });
+  const token = await getCookie("token");
+  if (!token) {
+    return redirect("/login");
+  }
+  const decoded = await verifyToken(token);
+  if (!decoded) {
+    return redirect("/login");
+  }
 
-  const { departmentId, entityId, categoryId } = await searchParams;
+  const { departmentId, entityId, categoryId, startDate, endDate } =
+    await searchParams;
+
   // Build the where clause based on filters
-  const where = {
-    ...(departmentId && {
-      departmentId: departmentId,
-    }),
-    ...(entityId && {
-      department: {
-        entityId: entityId,
-      },
-    }),
-    ...(categoryId && {
-      department: {
-        entity: {
-          categoryId: categoryId,
-        },
-      },
-    }),
+  const where: any = {
+    department: {
+      entityId: decoded.entityId,
+    },
   };
 
-  const pqrs = await prisma.pQRS.findMany({
-    where,
-    include: {
-      department: {
-        include: {
-          entity: {
-            include: {
-              category: true,
+  // Add department filter if provided
+  if (departmentId) {
+    where.departmentId = departmentId;
+  }
+
+  // Add entity filter if provided
+  if (entityId) {
+    where.department = {
+      ...where.department,
+      entityId: entityId,
+    };
+  }
+
+  // Add category filter if provided
+  if (categoryId) {
+    where.department = {
+      ...where.department,
+      entity: {
+        categoryId: categoryId,
+      },
+    };
+  }
+
+  // Add date range filter if provided
+  if (startDate || endDate) {
+    where.createdAt = {};
+
+    if (startDate) {
+      where.createdAt.gte = new Date(startDate);
+    }
+
+    if (endDate) {
+      // Add one day to include the entire end date
+      const endDateObj = new Date(endDate);
+      endDateObj.setDate(endDateObj.getDate() + 1);
+      where.createdAt.lt = endDateObj;
+    }
+  }
+
+  const [pqrs, departments] = await Promise.all([
+    prisma.pQRS.findMany({
+      where,
+      include: {
+        department: {
+          include: {
+            entity: {
+              include: {
+                category: true,
+              },
             },
           },
         },
+        creator: true,
       },
-      creator: true,
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    prisma.department.findMany({
+      include: {
+        entity: true,
+      },
+      where: {
+        entityId: decoded.entityId,
+      },
+    }),
+  ]);
+
+  console.log(`Found ${pqrs.length} PQRs after filtering`);
 
   return (
     <div className="flex flex-col gap-4">
-      <PqrFilters categories={categories} />
+      <PqrFilters
+        departments={departments}
+        startDate={startDate ?? null}
+        endDate={endDate ?? null}
+      />
 
       <div className="flex flex-row gap-4 w-full">
-        <PqrVsTimeChart pqrs={pqrs} />
-        <PqrVsEntityChart pqrs={pqrs} />
+        <PqrVsTimeChart
+          pqrs={pqrs.sort(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+          )}
+        />
+        {/* <PqrVsEntityChart pqrs={pqrs} /> */}
       </div>
 
       <div className="flex flex-row gap-4 w-full">
-        <PqrVsCategoryChart pqrs={pqrs} />
         <PqrVsDepartmentChart pqrs={pqrs} />
+        {/* <PqrVsCategoryChart pqrs={pqrs} /> */}
       </div>
 
       <PqrTable pqrs={pqrs} />
