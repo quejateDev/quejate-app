@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client'
+import { Entity, UserRole } from '@prisma/client'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { Client } from '@/services/api/Client';
@@ -8,6 +8,7 @@ interface User {
   email: string
   name?: string
   role?: UserRole
+  entity?: Entity
 }
 
 interface AuthStore {

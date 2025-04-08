@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
+import { Loader2 } from "lucide-react";
 interface Client {
   id: string;
   email: string;
@@ -85,13 +85,13 @@ export default function ClientsPage() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader2 className="animate-spin" />;
   }
 
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Clientes</h1>
+        <h1 className="text-3xl font-bold">Empleados</h1>
       </div>
 
       <div className="rounded-md border">
@@ -118,7 +118,7 @@ export default function ClientsPage() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/admin/clients/${client.id}/edit`}>
+                    <Link href={`/admin/users/${client.id}/edit`}>
                       <Button variant="outline" size="icon">
                         <Pencil className="h-4 w-4" />
                       </Button>

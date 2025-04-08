@@ -52,9 +52,11 @@ export default function Login() {
             email: userData.user.email,
             name: userData.user.name,
             role: userData.user.role,
+            entity: userData.user.Entity,
           },
           userData.token
         );
+        
         document.cookie = `auth-storage=${JSON.stringify({
           state: { 
             user: {
@@ -62,6 +64,7 @@ export default function Login() {
               email: userData.user.email,
               name: userData.user.name,
               role: userData.user.role,
+              entity: userData.user.Entity,
             },
             token: userData.token
           }

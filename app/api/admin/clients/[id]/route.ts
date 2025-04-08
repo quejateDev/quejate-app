@@ -6,11 +6,11 @@ export async function GET(
   { params }: any 
 ) {
   const { id } = await params;
+
   try {
     const client = await prisma.user.findUnique({
       where: {
-        id,
-        role: "CLIENT",
+        id
       },
       select: {
         id: true,

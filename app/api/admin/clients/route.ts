@@ -1,11 +1,28 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { verifyToken } from "@/lib/utils";
+import { getCookie } from "@/lib/utils";
 
 export async function GET() {
+  const token = await getCookie("token");
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const decoded = await verifyToken(token);
+  if (!decoded) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const clients = await prisma.user.findMany({
       where: {
-        role: "CLIENT",
+        role: {
+          in: ["EMPLOYEE", "ADMIN"],
+        },
+        Entity: {
+          id: decoded.entityId,
+        },
       },
       select: {
         id: true,

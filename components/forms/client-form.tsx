@@ -79,7 +79,7 @@ export function ClientForm({ initialData, mode }: ClientFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>
-          {mode === "create" ? "Crear Nuevo Cliente" : "Editar Cliente"}
+          {mode === "create" ? "Crear Nuevo Empleado" : "Editar Empleado"}
         </CardTitle>
       </CardHeader>
       <CardContent>

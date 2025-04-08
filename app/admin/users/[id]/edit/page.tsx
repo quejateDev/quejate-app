@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ClientForm } from "@/components/forms/client-form";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function EditClientPage() {
   const [client, setClient] = useState(null);
@@ -37,7 +38,7 @@ export default function EditClientPage() {
   }, [params.id, toast]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader2 className="animate-spin" />;
   }
 
   if (!client) {
@@ -46,7 +47,7 @@ export default function EditClientPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-8">Editar Cliente</h1>
+      <h1 className="text-3xl font-bold mb-8">Editar Empleado</h1>
       <ClientForm mode="edit" initialData={client} />
     </div>
   );
