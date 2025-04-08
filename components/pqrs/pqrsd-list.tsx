@@ -5,6 +5,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
 import { PQRCard } from "../pqr/PQRCard";
 import { PQR } from "@/types/pqrsd";
+import { PQRSkeleton } from "./pqr-skeleton";
 
 interface PQRListProps {
   pqrs: PQR[];
@@ -12,15 +13,6 @@ interface PQRListProps {
 
 export default function PQRList({ pqrs }: PQRListProps) {
   const { user: authUser } = useAuthStore();
-  const { user: currentUser, fetchUser, isLoading } = useUser();
-
-  useEffect(() => {
-    if (authUser?.id) {
-      fetchUser(authUser.id);
-    }
-  }, [authUser]);
-
-  if (isLoading && authUser) return <p className="text-center">Cargando...</p>;
 
   return (
     <div className="space-y-6">
@@ -29,7 +21,7 @@ export default function PQRList({ pqrs }: PQRListProps) {
           key={pqr.id}
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
-          user={currentUser || null}
+          user={authUser || null}
         />
       ))}
       {pqrs.length === 0 && (

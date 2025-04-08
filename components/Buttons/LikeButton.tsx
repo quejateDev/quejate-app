@@ -32,10 +32,12 @@ export default function LikeButton({
 
     try {
       setIsLoading(true);
-      await toggleLike(pqrId, user.id);
       setLiked(!liked);
-        setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      await toggleLike(pqrId, user.id);
     } catch (error) {
+      setLiked(initialLiked);
+      setLikeCount((prev) => (initialLiked ? prev + 1 : prev - 1));
       console.error("Error toggling like:", error);
       toast({
         title: "Error",
@@ -47,20 +49,15 @@ export default function LikeButton({
     }
   };
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="gap-2"
-      onClick={handleLike}
-      disabled={isLoading}
-      >
-        <Heart
-          className={cn(
-            "w-4 h-4",
-            liked ? "fill-current text-red-500" : "text-gray-500"
-          )}
-        />
+    <div className="gap-2 flex items-center px-3 text-sm">
+      <Heart
+        onClick={() => (isLoading ? null : handleLike())}
+        className={cn(
+          "w-4 h-4 cursor-pointer",
+          liked ? "fill-current text-red-500" : "text-gray-500"
+        )}
+      />
       <span>{likeCount}</span>
-    </Button>
+    </div>
   );
 }
