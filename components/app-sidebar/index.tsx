@@ -3,40 +3,26 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarFooter, SidebarHeader
 } from "@/components/ui/sidebar";
 import useAuthStore from "@/store/useAuthStore";
 import {
   Users,
   Building2,
   LogOut,
-  MessageCircle,
-  Building,
-  Tags
+  MessageCircle, LayoutDashboard
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 
-// Menu items.
-const InternalManagement = [
-  // {
-  //   title: "Categorias",
-  //   url: "/admin/categories",
-  //   icon: Tags,
-  // },
-  // {
-  //   title: "Entidades",
-  //   url: "/admin/entity",
-  //   icon: Building,
-  // },
+const menuItems = [
   {
-    title: "Areas",
+    title: "Dashboard",
+    url: "/admin",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Áreas",
     url: "/admin/area",
     icon: Building2,
   },
@@ -51,9 +37,11 @@ const InternalManagement = [
     icon: Users,
   },
 ];
+
 export function AppSidebar() {
   const { logout } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
 
   function handleLogout() {
     logout();
@@ -61,47 +49,37 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar>
-      <SidebarHeader>
-        {/* Logo de la empresa */}
-        <div className="flex items-center justify-center p-4">
-          <img src="/logo.png" alt="Logo de la empresa" className="h-8" />
-        </div>
+    <Sidebar className="sidebar">
+      <SidebarHeader className="p-6 flex justify-center">
+        <img src="/logo.png" alt="Logo" className="w-32 brightness-0 invert" />
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Gestión Interna</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {InternalManagement.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon className="text-blue-500" />
-                      <span className={``}>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+
+      <SidebarContent className="px-3 py-4">
+        <nav className="space-y-1">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.url;
+            return (
+              <Link
+                key={item.url}
+                href={item.url}
+                className={`sidebar-link ${isActive ? "active" : ""}`}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.title}</span>
+              </Link>
+            );
+          })}
+        </nav>
       </SidebarContent>
 
-      <SidebarFooter>
-        <SidebarGroup>
-          <SidebarGroupLabel>Sistema</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton className="bg-red-500 text-white hover rounded-lg hover:bg-red-600 hover:text-white" onClick={handleLogout}>
-                  <LogOut />
-                  <span>Cerrar Sesión</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarFooter className="px-3 py-4">
+        <button
+          onClick={handleLogout}
+          className="sidebar-link w-full justify-center text-red-100 hover:bg-red-500/20"
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Cerrar Sesión</span>
+        </button>
       </SidebarFooter>
     </Sidebar>
   );
