@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
@@ -28,8 +27,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import {
   flexRender,
   getCoreRowModel,
@@ -133,11 +130,7 @@ export function DataTable<T extends { id: string }>({
                   headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={`font-semibold ${
-                        header.index === columns.length - 1 && actions
-                          ? "text-right"
-                          : ""
-                      }`}
+                      className="font-semibold"
                     >
                       {header.isPlaceholder ? null : (
                         <div
@@ -162,7 +155,7 @@ export function DataTable<T extends { id: string }>({
                   ))
                 )}
                 {actions && (
-                  <TableHead className="text-right font-semibold">
+                  <TableHead className="font-semibold">
                     Acciones
                   </TableHead>
                 )}
@@ -184,11 +177,6 @@ export function DataTable<T extends { id: string }>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className={`${
-                          cell.column.id === String(columns.length - 1) && actions
-                            ? "text-right"
-                            : ""
-                        }`}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -197,8 +185,8 @@ export function DataTable<T extends { id: string }>({
                       </TableCell>
                     ))}
                     {actions && (
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                      <TableCell className="">
+                        <div className="flex gap-2">
                           {actions.edit && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -261,12 +249,14 @@ export function DataTable<T extends { id: string }>({
                                     ¿Está seguro de eliminar este registro?
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Esta acción no se puede deshacer. Se eliminarán
-                                    todos los datos asociados.
+                                    Esta acción no se puede deshacer. Se
+                                    eliminarán todos los datos asociados.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() =>
                                       actions.delete?.onDelete(row.original.id)
@@ -289,62 +279,80 @@ export function DataTable<T extends { id: string }>({
           </Table>
         </div>
 
-        <div className="flex items-center justify-between space-x-2">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Filas por página</p>
-            <Select
-              value={`${table.getState().pagination.pageSize}`}
-              onValueChange={(value) => {
-                table.setPageSize(Number(value));
-                onPageSizeChange?.(Number(value));
-              }}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Página {table.getState().pagination.pageIndex + 1} de{" "}
-              {table.getPageCount()}
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                className="h-8 w-8 p-0"
-                onClick={() => {
-                  table.previousPage();
-                  onPageIndexChange?.(table.getState().pagination.pageIndex - 1);
-                }}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Ir a la página anterior</span>
-                <ChevronDown className="h-4 w-4 rotate-90" />
-              </Button>
-              <Button
-                variant="outline"
-                className="h-8 w-8 p-0"
-                onClick={() => {
-                  table.nextPage();
-                  onPageIndexChange?.(table.getState().pagination.pageIndex + 1);
-                }}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Ir a la página siguiente</span>
-                <ChevronDown className="h-4 w-4 -rotate-90" />
-              </Button>
-            </div>
-          </div>
-        </div>
+        <Pagination
+          table={table}
+          onPageSizeChange={onPageSizeChange}
+          onPageIndexChange={onPageIndexChange}
+        />
       </div>
     </TooltipProvider>
+  );
+}
+
+function Pagination({
+  table,
+  onPageSizeChange,
+  onPageIndexChange,
+}: {
+  table: any;
+  onPageSizeChange?: (pageSize: number) => void;
+  onPageIndexChange?: (pageIndex: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between space-x-2">
+      <div className="flex items-center space-x-2">
+        <p className="text-sm font-medium">Filas por página</p>
+        <Select
+          value={`${table.getState().pagination.pageSize}`}
+          onValueChange={(value) => {
+            table.setPageSize(Number(value));
+            onPageSizeChange?.(Number(value));
+          }}
+        >
+          <SelectTrigger className="h-8 w-[70px]">
+            <SelectValue placeholder={table.getState().pagination.pageSize} />
+          </SelectTrigger>
+          <SelectContent side="top">
+            {[10, 20, 30, 40, 50].map((pageSize) => (
+              <SelectItem key={pageSize} value={`${pageSize}`}>
+                {pageSize}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+          Página {table.getState().pagination.pageIndex + 1} de{" "}
+          {table.getPageCount()}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={() => {
+              table.previousPage();
+              onPageIndexChange?.(table.getState().pagination.pageIndex - 1);
+            }}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <span className="sr-only">Ir a la página anterior</span>
+            <ChevronDown className="h-4 w-4 rotate-90" />
+          </Button>
+          <Button
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={() => {
+              table.nextPage();
+              onPageIndexChange?.(table.getState().pagination.pageIndex + 1);
+            }}
+            disabled={!table.getCanNextPage()}
+          >
+            <span className="sr-only">Ir a la página siguiente</span>
+            <ChevronDown className="h-4 w-4 -rotate-90" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

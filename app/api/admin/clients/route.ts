@@ -33,6 +33,7 @@ export async function GET() {
         phone: true,
         createdAt: true,
         updatedAt: true,
+        isActive: true,
       },
       orderBy: {
         createdAt: "desc",

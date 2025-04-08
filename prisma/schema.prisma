@@ -141,8 +141,8 @@ model Comment {
   updatedAt DateTime @updatedAt
   userId    String   
   pqrId     String  
-  user      User     @relation(fields: [userId], references: [id]) 
-  pqr       PQRS     @relation(fields: [pqrId], references: [id]) 
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade) 
 
   @@index([userId]) 
   @@index([pqrId])  

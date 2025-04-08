@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Users, UserPlus, UserMinus, Ban } from "lucide-react";
+import { Plus, Search, Users, UserPlus, UserMinus } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 interface Client {
   id: string;
@@ -154,13 +154,12 @@ export default function ClientsPage() {
         body: JSON.stringify({ isActive: !currentStatus }),
       });
 
-      if (!response.ok) throw new Error("Error al cambiar el estado del cliente");
+      if (!response.ok)
+        throw new Error("Error al cambiar el estado del cliente");
 
       setClients((prev) =>
         prev.map((client) =>
-          client.id === id
-            ? { ...client, isActive: !currentStatus }
-            : client
+          client.id === id ? { ...client, isActive: !currentStatus } : client
         )
       );
       toast({
@@ -193,7 +192,9 @@ export default function ClientsPage() {
           return a.email.localeCompare(b.email);
         case "date":
         default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
       }
     });
 
@@ -212,11 +213,7 @@ export default function ClientsPage() {
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard
-          icon={Users}
-          title="Total Empleados"
-          value={stats.total}
-        />
+        <StatCard icon={Users} title="Total Empleados" value={stats.total} />
         <StatCard
           icon={UserPlus}
           title="Nuevos este mes"
@@ -247,8 +244,8 @@ export default function ClientsPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select 
-                value={sortBy} 
+              <Select
+                value={sortBy}
                 onValueChange={(value: SortField) => setSortBy(value)}
               >
                 <SelectTrigger className="w-full md:w-[180px]">
@@ -270,57 +267,65 @@ export default function ClientsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border bg-card">
-            <DataTable
-              data={filteredClients}
-              columns={[
-                {
-                  header: "Nombre",
-                  accessorFn: (client) => `${client.firstName} ${client.lastName}`,
-                },
-                {
-                  header: "Email",
-                  accessorKey: "email",
-                },
-                {
-                  header: "Teléfono",
-                  accessorKey: "phone",
-                },
-                {
-                  header: "Estado",
-                  cell: ({ row }) => (
-                    <Badge
-                      variant={row.original.isActive ? "default" : "secondary"}
-                      className="font-normal"
-                    >
-                      {row.original.isActive ? "Activo" : "Inactivo"}
-                    </Badge>
-                  ),
-                },
-                {
-                  header: "Fecha de Registro",
-                  accessorKey: "createdAt",
-                  cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
-                },
-              ]}
-              actions={{
-                edit: {
-                  href: (client) => `/admin/users/${client.id}/edit`,
-                },
-                delete: {
-                  onDelete: handleDelete,
-                },
-                custom: [
-                  {
-                    icon: Ban,
-                    label: "Cambiar Estado",
-                    onClick: (client) => handleToggleStatus(client.id, client.isActive),
-                  },
-                ],
-              }}
-              emptyMessage="No se encontraron empleados"
-            />
-          </div>
+          <DataTable
+            data={filteredClients}
+            columns={[
+              {
+                header: "Nombre",
+                accessorFn: (client) =>
+                  `${client.firstName} ${client.lastName}`,
+                meta: {
+                  width: "w-[25%]"
+                }
+              },
+              {
+                header: "Email",
+                accessorKey: "email",
+                meta: {
+                  width: "w-[25%]"
+                }
+              },
+              {
+                header: "Teléfono",
+                accessorKey: "phone",
+                meta: {
+                  width: "w-[15%]"
+                }
+              },
+              {
+                header: "Activo?",
+                cell: ({ row }) => (
+                  <Switch
+                    checked={row.original.isActive}
+                    onCheckedChange={() =>
+                      handleToggleStatus(row.original.id, row.original.isActive)
+                    }
+                  />
+                ),
+                meta: {
+                  width: "w-[10%]"
+                }
+              },
+              {
+                header: "Fecha de Registro",
+                accessorKey: "createdAt",
+                cell: ({ row }) =>
+                  new Date(row.original.createdAt).toLocaleDateString(),
+                meta: {
+                  width: "w-[15%]"
+                }
+              },
+            ]}
+            actions={{
+              edit: {
+                href: (client) => `/admin/users/${client.id}/edit`,
+              },
+              delete: {
+                onDelete: handleDelete,
+              },
+            }}
+            emptyMessage="No se encontraron empleados"
+          />
         </CardContent>
       </Card>
     </div>

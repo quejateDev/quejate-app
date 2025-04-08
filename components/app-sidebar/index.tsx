@@ -9,8 +9,7 @@ import useAuthStore from "@/store/useAuthStore";
 import {
   Users,
   Building2,
-  LogOut,
-  MessageCircle, LayoutDashboard
+  LogOut, LayoutDashboard
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -18,7 +17,7 @@ import Link from "next/link";
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/admin",
+    url: "/admin/pqr",
     icon: LayoutDashboard,
   },
   {
@@ -26,11 +25,11 @@ const menuItems = [
     url: "/admin/area",
     icon: Building2,
   },
-  {
-    title: "PQRSD",
-    url: "/admin/pqr",
-    icon: MessageCircle,
-  },
+  // {
+  //   title: "PQRSD",
+  //   url: "/admin/pqr",
+  //   icon: MessageCircle,
+  // },
   {
     title: "Usuarios",
     url: "/admin/users",

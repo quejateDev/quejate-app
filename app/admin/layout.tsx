@@ -22,7 +22,7 @@ export default function RootLayout({
             <NavbarAdmin />
             
             {/* Content Area */}
-            <div className="flex-1 p-6 bg-[#ecedff]">
+            <div className="flex-1 p-6 bg-[#f2f4f6]">
               {children}
             </div>
           </main>
