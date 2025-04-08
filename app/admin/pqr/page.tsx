@@ -1,5 +1,6 @@
 import PqrVsDepartmentChart from "@/components/charts/pqr/pqr-vs-deparment";
 import { PqrVsTimeChart } from "@/components/charts/pqr/pqr-vs-time";
+import { PqrVsTypeChart } from "@/components/charts/pqr/pqr-vs-type";
 import { PqrFilters } from "@/components/pqr/pqr-filters";
 import { PQRTable } from "@/components/pqr/pqr-table";
 import prisma from "@/lib/prisma";
@@ -212,6 +213,7 @@ export default async function PQRPage({ searchParams }: PageProps) {
         />
 
         <PqrVsDepartmentChart pqrs={pqrs} />
+        <PqrVsTypeChart pqrs={pqrs} />
       </div>
 
       {/* Table section */}

@@ -4,10 +4,9 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardContent,
   CardDescription,
+  CardContent,
 } from "@/components/ui/card";
-import { ChartContainer } from "@/components/ui/chart";
 import { CHART_COLORS } from "@/lib/config";
 import {
   BarChart,
@@ -22,27 +21,26 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { typeMap } from "@/constants/pqrMaps";
 
-interface PqrVsDepartmentChartProps {
+interface PqrVsTypeChartProps {
   pqrs: Array<{
-    department?: {
-      name: string;
-    };
+    type: keyof typeof typeMap;
   }>;
 }
 
-export default function PqrVsDepartmentChart({ pqrs }: PqrVsDepartmentChartProps) {
-  function getPqrsByDepartment() {
-    const pqrsByDepartment = pqrs.reduce((acc: Record<string, number>, pqr) => {
-      const department = pqr.department?.name || "Sin asignar";
-      acc[department] = (acc[department] || 0) + 1;
+export function PqrVsTypeChart({ pqrs }: PqrVsTypeChartProps) {
+  function getPqrsByType() {
+    const pqrsByType = pqrs.reduce((acc: Record<string, number>, pqr) => {
+      const type = typeMap[pqr.type].label;
+      acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
 
-    return Object.entries(pqrsByDepartment)
+    return Object.entries(pqrsByType)
       .sort(([, a], [, b]) => b - a)
-      .map(([department, count]) => ({
-        name: department,
+      .map(([type, count]) => ({
+        name: type,
         Registros: count,
       }));
   }
@@ -61,16 +59,16 @@ export default function PqrVsDepartmentChart({ pqrs }: PqrVsDepartmentChartProps
     return null;
   };
 
-  const data = getPqrsByDepartment();
+  const data = getPqrsByType();
   const total = data.reduce((sum, entry) => sum + entry.Registros, 0);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full col-span-2">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>PQRSD por departamento</CardTitle>
+          <CardTitle>PQRSD por tipo</CardTitle>
           <CardDescription>
-            Distribución de PQRSD por departamento en gráfico de barras
+            Distribución de PQRSD por tipo
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px]">
@@ -113,7 +111,7 @@ export default function PqrVsDepartmentChart({ pqrs }: PqrVsDepartmentChartProps
         <CardHeader>
           <CardTitle>Distribución porcentual</CardTitle>
           <CardDescription>
-            Distribución de porcentual de PQRSD por departamento
+            Distribución de porcentual de PQRSD por tipo
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px]">
@@ -147,4 +145,4 @@ export default function PqrVsDepartmentChart({ pqrs }: PqrVsDepartmentChartProps
       </Card>
     </div>
   );
-}
+} 
