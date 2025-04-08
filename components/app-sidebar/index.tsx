@@ -43,8 +43,8 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   function handleLogout() {
-    logout();
-    router.push("/login");
+    console.log(document.cookie);
+    // router.push("/dashboard");
   }
 
   return (
