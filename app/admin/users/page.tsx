@@ -25,27 +25,87 @@ interface Client {
   lastName: string;
   phone: string;
   createdAt: string;
-  isActive?: boolean;
+  isActive: boolean;
+}
+
+type SortField = "name" | "date" | "email";
+
+interface Stats {
+  total: number;
+  active: number;
+  newThisMonth: number;
+}
+
+function StatCard({
+  icon: Icon,
+  title,
+  value,
+}: {
+  icon: React.ElementType;
+  title: string;
+  value: number;
+}) {
+  return (
+    <Card className="border-none shadow-md">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium text-muted-foreground">
+            {title}
+          </span>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="container mx-auto py-6 px-4 md:px-6 space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="border-none shadow-md">
+            <CardHeader className="pb-2">
+              <Skeleton className="h-4 w-24" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-16" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card className="border-none shadow-md">
+        <CardHeader className="pb-4">
+          <Skeleton className="h-8 w-48" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "date" | "email">("date");
+  const [sortBy, setSortBy] = useState<SortField>("date");
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
 
   const fetchClients = async () => {
     try {
       const response = await fetch("/api/admin/clients");
-      if (response.ok) {
-        const data = await response.json();
-        setClients(data);
-      }
+      if (!response.ok) throw new Error("Error al cargar los clientes");
+      const data = await response.json();
+      setClients(data);
     } catch (error) {
       console.error("Error fetching clients:", error);
       toast({
@@ -58,18 +118,22 @@ export default function ClientsPage() {
     }
   };
 
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
   const handleDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/admin/clients/${id}`, {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        setClients((prev) => prev.filter((client) => client.id !== id));
-        toast({
-          description: "Cliente eliminado exitosamente",
-        });
-      }
+      if (!response.ok) throw new Error("Error al eliminar el cliente");
+
+      setClients((prev) => prev.filter((client) => client.id !== id));
+      toast({
+        description: "Cliente eliminado exitosamente",
+      });
     } catch (error) {
       console.error("Error deleting client:", error);
       toast({
@@ -90,18 +154,18 @@ export default function ClientsPage() {
         body: JSON.stringify({ isActive: !currentStatus }),
       });
 
-      if (response.ok) {
-        setClients((prev) =>
-          prev.map((client) =>
-            client.id === id
-              ? { ...client, isActive: !currentStatus }
-              : client
-          )
-        );
-        toast({
-          description: `Cliente ${!currentStatus ? "activado" : "desactivado"} exitosamente`,
-        });
-      }
+      if (!response.ok) throw new Error("Error al cambiar el estado del cliente");
+
+      setClients((prev) =>
+        prev.map((client) =>
+          client.id === id
+            ? { ...client, isActive: !currentStatus }
+            : client
+        )
+      );
+      toast({
+        description: `Cliente ${!currentStatus ? "activado" : "desactivado"} exitosamente`,
+      });
     } catch (error) {
       console.error("Error toggling client status:", error);
       toast({
@@ -133,9 +197,9 @@ export default function ClientsPage() {
       }
     });
 
-  const stats = {
+  const stats: Stats = {
     total: clients.length,
-    active: clients.filter((client) => client.isActive !== false).length,
+    active: clients.filter((client) => client.isActive).length,
     newThisMonth: clients.filter(
       (client) =>
         new Date(client.createdAt).getTime() >
@@ -143,79 +207,26 @@ export default function ClientsPage() {
     ).length,
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto py-6 px-4 md:px-6 space-y-6">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-none shadow-md">
-              <CardHeader className="pb-2">
-                <Skeleton className="h-4 w-24" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-16" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <Card className="border-none shadow-md">
-          <CardHeader className="pb-4">
-            <Skeleton className="h-8 w-48" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSkeleton />;
 
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border-none shadow-md">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Total Empleados
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-md">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <UserPlus className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Nuevos este mes
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.newThisMonth}</div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-md">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <UserMinus className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Empleados Activos
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.active}</div>
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={Users}
+          title="Total Empleados"
+          value={stats.total}
+        />
+        <StatCard
+          icon={UserPlus}
+          title="Nuevos este mes"
+          value={stats.newThisMonth}
+        />
+        <StatCard
+          icon={UserMinus}
+          title="Empleados Activos"
+          value={stats.active}
+        />
       </div>
 
       <Card className="border-none shadow-md">
@@ -236,7 +247,10 @@ export default function ClientsPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <Select 
+                value={sortBy} 
+                onValueChange={(value: SortField) => setSortBy(value)}
+              >
                 <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder="Ordenar por" />
                 </SelectTrigger>
@@ -262,7 +276,7 @@ export default function ClientsPage() {
               columns={[
                 {
                   header: "Nombre",
-                  accessorKey: (client) => `${client.firstName} ${client.lastName}`,
+                  accessorFn: (client) => `${client.firstName} ${client.lastName}`,
                 },
                 {
                   header: "Email",
@@ -274,18 +288,19 @@ export default function ClientsPage() {
                 },
                 {
                   header: "Estado",
-                  accessorKey: (client) => (
+                  cell: ({ row }) => (
                     <Badge
-                      variant={client.isActive !== false ? "default" : "secondary"}
+                      variant={row.original.isActive ? "default" : "secondary"}
                       className="font-normal"
                     >
-                      {client.isActive !== false ? "Activo" : "Inactivo"}
+                      {row.original.isActive ? "Activo" : "Inactivo"}
                     </Badge>
                   ),
                 },
                 {
                   header: "Fecha de Registro",
                   accessorKey: "createdAt",
+                  cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
                 },
               ]}
               actions={{
@@ -299,8 +314,7 @@ export default function ClientsPage() {
                   {
                     icon: Ban,
                     label: "Cambiar Estado",
-                    onClick: (client) => handleToggleStatus(client.id, client.isActive !== false),
-                    // variant: client.isActive !== false ? "destructive" : "default",
+                    onClick: (client) => handleToggleStatus(client.id, client.isActive),
                   },
                 ],
               }}

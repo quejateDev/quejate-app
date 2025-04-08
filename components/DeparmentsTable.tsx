@@ -1,41 +1,48 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Plus, Search, Building2, Trash2, PencilLine } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataTable } from "@/components/ui/data-table";
+import { Department } from "@prisma/client";
+import Link from "next/link";
+import { toast } from "@/hooks/use-toast";
+import ConfirmationModal from "./modals/ConfirmationModal";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   deleteDepartmentService,
   getDepartmentsService,
 } from "@/services/api/Department.service";
-import { Department } from "@prisma/client";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
-import ConfirmationModal from "./modals/ConfirmationModal";
 
-interface DeparmentsTableProps {
-  departments: (Department & {
-    entity: {
-      name: string;
-    };
-  })[];
+interface DepartmentWithEntity extends Department {
+  entity: {
+    name: string;
+  };
 }
 
-export function DeparmentsTable({ departments }: DeparmentsTableProps) {
+type SortField = "name" | "date" | "entity";
+
+interface DepartmentsTableProps {
+  departments: DepartmentWithEntity[];
+}
+
+export function DeparmentsTable({
+  departments: initialDepartments,
+}: DepartmentsTableProps) {
+  const [departments, setDepartments] = useState(initialDepartments);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortField>("date");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [departmentToDelete, setDepartmentToDelete] = useState<string | null>(
     null
   );
-  const [data, setData] = useState(departments);
-
-  async function deleteDepartment(id: string) {
-    await deleteDepartmentService(id);
-  }
 
   async function handleDeleteClick(departmentId: string) {
     setDepartmentToDelete(departmentId);
@@ -43,78 +50,195 @@ export function DeparmentsTable({ departments }: DeparmentsTableProps) {
   }
 
   async function handleDeleteConfirm() {
-    if (departmentToDelete) {
-      try {
-        await deleteDepartment(departmentToDelete);
-        setIsDeleteModalOpen(false);
-        setDepartmentToDelete(null);
-        toast({
-          title: "Área eliminada correctamente",
-          description: "El área ha sido eliminada correctamente",
-        });
-        const newData = await getDepartmentsService();
-        setData(newData);
-      } catch (error) {
-        console.error(error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar el área",
-        });
-      }
+    if (!departmentToDelete) return;
+
+    try {
+      await deleteDepartmentService(departmentToDelete);
+      const newData = await getDepartmentsService();
+      setDepartments(newData);
+      toast({
+        description: "Área eliminada correctamente",
+      });
+    } catch (error) {
+      console.error("Error al eliminar el área:", error);
+      toast({
+        description: "Error al eliminar el área",
+        variant: "destructive",
+      });
+    } finally {
       setIsDeleteModalOpen(false);
       setDepartmentToDelete(null);
     }
   }
 
+  const filteredDepartments = departments
+    .filter(
+      (department) =>
+        department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        department.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "date":
+        default:
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+      }
+    });
+
+  const stats = {
+    total: departments.length,
+    departments: departments.length,
+    entities: new Set(departments.map((d) => d.entityId)).size,
+  };
+
   return (
-    <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Descripción</TableHead>
-            <TableHead>Entidad</TableHead>
-            <TableHead>Fecha de Creación</TableHead>
-            <TableHead>Última Actualización</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((department) => (
-            <TableRow key={department.id}>
-              <TableCell className="font-medium">{department.name}</TableCell>
-              <TableCell>{department.description || "Sin descripción"}</TableCell>
-              <TableCell>{department.entity.name}</TableCell>
-              <TableCell>{new Date(department.createdAt).toLocaleDateString("es-ES")}</TableCell>
-              <TableCell>{new Date(department.updatedAt).toLocaleDateString("es-ES")}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Link href={`/admin/area/${department.id}`}>
-                    <Button variant="outline" size="sm">
-                      Editar
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteClick(department.id)}
-                  >
-                    Eliminar
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-primary/80" />
+              <span className="text-sm font-medium text-muted-foreground">
+                Total Áreas
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">{stats.total}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-primary/80" />
+              <span className="text-sm font-medium text-muted-foreground">
+                Departamentos
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">
+              {stats.departments}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-primary/80" />
+              <span className="text-sm font-medium text-muted-foreground">
+                Entidades
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">
+              {stats.entities}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-6 w-6 text-primary/80" />
+              <CardTitle className="text-2xl font-bold">Áreas</CardTitle>
+            </div>
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground/70" />
+                <Input
+                  type="search"
+                  placeholder="Buscar áreas..."
+                  className="pl-8 bg-white/50 border-muted-foreground/20 focus:border-primary/30 transition-colors"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Select
+                value={sortBy}
+                onValueChange={(value: SortField) => setSortBy(value)}
+              >
+                <SelectTrigger className="w-full md:w-[180px] bg-white/50 border-muted-foreground/20">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">Fecha de registro</SelectItem>
+                  <SelectItem value="name">Nombre</SelectItem>
+                  <SelectItem value="entity">Entidad</SelectItem>
+                </SelectContent>
+              </Select>
+              <Link href="/admin/area/new" className="shrink-0">
+                <Button className="w-full md:w-auto gap-2 bg-primary/90 hover:bg-primary transition-colors">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden md:inline">Nueva Área</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg overflow-hidden bg-white">
+            <DataTable
+              data={filteredDepartments}
+              columns={[
+                {
+                  header: "Nombre",
+                  accessorKey: "name",
+                  cell: ({ row }) => (
+                    <span className="font-medium text-primary/90">
+                      {row.original.name}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Descripción",
+                  accessorKey: "description",
+                  cell: ({ row }) => (
+                    <span className="text-muted-foreground">
+                      {row.original.description || "Sin descripción"}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Fecha de Registro",
+                  accessorKey: "createdAt",
+                  cell: ({ row }) => (
+                    <span className="text-muted-foreground">
+                      {new Date(row.original.createdAt).toLocaleDateString(
+                        "es-ES"
+                      )}
+                    </span>
+                  ),
+                },
+              ]}
+              actions={{
+                edit: {
+                  href: (department) => `/admin/area/${department.id}`,
+                },
+                delete: {
+                  onDelete: handleDeleteClick,
+                },
+              }}
+              emptyMessage="No se encontraron áreas"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
-        title="¿Está seguro?"
-        description="Esta acción no se puede deshacer"
+        title="¿Está seguro de eliminar esta área?"
+        description="Esta acción no se puede deshacer. Se eliminarán todos los datos asociados a esta área."
         onConfirm={handleDeleteConfirm}
       />
-    </>
+    </div>
   );
 }

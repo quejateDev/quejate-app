@@ -10,7 +10,7 @@ import {
 import { LineChart, CartesianGrid, XAxis, YAxis, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
+import { CHART_COLORS } from "@/lib/config";
 interface PqrVsTimeChartProps {
   pqrs: Array<{
     createdAt: Date;
@@ -88,10 +88,10 @@ export function PqrVsTimeChart({ pqrs }: PqrVsTimeChartProps) {
             <Line
               type="monotone"
               dataKey="Registros"
-              stroke="#8884d8"
+              stroke={CHART_COLORS[0]}
               strokeWidth={2}
-              dot={{ fill: "#8884d8", strokeWidth: 2 }}
-              activeDot={{ r: 6, fill: "#8884d8" }}
+              dot={{ fill: CHART_COLORS[0], strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: CHART_COLORS[0] }}
               fillOpacity={1}
               fill="url(#colorRegistros)"
             />

@@ -7,15 +7,16 @@ export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || proces
 export const AWS_BUCKET = process.env.AWS_BUCKET || 'quejate-files';
 
 export const CHART_COLORS = [
-  "#8884d8",
-  "#82ca9d",
-  "#ffc658",
-  "#ff8042",
-  "#a4de6c",
-  "#ff6361",
-  "#949494",
-  "#feca57",
-  "#576574",
-  "#54a0ff",
-  "#00d2d3",
+  "#2563eb", // Azul brillante
+  "#16a34a", // Verde esmeralda
+  "#dc2626", // Rojo vibrante
+  "#9333ea", // Púrpura real
+  "#ea580c", // Naranja intenso
+  "#0d9488", // Verde azulado
+  "#0891b2", // Cyan vibrante
+  "#f59e0b", // Ámbar
+  "#6366f1", // Indigo
+  "#ec4899", // Rosa intenso
+  "#84cc16", // Lima brillante
+  "#14b8a6", // Turquesa
 ];

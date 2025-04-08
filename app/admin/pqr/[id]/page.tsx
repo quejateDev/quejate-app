@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
+import { typeMap } from "@/constants/pqrMaps";
 
 export default async function PQRDetailPage({
   params,
@@ -49,11 +50,11 @@ export default async function PQRDetailPage({
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">ID</span>
-                  <span>{pqr.id}</span>
+                  <span>{pqr.consecutiveCode}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tipo</span>
-                  <span>{pqr.type}</span>
+                  <span>{typeMap[pqr.type as keyof typeof typeMap].label}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Estado</span>
