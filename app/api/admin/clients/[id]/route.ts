@@ -84,7 +84,6 @@ export async function DELETE(
     await prisma.user.delete({
       where: {
         id,
-        role: "CLIENT",
       },
     });
 

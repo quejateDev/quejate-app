@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/utils";
 import { getCookie } from "@/lib/utils";
+import { hash } from "bcryptjs";
 
 export async function GET() {
   const token = await getCookie("token");
@@ -50,16 +51,18 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const { email, firstName, lastName, phone, password, role, entityId } =
+      await req.json();
 
     const client = await prisma.user.create({
       data: {
-        email: body.email,
-        firstName: body.firstName,
-        lastName: body.lastName,
-        phone: body.phone,
-        password: body.password, // Note: This should be hashed
-        role: "CLIENT",
+        email,
+        firstName,
+        lastName,
+        phone,
+        password: await hash(password, 10),
+        role: "EMPLOYEE",
+        entityId,
       },
     });
 

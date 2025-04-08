@@ -65,7 +65,7 @@ export default function PqrVsDepartmentChart({ pqrs }: PqrVsDepartmentChartProps
   const total = data.reduce((sum, entry) => sum + entry.Registros, 0);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full col-span-2">
       <Card className="w-full">
         <CardHeader>
           <CardTitle>PQRSD por departamento</CardTitle>

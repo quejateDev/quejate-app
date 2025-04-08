@@ -7,17 +7,27 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { LineChart, CartesianGrid, XAxis, YAxis, Line, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CHART_COLORS } from "@/lib/config";
+import { cn } from "@/lib/utils";
 interface PqrVsTimeChartProps {
   pqrs: Array<{
     createdAt: Date;
   }>;
+  className?: string;
 }
 
-export function PqrVsTimeChart({ pqrs }: PqrVsTimeChartProps) {
+export function PqrVsTimeChart({ pqrs, className }: PqrVsTimeChartProps) {
   function getPqrsByDate() {
     const pqrsByDate = pqrs.reduce((acc: Record<string, number>, pqr) => {
       const date = new Date(pqr.createdAt).toISOString().split("T")[0];
@@ -50,7 +60,7 @@ export function PqrVsTimeChart({ pqrs }: PqrVsTimeChartProps) {
   };
 
   return (
-    <Card className="w-full">
+    <Card className={cn("w-full", className)}>
       <CardHeader>
         <CardTitle>PQRSD creados a lo largo del tiempo</CardTitle>
         <CardDescription>
@@ -59,27 +69,33 @@ export function PqrVsTimeChart({ pqrs }: PqrVsTimeChartProps) {
       </CardHeader>
       <CardContent className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart 
-            data={getPqrsByDate()} 
+          <LineChart
+            data={getPqrsByDate()}
             margin={{ top: 10, right: 30, left: 0, bottom: 30 }}
           >
             <defs>
               <linearGradient id="colorRegistros" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.1}/>
-                <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis 
-              dataKey="date" 
-              tickFormatter={(date) => format(new Date(date), "d MMM", { locale: es })}
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#e2e8f0"
+            />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(date) =>
+                format(new Date(date), "d MMM", { locale: es })
+              }
               angle={-45}
               textAnchor="end"
               height={60}
               stroke="#64748b"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               stroke="#64748b"
               fontSize={12}
               tickFormatter={(value) => value.toFixed(0)}

@@ -89,60 +89,8 @@ export function DeparmentsTable({
       }
     });
 
-  const stats = {
-    total: departments.length,
-    departments: departments.length,
-    entities: new Set(departments.map((d) => d.entityId)).size,
-  };
-
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-primary/80" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Total Áreas
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-primary/80" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Departamentos
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {stats.departments}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-primary/80" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Entidades
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {stats.entities}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       <Card className="border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
         <CardHeader className="pb-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

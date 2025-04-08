@@ -113,24 +113,28 @@ export default async function PQRPage({ searchParams }: PageProps) {
 
   // Calculate statistics
   const totalPqrs = pqrs.length;
-  const pendingPqrs = pqrs.filter(pqr => {
+  const pendingPqrs = pqrs.filter((pqr) => {
     const dueDate = new Date(pqr.createdAt);
     dueDate.setDate(dueDate.getDate() + 15);
     return new Date() < dueDate;
   }).length;
-  const overduePqrs = pqrs.filter(pqr => {
+  const overduePqrs = pqrs.filter((pqr) => {
     const dueDate = new Date(pqr.createdAt);
     dueDate.setDate(dueDate.getDate() + 15);
     return new Date() >= dueDate;
   }).length;
-  const completedPqrs = pqrs.filter(pqr => pqr.status === PQRSStatus.RESOLVED).length;
+  const completedPqrs = pqrs.filter(
+    (pqr) => pqr.status === PQRSStatus.RESOLVED
+  ).length;
 
   return (
     <div className="flex flex-col gap-6">
       {/* Header with title and filters */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de PQRSD</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Gestión de PQRSD
+          </h1>
           <p className="text-muted-foreground mt-1">
             Administra y monitorea las PQRSD de tu entidad
           </p>
@@ -174,7 +178,9 @@ export default async function PQRPage({ searchParams }: PageProps) {
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">{overduePqrs}</div>
+            <div className="text-2xl font-bold text-destructive">
+              {overduePqrs}
+            </div>
             <p className="text-xs text-muted-foreground">
               PQRSD fuera del plazo de respuesta
             </p>
@@ -186,7 +192,9 @@ export default async function PQRPage({ searchParams }: PageProps) {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">{completedPqrs}</div>
+            <div className="text-2xl font-bold text-green-500">
+              {completedPqrs}
+            </div>
             <p className="text-xs text-muted-foreground">
               PQRSD resueltas exitosamente
             </p>
@@ -196,26 +204,14 @@ export default async function PQRPage({ searchParams }: PageProps) {
 
       {/* Charts section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Evolución temporal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PqrVsTimeChart
-              pqrs={pqrs.sort(
-                (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-              )}
-            />
-          </CardContent>
-        </Card>
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Distribución por departamento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PqrVsDepartmentChart pqrs={pqrs} />
-          </CardContent>
-        </Card>
+        <PqrVsTimeChart
+          pqrs={pqrs.sort(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+          )}
+          className="col-span-2"
+        />
+
+        <PqrVsDepartmentChart pqrs={pqrs} />
       </div>
 
       {/* Table section */}

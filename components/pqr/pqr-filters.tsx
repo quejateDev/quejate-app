@@ -93,7 +93,7 @@ export function PqrFilters({
         value={searchParams.get("departmentId") || ""}
         onValueChange={(value) => updateFilters("departmentId", value)}
       >
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-[200px] bg-white">
           <SelectValue placeholder="Filtrar por departamento" />
         </SelectTrigger>
         <SelectContent>

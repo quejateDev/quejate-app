@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ChangePasswordDialog } from "./change-password-dialog";
+import axios from "axios";
+import useAuthStore from "@/store/useAuthStore";
 
 const formSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -41,6 +43,7 @@ interface ClientFormProps {
 export function ClientForm({ initialData, mode }: ClientFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,19 +60,13 @@ export function ClientForm({ initialData, mode }: ClientFormProps) {
     try {
       setIsLoading(true);
       const url =
-        mode === "create" ? "/api/clients" : `/api/clients/${initialData?.id}`;
+        mode === "create" ? "/api/admin/clients" : `/api/admin/clients/${initialData?.id}`;
 
-      const response = await fetch(url, {
-        method: mode === "create" ? "POST" : "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+      await axios.post(url, {
+        ...values,
+        role: "CLIENT",
+        entityId: user?.entity?.id,
       });
-
-      if (!response.ok) {
-        throw new Error("Error al guardar el empleado");
-      }
 
       toast.success(
         mode === "create"

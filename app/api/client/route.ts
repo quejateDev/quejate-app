@@ -11,8 +11,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { password, firstName, lastName, email, phone } =
+  let { password, firstName, lastName, email, phone, role, entityId } =
     await request.json();
+
   const client = await prisma.user.create({
     data: {
       password,
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
       lastName,
       email,
       phone,
-      role: "CLIENT",
+      role: role || "CLIENT",
+      entityId: entityId || null,
     },
   });
   return NextResponse.json(client);
