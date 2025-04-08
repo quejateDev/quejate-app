@@ -1,13 +1,15 @@
-import { PqrVsCategoryChart } from "@/components/charts/pqr/pqr-vs-category";
 import PqrVsDepartmentChart from "@/components/charts/pqr/pqr-vs-deparment";
-import { PqrVsEntityChart } from "@/components/charts/pqr/pqr-vs-entity";
 import { PqrVsTimeChart } from "@/components/charts/pqr/pqr-vs-time";
 import { PqrFilters } from "@/components/pqr/pqr-filters";
-import PqrTable from "@/components/pqrTable";
+import { PQRTable } from "@/components/pqr/pqr-table";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/utils";
 import { getCookie } from "@/lib/utils";
 import { redirect } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { FileText, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import { PQRSStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -109,31 +111,122 @@ export default async function PQRPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  console.log(`Found ${pqrs.length} PQRs after filtering`);
+  // Calculate statistics
+  const totalPqrs = pqrs.length;
+  const pendingPqrs = pqrs.filter(pqr => {
+    const dueDate = new Date(pqr.createdAt);
+    dueDate.setDate(dueDate.getDate() + 15);
+    return new Date() < dueDate;
+  }).length;
+  const overduePqrs = pqrs.filter(pqr => {
+    const dueDate = new Date(pqr.createdAt);
+    dueDate.setDate(dueDate.getDate() + 15);
+    return new Date() >= dueDate;
+  }).length;
+  const completedPqrs = pqrs.filter(pqr => pqr.status === PQRSStatus.RESOLVED).length;
 
   return (
-    <div className="flex flex-col gap-4">
-      <PqrFilters
-        departments={departments}
-        startDate={startDate ?? null}
-        endDate={endDate ?? null}
-      />
-
-      <div className="flex flex-row gap-4 w-full">
-        <PqrVsTimeChart
-          pqrs={pqrs.sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-          )}
+    <div className="flex flex-col gap-6">
+      {/* Header with title and filters */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Gestión de PQRSD</h1>
+          <p className="text-muted-foreground mt-1">
+            Administra y monitorea las PQRSD de tu entidad
+          </p>
+        </div>
+        <PqrFilters
+          departments={departments}
+          startDate={startDate ?? null}
+          endDate={endDate ?? null}
         />
-        {/* <PqrVsEntityChart pqrs={pqrs} /> */}
       </div>
 
-      <div className="flex flex-row gap-4 w-full">
-        <PqrVsDepartmentChart pqrs={pqrs} />
-        {/* <PqrVsCategoryChart pqrs={pqrs} /> */}
+      {/* Statistics cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Total PQRSD</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalPqrs}</div>
+            <p className="text-xs text-muted-foreground">
+              Solicitudes en el período seleccionado
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Pendientes</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingPqrs}</div>
+            <p className="text-xs text-muted-foreground">
+              PQRSD dentro del plazo de respuesta
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Vencidas</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">{overduePqrs}</div>
+            <p className="text-xs text-muted-foreground">
+              PQRSD fuera del plazo de respuesta
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Completadas</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-500">{completedPqrs}</div>
+            <p className="text-xs text-muted-foreground">
+              PQRSD resueltas exitosamente
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      <PqrTable pqrs={pqrs} />
+      {/* Charts section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>Evolución temporal</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PqrVsTimeChart
+              pqrs={pqrs.sort(
+                (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+              )}
+            />
+          </CardContent>
+        </Card>
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>Distribución por departamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PqrVsDepartmentChart pqrs={pqrs} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Table section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Listado de PQRSD</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PQRTable pqrs={pqrs} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
