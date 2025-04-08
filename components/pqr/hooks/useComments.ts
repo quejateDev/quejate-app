@@ -1,13 +1,21 @@
 "use client";
 
+import { useLoginModal } from "@/providers/LoginModalProivder";
+import useAuthStore from "@/store/useAuthStore";
 import { useState, useCallback } from "react";
+import { toast } from "sonner";
 
 export function useComments(initialComments: any[] = []) {
   const [commentCount, setCommentCount] = useState(initialComments.length);
   const [isVisible, setIsVisible] = useState(false);
   const [localComments, setLocalComments] = useState(initialComments);
-
+  const { setIsOpen } = useLoginModal();
+  const { user } = useAuthStore();
   const toggleComments = useCallback(() => {
+    if (!user) {
+      setIsOpen(true);
+      return;
+    }
     setIsVisible(prev => !prev);
   }, []);
 
