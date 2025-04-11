@@ -20,7 +20,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { VerificationBadge } from "../ui/verification-badge";
-import { Player } from "@lottiefiles/react-lottie-player";
+import dynamic from "next/dynamic";
+
+const LottiePlayer = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then(mod => mod.Player),
+  { ssr: false }
+);
 
 interface SimpleEntity {
   id: string;
@@ -286,7 +291,7 @@ export function CategorySelection({
                 {category.imageUrl ? (
                   category.imageUrl.endsWith('.json') ? (
                     <div className="w-32 h-32 flex">
-                      <Player
+                      <LottiePlayer
                         autoplay={false}
                         loop
                         hover
