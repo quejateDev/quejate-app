@@ -14,6 +14,8 @@ import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import Image from "next/image";
+import { ImageIcon } from "lucide-react";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 interface Category {
   id: string;
@@ -50,12 +52,12 @@ export default function CategoryList({ categories }: CategoryListProps) {
 
         setIsDeleteModalOpen(false);
         setCategoryToDelete(null);
-        
+
         toast({
           title: "Categoria eliminada correctamente",
           description: "La categoria ha sido eliminada correctamente",
         });
-        
+
         // Fetch updated data
         const newDataResponse = await fetch("/api/category");
         const newData = await newDataResponse.json();
@@ -90,17 +92,30 @@ export default function CategoryList({ categories }: CategoryListProps) {
             <TableRow key={category.id}>
               <TableCell>
                 {category.imageUrl ? (
-                  <div className="relative w-16 h-16">
-                    <Image
-                      src={category.imageUrl}
-                      alt={category.name}
-                      fill
-                      className="object-cover rounded-md"
-                    />
-                  </div>
+                  category.imageUrl.endsWith(".json") ? (
+                    <div className="w-16 h-16 hover:scale-105 transition-transform duration-300">
+                      <Player
+                        autoplay={false}
+                        loop
+                        hover
+                        src={category.imageUrl}
+                        style={{ width: "100%", height: "100%" }}
+                        renderer="svg"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative w-16 h-16 group">
+                      <Image
+                        src={category.imageUrl}
+                        alt={category.name}
+                        fill
+                        className="object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  )
                 ) : (
                   <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
-                    <span className="text-gray-400">Sin imagen</span>
+                    <ImageIcon className="h-6 w-6 text-gray-400" />
                   </div>
                 )}
               </TableCell>

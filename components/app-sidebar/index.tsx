@@ -22,6 +22,7 @@ import {
   Tags
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Menu items.
 const InternalManagement = [
@@ -69,7 +70,13 @@ export function AppSidebar() {
       <SidebarHeader>
         {/* Logo de la empresa */}
         <div className="flex items-center justify-center p-4">
-          <img src="/logo.png" alt="Logo de la empresa" className="h-8" />
+          <Image 
+            src="/logo2.png" 
+            alt="Logo" 
+            width={128} 
+            height={128}
+            className="h-20 w-auto"
+          />
         </div>
       </SidebarHeader>
       <SidebarContent>
