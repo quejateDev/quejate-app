@@ -15,7 +15,13 @@ import { toast } from "@/hooks/use-toast";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
-import { Player } from "@lottiefiles/react-lottie-player";
+import dynamic from "next/dynamic";
+
+const LottiePlayer = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then(mod => mod.Player),
+  { ssr: false }
+);
+
 
 interface Category {
   id: string;
@@ -94,7 +100,7 @@ export default function CategoryList({ categories }: CategoryListProps) {
                 {category.imageUrl ? (
                   category.imageUrl.endsWith(".json") ? (
                     <div className="w-16 h-16 hover:scale-105 transition-transform duration-300">
-                      <Player
+                      <LottiePlayer
                         autoplay={false}
                         loop
                         hover
