@@ -2,7 +2,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
 import { Paperclip } from "lucide-react";
-import { mediaExtensions, videoExtensions } from "../../../constants/mediaExtensions";
+import { mediaExtensions, videoExtensions } from "../../constants/mediaExtensions";
 
 type PQRCardAttachmentsProps = {
   attachments: {

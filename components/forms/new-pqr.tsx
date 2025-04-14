@@ -78,6 +78,8 @@ type NewPQRFormProps = {
 const formSchema = z.object({
   type: z.enum(["PETITION", "COMPLAINT", "CLAIM", "SUGGESTION", "REPORT"]),
   departmentId: z.string().min(1, "Debe seleccionar un área"),
+  subject: z.string().min(1, "Describa brevemente el tema de su PQRSD"),
+  description: z.string().min(1, "Describa detalladamente su PQRSD"),
   customFields: z.record(z.string()),
   isAnonymous: z.boolean(),
   isPrivate: z.boolean(),
@@ -92,7 +94,6 @@ const formSchema = z.object({
 export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const { user } = useAuthStore();
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [entities, setEntities] = useState<Entity[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [pqr, setPqr] = useState<PQRSForm>({
     type: "PETITION",
@@ -104,12 +105,10 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     isPrivate: true,
     attachments: [],
   });
-  const [selectedEntityId, setSelectedEntityId] = useState<string>("");
+  const [selectedEntityId, setSelectedEntityId] = useState<string>(entityId);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-
   const [openDepartment, setOpenDepartment] = useState(false);
-  const [openEntity, setOpenEntity] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -118,8 +117,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
       departmentId: "",
       customFields: {},
       isAnonymous: false,
-      isPrivate: true 
-      ,
+      isPrivate: true,
       attachments: [],
     },
   });
@@ -131,27 +129,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
       setPqr((prev) => ({ ...prev, creatorId: user?.id || "" }));
     }
   }, [user]);
-
-  async function fetchEntities() {
-    try {
-      const response = await getEntities();
-      setEntities(response);
-      setSelectedEntityId(entityId);
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Error al cargar las entidades",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingInitial(false);
-    }
-  }
-
-  useEffect(() => {
-    fetchEntities();
-  }, []);
 
   useEffect(() => {
     if (selectedEntityId) {
@@ -184,6 +161,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
         description: "Error al cargar los departamentos",
         variant: "destructive",
       });
+    } finally {
+      setIsLoadingInitial(false);
     }
   }
 
@@ -276,8 +255,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
           isAnonymous: values.isAnonymous,
           isPrivate: values.isPrivate,
           attachments: attachmentsData,
-          title: values.customFields["Título"] || "",
-          description: values.customFields["Descripción"] || "",
+          subject: values.subject,
+          description: values.description,
         })
       );
 
@@ -412,6 +391,37 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tema</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Asunto de la PQRSD" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descripción</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Descripción de la PQRSD"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {customFields.map((field) => (
                 <FormField
                   key={field.name}
@@ -502,11 +512,13 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl className="m-0">
-                      <Checkbox
-                        id="isPrivate"
-                        checked={!field.value}
-                        onCheckedChange={(checked) => field.onChange(!checked)}
-                      />
+                        <Checkbox
+                          id="isPrivate"
+                          checked={!field.value}
+                          onCheckedChange={(checked) =>
+                            field.onChange(!checked)
+                          }
+                        />
                       </FormControl>
                       <FormLabel>
                         ¿Desea publicar esta PQRSD en el muro público?

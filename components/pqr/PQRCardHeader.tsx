@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { typeMap, statusMap } from "../../../constants/pqrMaps";
+import { typeMap, statusMap } from "../../constants/pqrMaps";
 import { User } from "lucide-react";
 import Image from "next/image";
 

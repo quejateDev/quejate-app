@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
     const fechaConsecutivo = new Date().toISOString().split("T")[0].replace(/-/g, "");
 
     // Create PQR with attachments
-    const [pqr, entityConsecutive] = await prisma.$transaction([
+    const [pqr] = await prisma.$transaction([
       prisma.pQRS.create({
         data: {
           type: body.type,
@@ -100,6 +100,8 @@ export async function POST(req: NextRequest) {
           anonymous: body.isAnonymous || false,
           departmentId: body.departmentId,
           creatorId: body.creatorId,
+          subject: body.subject,
+          description: body.description,
           customFieldValues: {
             create: body.customFields.map((field: any) => ({
               name: field.name,

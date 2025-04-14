@@ -1,14 +1,14 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { PQRCardHeader } from "./components/PQRCardHeader";
-import { PQRCardContent } from "./components/PQRCardContent";
-import { PQRCardAttachments } from "./components/PQRCardAttachments";
-import { PQRCardActions } from "./components/PQRCardActions";
-import { CommentSection } from "./components/CommentSection";
-import { useLike } from "./hooks/useLike";
-import { useVideoPlayback } from "./hooks/useVideoPlayback";
+import { PQRCardHeader } from "./PQRCardHeader";
+import { PQRCardContent } from "./PQRCardContent";
+import { PQRCardAttachments } from "./PQRCardAttachments";
+import { PQRCardActions } from "./PQRCardActions";
+import { CommentSection } from "./CommentSection";
+import { useLike } from "../../hooks/useLike";
+import { useVideoPlayback } from "../../hooks/useVideoPlayback";
 import { typeMap, statusMap } from "@/constants/pqrMaps";
-import { useComments } from "./hooks/useComments";
+import { useComments } from "../../hooks/useComments";
 
 type PQRCardProps = {
   pqr: {
@@ -90,15 +90,14 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
             <PQRCardHeader pqr={pqr} />
           </div>
           <CardContent>
-            <PQRCardContent pqr={pqr} />
-            <div className="mt-4">
+            <PQRCardContent pqr={pqr}/>
+
               <PQRCardAttachments
                 attachments={pqr.attachments}
                 videoRefsDesktop={videoRefsDesktop}
                 isMobile={false}
               />
-            </div>
-            <div className="mt-4">
+
               <PQRCardActions
                 liked={liked}
                 likeCount={likeCount}
@@ -108,7 +107,6 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
                 onCommentClick={toggleComments}
                 pqrId={pqr.id}
               />
-            </div>
             {showComments && (
               <CommentSection
                 pqrId={pqr.id}

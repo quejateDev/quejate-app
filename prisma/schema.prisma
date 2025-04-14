@@ -120,6 +120,8 @@ model PQRS {
   updatedAt         DateTime           @updatedAt
   creatorId         String?
   departmentId      String
+  subject           String?
+  description       String?
   private           Boolean            @default(true)
   attachments       Attachment[]
   customFieldValues CustomFieldValue[]
