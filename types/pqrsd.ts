@@ -17,7 +17,7 @@ export interface PQR {
       name: string;
     };
   };
-  likes: { id: string }[];
+  likes: { id: string; userId: string }[];
   customFieldValues: { name: string; value: string }[];
   attachments: any[];
   comments: {

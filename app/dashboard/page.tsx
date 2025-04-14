@@ -98,11 +98,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         },
       },
       likes: {
-        where: {
-          userId: "user-id", // TODO: Replace with actual user ID
-        },
         select: {
           id: true,
+          userId: true
         },
       },
       customFieldValues: {
