@@ -62,7 +62,7 @@ type PQRCardProps = {
 
 export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
 
-  const { liked, likeCount, isLoading, handleLike } = useLike(
+  const { liked, likeCount } = useLike(
     pqr.id,
     initialLiked,
     pqr._count?.likes || 0
@@ -102,8 +102,6 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
                 liked={liked}
                 likeCount={likeCount}
                 commentCount={commentCount}
-                isLoading={isLoading}
-                handleLike={handleLike}
                 onCommentClick={toggleComments}
                 pqrId={pqr.id}
               />
@@ -134,8 +132,6 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
             liked={liked}
             likeCount={likeCount}
             commentCount={commentCount}
-            isLoading={isLoading}
-            handleLike={handleLike}
             onCommentClick={toggleComments}
             pqrId={pqr.id}
           />

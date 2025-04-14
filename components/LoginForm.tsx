@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
 import { EmailNotVerifiedModal } from "@/components/modals/email-not-verified-modal";
 
 export default function LoginForm({ onClose }: { onClose: () => void }) {
@@ -17,19 +16,8 @@ export default function LoginForm({ onClose }: { onClose: () => void }) {
     password: "",
   });
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const { login, user } = useAuthStore();
-  const router = useRouter();
+  const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      if (user.role === "ADMIN") {
-        router.push("/admin");
-      } else {
-        window.location.reload();
-      }
-    }
-  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

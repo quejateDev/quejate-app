@@ -11,13 +11,14 @@ export function useComments(initialComments: any[] = []) {
   const [localComments, setLocalComments] = useState(initialComments);
   const { setIsOpen } = useLoginModal();
   const { user } = useAuthStore();
+
   const toggleComments = useCallback(() => {
     if (!user) {
       setIsOpen(true);
       return;
     }
     setIsVisible(prev => !prev);
-  }, []);
+  }, [user]);
 
   const incrementCount = useCallback(() => {
     setCommentCount(prev => prev + 1);
