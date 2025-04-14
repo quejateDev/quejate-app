@@ -6,6 +6,8 @@ export interface PQR {
   anonymous: boolean;
   createdAt: Date;
   updatedAt: Date;
+  subject?: string | null;
+  description?: string | null;
   creator: {
     firstName: string;
     lastName: string;

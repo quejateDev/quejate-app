@@ -1,5 +1,7 @@
 type PQRCardContentProps = {
     pqr: {
+      subject?: string | null;
+      description?: string | null;
       customFieldValues: {
         name: string;
         value: string;
@@ -15,19 +17,24 @@ type PQRCardContentProps = {
 export function PQRCardContent({ pqr }: PQRCardContentProps) {
 return (
     <div className="space-y-4">
-    <div>
+    <div className="flex flex-col gap-2">
         <h1 className="font-semibold text-md">
-        {pqr.customFieldValues.find(
-            (field) => field.name === "Título" || "Titulo"
-        )?.value || "No Title"}
+        {pqr.subject || "Sin título"}
         </h1>
         <p className="text-xs text-muted-foreground mb-5">
         Entidad: {pqr.department.entity.name}
         </p>
         <p className="text-sm">
-        {pqr.customFieldValues.find((field) => field.name === "Descripción")
-            ?.value || "No Description"}
+        {pqr.description || "Sin descripción"}
         </p>
+
+        <div className="flex flex-col  gap-2">
+          {pqr.customFieldValues.map((field) => (
+            <div key={field.name} className="text-xs text-muted-foreground">
+              {field.name}: {field.value}
+            </div>
+          ))}
+        </div>
     </div>
     </div>
 );

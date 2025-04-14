@@ -22,6 +22,8 @@ type PQRCardProps = {
     createdAt: Date;
     type: keyof typeof typeMap;
     status: keyof typeof statusMap;
+    subject?: string | null;
+    description?: string | null;
     customFieldValues: {
       name: string;
       value: string;

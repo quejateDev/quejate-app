@@ -1,11 +1,8 @@
 "use client";
 
-import useUser from "@/hooks/useUser";
 import useAuthStore from "@/store/useAuthStore";
-import { useEffect } from "react";
 import { PQRCard } from "./PQRCard";
 import { PQR } from "@/types/pqrsd";
-import { PQRSkeleton } from "./pqr-skeleton";
 
 interface PQRListProps {
   pqrs: PQR[];
