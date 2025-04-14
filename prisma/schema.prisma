@@ -38,6 +38,7 @@ model User {
   Entity            Entity?             @relation(fields: [entityId], references: [id])
 
   @@index([departmentId])
+  EntityHasUser EntityHasUser[]
 }
 
 model Department {
@@ -72,6 +73,7 @@ model Entity {
   Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
   users             User[]
   @@index([categoryId])
+  EntityHasUser EntityHasUser[]
 }
 
 model EntityConsecutive {
@@ -84,6 +86,18 @@ model EntityConsecutive {
   updatedAt   DateTime? @updatedAt
 
   @@index([entityId])
+}
+
+model EntityHasUser {
+  id        String   @id @default(uuid())
+  entityId  String
+  userId    String
+  role      UserRole
+  entity    Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([entityId])
+  @@index([userId])
 }
 
 model Category {

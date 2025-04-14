@@ -4,7 +4,7 @@ import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 import { PlusIcon } from "lucide-react";
-import PQRList from "@/components/pqrs/pqrsd-list";
+import PQRList from "@/components/pqr/pqrsd-list";
 
 interface PageProps {
   searchParams: Promise<{
@@ -59,7 +59,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   // Fetch PQRs
   const pqrs = await prisma.pQRS.findMany({
-    where,
+    where: {
+      creatorId: {
+        not: null,
+      },
+      ...where,
+    },
     include: {
       creator: {
         select: {

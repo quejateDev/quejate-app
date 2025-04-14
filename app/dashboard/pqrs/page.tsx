@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
 import { PQRCard } from '@/components/pqr/PQRCard';
-import { PQRSkeleton } from '@/components/pqrs/pqr-skeleton';
+import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { getGetPQRDTO } from '@/dto/pqr.dto';
 
 export default function UserPQRs() {
