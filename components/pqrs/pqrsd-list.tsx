@@ -30,6 +30,7 @@ export default function PQRList({ pqrs }: PQRListProps) {
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
           user={currentUser || null}
+          isUserProfile={false}
         />
       ))}
       {pqrs.length === 0 && (

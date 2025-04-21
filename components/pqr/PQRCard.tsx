@@ -58,9 +58,10 @@ type PQRCardProps = {
     firstName?: string;
     lastName?: string;
   } | null;
+  isUserProfile?: boolean;
 };
 
-export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
+export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false }: PQRCardProps) {
 
   const { liked, likeCount, isLoading, handleLike } = useLike(
     pqr.id,
@@ -87,7 +88,7 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
       <div className="hidden md:block">
         <Card>
           <div className="p-6">
-            <PQRCardHeader pqr={pqr} />
+            <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
           </div>
           <CardContent>
             <PQRCardContent pqr={pqr} />
@@ -122,7 +123,7 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
         </Card>
       </div>
       <div className="md:hidden border-b border-gray-300">
-        <PQRCardHeader pqr={pqr} />
+        <PQRCardHeader pqr={pqr} isUserProfile={true} />
         <PQRCardContent pqr={pqr} />
         <div className="mt-4 mb-2">
           <PQRCardAttachments

@@ -1,8 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { typeMap, statusMap } from "../../../constants/pqrMaps";
-import { User } from "lucide-react";
+import { AlertTriangle, User } from "lucide-react";
 import Image from "next/image";
-
+import { useState } from "react";
+import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
+import { PQRAlertModal } from "./PQRAlertModal";
 
 type PQRCardHeaderProps = {
   pqr: {
@@ -16,9 +18,25 @@ type PQRCardHeaderProps = {
     type: keyof typeof typeMap;
     status: keyof typeof statusMap;
   };
+  isUserProfile: boolean;
 };
 
-export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
+export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showAlert = isUserProfile && 
+                   calculateBusinessDaysExceeded(pqr.createdAt) > 0 && 
+                   pqr.status !== "RESOLVED";
+
+  const daysExceeded = calculateBusinessDaysExceeded(pqr.createdAt);
+
+  const handleResolved = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleFollowUp = () => {
+    setIsModalOpen(false);
+  };
+
   const creatorName = !pqr.anonymous && pqr.creator
     ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
     : "Anónimo";
@@ -38,22 +56,21 @@ export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100">
-            {pqr.anonymous ? (
-              <User className="h-6 w-6 stroke-1" />
-            ) : pqr.creator?.profilePicture ? (
-              <Image
-                src={pqr.creator.profilePicture}
-                alt={creatorName}
-                width={48}
-                height={48}
-                className="rounded-full object-cover"
-              />
-            ) : (
-              <span className="text-md">
-                {creatorName.charAt(0).toUpperCase()}
-              </span>
-            )}
-
+              {pqr.anonymous ? (
+                <User className="h-6 w-6 stroke-1" />
+              ) : pqr.creator?.profilePicture ? (
+                <Image
+                  src={pqr.creator.profilePicture}
+                  alt={creatorName}
+                  width={48}
+                  height={48}
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <span className="text-md">
+                  {creatorName.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <div>
               <p className="text-sm font-semibold">{creatorName}</p>
@@ -63,7 +80,24 @@ export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
               </p>
             </div>
           </div>
-          <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
+            {showAlert && (
+              <div className="relative group">
+                <AlertTriangle 
+                  className="h-5 w-5 text-amber-500 cursor-pointer hover:text-amber-600 transition-colors animate-pulse"
+                  onClick={() => setIsModalOpen(true)}
+                />
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <div className="hidden group-hover:block absolute right-0 top-full mt-1 bg-gray-800 text-white text-xs rounded p-2 whitespace-nowrap z-10 shadow-lg">
+                  Tiempo excedido de respuesta: {daysExceeded}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -87,9 +121,21 @@ export function PQRCardHeader({ pqr }: PQRCardHeaderProps) {
               </p>
             </div>
           </div>
-          <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
+          </div>
         </div>
       </div>
+
+      {showAlert && (
+        <PQRAlertModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          daysExceeded={daysExceeded}
+          onResolved={handleResolved}
+          onFollowUp={handleFollowUp}
+        />
+      )}
     </>
   );
 }
