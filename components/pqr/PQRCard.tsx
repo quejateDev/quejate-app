@@ -14,11 +14,13 @@ type PQRCardProps = {
   pqr: {
     id: string;
     creator: {
+      id: string;
       firstName: string;
       lastName: string;
       profilePicture?: string | null;
     } | null;
     anonymous: boolean;
+    private: boolean;
     createdAt: Date;
     type: keyof typeof typeMap;
     status: keyof typeof statusMap;
@@ -62,7 +64,8 @@ type PQRCardProps = {
 };
 
 export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false }: PQRCardProps) {
-
+  const shouldShowCard = !pqr.private || isUserProfile || (user?.id && pqr.creator?.id === user.id);
+  
   const { liked, likeCount, isLoading, handleLike } = useLike(
     pqr.id,
     initialLiked,
@@ -83,6 +86,9 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
     console.log("Comentario enviado:", text);
   };
 
+  if (!shouldShowCard) {
+    return null;
+  }
   return (
     <div className="md:block">
       <div className="hidden md:block">

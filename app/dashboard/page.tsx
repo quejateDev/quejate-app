@@ -63,6 +63,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     include: {
       creator: {
         select: {
+          id: true,
           firstName: true,
           lastName: true,
           profilePicture: true,

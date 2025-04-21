@@ -14,30 +14,32 @@ import { useToast } from '@/hooks/use-toast';
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
-  const { user } = useAuthStore();
+  const { user: currentUser } = useAuthStore();
   const { pqrs, fetchUserPQRS } = usePQR();
-  const { user: currentUser, fetchUser } = useUser();
+  const { user: userProfile, fetchUser } = useUser();
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (user?.id) {
-      fetchUserPQRS(user.id);
+    if (currentUser?.id) {
+      fetchUserPQRS(currentUser.id);
     }
-  }, [user?.id]);
+  }, [currentUser?.id]);
 
   useEffect(() => {
-    if (user?.id) {
-      fetchUser(user.id);
+    if (currentUser?.id) {
+      fetchUser(currentUser.id);
     }
-  }, [user]);
+  }, [currentUser]);
+
+  const isOwnProfile = userProfile ? userProfile.id === currentUser?.id : false;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
   
-    if (!user?.id) return;
+    if (!currentUser?.id) return;
   
     setIsUploading(true);
   
@@ -61,7 +63,7 @@ export default function ProfilePage() {
         throw new Error('No se recibió URL de la imagen');
       }
 
-      const updateResponse = await fetch(`/api/users/${user.id}`, {
+      const updateResponse = await fetch(`/api/users/${currentUser.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -77,8 +79,8 @@ export default function ProfilePage() {
       }
       
       await Promise.all([
-        fetchUser(user.id),
-        fetchUserPQRS(user.id)
+        fetchUser(currentUser.id),
+        fetchUserPQRS(currentUser.id)
       ]);
       toast({
         title: 'Éxito',
@@ -102,11 +104,11 @@ export default function ProfilePage() {
   };
 
   const getFullName = () => {
-    if (!currentUser) return '';
-    return `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+    if (!userProfile) return '';
+    return `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
   };
 
-  if (!user) {
+  if (!currentUser) {
     return (
       <div className="container mx-auto p-4">
         <p className="text-muted-foreground">Por favor inicia sesión para ver tu perfil</p>
@@ -122,8 +124,8 @@ export default function ProfilePage() {
             <CardHeader className="text-center">
               <div className="relative mx-auto mb-6 w-32 h-32 group">
                 <Avatar className="h-32 w-32 border-2 border-muted">
-                  {currentUser?.profilePicture ? (
-                    <AvatarImage src={currentUser.profilePicture} alt={getFullName()} />
+                  {userProfile?.profilePicture ? (
+                    <AvatarImage src={userProfile.profilePicture} alt={getFullName()} />
                   ) : null}
                   <AvatarFallback className="bg-muted-foreground/10">
                     {<User className="h-16 w-16 stroke-1" />}
@@ -158,7 +160,7 @@ export default function ProfilePage() {
               </div>
               
               <h2 className="text-2xl font-semibold">{getFullName()}</h2>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
+              <p className="text-sm text-muted-foreground">{currentUser?.email}</p>
             </CardHeader>
           </Card>
         </div>
@@ -168,7 +170,7 @@ export default function ProfilePage() {
             {pqrs.length > 0 ? (
               pqrs?.map((pqr) => (
                   //@ts-ignore
-                  <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} isUserProfile={true} />
+                  <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />
                 ))
             ) : (
               <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>

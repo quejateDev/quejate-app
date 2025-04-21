@@ -34,15 +34,17 @@ export function PQRAlertModal({
             <AlertTriangle className="h-5 w-5" />
             Tiempo de respuesta excedido
           </DialogTitle>
-          <DialogDescription className="pt-2 pb-2">
-            <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-amber-700">
+          <div className="space-y-4 py-2">
+            <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
+              <div className="flex items-center gap-2 text-sm font-medium text-amber-700">
                 <Clock className="h-4 w-4" />
                 Tu PQRSD ha excedido el tiempo de respuesta por {daysExceeded} día(s) hábil(es)
-              </p>
+              </div>
             </div>
-            <p className="text-sm">¿Has recibido una respuesta a tu solicitud o deseas realizar un seguimiento?</p>
-          </DialogDescription>
+            <DialogDescription>
+              ¿Has recibido una respuesta a tu solicitud o deseas realizar un seguimiento?
+            </DialogDescription>
+          </div>
         </DialogHeader>
         
         <div className="grid grid-cols-1 gap-4 py-2">

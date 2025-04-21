@@ -5,9 +5,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { PQRAlertModal } from "./PQRAlertModal";
+import { toast } from "@/hooks/use-toast";
 
 type PQRCardHeaderProps = {
   pqr: {
+    id: string;
     creator: {
       firstName: string;
       lastName: string;
@@ -22,6 +24,7 @@ type PQRCardHeaderProps = {
 };
 
 export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showAlert = isUserProfile && 
                    calculateBusinessDaysExceeded(pqr.createdAt) > 0 && 
@@ -29,8 +32,39 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
 
   const daysExceeded = calculateBusinessDaysExceeded(pqr.createdAt);
 
-  const handleResolved = () => {
-    setIsModalOpen(false);
+  const handleResolved = async () => {
+    setIsUpdating(true);
+    try {
+      const response = await fetch(`/api/pqr/${pqr.id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'RESOLVED' })
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al actualizar el estado');
+      }
+  
+      toast({
+        title: 'Éxito',
+        description: data.message || 'PQRSD marcada como resuelta',
+      });
+      setIsModalOpen(false);
+  
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error desconocido',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleFollowUp = () => {
