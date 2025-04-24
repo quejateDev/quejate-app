@@ -24,7 +24,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createPQRS } from "@/services/api/pqr.service";
 import { getEntities } from "@/services/api/entity.service";
 import useAuthStore from "@/store/useAuthStore";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -51,6 +51,8 @@ import {
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { useLoginModal } from "@/providers/LoginModalProivder";
 
 type CustomFieldValue = {
   name: string;
@@ -109,6 +111,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   const [openDepartment, setOpenDepartment] = useState(false);
+
+  const { setIsOpen } = useLoginModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -509,23 +513,44 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 <FormField
                   control={form.control}
                   name="isPrivate"
+                  disabled={user === null}
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl className="m-0">
                         <Checkbox
                           id="isPrivate"
                           checked={!field.value}
+                          disabled={user === null}
                           onCheckedChange={(checked) =>
                             field.onChange(!checked)
                           }
                         />
                       </FormControl>
-                      <FormLabel>
-                        ¿Desea publicar esta PQRSD en el muro público?
+                      <FormLabel
+                        className={`${user === null ? "line-through" : ""} flex flex-col gap-2`}
+                      >
+                        <span>
+                          ¿Desea publicar esta PQRSD en el muro?
+                        </span>
                       </FormLabel>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="w-4 h-4" color="red" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Esta opción solo está permitida para usuario
+                          registrados
+                        </TooltipContent>
+                      </Tooltip>
                     </FormItem>
                   )}
                 />
+                <span
+                  className="text-blue-500 underline font-semibold cursor-pointer"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Inicia sesión para publicar tu PQRSD en el muro.
+                </span>
                 <p className="text-xs text-gray-500">
                   Si marca esta opción, su queja será visible para otras
                   personas en la sección de denuncias públicas.

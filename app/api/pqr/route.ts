@@ -89,7 +89,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const fechaConsecutivo = new Date().toISOString().split("T")[0].replace(/-/g, "");
+    let fechaConsecutivo = new Date().toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    fechaConsecutivo = fechaConsecutivo.split("/").reverse().join("");
+    fechaConsecutivo = fechaConsecutivo.replace(/\//g, "");
 
     // Create PQR with attachments
     const [pqr] = await prisma.$transaction([
