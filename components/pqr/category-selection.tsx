@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, Search } from "lucide-react";
+import { ChevronLeft, ImageIcon, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -19,8 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "../ui/badge";
 import { VerificationBadge } from "../ui/verification-badge";
+import dynamic from "next/dynamic";
+
+const LottiePlayer = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then(mod => mod.Player),
+  { ssr: false }
+);
 
 interface SimpleEntity {
   id: string;
@@ -278,21 +283,34 @@ export function CategorySelection({
               key={category.id}
               className={cn(
                 "p-4 cursor-pointer hover:border-primary transition-colors",
-                "flex flex-col items-center justify-center gap-3"
+                "flex flex-col items-center gap-1"
               )}
               onClick={() => setSelectedCategory(category)}
             >
-              <div className="relative w-12 h-12">
+              <div className="relative w-32 h-32 flex items-center">
                 {category.imageUrl ? (
-                  <Image
-                    src={category.imageUrl}
-                    alt={category.name}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
+                  category.imageUrl.endsWith('.json') ? (
+                    <div className="w-32 h-32 flex">
+                      <LottiePlayer
+                        autoplay={false}
+                        loop
+                        hover
+                        src={category.imageUrl}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src={category.imageUrl}
+                        alt={category.name}
+                        fill
+                        className="object-cover rounded-lg transition-transform duration-200 group-hover:scale-105"
+                      />
+                    </div>
+                  )
                 ) : (
                   <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-400">Sin imagen</span>
+                    <ImageIcon className="w-5 h-5 text-gray-400" />
                   </div>
                 )}
               </div>
