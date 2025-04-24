@@ -1,4 +1,4 @@
-import { CategorySelection } from "@/components/pqrs/category-selection";
+import { CategorySelection } from "@/components/pqr/category-selection";
 import { Card } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";

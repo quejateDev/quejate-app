@@ -1,75 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken } from '@/lib/utils'
-
-// Define which paths require admin authentication
-const ADMIN_PATHS = ['/admin']
+import { getCookie } from '@/lib/utils'
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value
+  // const authStorage = await getCookie('auth-storage')
+  // const authParsed = authStorage ? JSON.parse(authStorage) : null
+
+  // const token = authParsed?.state?.token
+
   if (request.nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Redirect /dashboard to /dashboard/pqrs
-  if (request.nextUrl.pathname === '/admin') {
-    return NextResponse.redirect(new URL('/admin/pqr', request.url))
-  }
-
-  // If no token and trying to access protected route, redirect to login
-  // if (!token && PROTECTED_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
-  //   const loginUrl = new URL('/login', request.url)
-  //   loginUrl.searchParams.set('from', request.nextUrl.pathname)
-  //   return NextResponse.redirect(loginUrl)
-  // }
-
-  // Define which paths require dashboard access
-  const DASHBOARD_PATHS = ['/dashboard'];
-  
-  // If there's a token, verify it
-  if (token) {
-    try {
-      const decoded = await verifyToken(token)
-      
-      if (!decoded) {
-        const response = NextResponse.redirect(new URL('/login', request.url))
-        response.cookies.delete('token')
-        return response
-      }
-      
-      // Check if user is trying to access admin routes
-      if (ADMIN_PATHS.some(path => request.nextUrl.pathname.startsWith(path))) {
-        // If not admin, redirect to dashboard
-        if (decoded.role !== 'ADMIN' && decoded.role !== 'SUPER_ADMIN') {
-          return NextResponse.redirect(new URL('/dashboard', request.url))
-        }
-      }
-
-      if (DASHBOARD_PATHS.some(path => request.nextUrl.pathname.startsWith(path)) && 
-          (decoded.role === 'ADMIN' || decoded.role === 'SUPER_ADMIN')) {
-        return NextResponse.redirect(new URL('/admin', request.url))
-      }
-
-      // Add user info to headers for use in server components
-      const requestHeaders = new Headers(request.headers)
-      requestHeaders.set('x-user-id', decoded.id)
-      requestHeaders.set('x-user-role', decoded.role)
-
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      })
-    } catch (error) {
-      console.error('Token verification error:', error)
-      // If token is invalid, clear it and redirect to login
-      const response = NextResponse.redirect(new URL('/login', request.url))
-      response.cookies.delete('token')
-      return response
-    }
-  }
-
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 // Configure paths that trigger the middleware

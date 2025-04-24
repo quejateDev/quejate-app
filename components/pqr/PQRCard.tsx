@@ -1,14 +1,14 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { PQRCardHeader } from "./components/PQRCardHeader";
-import { PQRCardContent } from "./components/PQRCardContent";
-import { PQRCardAttachments } from "./components/PQRCardAttachments";
-import { PQRCardActions } from "./components/PQRCardActions";
-import { CommentSection } from "./components/CommentSection";
-import { useLike } from "./hooks/useLike";
-import { useVideoPlayback } from "./hooks/useVideoPlayback";
+import { PQRCardHeader } from "./PQRCardHeader";
+import { PQRCardContent } from "./PQRCardContent";
+import { PQRCardAttachments } from "./PQRCardAttachments";
+import { PQRCardActions } from "./PQRCardActions";
+import { CommentSection } from "./CommentSection";
+import { useLike } from "../../hooks/useLike";
+import { useVideoPlayback } from "../../hooks/useVideoPlayback";
 import { typeMap, statusMap } from "@/constants/pqrMaps";
-import { useComments } from "./hooks/useComments";
+import { useComments } from "../../hooks/useComments";
 
 type PQRCardProps = {
   pqr: {
@@ -22,6 +22,8 @@ type PQRCardProps = {
     createdAt: Date;
     type: keyof typeof typeMap;
     status: keyof typeof statusMap;
+    subject?: string | null;
+    description?: string | null;
     customFieldValues: {
       name: string;
       value: string;
@@ -62,7 +64,7 @@ type PQRCardProps = {
 
 export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
 
-  const { liked, likeCount, isLoading, handleLike } = useLike(
+  const { liked, likeCount } = useLike(
     pqr.id,
     initialLiked,
     pqr._count?.likes || 0
@@ -90,25 +92,21 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
             <PQRCardHeader pqr={pqr} />
           </div>
           <CardContent>
-            <PQRCardContent pqr={pqr} />
-            <div className="mt-4">
+            <PQRCardContent pqr={pqr}/>
+
               <PQRCardAttachments
                 attachments={pqr.attachments}
                 videoRefsDesktop={videoRefsDesktop}
                 isMobile={false}
               />
-            </div>
-            <div className="mt-4">
+
               <PQRCardActions
                 liked={liked}
                 likeCount={likeCount}
                 commentCount={commentCount}
-                isLoading={isLoading}
-                handleLike={handleLike}
                 onCommentClick={toggleComments}
                 pqrId={pqr.id}
               />
-            </div>
             {showComments && (
               <CommentSection
                 pqrId={pqr.id}
@@ -136,8 +134,6 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
             liked={liked}
             likeCount={likeCount}
             commentCount={commentCount}
-            isLoading={isLoading}
-            handleLike={handleLike}
             onCommentClick={toggleComments}
             pqrId={pqr.id}
           />

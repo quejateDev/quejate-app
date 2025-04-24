@@ -11,6 +11,9 @@ export async function POST(request: Request) {
     // Find user
     const user = await prisma.user.findUnique({
       where: { email },
+      include: {
+        Entity: true
+      }
     })
 
     if (!user) {
@@ -42,7 +45,12 @@ export async function POST(request: Request) {
     }
 
     // Create JWT token
-    const token = await signToken(user.id, user.role)
+    const token = await signToken({
+      id: user.id,
+      role: user.role,
+      email: user.email,
+      entityId: user.Entity?.id || "",
+    });
 
     // Remove password and verification token from response
     // @ts-ignore
@@ -56,11 +64,11 @@ export async function POST(request: Request) {
 
     // Set token cookie
     response.cookies.set({
-      name: 'token',
+      name: "token",
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 1 week
     })
 

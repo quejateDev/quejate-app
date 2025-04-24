@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
 import { PQRCard } from '@/components/pqr/PQRCard';
-import { Skeleton } from '@/components/ui/skeleton';
+import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { getGetPQRDTO } from '@/dto/pqr.dto';
 
 export default function UserPQRs() {
@@ -12,37 +12,30 @@ export default function UserPQRs() {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    const fetchUserPQRs = async () => {
-      if (!user?.id) return;
-      
-      try {
-        const response = await fetch(`/api/pqr/user?userId=${user.id}`);
-        if (response.ok) {
-          const data = await response.json();
-
-          setPqrs(data);
-        }
-      } catch (error) {
-        console.error('Error fetching user PQRs:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserPQRs();
   }, [user?.id]);
+
+  async function fetchUserPQRs() {
+    try {
+      if (!user?.id) return;
+      setLoading(true);
+      const response = await fetch(`/api/pqr/user?userId=${user?.id}`);
+      const data = await response.json();
+      setPqrs(data);
+    } catch (error) {
+      console.error('Error fetching user PQRs:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading) {
     return (
       <div className="container mx-auto py-8">
         <h1 className="text-2xl font-bold mb-6">Mis Quejas y Reclamos</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="h-[200px] w-full rounded-lg" />
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
-            </div>
+            <PQRSkeleton key={i} />
           ))}
         </div>
       </div>
@@ -63,7 +56,7 @@ export default function UserPQRs() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Mis Quejas y Reclamos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-6">
         {pqrs.map((pqr) => (
           <PQRCard
             key={pqr.id}
