@@ -168,6 +168,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
           daysExceeded={daysExceeded}
           onResolved={handleResolved}
           onFollowUp={handleFollowUp}
+          pqrType={pqr.type}
         />
       )}
     </>
