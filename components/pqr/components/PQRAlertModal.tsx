@@ -10,9 +10,32 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { typeMap } from "@/constants/pqrMaps";
+import { typeMap, statusMap } from "@/constants/pqrMaps";
 import { PQRFollowUpModal } from "./follow-up/PQRFollowUpModal";
 import { useState } from "react";
+import { getPQRDescription } from "@/lib/helpers/pqrHelpers";
+
+type PQRBasicInfo = {
+  id: string;
+  creator: {
+    firstName: string;
+    lastName: string;
+    profilePicture?: string | null;
+  } | null;
+  anonymous: boolean;
+  createdAt: Date;
+  type: keyof typeof typeMap;
+  status: keyof typeof statusMap;
+  customFieldValues: {
+    name: string;
+    value: string;
+  }[];
+  department: {
+    entity: {
+      name: string;
+    };
+  };
+};
 
 type PQRAlertModalProps = {
   open: boolean;
@@ -21,6 +44,7 @@ type PQRAlertModalProps = {
   onResolved: () => void;
   onFollowUp: () => void;
   pqrType: keyof typeof typeMap;
+  pqr: PQRBasicInfo;
 };
 
 export function PQRAlertModal({
@@ -30,8 +54,10 @@ export function PQRAlertModal({
   onResolved,
   onFollowUp,
   pqrType,
+  pqr
 }: PQRAlertModalProps) {
   const [followUpOpen, setFollowUpOpen] = useState(false);
+  const description = getPQRDescription(pqr.customFieldValues);
 
   const handleFollowUpClick = () => {
     onFollowUp();
@@ -100,6 +126,11 @@ export function PQRAlertModal({
         open={followUpOpen}
         onOpenChange={setFollowUpOpen}
         pqrType={pqrType}
+        pqrData={{
+          entity: pqr.department.entity.name,
+          description: description,
+          createdAt: pqr.createdAt
+        }}
       />
     </>
   );

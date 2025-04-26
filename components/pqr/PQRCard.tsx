@@ -10,7 +10,7 @@ import { useVideoPlayback } from "./hooks/useVideoPlayback";
 import { typeMap, statusMap } from "@/constants/pqrMaps";
 import { useComments } from "./hooks/useComments";
 
-type PQRCardProps = {
+export type PQRCardProps = {
   pqr: {
     id: string;
     creator: {

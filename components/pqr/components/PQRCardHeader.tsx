@@ -17,8 +17,17 @@ type PQRCardHeaderProps = {
     } | null;
     anonymous: boolean;
     createdAt: Date;
+    department: {
+      entity: {
+        name: string;
+      };
+    };
     type: keyof typeof typeMap;
     status: keyof typeof statusMap;
+    customFieldValues: {
+      name: string;
+      value: string;
+    }[];
   };
   isUserProfile: boolean;
 };
@@ -169,6 +178,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
           onResolved={handleResolved}
           onFollowUp={handleFollowUp}
           pqrType={pqr.type}
+          pqr={pqr}
         />
       )}
     </>
