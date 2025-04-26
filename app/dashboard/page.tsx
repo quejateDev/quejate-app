@@ -4,7 +4,7 @@ import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 import { PlusIcon } from "lucide-react";
-import PQRList from "@/components/pqrs/pqrsd-list";
+import PQRList from "@/components/pqr/pqrsd-list";
 
 interface PageProps {
   searchParams: Promise<{
@@ -36,7 +36,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   // Build where clause based on search params
   const where: any = {
-    private: false
+    private: false,
   };
 
   if (type && type !== "all") {
@@ -59,7 +59,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   // Fetch PQRs
   const pqrs = await prisma.pQRS.findMany({
-    where,
+    where: {
+      creatorId: {
+        not: null,
+      },
+      ...where,
+    },
     include: {
       creator: {
         select: {
@@ -94,11 +99,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         },
       },
       likes: {
-        where: {
-          userId: "user-id", // TODO: Replace with actual user ID
-        },
         select: {
           id: true,
+          userId: true
         },
       },
       customFieldValues: {
@@ -111,7 +114,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       _count: {
         select: {
           likes: true,
-          comments: true, 
+          comments: true,
         },
       },
     },
@@ -119,7 +122,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       createdAt: "desc",
     },
   });
- 
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto p-4">
@@ -127,8 +130,14 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           <div className="bg-primary/10 p-4 rounded-lg">
             <div className="container mx-auto flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div>
-                <h2 className="font-semibold">¿Tienes alguna petición, queja, reclamo, sugerencia o denuncia?</h2>
-                <p className="text-sm text-muted-foreground">Crea y envía tu PQRSD fácilmente a través de nuestra plataforma.</p>
+                <h2 className="font-semibold">
+                  ¿Tienes alguna petición, queja, reclamo, sugerencia o
+                  denuncia?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Crea y envía tu PQRSD fácilmente a través de nuestra
+                  plataforma.
+                </p>
               </div>
               <Link href="/dashboard/pqrs/create">
                 <Button className="bg-primary hover:bg-primary/90 flex items-center gap-2">

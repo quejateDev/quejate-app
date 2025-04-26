@@ -33,17 +33,6 @@ interface UserProfile {
 export default function useUser() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  async function fetchUser(id: string) {
-    try {
-      const user = await getUserService(id);
-
-      setUser(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   async function fetchUserPQRS(id: string) {
     try {
@@ -55,6 +44,15 @@ export default function useUser() {
     }
   }
 
+
+  async function fetchUser(id: string) {
+    try {
+      const user = await getUserService(id);
+      setUser(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  }
   const clearUser = () => {
     setUser(null);
     setIsLoading(true);

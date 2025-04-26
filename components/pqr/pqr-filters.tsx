@@ -9,57 +9,42 @@ import {
 } from "@/components/ui/select";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Prisma } from "@prisma/client";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
+import { useState, useEffect } from "react";
 
 type PqrFiltersProps = {
-  categories: Prisma.CategoryGetPayload<{
+  departments: Prisma.DepartmentGetPayload<{
     include: {
-      entities: {
-        include: {
-          Department: true;
-        };
-      };
+      entity: true;
     };
   }>[];
+  startDate: string | null;
+  endDate: string | null;
 };
 
-export function PqrFilters({ categories }: PqrFiltersProps) {
+export function PqrFilters({
+  departments,
+  endDate,
+  startDate,
+}: PqrFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Get unique categories from entities
-  const selectedCategoryIds = searchParams.getAll("categoryId");
-  const uniqueCategories = Array.from(new Set(selectedCategoryIds)).filter(
-    Boolean
-  );
-
-  const entities = categories
-    .filter((category) => uniqueCategories.includes(category.id))
-    .flatMap((category) => category.entities);
-
-  // Get unique entities from categories
-  const selectedEntityIds = searchParams.getAll("entityId");
-  const uniqueEntityIds = Array.from(new Set(selectedEntityIds)).filter(
-    Boolean
-  );
-  const selectedEntities = entities.filter((entity) =>
-    uniqueEntityIds.includes(entity.id)
-  );
-
-  // Get unique departments from entities
-  const selectedDepartmentIds = searchParams.getAll("departmentId");
-  const uniqueDepartmentIds = Array.from(new Set(selectedDepartmentIds)).filter(
-    Boolean
-  );
-  const selectedDepartments = selectedEntities.flatMap((entity) =>
-    entity.Department.filter((department) =>
-      uniqueDepartmentIds.includes(department.id)
-    )
-  );
-
-  // Get departments based on selected entity
-  // const selectedEntityId = searchParams.get("entityId");
-  // const selectedEntity = entities.find((e) => e.id === selectedEntityId);
-  // const departments = selectedEntity?.departments || [];
+  const [isOpen, setIsOpen] = useState(false);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: startDate ? parseISO(startDate) : undefined,
+    to: endDate ? parseISO(endDate) : undefined,
+  });
 
   function updateFilters(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString());
@@ -75,63 +60,87 @@ export function PqrFilters({ categories }: PqrFiltersProps) {
       params.delete("departmentId");
     }
 
-    router.push(`?${params.toString()}`);
+    const newUrl = `?${params.toString()}`;
+
+    router.push(newUrl);
   }
+
+  const handleDateSelect = (range: DateRange | undefined) => {
+    console.log("Date range selected:", range);
+
+    // Update local state
+    setDate(range);
+
+    if (range?.from) {
+      updateFilters("startDate", range.from.toISOString());
+    } else {
+      updateFilters("startDate", null);
+    }
+
+    if (range?.to) {
+      updateFilters("endDate", range.to.toISOString());
+    } else {
+      updateFilters("endDate", null);
+    }
+
+    // Close the popover after selection
+    setIsOpen(false);
+  };
 
   return (
     <div className="flex flex-wrap gap-4">
       <Select
-        value={searchParams.get("categoryId") || ""}
-        onValueChange={(value) => updateFilters("categoryId", value)}
-      >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Filtrar por categoría" />
-        </SelectTrigger>
-
-        <SelectContent>
-          {/* <SelectItem value="">Todas las categorias</SelectItem> */}
-          {categories.map((category) => (
-            <SelectItem key={category.id} value={category.id}>
-              {category.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={searchParams.get("entityId") || ""}
-        onValueChange={(value) => updateFilters("entityId", value)}
-      >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Filtrar por entidad" />
-        </SelectTrigger>
-        <SelectContent>
-          {/* <SelectItem value="">Todas las entidades</SelectItem> */}
-          {entities.map((entity) => (
-            <SelectItem key={entity.id} value={entity.id}>
-              {entity.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
         value={searchParams.get("departmentId") || ""}
         onValueChange={(value) => updateFilters("departmentId", value)}
-        disabled={!selectedEntityIds}
       >
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-[200px] bg-white">
           <SelectValue placeholder="Filtrar por departamento" />
         </SelectTrigger>
         <SelectContent>
-          {/* <SelectItem value="">Todos los departamentos</SelectItem> */}
-          {selectedDepartments.map((department) => (
+          {departments.map((department) => (
             <SelectItem key={department.id} value={department.id}>
               {department.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
+
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant={"outline"}
+            className={cn(
+              "w-[240px] justify-start text-left font-normal",
+              !startDate && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date?.from ? (
+              date?.to ? (
+                <>
+                  {format(date.from, "P", { locale: es })} -{" "}
+                  {format(date.to, "P", { locale: es })}
+                </>
+              ) : (
+                format(date.from, "P", { locale: es })
+              )
+            ) : (
+              <span>Filtrar por fecha</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            initialFocus
+            mode="range"
+            defaultMonth={date?.from ? date.from : undefined}
+            selected={date}
+            onSelect={handleDateSelect}
+            numberOfMonths={2}
+            locale={es}
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
