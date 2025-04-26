@@ -10,15 +10,17 @@ import { useVideoPlayback } from "../../hooks/useVideoPlayback";
 import { typeMap, statusMap } from "@/constants/pqrMaps";
 import { useComments } from "../../hooks/useComments";
 
-type PQRCardProps = {
+export type PQRCardProps = {
   pqr: {
     id: string;
     creator: {
+      id: string;
       firstName: string;
       lastName: string;
       profilePicture?: string | null;
     } | null;
     anonymous: boolean;
+    private: boolean;
     createdAt: Date;
     type: keyof typeof typeMap;
     status: keyof typeof statusMap;
@@ -60,10 +62,11 @@ type PQRCardProps = {
     firstName?: string;
     lastName?: string;
   } | null;
+  isUserProfile?: boolean;
 };
 
-export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
-
+export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false }: PQRCardProps) {
+  const shouldShowCard = !pqr.private || isUserProfile || (user?.id && pqr.creator?.id === user.id);
   const { liked, likeCount } = useLike(
     pqr.id,
     initialLiked,
@@ -84,22 +87,26 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
     console.log("Comentario enviado:", text);
   };
 
+  if (!shouldShowCard) {
+    return null;
+  }
   return (
     <div className="md:block">
       <div className="hidden md:block">
         <Card>
           <div className="p-6">
-            <PQRCardHeader pqr={pqr} />
+            <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
           </div>
           <CardContent>
-            <PQRCardContent pqr={pqr}/>
-
+            <PQRCardContent pqr={pqr} />
+            <div className="mt-4">
               <PQRCardAttachments
                 attachments={pqr.attachments}
                 videoRefsDesktop={videoRefsDesktop}
                 isMobile={false}
               />
-
+            </div>
+            <div className="mt-4">
               <PQRCardActions
                 liked={liked}
                 likeCount={likeCount}
@@ -107,6 +114,7 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
                 onCommentClick={toggleComments}
                 pqrId={pqr.id}
               />
+            </div>
             {showComments && (
               <CommentSection
                 pqrId={pqr.id}
@@ -120,7 +128,7 @@ export function PQRCard({ pqr, initialLiked = false, user }: PQRCardProps) {
         </Card>
       </div>
       <div className="md:hidden border-b border-gray-300">
-        <PQRCardHeader pqr={pqr} />
+        <PQRCardHeader pqr={pqr} isUserProfile={true} />
         <PQRCardContent pqr={pqr} />
         <div className="mt-4 mb-2">
           <PQRCardAttachments

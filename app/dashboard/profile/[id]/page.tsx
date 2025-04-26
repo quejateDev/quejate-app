@@ -109,7 +109,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             {pqrs?.length && pqrs.length > 0 ? (
               // @ts-ignore
-              pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} />)
+              pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />)
             ) : (
               <p className="text-muted-foreground">No hay PQRSD publicadas</p>
             )}

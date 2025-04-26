@@ -4,14 +4,16 @@ export interface PQR {
   status: "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
   dueDate: Date;
   anonymous: boolean;
+  private: boolean;
   createdAt: Date;
   updatedAt: Date;
   subject?: string | null;
   description?: string | null;
   creator: {
+    id: string;
     firstName: string;
     lastName: string;
-    avatarUrl?: string;
+    profilePicture?: string | null;
   } | null;
   department: {
     name: string;

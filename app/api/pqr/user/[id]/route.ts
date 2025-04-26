@@ -1,22 +1,26 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getUserIdFromToken } from "@/lib/auth";
 
-export async function GET(request: Request, params: any ) {
+export async function GET(request: Request, params: any) {
   try {
-    const { id: userId } = await params.params;
+    const { id: requestedUserId } = await params.params;
 
-    if (!userId) {
+    if (!requestedUserId) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
     }
 
+    const currentUserId = await getUserIdFromToken();
+    const isOwnProfile = currentUserId === requestedUserId;
+
     const userPQRs = await prisma.pQRS.findMany({
       where: {
-        creatorId: userId,
-        private: false
-      },
+        creatorId: requestedUserId,
+        private: isOwnProfile ? undefined : false
+      },      
       include: {
         likes: true,
         attachments: true,

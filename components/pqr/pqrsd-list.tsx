@@ -18,6 +18,7 @@ export default function PQRList({ pqrs }: PQRListProps) {
           key={pqr.id}
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
+          isUserProfile={false}
           user={authUser || null}
         />
       ))}
