@@ -1,4 +1,3 @@
-//api/legal-docs/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { generateTutelaPrompt } from "@/lib/gpt/generateTutelaPrompt";
 import { sendToGPT } from "@/lib/gpt/sendToModel";
