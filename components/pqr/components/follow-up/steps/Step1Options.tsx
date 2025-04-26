@@ -1,4 +1,3 @@
-// components/pqr/steps/Step1Options.tsx
 import { FileText, ChevronRight } from "lucide-react";
 import type { StepProps } from "../types";
 

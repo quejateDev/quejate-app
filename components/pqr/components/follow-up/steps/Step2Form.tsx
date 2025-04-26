@@ -30,7 +30,7 @@ export function Step2Form({
   onClose,
   pqrData,
 }: StepProps & { pqrData: { entity: string; description: string } }) {
-  console.log("Datos de la PQR recibidos:", pqrData);
+
   const [formData, setFormData] = useState({
     fullName: "",
     documentNumber: "",
@@ -41,7 +41,7 @@ export function Step2Form({
     entity: pqrData.entity,
     pqrDescription: pqrData.description,
   });
-  console.log("Estado inicial del formulario:", formData);
+
   const [departments, setDepartments] = useState<
     { id: string; name: string }[]
   >([]);

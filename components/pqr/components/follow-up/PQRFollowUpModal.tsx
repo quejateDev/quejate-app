@@ -17,6 +17,7 @@ import { Step3GeneratedDocument } from "./steps/Step3GeneratedDocument";
 import { Step2Form } from "./steps/Step2Form";
 import { TutelaFormData } from "./types";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
+import { toast } from "@/hooks/use-toast";
 
 type PQRFollowUpModalProps = {
   open: boolean;
@@ -45,7 +46,15 @@ export function PQRFollowUpModal({
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
-    setStep(2);
+    if (option === "abogado") {
+      toast({
+        title: "Información",
+        description: "No hay abogados disponibles en este momento",
+        variant: "default",
+      });
+      return;
+    }
+    setStep(2); 
   };
 
   const handleGenerateDocument = async (formData: TutelaFormData) => {
