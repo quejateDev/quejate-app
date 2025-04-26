@@ -1,6 +1,8 @@
 "use client";
 
+import useUser from "@/hooks/useUser";
 import useAuthStore from "@/store/useAuthStore";
+import { useEffect } from "react";
 import { PQRCard } from "./PQRCard";
 import { PQR } from "@/types/pqrsd";
 
@@ -10,6 +12,14 @@ interface PQRListProps {
 
 export default function PQRList({ pqrs }: PQRListProps) {
   const { user: authUser } = useAuthStore();
+  const { user: currentUser, fetchUser } = useUser();
+
+  useEffect(() => {
+    if (authUser?.id) {
+      fetchUser(authUser.id);
+    }
+  }, [authUser]);
+
 
   return (
     <div className="space-y-6">
@@ -18,8 +28,8 @@ export default function PQRList({ pqrs }: PQRListProps) {
           key={pqr.id}
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
+          user={currentUser || null}
           isUserProfile={false}
-          user={authUser || null}
         />
       ))}
       {pqrs.length === 0 && (
