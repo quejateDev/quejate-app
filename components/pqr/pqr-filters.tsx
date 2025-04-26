@@ -21,7 +21,7 @@ import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type PqrFiltersProps = {
   departments: Prisma.DepartmentGetPayload<{
