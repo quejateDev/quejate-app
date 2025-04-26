@@ -128,7 +128,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
         </Card>
       </div>
       <div className="md:hidden border-b border-gray-300">
-        <PQRCardHeader pqr={pqr} isUserProfile={true} />
+        <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
         <PQRCardContent pqr={pqr} />
         <div className="mt-4 mb-2">
           <PQRCardAttachments
