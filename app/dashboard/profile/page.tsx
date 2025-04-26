@@ -170,7 +170,7 @@ export default function ProfilePage() {
             {pqrs.length > 0 ? (
               pqrs?.map((pqr) => (
                   //@ts-ignore
-                  <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />
+                  <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} isUserProfile={isOwnProfile} />
                 ))
             ) : (
               <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>
