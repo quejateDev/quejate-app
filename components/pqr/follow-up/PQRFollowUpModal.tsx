@@ -92,7 +92,6 @@ export function PQRFollowUpModal({
     }
   };
   
-
   const handleClose = () => {
     onOpenChange(false);
     setTimeout(() => {
