@@ -35,9 +35,12 @@ type PQRCardHeaderProps = {
 export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const showAlert = isUserProfile && 
-                   calculateBusinessDaysExceeded(pqr.createdAt) > 0 && 
-                   pqr.status !== "RESOLVED";
+                pqr.type !== "SUGGESTION" &&
+                calculateBusinessDaysExceeded(pqr.createdAt) > 0 && 
+                pqr.status !== "RESOLVED" &&
+                pqr.status !== "CLOSED";
 
   const daysExceeded = calculateBusinessDaysExceeded(pqr.createdAt);
 
@@ -166,6 +169,21 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
+            {showAlert && (
+              <div className="relative group">
+                <AlertTriangle 
+                  className="h-5 w-5 text-amber-500 cursor-pointer hover:text-amber-600 transition-colors animate-pulse"
+                  onClick={() => setIsModalOpen(true)}
+                />
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <div className="hidden group-hover:block absolute right-0 top-full mt-1 bg-gray-800 text-white text-xs rounded p-2 whitespace-nowrap z-10 shadow-lg">
+                  Tiempo excedido de respuesta: {daysExceeded}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
