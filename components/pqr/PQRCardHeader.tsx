@@ -1,8 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { typeMap, statusMap } from "../../../constants/pqrMaps";
 import { AlertTriangle, User } from "lucide-react";
 import { typeMap, statusMap } from "../../constants/pqrMaps";
-import { User } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
