@@ -529,28 +529,30 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                       <FormLabel
                         className={`${user === null ? "line-through" : ""} flex flex-col gap-2`}
                       >
-                        <span>
-                          ¿Desea publicar esta PQRSD en el muro?
-                        </span>
+                        <span>¿Desea publicar esta PQRSD en el muro?</span>
                       </FormLabel>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Info className="w-4 h-4" color="red" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Esta opción solo está permitida para usuario
-                          registrados
-                        </TooltipContent>
-                      </Tooltip>
+                      {user === null && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info className="w-4 h-4" color="red" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Esta opción solo está permitida para usuario
+                            registrados
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                     </FormItem>
                   )}
                 />
-                <span
-                  className="text-blue-500 underline font-semibold cursor-pointer"
-                  onClick={() => setIsOpen(true)}
-                >
-                  Inicia sesión para publicar tu PQRSD en el muro.
-                </span>
+                {user === null && (
+                  <span
+                    className="text-blue-500 underline font-semibold cursor-pointer"
+                    onClick={() => setIsOpen(true)}
+                  >
+                    Inicia sesión para publicar tu PQRSD en el muro.
+                  </span>
+                )}
                 <p className="text-xs text-gray-500">
                   Si marca esta opción, su queja será visible para otras
                   personas en la sección de denuncias públicas.
