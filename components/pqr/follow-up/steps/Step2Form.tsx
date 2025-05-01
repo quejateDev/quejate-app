@@ -231,13 +231,13 @@ export function Step2Form({
 
         <div className="space-y-2">
           <Label htmlFor="pqrDescription">Descripción de tu {typeLabel}</Label>
-          <textarea
-            id="pqrDescription"
-            name="pqrDescription"
-            value={formData.pqrDescription}
-            readOnly
-            className="flex w-full rounded-md border border-input bg-gray-100 px-3 py-2 text-sm min-h-[100px]"
-          />
+            <textarea
+              id="pqrDescription"
+              name="pqrDescription"
+              value={formData.pqrDescription}
+              onChange={handleChange}
+              className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[100px]"
+            />
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
