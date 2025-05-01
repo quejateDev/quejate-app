@@ -12,9 +12,9 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { typeMap } from "@/constants/pqrMaps";
-import { Step1Options } from "./steps/Step1Options";
-import { Step3GeneratedDocument } from "./steps/Step3GeneratedDocument";
-import { Step2Form } from "./steps/Step2Form";
+import { LegalActionSelector } from "./steps/LegalActionSelector";
+import { TutelaFormGenerator } from "./steps/TutelaFormGenerator";
+import { DocumentExport } from "./steps/DocumentExport";
 import { TutelaFormData } from "./types";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { toast } from "@/hooks/use-toast";
@@ -110,10 +110,10 @@ export function PQRFollowUpModal({
 
     switch (step) {
       case 1:
-        return <Step1Options {...commonProps} onOptionSelect={handleOptionSelect} />;
+        return <LegalActionSelector {...commonProps} onOptionSelect={handleOptionSelect} />;
       case 2:
         return (
-          <Step2Form
+          <TutelaFormGenerator
             {...commonProps}
             selectedOption={selectedOption}
             isGenerating={isGenerating}
@@ -122,7 +122,7 @@ export function PQRFollowUpModal({
         );
       case 3:
         return (
-          <Step3GeneratedDocument
+          <DocumentExport
             {...commonProps}
             generatedDocument={generatedDocument}
             onClose={handleClose}

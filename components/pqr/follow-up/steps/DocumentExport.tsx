@@ -15,7 +15,7 @@ import {
 import saveAs from "file-saver";
 import jsPDF from "jspdf";
 
-export function Step3GeneratedDocument({
+export function DocumentExport({
   generatedDocument,
   onClose,
   pqrData,

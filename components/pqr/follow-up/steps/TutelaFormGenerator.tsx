@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
 
-export function Step2Form({
+export function TutelaFormGenerator({
   typeLabel,
   onGenerateDocument,
   isGenerating,
