@@ -89,7 +89,7 @@ export function PQRAlertModal({
           <div className="grid grid-cols-1 gap-4 py-2">
             <button 
               onClick={onResolved}
-              className="focus-visible:outline-none flex items-center justify-center gap-3 p-4 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition-colors text-left"
+              className="focus-visible:outline-none flex items-center gap-3 p-4 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition-colors text-left"
             >
               <div className="flex-shrink-0">
                 <CheckCircle2 className="h-6 w-6 text-green-600" />
@@ -102,7 +102,7 @@ export function PQRAlertModal({
             
             <button 
               onClick={handleFollowUpClick}
-              className="flex items-center justify-center gap-3 p-4 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
+              className="flex items-center  gap-3 p-4 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
             >
               <div className="flex-shrink-0">
                 <FileSearch className="h-6 w-6 text-blue-600" />

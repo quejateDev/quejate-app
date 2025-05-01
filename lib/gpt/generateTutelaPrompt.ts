@@ -21,7 +21,7 @@ export const generateTutelaPrompt = ({
   daysExceeded: number;
   pqrDescription: string;
 }) => `
-Redacta una acción de tutela en Colombia teniendo en cuenta los siguientes datos, usando **solo texto plano**, sin negritas, sin cursivas, sin formato Markdown, ni símbolos como asteriscos (*).
+Redacta una acción de tutela en Colombia teniendo en cuenta los siguientes datos, usando solo texto plano, sin negritas, sin cursivas, sin formato Markdown, ni símbolos como asteriscos.
 
 - Nombre del solicitante: ${fullName}
 - Documento de identidad: ${documentNumber}
@@ -34,13 +34,8 @@ Redacta una acción de tutela en Colombia teniendo en cuenta los siguientes dato
 - Descripción de la solicitud: ${pqrDescription}
 - Fecha de la acción de tutela: ${new Date().toLocaleDateString('es-CO')}
 
-La tutela debe estar orientada a proteger el derecho fundamental de petición por la falta de respuesta en el tiempo legal (15 días hábiles). Especifica los hechos, derechos vulnerados, pretensiones y solicita respuesta inmediata.
+La tutela debe estar orientada a proteger el derecho fundamental de ${rightViolated}, el cual ha sido vulnerado por la falta de respuesta a una PQRSD dentro del tiempo legal (15 días hábiles). Especifica los hechos, derechos vulnerados, pretensiones y solicita respuesta inmediata.
 
-Al final del documento, incluye una sección para la firma del solicitante que diga:
-
-"Firma del solicitante:
-
-___________________________
-${fullName}
-C.C. ${documentNumber}"
+No incluir sección para firmar.
+No incluir título "Acción de tutela".
 `;
