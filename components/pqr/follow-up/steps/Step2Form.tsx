@@ -14,14 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-const RIGHTS_VIOLATED = [
-  "Derecho de petición",
-  "Derecho a la salud",
-  "Derecho a la educación",
-  "Derecho al debido proceso",
-  "Derecho a la igualdad",
-];
+import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
 
 export function Step2Form({
   typeLabel,
@@ -37,7 +30,7 @@ export function Step2Form({
     city: "",
     cityId: "",
     department: "",
-    rightViolated: RIGHTS_VIOLATED[0],
+    rightViolated: FUNDAMENTAL_RIGHTS[0],
     entity: pqrData.entity,
     pqrDescription: pqrData.description,
   });
@@ -215,7 +208,7 @@ export function Step2Form({
                 <SelectValue placeholder="Selecciona un derecho" />
               </SelectTrigger>
               <SelectContent>
-                {RIGHTS_VIOLATED.map((right) => (
+                {FUNDAMENTAL_RIGHTS.map((right) => (
                   <SelectItem key={right} value={right}>
                     {right}
                   </SelectItem>

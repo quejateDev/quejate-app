@@ -36,6 +36,7 @@ Redacta una acción de tutela en Colombia teniendo en cuenta los siguientes dato
 
 La tutela debe estar orientada a proteger el derecho fundamental de petición por la falta de respuesta en el tiempo legal (15 días hábiles). Especifica los hechos, derechos vulnerados, pretensiones y solicita respuesta inmediata.
 
-No incluir una sección para la firma del solicitante.
+No incluir sección para firmar.
+No incluir titulo "Acción de tutela".
 
 `;
