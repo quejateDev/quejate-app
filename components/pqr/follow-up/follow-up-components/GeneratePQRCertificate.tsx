@@ -3,7 +3,7 @@ import logo from "@/public/logo2.png";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
-export async function GeneratePQRSDCertificate(data: PQR) {
+export async function GeneratePQRCertificate(data: PQR) {
   const doc = new jsPDF();
   const margin = 15;
   let currentY = margin;
