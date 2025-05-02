@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
-import { generatePQRSDCertificate } from "./generatePQRSDCertificate";
+import { GeneratePQRSDCertificate } from "./GeneratePQRSDCertificate";
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
@@ -231,7 +231,7 @@ export function DocumentExport({
 
     setIsDownloading(true);
     try {
-      const certificateBase64 = await generatePQRSDCertificate(pqrData);
+      const certificateBase64 = await GeneratePQRSDCertificate(pqrData);
       const link = document.createElement("a");
       link.href = certificateBase64;
       link.download = `Certificado-PQRSD.pdf`;
