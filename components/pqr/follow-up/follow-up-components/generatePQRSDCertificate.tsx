@@ -42,12 +42,6 @@ export async function generatePQRSDCertificate(data: PQR) {
     currentY += lineHeight * 1.5;
 
     doc.setFont("helvetica", "normal");
-    doc.text(
-      `Número de Radicado: ${data.consecutiveCode || data.id}`,
-      margin,
-      currentY
-    );
-    currentY += lineHeight;
 
     doc.text(
       `Fecha de Creación: ${formatDate(data.createdAt)}`,

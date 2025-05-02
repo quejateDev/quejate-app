@@ -234,7 +234,7 @@ export function DocumentExport({
       const certificateBase64 = await generatePQRSDCertificate(pqrData);
       const link = document.createElement("a");
       link.href = certificateBase64;
-      link.download = `Certificado-PQRSD-${pqrData.consecutiveCode}.pdf`;
+      link.download = `Certificado-PQRSD.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

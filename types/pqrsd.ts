@@ -44,5 +44,4 @@ export interface PQR {
     likes: number;
     comments: number;
   };
-  consecutiveCode: string;
 }
