@@ -98,11 +98,7 @@ export function TutelaFormGenerator({
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">
-        Información requerida para la tutela
-      </h3>
-
+    <div className="space-y-4 mt-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -237,7 +233,7 @@ export function TutelaFormGenerator({
               name="pqrDescription"
               value={formData.pqrDescription}
               onChange={handleChange}
-              className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[100px]"
+              className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[150px]"
             />
         </div>
 

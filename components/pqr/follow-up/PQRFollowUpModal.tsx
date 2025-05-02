@@ -137,7 +137,7 @@ export function PQRFollowUpModal({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              {step === 1 ? "Seguimiento de PQRSD" : "Generar acción de tutela"}
+              {step === 1 ? "Seguimiento de PQRSD" : "Información requerida para la tutela"}
             </DialogTitle>
           </DialogHeader>
         )}
