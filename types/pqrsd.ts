@@ -25,7 +25,12 @@ export interface PQR {
   };
   likes: { id: string; userId: string }[];
   customFieldValues: { name: string; value: string }[];
-  attachments: any[];
+  attachments: {
+    name: string;
+    url: string;
+    type: string;
+    size: number;
+  }[];
   comments: {
     id: string;
     text: string;
