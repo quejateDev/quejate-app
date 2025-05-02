@@ -3,7 +3,7 @@ import logo from "@/public/logo2.png";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
-export async function GeneratePQRSDCertificate(data: PQR) {
+export async function GeneratePQRCertificate(data: PQR) {
   const doc = new jsPDF();
   const margin = 15;
   let currentY = margin;
@@ -186,7 +186,6 @@ function formatDate(date: Date | string): string {
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 Bytes";
-
   const k = 1024;
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));

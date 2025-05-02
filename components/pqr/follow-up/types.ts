@@ -1,7 +1,4 @@
-import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
-
-export type PQRType = keyof typeof typeMap;
 
 export type TutelaFormData = {
   fullName: string;
@@ -14,8 +11,6 @@ export type TutelaFormData = {
 };
 
 export type StepProps = {
-  pqrType: PQRType;
-  typeLabel: string;
   onOptionSelect?: (option: string) => void;
   onGenerateDocument?: (formData: TutelaFormData) => Promise<void>;
   onClose?: () => void;
