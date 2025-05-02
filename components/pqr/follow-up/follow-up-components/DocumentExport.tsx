@@ -228,32 +228,30 @@ export function DocumentExport({
   };
 
   const handleDownloadCertificate = async () => {
-    if (!pqrData) return;
-  
-    setIsDownloading(true);
     try {
-      const pdfBlob = await GeneratePQRCertificate(pqrData);
-      const blobUrl = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `Certificado-PQRSD-${pqrData.id || Date.now()}.pdf`;
-      
-      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-        window.open(blobUrl, '_blank');
-      } else {
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      const blob = await GeneratePQRCertificate(pqrData);
+      const url = URL.createObjectURL(blob);
+  
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "certificado_pqrsd.pdf";
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
   
       toast({
-        title: "Certificado descargado",
-        description: "Revise su carpeta de descargas",
+        title: "Documento descargado",
+        description: "El certificado PDF se ha generado correctamente",
       });
     } catch (error) {
-    } finally {
-      setIsDownloading(false);
+      console.error("Error al descargar el certificado:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo generar el certificado PDF",
+        variant: "destructive",
+      });
     }
   };
 
