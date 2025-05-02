@@ -16,9 +16,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
 import { PQR } from "@/types/pqrsd";
+import { typeMap } from "@/constants/pqrMaps";
 
 export function TutelaFormGenerator({
-  typeLabel,
   onGenerateDocument,
   isGenerating,
   onClose,
@@ -227,14 +227,16 @@ export function TutelaFormGenerator({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pqrDescription">Descripción de tu {typeLabel}</Label>
-            <textarea
-              id="pqrDescription"
-              name="pqrDescription"
-              value={formData.pqrDescription}
-              onChange={handleChange}
-              className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[150px]"
-            />
+          <Label htmlFor="pqrDescription">
+            Descripción de tu {typeMap[pqrData.type].label.toLowerCase()}
+          </Label>
+          <textarea
+            id="pqrDescription"
+            name="pqrDescription"
+            value={formData.pqrDescription}
+            onChange={handleChange}
+            className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[150px]"
+          />
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
