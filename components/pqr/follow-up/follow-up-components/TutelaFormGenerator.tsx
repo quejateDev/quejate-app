@@ -15,24 +15,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
+import { PQR } from "@/types/pqrsd";
 
-export function Step2Form({
+export function TutelaFormGenerator({
   typeLabel,
   onGenerateDocument,
   isGenerating,
   onClose,
   pqrData,
-}: StepProps & { pqrData: { entity: string; description: string } }) {
+}: StepProps & { pqrData: PQR }) {
 
   const [formData, setFormData] = useState({
     fullName: "",
     documentNumber: "",
     city: "",
     cityId: "",
-    department: "",
+    department: pqrData.department.name,
     rightViolated: FUNDAMENTAL_RIGHTS[0],
-    entity: pqrData.entity,
-    pqrDescription: pqrData.description,
+    entity: pqrData.department.entity.name,
+    pqrDescription: pqrData.description || "",
   });
 
   const [departments, setDepartments] = useState<
@@ -97,11 +98,7 @@ export function Step2Form({
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">
-        Información requerida para la tutela
-      </h3>
-
+    <div className="space-y-4 mt-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -236,7 +233,7 @@ export function Step2Form({
               name="pqrDescription"
               value={formData.pqrDescription}
               onChange={handleChange}
-              className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[100px]"
+              className="flex w-full focus-visible:outline-none rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[150px]"
             />
         </div>
 

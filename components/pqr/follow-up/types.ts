@@ -1,17 +1,7 @@
 import { typeMap } from "@/constants/pqrMaps";
+import { PQR } from "@/types/pqrsd";
 
 export type PQRType = keyof typeof typeMap;
-
-export type PQRFollowUpModalProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  pqrType: keyof typeof typeMap;
-  pqrData: {
-    entity: string;
-    description: string;
-    createdAt: Date;
-  };
-};
 
 export type TutelaFormData = {
   fullName: string;
@@ -35,9 +25,5 @@ export type StepProps = {
   departments?: Array<{ id: string; name: string }>;
   municipalities?: Array<{ id: string; name: string }>;
   onDepartmentChange?: (departmentId: string) => void;
-  pqrData?: { 
-    entity: string;
-    description: string;
-    createdAt: Date;
-  };
+  pqrData?: PQR;
 };

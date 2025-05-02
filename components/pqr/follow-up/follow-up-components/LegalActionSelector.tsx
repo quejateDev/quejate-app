@@ -16,7 +16,7 @@ const LOTTIE_ICONS = {
 
 type ButtonOption = "tutela" | "abogado";
 
-export function Step1Options({ pqrType, typeLabel, onOptionSelect }: StepProps) {
+export function LegalActionSelector({ pqrType, typeLabel, onOptionSelect }: StepProps) {
   const [hoverState, setHoverState] = useState<ButtonOption | null>(null);
 
   const handleMouseEnter = (option: ButtonOption) => {

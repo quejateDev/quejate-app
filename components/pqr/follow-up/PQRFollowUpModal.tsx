@@ -12,22 +12,19 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { typeMap } from "@/constants/pqrMaps";
-import { Step1Options } from "./steps/Step1Options";
-import { Step3GeneratedDocument } from "./steps/Step3GeneratedDocument";
-import { Step2Form } from "./steps/Step2Form";
+import { LegalActionSelector } from "./follow-up-components/LegalActionSelector";
+import { TutelaFormGenerator } from "./follow-up-components/TutelaFormGenerator";
+import { DocumentExport } from "./follow-up-components/DocumentExport";
 import { TutelaFormData } from "./types";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { toast } from "@/hooks/use-toast";
+import { PQR } from "@/types/pqrsd";
 
 type PQRFollowUpModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   pqrType: keyof typeof typeMap;
-  pqrData: {
-    entity: string;
-    description: string;
-    createdAt: Date;
-  };
+  pqrData: PQR;
 };
 
 export function PQRFollowUpModal({
@@ -110,10 +107,10 @@ export function PQRFollowUpModal({
 
     switch (step) {
       case 1:
-        return <Step1Options {...commonProps} onOptionSelect={handleOptionSelect} />;
+        return <LegalActionSelector {...commonProps} onOptionSelect={handleOptionSelect} />;
       case 2:
         return (
-          <Step2Form
+          <TutelaFormGenerator
             {...commonProps}
             selectedOption={selectedOption}
             isGenerating={isGenerating}
@@ -122,7 +119,7 @@ export function PQRFollowUpModal({
         );
       case 3:
         return (
-          <Step3GeneratedDocument
+          <DocumentExport
             {...commonProps}
             generatedDocument={generatedDocument}
             onClose={handleClose}
@@ -140,7 +137,7 @@ export function PQRFollowUpModal({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              {step === 1 ? "Seguimiento de PQRSD" : "Generar acción de tutela"}
+              {step === 1 ? "Seguimiento de PQRSD" : "Información requerida para la tutela"}
             </DialogTitle>
           </DialogHeader>
         )}
