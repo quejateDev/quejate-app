@@ -229,29 +229,29 @@ export function DocumentExport({
 
   const handleDownloadCertificate = async () => {
     if (!pqrData) return;
-
+  
     setIsDownloading(true);
     try {
-      const certificateBase64 = await GeneratePQRCertificate(pqrData);
-      const link = document.createElement("a");
-      link.href = certificateBase64;
-      link.download = `Certificado-PQRSD.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
+      const pdfBlob = await GeneratePQRCertificate(pqrData);
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `Certificado-PQRSD-${pqrData.id || Date.now()}.pdf`;
+      
+      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+        window.open(blobUrl, '_blank');
+      } else {
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+  
       toast({
         title: "Certificado descargado",
-        description:
-          "El certificado de radicación se ha descargado correctamente",
+        description: "Revise su carpeta de descargas",
       });
     } catch (error) {
-      console.error("Error al generar el certificado:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo generar el certificado de radicación",
-        variant: "destructive",
-      });
     } finally {
       setIsDownloading(false);
     }

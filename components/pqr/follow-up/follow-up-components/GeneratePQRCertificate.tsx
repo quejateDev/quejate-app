@@ -158,7 +158,7 @@ export async function GeneratePQRCertificate(data: PQR) {
     throw error;
   }
 
-  return doc.output("datauristring");
+  return doc.output('blob');
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
