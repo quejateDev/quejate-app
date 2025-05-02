@@ -313,9 +313,7 @@ export function DocumentExport({
   }
 
   return (
-    <div
-      className={`flex flex-col ${activeTab === "download" ? "" : "h-screen"} max-w-6xl mx-auto`}
-    >
+    <div className="flex flex-col max-w-6xl mx-auto h-full">
       <div className="pt-6 pb-4 text-center">
         <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-green-100 mb-2">
           <FileCheck className="h-5 w-5 text-green-600" />
@@ -330,181 +328,175 @@ export function DocumentExport({
         )}
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full flex-1 flex flex-col overflow-hidden"
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full flex flex-col flex-1 overflow-hidden"
+      >
+        <TabsList className="mb-4 w-full max-w-md mx-auto grid grid-cols-2">
+          <TabsTrigger value="preview" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" /> Vista previa
+          </TabsTrigger>
+          <TabsTrigger value="download" className="flex items-center gap-2">
+            <Download className="h-4 w-4" /> Descargar
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent 
+          value="preview" 
+          className="overflow-auto flex-1"
+          style={{ height: "calc(100% - 120px)" }}
         >
-          <TabsList className="mb-4 w-full max-w-md mx-auto grid grid-cols-2">
-            <TabsTrigger value="preview" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" /> Vista previa
-            </TabsTrigger>
-            <TabsTrigger value="download" className="flex items-center gap-2">
-              <Download className="h-4 w-4" /> Descargar
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="flex-1 overflow-hidden">
-            <TabsContent value="preview" className="h-full">
-              <div className="flex flex-col h-full">
-                <div className="flex justify-between items-center mb-4 pb-2">
-                  <div className="flex items-center ml-4 gap-2">
-                    <Info className="h-4 w-4 text-sky-500" />
-                    <span className="text-xs text-muted-foreground">
-                      Este documento ha sido generado con inteligencia
-                      artificial
-                    </span>
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-1 mr-10 bg-white hover:bg-slate-100"
-                    onClick={handleCopy}
-                  >
-                    {copySuccess ? (
-                      <>
-                        <Check className="h-4 w-4 text-green-500" /> Copiado
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4" /> Copiar texto
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <div className="flex-1 overflow-auto mb-6">
-                  <div className="bg-white p-8 border rounded-lg shadow-sm mx-6 mb-6">
-                    <h1 className="text-2xl font-bold text-center mb-6">
-                      ACCIÓN DE TUTELA
-                    </h1>
-                    {generatedDocument}
-                  </div>
-                </div>
+          <div className="flex flex-col">
+            <div className="flex justify-between items-center mb-4 pb-2">
+              <div className="flex items-center ml-4 gap-2">
+                <Info className="h-4 w-4 text-sky-500" />
+                <span className="text-xs text-muted-foreground">
+                  Este documento ha sido generado con inteligencia
+                  artificial
+                </span>
               </div>
-            </TabsContent>
 
-            <TabsContent value="download" className="h-full overflow-auto pt-2">
-              <div className="bg-white p-8 rounded-lg border shadow-sm flex flex-col items-center justify-center space-y-8">
-                <div className="text-center space-y-2 max-w-lg">
-                  <h4 className="font-medium text-xl text-green-700">
-                    Descargue su documentación
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Su acción de tutela está lista. Seleccione el formato en el
-                    que desea descargarla para presentar ante la entidad
-                    correspondiente.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
-                  <Button
-                    variant="outline"
-                    className="h-32 flex-col gap-3 border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300 transition-all shadow-sm"
-                    onClick={handleDownloadPDF}
-                    disabled={isDownloading}
-                  >
-                    {isDownloading ? (
-                      <Loader2 className="h-8 w-8 animate-spin text-red-500" />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                        <FileText className="h-6 w-6 text-red-500" />
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="font-medium text-red-700">
-                        Formato PDF
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Documento no editable (.pdf)
-                      </span>
-                    </div>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="h-32 flex-col gap-3 border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm"
-                    onClick={handleDownloadWord}
-                    disabled={isDownloading}
-                  >
-                    {isDownloading ? (
-                      <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <FileText className="h-6 w-6 text-blue-500" />
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="font-medium text-blue-700">
-                        Formato Word
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Documento editable (.docx)
-                      </span>
-                    </div>
-                  </Button>
-                </div>
-
-                <div className="border-t border-slate-200 w-full max-w-xl pt-6 mt-4 flex flex-col items-center">
-                  <h5 className="font-medium text-sm mb-4">
-                    Certificados y Comprobantes
-                  </h5>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 w-full max-w-md h-16 shadow-sm"
-                    onClick={handleDownloadCertificate}
-                    disabled={isDownloading || !pqrData}
-                  >
-                    <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <FileCheck className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium text-emerald-700">
-                        Certificado de radicación
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Comprobante de envío de su PQRSD
-                      </span>
-                    </div>
-                  </Button>
-                </div>
-
-                <div className="text-xs text-muted-foreground text-center max-w-md space-y-2 mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <div className="flex items-start gap-2">
-                    <Info className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                    <p>
-                      Recuerde revisar el contenido de la acción de tutela antes
-                      de presentarla oficialmente. Asegúrese de que todos los
-                      datos e información incluida sean correctos.
-                    </p>
-                  </div>
-                </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 mr-4 bg-white hover:bg-slate-100"
+                onClick={handleCopy}
+              >
+                {copySuccess ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500" /> Copiado
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" /> Copiar texto
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            <div className="overflow-auto px-4 pb-6">
+              <div className="bg-white p-6 md:p-8 border rounded-lg shadow-sm mb-6">
+                <h1 className="text-2xl font-bold text-center mb-6">
+                  ACCIÓN DE TUTELA
+                </h1>
+                {generatedDocument}
               </div>
-            </TabsContent>
+            </div>
           </div>
-        </Tabs>
+        </TabsContent>
+
+        <TabsContent 
+          value="download" 
+          className="overflow-auto flex-1"
+          style={{ height: "calc(100% - 120px)" }}
+        >
+          <div className="bg-white p-4 md:p-8 rounded-lg border shadow-sm flex flex-col items-center justify-center space-y-6 mx-4 mb-4">
+            <div className="text-center space-y-2 max-w-lg">
+              <h4 className="font-medium text-xl text-green-700">
+                Descargue su documentación
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Su acción de tutela está lista. Seleccione el formato en el
+                que desea descargarla para presentar ante la entidad
+                correspondiente.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
+              <Button
+                variant="outline"
+                className="h-24 md:h-32 flex-col gap-2 md:gap-3 border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300 transition-all shadow-sm"
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-red-500" />
+                ) : (
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <FileText className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="font-medium text-red-700">
+                    Formato PDF
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Documento no editable (.pdf)
+                  </span>
+                </div>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-24 md:h-32 flex-col gap-2 md:gap-3 border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm"
+                onClick={handleDownloadWord}
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-blue-500" />
+                ) : (
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <FileText className="h-5 w-5 md:h-6 md:w-6 text-blue-500" />
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="font-medium text-blue-700">
+                    Formato Word
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Documento editable (.docx)
+                  </span>
+                </div>
+              </Button>
+            </div>
+
+            <div className="border-t border-slate-200 w-full max-w-xl pt-6 mt-2 flex flex-col items-center">
+              <h5 className="font-medium text-sm mb-4">
+                Certificados y Comprobantes
+              </h5>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 w-full max-w-md h-16 shadow-sm"
+                onClick={handleDownloadCertificate}
+                disabled={isDownloading || !pqrData}
+              >
+                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <FileCheck className="h-4 w-4 text-emerald-600" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="font-medium text-emerald-700">
+                    Certificado de radicación
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Comprobante de envío de su PQRSD
+                  </span>
+                </div>
+              </Button>
+            </div>
+
+            <div className="text-xs text-muted-foreground text-center max-w-md space-y-2 mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="flex items-start gap-2">
+                <Info className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                <p>
+                  Recuerde revisar el contenido de la acción de tutela antes
+                  de presentarla oficialmente. Asegúrese de que todos los
+                  datos e información incluida sean correctos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <div className="py-4 px-6 bg-white border-t mt-auto">
+        <div className="flex gap-3 max-w-md mx-auto">
+          <Button variant="outline" onClick={onClose} className="flex-1">
+            {activeTab === "download" ? "Finalizar proceso" : "Cancelar"}
+          </Button>
+        </div>
       </div>
-
-      {activeTab === "preview" && (
-        <div className="py-4 px-6 bg-white sticky bottom-0">
-          <div className="flex gap-3 max-w-md mx-auto">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancelar
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "download" && (
-        <div className="py-4 px-6 bg-white sticky bottom-0">
-          <div className="flex gap-3 max-w-md mx-auto">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Finalizar proceso
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
+
 }
