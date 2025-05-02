@@ -1,7 +1,9 @@
+import { statusMap, typeMap } from "@/constants/pqrMaps";
+
 export interface PQR {
   id: string;
-  type: "PETITION" | "COMPLAINT" | "CLAIM" | "SUGGESTION" | "REPORT";
-  status: "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  type: keyof typeof typeMap;
+  status: keyof typeof statusMap;
   dueDate: Date;
   anonymous: boolean;
   private: boolean;
@@ -37,4 +39,5 @@ export interface PQR {
     likes: number;
     comments: number;
   };
+  consecutiveCode: string;
 }

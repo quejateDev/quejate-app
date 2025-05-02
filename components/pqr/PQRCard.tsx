@@ -7,55 +7,11 @@ import { PQRCardActions } from "./PQRCardActions";
 import { CommentSection } from "./CommentSection";
 import { useLike } from "../../hooks/useLike";
 import { useVideoPlayback } from "../../hooks/useVideoPlayback";
-import { typeMap, statusMap } from "@/constants/pqrMaps";
 import { useComments } from "../../hooks/useComments";
+import { PQR } from "@/types/pqrsd";
 
 export type PQRCardProps = {
-  pqr: {
-    id: string;
-    creator: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      profilePicture?: string | null;
-    } | null;
-    anonymous: boolean;
-    private: boolean;
-    createdAt: Date;
-    type: keyof typeof typeMap;
-    status: keyof typeof statusMap;
-    subject?: string | null;
-    description?: string | null;
-    customFieldValues: {
-      name: string;
-      value: string;
-    }[];
-    department: {
-      entity: {
-        name: string;
-      };
-    };
-    attachments: {
-      name: string;
-      url: string;
-      type: string;
-      size: number;
-    }[];
-    comments: {
-      id: string;
-      text: string;
-      createdAt: Date;
-      user: {
-        firstName: string;
-        lastName: string;
-      };
-    }[];
-    _count?: {
-      likes: number;
-      comments: number;
-    };
-    dueDate: Date;
-  };
+  pqr: PQR;
   initialLiked?: boolean;
   user: {
     id?: string;

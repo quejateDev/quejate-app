@@ -6,29 +6,10 @@ import { useState } from "react";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { PQRAlertModal } from "./PQRAlertModal";
 import { toast } from "@/hooks/use-toast";
+import { PQR } from "@/types/pqrsd";
 
 type PQRCardHeaderProps = {
-  pqr: {
-    id: string;
-    creator: {
-      firstName: string;
-      lastName: string;
-      profilePicture?: string | null;
-    } | null;
-    anonymous: boolean;
-    createdAt: Date;
-    department: {
-      entity: {
-        name: string;
-      };
-    };
-    type: keyof typeof typeMap;
-    status: keyof typeof statusMap;
-    customFieldValues: {
-      name: string;
-      value: string;
-    }[];
-  };
+  pqr: PQR;
   isUserProfile: boolean;
 };
 

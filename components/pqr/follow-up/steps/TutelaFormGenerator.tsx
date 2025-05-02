@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
+import { PQR } from "@/types/pqrsd";
 
 export function TutelaFormGenerator({
   typeLabel,
@@ -22,17 +23,17 @@ export function TutelaFormGenerator({
   isGenerating,
   onClose,
   pqrData,
-}: StepProps & { pqrData: { entity: string; description: string } }) {
+}: StepProps & { pqrData: PQR }) {
 
   const [formData, setFormData] = useState({
     fullName: "",
     documentNumber: "",
     city: "",
     cityId: "",
-    department: "",
+    department: pqrData.department.name,
     rightViolated: FUNDAMENTAL_RIGHTS[0],
-    entity: pqrData.entity,
-    pqrDescription: pqrData.description,
+    entity: pqrData.department.entity.name,
+    pqrDescription: pqrData.description || "",
   });
 
   const [departments, setDepartments] = useState<

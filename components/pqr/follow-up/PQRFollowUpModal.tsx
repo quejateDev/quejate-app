@@ -18,16 +18,13 @@ import { DocumentExport } from "./steps/DocumentExport";
 import { TutelaFormData } from "./types";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { toast } from "@/hooks/use-toast";
+import { PQR } from "@/types/pqrsd";
 
 type PQRFollowUpModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   pqrType: keyof typeof typeMap;
-  pqrData: {
-    entity: string;
-    description: string;
-    createdAt: Date;
-  };
+  pqrData: PQR;
 };
 
 export function PQRFollowUpModal({

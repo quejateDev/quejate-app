@@ -14,28 +14,9 @@ import { typeMap, statusMap } from "@/constants/pqrMaps";
 import { PQRFollowUpModal } from "./follow-up/PQRFollowUpModal";
 import { useState } from "react";
 import { getPQRDescription } from "@/lib/helpers/pqrHelpers";
+import { PQR } from "@/types/pqrsd";
 
-type PQRBasicInfo = {
-  id: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-    profilePicture?: string | null;
-  } | null;
-  anonymous: boolean;
-  createdAt: Date;
-  type: keyof typeof typeMap;
-  status: keyof typeof statusMap;
-  customFieldValues: {
-    name: string;
-    value: string;
-  }[];
-  department: {
-    entity: {
-      name: string;
-    };
-  };
-};
+type PQRBasicInfo = PQR;
 
 type PQRAlertModalProps = {
   open: boolean;
@@ -126,11 +107,7 @@ export function PQRAlertModal({
         open={followUpOpen}
         onOpenChange={setFollowUpOpen}
         pqrType={pqrType}
-        pqrData={{
-          entity: pqr.department.entity.name,
-          description: description,
-          createdAt: pqr.createdAt
-        }}
+        pqrData= {pqr}
       />
     </>
   );
