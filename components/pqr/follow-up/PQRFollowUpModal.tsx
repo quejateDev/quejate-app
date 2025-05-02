@@ -130,9 +130,16 @@ export function PQRFollowUpModal({
     }
   };
 
+  
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className={step === 3 ? "sm:max-w-3xl max-h-screen overflow-hidden" : "sm:max-w-md"}>
+      <DialogContent 
+        className={
+          step === 3 
+            ? "sm:max-w-3xl p-0 overflow-hidden flex flex-col max-h-[90vh] h-[90vh]" 
+            : "sm:max-w-md"
+        }
+      >
         {step !== 3 && (
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
