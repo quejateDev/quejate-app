@@ -31,7 +31,7 @@ export function TutelaFormGenerator({
     city: "",
     cityId: "",
     department: pqrData.department.name,
-    rightViolated: FUNDAMENTAL_RIGHTS[0],
+    rightViolated: "",
     entity: pqrData.department.entity.name,
     pqrDescription: pqrData.description || "",
   });
@@ -242,7 +242,7 @@ export function TutelaFormGenerator({
         <div className="flex justify-end gap-3 pt-4">
           <Button
             type="submit"
-            disabled={isGenerating || !formData.department || !formData.city}
+            disabled={isGenerating || !formData.department || !formData.city || !formData.rightViolated || !formData.pqrDescription}
           >
             {isGenerating ? "Generando documento..." : "Generar tutela"}
           </Button>

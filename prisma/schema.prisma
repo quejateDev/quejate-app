@@ -101,13 +101,26 @@ model EntityHasUser {
 }
 
 model Category {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id                String           @id @default(uuid())
+  name              String           @unique
+  description       String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  imageUrl          String?
+  oversightEntityId String?
+  oversightEntity   OversightEntity? @relation(fields: [oversightEntityId], references: [id])
+  entities          Entity[]
+}
+
+model OversightEntity {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  email       String
+  phone       String?
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  imageUrl    String?
-  entities    Entity[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  categories  Category[]
 }
 
 model PQRS {
