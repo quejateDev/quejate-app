@@ -484,6 +484,20 @@ export function DocumentExport({
                 </p>
               </div>
             </div>
+
+            <div className="text-xs text-muted-foreground text-start max-w-md mt-4 p-3 bg-slate-100 rounded-lg border border-slate-200">
+              <p>
+                Una vez descargados los documentos necesarios, puede dirigirse al siguiente enlace para subir la tutela:&nbsp;
+                <a
+                  href="https://procesojudicial.ramajudicial.gov.co/tutelaenlinea"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800"
+                >
+                  https://procesojudicial.ramajudicial.gov.co/tutelaenlinea
+                </a>
+              </p>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
