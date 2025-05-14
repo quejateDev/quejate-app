@@ -20,6 +20,7 @@ export interface PQR {
   department: {
     name: string;
     entity: {
+      id: string;
       name: string;
     };
   };
