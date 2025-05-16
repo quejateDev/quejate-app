@@ -1,6 +1,6 @@
 import { openai } from "../openai";
 
-export async function sendToGPT(prompt: string): Promise<string> {
+export async function sendToGPT(prompt: string, errorMessage = "Error generando el contenido"): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 25000);
 
@@ -21,10 +21,10 @@ export async function sendToGPT(prompt: string): Promise<string> {
       }
     );
 
-    return chatCompletion.choices[0]?.message?.content || "Error generando la tutela";
+    return chatCompletion.choices[0]?.message?.content || errorMessage;
   } catch (error: any) {
-    console.error("[TUTELA_GENERATE_ERROR]", error?.response?.data || error?.message || error);
-    return "Error generando la tutela";
+    console.error("[GPT_GENERATE_ERROR]", error?.response?.data || error?.message || error);
+    return errorMessage;
   } finally {
     clearTimeout(timeoutId);
   }
