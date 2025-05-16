@@ -27,3 +27,11 @@ export type StepProps = {
   onDepartmentChange?: (departmentId: string) => void;
   pqrData?: PQR;
 };
+
+export type OversightEntity = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  description: string;
+};

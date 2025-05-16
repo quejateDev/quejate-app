@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import type { StepProps } from "../types";
+import type { TutelaFormData } from "../types";
 import { useEffect, useState } from "react";
 import {
   getMunicipalitiesByDepartment,
@@ -17,13 +17,21 @@ import { Label } from "@/components/ui/label";
 import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
 import { PQR } from "@/types/pqrsd";
 import { typeMap } from "@/constants/pqrMaps";
+import { Loader2 } from "lucide-react";
+
+type TutelaFormGeneratorProps = {
+  onGenerateDocument: (formData: TutelaFormData) => void;
+  isGenerating: boolean;
+  onClose: () => void;
+  pqrData: PQR;
+};
 
 export function TutelaFormGenerator({
   onGenerateDocument,
   isGenerating,
   onClose,
   pqrData,
-}: StepProps & { pqrData: PQR }) {
+}: TutelaFormGeneratorProps) {
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -87,7 +95,7 @@ export function TutelaFormGenerator({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onGenerateDocument?.(formData);
+    onGenerateDocument(formData);
   };
 
   const handleChange = (
@@ -244,7 +252,14 @@ export function TutelaFormGenerator({
             type="submit"
             disabled={isGenerating || !formData.department || !formData.city || !formData.rightViolated || !formData.pqrDescription}
           >
-            {isGenerating ? "Generando documento..." : "Generar tutela"}
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generando documento...
+              </>
+            ) : (
+              "Generar tutela"
+            )}
           </Button>
         </div>
       </form>

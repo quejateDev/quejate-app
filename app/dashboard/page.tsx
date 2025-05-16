@@ -93,6 +93,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           name: true,
           entity: {
             select: {
+              id: true,
               name: true,
             },
           },
