@@ -477,7 +477,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   label="Archivos Adjuntos"
                   folder="pqr"
                   multiple={true}
-                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx, video/*"
+                  accept="*"
                   maxSize={10}
                 />
               </div>
