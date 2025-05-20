@@ -11,25 +11,16 @@ const s3Client = new S3Client({
   },
 })
 
-const ALLOWED_MIME_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml',
-  'application/json'
-]
-
 export async function POST(request: Request) {
   try {
     const { filename, contentType, folder = 'uploads' } = await request.json()
 
-    if (!ALLOWED_MIME_TYPES.includes(contentType)) {
-      return NextResponse.json(
-        { error: `Tipo de archivo no permitido. Solo se aceptan: ${ALLOWED_MIME_TYPES.join(', ')}` },
-        { status: 400 }
-      )
-    }
+    // if (!ALLOWED_MIME_TYPES.includes(contentType)) {
+    //   return NextResponse.json(
+    //     { error: `Tipo de archivo no permitido. Solo se aceptan: ${ALLOWED_MIME_TYPES.join(', ')}` },
+    //     { status: 400 }
+    //   )
+    // }
     
     // Generate unique filename with folder structure
     const key = `${folder}/${randomUUID()}-${filename}`
