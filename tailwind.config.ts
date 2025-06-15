@@ -21,11 +21,11 @@ export default {
           foreground: '#123159'
         },
         primary: {
-          DEFAULT: '#D8E6F8', 
+          DEFAULT: '#3E5C84', 
           foreground: '#FFFFFF'
         },
         secondary: {
-          DEFAULT: '#3E5C84',
+          DEFAULT: '#D8E6F8',
           foreground: '#FFFFFF'
         },
         muted: {

@@ -71,7 +71,7 @@ export function AppSidebar() {
         {/* Logo de la empresa */}
         <div className="flex items-center justify-center p-4">
           <Image 
-            src="/logo2.png" 
+            src="/logo2.svg" 
             alt="Logo" 
             width={128} 
             height={128}

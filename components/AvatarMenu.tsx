@@ -10,7 +10,6 @@ import {
 } from "./ui/dropdown-menu";
 import { LogIn, LogOut, User } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
-import { toast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import useUser from "@/hooks/useUser";
 import { useLoginModal } from "@/providers/LoginModalProivder";
@@ -35,7 +34,7 @@ export default function AvatarMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="h-10 w-10 border-2 border-muted cursor-pointer">
+        <Avatar className="h-10 w-10 border border-ring cursor-pointer">
           <AvatarImage
             src={
               user && userProfile?.profilePicture

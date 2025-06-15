@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import logo from "@/public/logo2.png";
+import logo from "@/public/logo2.svg";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
