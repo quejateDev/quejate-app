@@ -31,6 +31,7 @@ export default function RootLayout({
     <html lang="es" className={`${sora.variable} ${beVietnamPro.variable}`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="/IsotipoVector.svg" type="image/svg+xml" />
       </head>
       <body className="font-sans antialiased"> 
         <Providers>
