@@ -82,7 +82,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
       <div className="hidden md:block">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full border-tertiary border bg-muted">
               {pqr.anonymous ? (
                 <User className="h-6 w-6 stroke-1" />
               ) : pqr.creator?.profilePicture ? (

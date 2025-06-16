@@ -70,12 +70,12 @@ export default function SocialPage() {
       <Card className="hover:bg-accent transition-colors">
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
-            <Avatar className="h-32 w-32 border-2 border-muted">
+            <Avatar className="h-32 w-32 border border-quaternary">
               {user?.profilePicture ? (
                 <AvatarImage src={user.profilePicture} alt={user.firstName}/>
               ) : null}
               <AvatarFallback className="bg-muted-foreground/10">
-                {<User className="h-16 w-16 stroke-1" />}
+                {<User className="h-16 w-16 stroke-1 text-quaternary" />}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col flex-1">
@@ -104,7 +104,7 @@ export default function SocialPage() {
         {/* Main Content */}
         <div className="md:col-span-8 space-y-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-bold">Descubre Usuarios</h1>
+            <h1 className="text-2xl font-bold pt-4">Descubre usuarios</h1>
             <p className="text-muted-foreground">
               Encuentra y conecta con otros usuarios de la plataforma
             </p>
@@ -148,12 +148,12 @@ export default function SocialPage() {
                         href={`/dashboard/profile/${user.id}`}
                         className="flex items-center gap-3 hover:bg-accent rounded-lg p-2 transition-colors"
                       >
-                        <Avatar className="h-16 w-16 border-2 border-muted">
+                        <Avatar className="h-16 w-16 border border-quaternary">
                           {user?.profilePicture ? (
                             <AvatarImage src={user.profilePicture} alt={user.firstName}/>
                           ) : null}
                           <AvatarFallback className="bg-muted-foreground/10">
-                            {<User className="h-8 w-8 stroke-1" />}
+                            {<User className="h-8 w-8 stroke-1 text-quaternary" />}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col flex-1">

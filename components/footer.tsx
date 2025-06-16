@@ -6,14 +6,14 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Quejate</h3>
-            <p className="text-gray-400">
+            <h3 className="text-xl font-semibold mb-4">Quejate</h3>
+            <p className="text-white">
               Solución integral para la gestión de PQRSD en tu organización
             </p>
           </div>
           <div>
-            <h3 className="text-xl font-bold mb-4">Contacto</h3>
-            <p className="text-gray-400">
+            <h3 className="text-xl font-semibold mb-4">Contacto</h3>
+            <p className="text-white">
               Email: admin@quejate.com.co
               <br />
             </p>

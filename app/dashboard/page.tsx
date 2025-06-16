@@ -135,7 +135,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       <Header/>
       <div className="container mx-auto p-4">
         <div className="space-y-6">
-          <div className="flex items-center mt-4 gap-2">
+          <div className="flex items-center mt-8 gap-2">
             <Play className="h-8 w-8 text-quaternary fill-current" />
             <h1 className=" text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-primary">La comunidad opina</h1>
           </div>
