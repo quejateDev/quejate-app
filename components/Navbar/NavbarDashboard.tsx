@@ -18,19 +18,19 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { NotificationDropdown } from "../NotificationDropdown";
-import Image from "next/image";
+import { Logo } from "../Logo";
 
 export default function NavbarDashboard() {
   const NavItems = () => (
     <>
-      <NavigationMenuItem>
+      <NavigationMenuItem className="mx-2">
         <Link href="/dashboard" legacyBehavior passHref>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
             Inicio
           </NavigationMenuLink>
         </Link>
       </NavigationMenuItem>
-      <NavigationMenuItem>
+      <NavigationMenuItem className="mx-2">
         <Link href="/dashboard/social" legacyBehavior passHref>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
             <Users className="h-4 w-4 mr-2" />
@@ -42,24 +42,15 @@ export default function NavbarDashboard() {
   );
 
   return (
-    <nav className="border-b bg-white w-full">
-      <div className="w-full px-8 sm:px-8 lg:px-12 mx-auto">
-        <div className="flex items-center justify-between h-16">
+    <nav className="border-b bg-secondary w-full">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="flex-shrink-0">
-              <Image 
-                src="/logo2.png" 
-                alt="Logo" 
-                width={128} 
-                height={128}
-                className="h-16 w-auto"
-              />
+              <Logo className="h-8" />
             </Link>
-            <div className="hidden md:block pl-4">
-              <UserSearchCommand />
-            </div>
           </div>
-
+          
           <div className="flex items-center gap-4">
             <div className="hidden md:block mx-4">
               <NavigationMenu>
@@ -73,6 +64,7 @@ export default function NavbarDashboard() {
               <NotificationDropdown />
               <AvatarMenu />
             </div>
+            
             <div className="md:hidden">
               <Sheet>
                 <SheetTrigger asChild>
@@ -86,7 +78,10 @@ export default function NavbarDashboard() {
                     <Link href="/dashboard" className="text-lg font-semibold flex items-center">
                       Inicio
                     </Link>
-                    <Link href="/dashboard/social" className="text-lg font-semibold flex items-center">
+                    <Link 
+                      href="/dashboard/social" 
+                      className="text-lg font-semibold flex items-center"
+                    >
                       <Users className="h-4 w-4 mr-2" />
                       Explorar
                     </Link>

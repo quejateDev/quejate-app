@@ -13,9 +13,28 @@ import { useToast } from '@/hooks/use-toast';
 
 export const dynamic = 'force-dynamic';
 
+const PQRSkeleton = () => (
+  <Card className="w-full">
+    <CardHeader>
+      <div className="space-y-3">
+        <div className="flex items-center space-x-3">
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+          <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+        </div>
+        <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+        <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
+        <div className="flex justify-between items-center pt-2">
+          <div className="h-3 bg-gray-200 rounded animate-pulse w-20"></div>
+          <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+        </div>
+      </div>
+    </CardHeader>
+  </Card>
+);
+
 export default function ProfilePage() {
   const { user: currentUser } = useAuthStore();
-  const { pqrs, fetchUserPQRS } = usePQR();
+  const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
   const { user: userProfile, fetchUser } = useUser();
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
@@ -116,6 +135,33 @@ export default function ProfilePage() {
     );
   }
 
+  const renderPQRSContent = () => {
+    if (pqrsLoading) {
+      return (
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <PQRSkeleton key={index} />
+          ))}
+        </div>
+      );
+    }
+
+    if (pqrs.length > 0) {
+      return (
+        <div className="space-y-4">
+          {pqrs.map((pqr) => (
+            //@ts-ignore
+            <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} isUserProfile={isOwnProfile} />
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>
+    );
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="grid gap-6 md:grid-cols-12">
@@ -123,7 +169,7 @@ export default function ProfilePage() {
           <Card>
             <CardHeader className="text-center">
               <div className="relative mx-auto mb-6 w-32 h-32 group">
-                <Avatar className="h-32 w-32 border-2 border-muted">
+                <Avatar className="h-32 w-32 border-2 border-primary">
                   {userProfile?.profilePicture ? (
                     <AvatarImage src={userProfile.profilePicture} alt={getFullName()} />
                   ) : null}
@@ -166,16 +212,7 @@ export default function ProfilePage() {
         </div>
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
-          <div className="space-y-4">
-            {pqrs.length > 0 ? (
-              pqrs?.map((pqr) => (
-                  //@ts-ignore
-                  <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} isUserProfile={isOwnProfile} />
-                ))
-            ) : (
-              <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>
-            )}
-          </div>
+          {renderPQRSContent()}
         </div>
       </div>
     </div>
