@@ -32,6 +32,10 @@ export default {
           DEFAULT: '#123159',
           foreground: '#FFFFFF'
         },
+        quaternary: {
+          DEFAULT: '#005DD6', 
+          foreground: '#FFFFFF'
+        },
         muted: {
           DEFAULT: '#E8E8E8',
           foreground: '#3E5C84'

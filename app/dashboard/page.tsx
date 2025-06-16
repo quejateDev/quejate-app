@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
 import { Play } from "lucide-react";
 import PQRList from "@/components/pqr/pqrsd-list";
+import { Header } from "@/components/Header";
 
 interface PageProps {
   searchParams: Promise<{
@@ -132,15 +131,19 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   });
 
   return (
+    <div className="w-full">
+      <Header/>
       <div className="container mx-auto p-4">
         <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Play className="h-6 w-6 text-ring fill-current" />
-            <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-primary">La comunidad opina</h1>
+          <div className="flex items-center mt-4 gap-2">
+            <Play className="h-8 w-8 text-quaternary fill-current" />
+            <h1 className=" text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-primary">La comunidad opina</h1>
           </div>
           <PQRFilters entities={entities} departments={departments} />
           <PQRList pqrs={pqrs} />
         </div>
       </div>
+    </div>
+
   );
 }

@@ -49,7 +49,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
   return (
     <div className="md:block">
       <div className="hidden md:block">
-        <Card>
+        <Card className="border-secondary">
           <div className="p-6">
             <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
           </div>
@@ -83,7 +83,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
           </CardContent>
         </Card>
       </div>
-      <div className="md:hidden border-b border-gray-300">
+      <div className="md:hidden border-b border-quaternary">
         <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
         <PQRCardContent pqr={pqr} />
         <div className="mt-4 mb-2">

@@ -25,6 +25,8 @@ const typeOptions = [
   { label: "Petición", value: "PETITION" },
   { label: "Queja", value: "COMPLAINT" },
   { label: "Reclamo", value: "CLAIM" },
+  { label: "Sugerencia", value: "SUGGESTION" },
+  { label: "Denuncia", value: "REPORT" }
 ] as const;
 
 interface PQRFiltersProps {
@@ -72,7 +74,7 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
         value={currentSort}
         onValueChange={(value) => updateQueryParams("sort", value)}
       >
-        <SelectTrigger className="w-full md:w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px] bg-secondary border-quaternary text-quaternary">
           <SelectValue placeholder="Ordenar por" />
         </SelectTrigger>
         <SelectContent>
@@ -88,7 +90,7 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
         value={currentType || "all"}
         onValueChange={(value) => updateQueryParams("type", value === "all" ? null : value)}
       >
-        <SelectTrigger className="w-full md:w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px] bg-secondary border-quaternary text-quaternary">
           <SelectValue placeholder="Tipo de PQR" />
         </SelectTrigger>
         <SelectContent>
@@ -105,7 +107,7 @@ export function PQRFilters({ entities, departments }: PQRFiltersProps) {
         value={currentEntity || "all"}
         onValueChange={(value) => updateQueryParams("entity", value === "all" ? null : value)}
       >
-        <SelectTrigger className="w-full md:w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px] bg-secondary border-quaternary text-quaternary">
           <SelectValue placeholder="Entidad" />
         </SelectTrigger>
         <SelectContent>

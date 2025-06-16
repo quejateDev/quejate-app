@@ -2,7 +2,7 @@ import { FacebookIcon, InstagramIcon } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12 mt-20">
+    <footer className="bg-tertiary text-white py-12">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-8">
           <div>
