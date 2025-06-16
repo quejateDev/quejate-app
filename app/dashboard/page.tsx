@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PQRSType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { PQRFilters } from "@/components/filters/pqr-filters";
-import { PlusIcon } from "lucide-react";
+import { Play } from "lucide-react";
 import PQRList from "@/components/pqr/pqrsd-list";
 
 interface PageProps {
@@ -132,35 +132,15 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto p-4">
+      <div className="container mx-auto p-4">
         <div className="space-y-6">
-          <div className="bg-primary/10 p-4 rounded-lg">
-            <div className="container mx-auto flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-              <div>
-                <h2 className="font-semibold">
-                  ¿Tienes alguna petición, queja, reclamo, sugerencia o
-                  denuncia?
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Crea y envía tu PQRSD fácilmente a través de nuestra
-                  plataforma.
-                </p>
-              </div>
-              <Link href="/dashboard/pqrs/create">
-                <Button className="bg-primary hover:bg-primary/90 flex items-center gap-2">
-                  <PlusIcon className="h-4 w-4" />
-                  <span>Crear PQRSD</span>
-                </Button>
-              </Link>
-            </div>
+          <div className="flex items-center gap-2">
+            <Play className="h-6 w-6 text-ring fill-current" />
+            <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-primary">La comunidad opina</h1>
           </div>
-
           <PQRFilters entities={entities} departments={departments} />
-
           <PQRList pqrs={pqrs} />
         </div>
-      </main>
-    </div>
+      </div>
   );
 }

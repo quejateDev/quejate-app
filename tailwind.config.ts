@@ -28,6 +28,10 @@ export default {
           DEFAULT: '#D8E6F8',
           foreground: '#FFFFFF'
         },
+        tertiary: {
+          DEFAULT: '#123159',
+          foreground: '#FFFFFF'
+        },
         muted: {
           DEFAULT: '#E8E8E8',
           foreground: '#3E5C84'

@@ -43,7 +43,7 @@ export default function NavbarDashboard() {
 
   return (
     <nav className="border-b bg-secondary w-full">
-      <div className="w-full px-8 sm:px-8 lg:px-12 mx-auto">
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="flex-shrink-0">
