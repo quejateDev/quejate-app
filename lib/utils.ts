@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("es-CO", {
+  return new Date(date).toLocaleString("es-CO", {
     year: "numeric",
     month: "long",
     day: "numeric",

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqr/pqr-custom-fields";
+import { typeMap } from "@/constants/pqrMaps";
 
 interface PQRDetailPageProps {
   params: Promise<{ id: string }>;
@@ -46,7 +47,7 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-2xl font-bold">
-              {pqr.type} #{pqr.id}
+              {typeMap[pqr.type].label} #{pqr.id} #{pqr.id}
             </CardTitle>
             <p className="text-muted-foreground mt-2">
               {pqr.department.entity.name} - {pqr.department.name}
