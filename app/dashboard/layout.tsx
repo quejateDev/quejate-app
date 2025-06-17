@@ -19,7 +19,7 @@ export default function RootLayout({
             <div className="w-full"> 
               <NavbarDashboard />
             </div>
-            <div className="flex-1 w-full mx-auto mb-12">
+            <div className="flex-1 w-full mx-auto">
               <LoginModal />
               {children}
             </div>
