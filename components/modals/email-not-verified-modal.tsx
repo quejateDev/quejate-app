@@ -78,7 +78,7 @@ export function EmailNotVerifiedModal({
         </DialogHeader>
         <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button 
-            variant="success" 
+            className="bg-quaternary hover:bg-quaternary/80 text-white" 
             onClick={handleResendVerification}
             disabled={isResending}
           >
