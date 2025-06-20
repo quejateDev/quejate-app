@@ -1,6 +1,7 @@
 import { Sora, Be_Vietnam_Pro } from "next/font/google";
 import { Providers } from "./providers";
 import { Metadata } from "next";
+import "@/app/globals.css"; 
 
 const sora = Sora({
   subsets: ["latin"],

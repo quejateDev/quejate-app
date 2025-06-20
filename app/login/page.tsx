@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { EmailNotVerifiedModal } from "@/components/modals/email-not-verified-modal";
-
+import Image from "next/image";
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
@@ -24,7 +24,7 @@ export default function Login() {
   useEffect(() => {
     if (user) {
       if (user.role === "ADMIN") {
-        router.push("/admin");
+        router.push("/dashboard");
       } else {
         router.push("/dashboard");
       }
@@ -52,28 +52,32 @@ export default function Login() {
             email: userData.user.email,
             name: userData.user.name,
             role: userData.user.role,
+            entity: userData.user.Entity,
           },
           userData.token
         );
+
         document.cookie = `auth-storage=${JSON.stringify({
-          state: { 
+          state: {
             user: {
               id: userData.user.id,
               email: userData.user.email,
               name: userData.user.name,
               role: userData.user.role,
+              entity: userData.user.Entity,
             },
-            token: userData.token
-          }
-        })}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
-  
-        document.cookie = `token=${userData.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+            token: userData.token,
+          },
+        })}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+
+        document.cookie = `token=${userData.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
         // Optional: Show success message
         toast({
           title: "Inicio de sesión exitoso",
           description: "Bienvenido de nuevo!",
           variant: "default",
         });
+
       } else if (response.status === 403) {
         // Show verification modal if email is not verified
         setShowVerificationModal(true);
@@ -102,10 +106,14 @@ export default function Login() {
       className="flex grow bg-white"
       style={{ minHeight: "calc(100vh - 65px)" }}
     >
-      <img
+      <Image
         className="w-1/2 border-none my-auto hidden md:block"
         src="/login-banner.svg"
-      ></img>
+        alt="Login banner"
+        width={1000}
+        height={1000}
+        priority
+      ></Image>
       <div className="w-full md:w-1/2 rounded min-h-full flex items-center grow px-6">
         <Card className="rounded-none w-full">
           <CardHeader className="space-y-2">
@@ -169,7 +177,6 @@ export default function Login() {
                 variant="default"
                 type="submit"
                 className="w-full h-12 text-sm md:text-base"
-                onClick={handleSubmit}
                 disabled={isLoading}
                 isLoading={isLoading}
               >

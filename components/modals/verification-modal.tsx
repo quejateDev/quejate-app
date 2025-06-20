@@ -46,7 +46,7 @@ export default function VerificationModal({
         </div>
         <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button
-            variant="success"
+            className="bg-quaternary text-white hover:bg-quaternary/80"
             onClick={() => {
               onClose();
               router.push("/login");
