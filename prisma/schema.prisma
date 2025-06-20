@@ -67,6 +67,7 @@ model Entity {
   email             String?
   municipalityId    String?
   isVerified        Boolean             @default(false)
+  pqrConfig         PQRConfig?
   Department        Department[]
   EntityConsecutive EntityConsecutive[]
   category          Category            @relation(fields: [categoryId], references: [id])
@@ -159,7 +160,7 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([pqrId, userId])
-  @@index([pqrId])                                                                                                                                                                                                                                                                                                                                                                                                   
+  @@index([pqrId])
   @@index([userId])
 }
 
@@ -215,8 +216,10 @@ model PQRConfig {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   departmentId    String        @unique
+  entityId        String?       @unique
   customFields    CustomField[]
   department      Department    @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  entity          Entity?       @relation(fields: [entityId], references: [id], onDelete: Cascade)
 }
 
 model CustomField {
