@@ -137,7 +137,7 @@ model PQRS {
   updatedAt         DateTime           @updatedAt
   creatorId         String?
   departmentId      String?
-  entityId          String? 
+  entityId          String 
   assignedToId      String?
   private           Boolean            @default(true)
   consecutiveCode   String?
@@ -151,7 +151,7 @@ model PQRS {
   creator           User?              @relation(fields: [creatorId], references: [id])
   assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id])
   department        Department?         @relation(fields: [departmentId], references: [id])
-  entity            Entity?            @relation(fields: [entityId], references: [id])
+  entity            Entity            @relation(fields: [entityId], references: [id])
   customFields      CustomField[]      @relation("CustomFieldToPQRS")
   statusHistory     PQRStatusHistory[]
 

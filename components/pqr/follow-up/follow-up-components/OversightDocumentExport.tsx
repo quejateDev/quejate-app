@@ -76,7 +76,7 @@ export function OversightDocumentExport({
         }
       });
 
-      doc.save(`reporte_ente_control_${pqrData?.department.entity.name || "documento"}.pdf`);
+      doc.save(`reporte_ente_control_${pqrData?.entity?.name || "documento"}.pdf`);
 
       toast({
         title: "Documento descargado",

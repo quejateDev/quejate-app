@@ -16,6 +16,7 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
   const pqr = await prisma.pQRS.findUnique({
     where: { id: resolvedParams.id },
     include: {
+      entity: true,
       department: {
         include: {
           entity: true,
@@ -50,7 +51,8 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
               {typeMap[pqr.type].label} #{pqr.id} #{pqr.id}
             </CardTitle>
             <p className="text-muted-foreground mt-2">
-              {pqr.department.entity.name} - {pqr.department.name}
+              {pqr.entity.name}
+              {pqr.department ? ` - ${pqr.department.name}` : ""}
             </p>
           </div>
         </CardHeader>
