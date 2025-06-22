@@ -48,33 +48,38 @@ export async function POST(req: NextRequest) {
 
     const body = JSON.parse(jsonData as string);
 
-    // Validate required fields
-    if (!body.type || !body.departmentId) {
+    if (!body.type) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "El tipo de solicitud es requerido" },
         { status: 400 }
       );
     }
 
-    const pqrConfig = await prisma.pQRConfig.findFirst({
-      where: {
-        departmentId: body.departmentId,
-      },
-      select: {
-        maxResponseTime: true,
-      },
-    });
+    let maxResponseTime = 15; 
 
-    if (!pqrConfig) {
-      return NextResponse.json(
-        { error: "No PQR configuration found for this department" },
-        { status: 400 }
-      );
+    if (body.departmentId) {
+      const departmentConfig = await prisma.pQRConfig.findFirst({
+        where: { departmentId: body.departmentId },
+        select: { maxResponseTime: true },
+      });
+      
+      if (departmentConfig) {
+        maxResponseTime = departmentConfig.maxResponseTime;
+      }
+    } else {
+      const entityConfig = await prisma.pQRConfig.findFirst({
+        where: { entityId: body.entityId },
+        select: { maxResponseTime: true },
+      });
+      
+      if (entityConfig) {
+        maxResponseTime = entityConfig.maxResponseTime;
+      }
     }
 
-    // Calculate due date based on maxTimeResponse (in days)
+    // Calcular fecha límite
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + pqrConfig.maxResponseTime);
+    dueDate.setDate(dueDate.getDate() + maxResponseTime);
 
     const consecutiveCode = await prisma.entityConsecutive.findFirst({
       where: {

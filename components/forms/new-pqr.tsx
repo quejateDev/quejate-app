@@ -135,7 +135,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         >
                           {field.value
                             ? departments.find(department => department.id === field.value)?.name
-                            : "Seleccione un área (opcional)..."}
+                            : "Seleccione un área ..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
@@ -159,7 +159,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                                     !field.value ? "opacity-100" : "opacity-0"
                                   )}
                                 />
-                                Sin área específica
+                                La entidad no tiene áreas asignadas
                               </CommandItem>
                               {departments.map(department => (
                                 <CommandItem
@@ -199,7 +199,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   <FormItem>
                     <FormLabel>Tema</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Asunto de la PQRSD" />
+                      <Input {...field} placeholder="Tema de la PQRSD" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
