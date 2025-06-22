@@ -1,4 +1,4 @@
-import { Department, PQRS, User, Comment } from "@prisma/client";
+import { Department, PQRS, User, Comment, Entity } from "@prisma/client";
 import { getGetPQRDTO } from "@/dto/pqr.dto";
 import axios from "axios";
 
@@ -13,6 +13,7 @@ const Client = axios.create({
 type createPQRS = {
   type: PQRS["type"];
   departmentId: Department["id"];
+  entityId: Entity["id"];
   creatorId: User["id"];
   customFields: {
     name: string;

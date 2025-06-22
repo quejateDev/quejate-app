@@ -35,6 +35,7 @@ export async function GET(request: Request, params: any) {
             entity: true,
           },
         },
+        entity: true,
         customFieldValues: true,
         creator: true
       },

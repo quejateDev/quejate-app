@@ -11,18 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
-import { getDepartmentsService } from "@/services/api/Department.service";
-import {
-  Entity,
-  Department,
-  PQRSType,
-  User,
-  CustomField,
-} from "@prisma/client";
-import { useCallback, useEffect, useState } from "react";
-import { createPQRS } from "@/services/api/pqr.service";
-import { getEntities } from "@/services/api/entity.service";
+import { PQRSType } from "@prisma/client";
 import useAuthStore from "@/store/useAuthStore";
 import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
@@ -37,9 +26,7 @@ import {
 } from "../ui/command";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "../ui/file-upload";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+
 import {
   Form,
   FormField,
@@ -48,7 +35,6 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";

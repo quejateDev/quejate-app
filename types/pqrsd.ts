@@ -19,11 +19,11 @@ export interface PQR {
   } | null;
   department: {
     name: string;
-    entity: {
-      id: string;
-      name: string;
-    };
-  };
+  } | null;
+  entity: {
+    id: string;
+    name: string;
+  } | null;
   likes: { id: string; userId: string }[];
   customFieldValues: { name: string; value: string }[];
   attachments: {

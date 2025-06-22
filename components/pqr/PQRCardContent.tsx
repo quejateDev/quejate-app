@@ -6,11 +6,9 @@ type PQRCardContentProps = {
         name: string;
         value: string;
       }[];
-      department: {
-        entity: {
-          name: string;
-        };
-      };
+      entity: {
+        name: string;
+      }
     };
   };
   
@@ -22,7 +20,7 @@ return (
         {pqr.subject || "Sin título"}
         </h1>
         <p className="text-xs text-muted-foreground mb-5">
-        Entidad: {pqr.department.entity.name}
+        Entidad: {pqr.entity.name}
         </p>
         <p className="text-sm">
         {pqr.description || "Sin descripción"}

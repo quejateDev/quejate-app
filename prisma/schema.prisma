@@ -70,6 +70,7 @@ model Entity {
   municipalityId    String?
   isVerified        Boolean             @default(false)
   Department        Department[]
+  pqrs              PQRS[]
   category          Category            @relation(fields: [categoryId], references: [id])
   Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
   EntityConsecutive EntityConsecutive[]
@@ -136,6 +137,7 @@ model PQRS {
   updatedAt         DateTime           @updatedAt
   creatorId         String?
   departmentId      String?
+  entityId          String? 
   assignedToId      String?
   private           Boolean            @default(true)
   consecutiveCode   String?
@@ -149,6 +151,7 @@ model PQRS {
   creator           User?              @relation(fields: [creatorId], references: [id])
   assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id])
   department        Department?         @relation(fields: [departmentId], references: [id])
+  entity            Entity?            @relation(fields: [entityId], references: [id])
   customFields      CustomField[]      @relation("CustomFieldToPQRS")
   statusHistory     PQRStatusHistory[]
 

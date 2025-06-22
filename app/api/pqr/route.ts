@@ -55,6 +55,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!body.entityId) {
+      return NextResponse.json(
+        { error: "La entidad es requerida" },
+        { status: 400 }
+      );
+    }
+
     let maxResponseTime = 15; 
 
     if (body.departmentId) {
@@ -111,6 +118,7 @@ export async function POST(req: NextRequest) {
           dueDate,
           anonymous: body.isAnonymous || false,
           departmentId: body.departmentId,
+          entityId: body.entityId,
           creatorId: body.creatorId,
           subject: body.subject,
           description: body.description,
@@ -138,6 +146,7 @@ export async function POST(req: NextRequest) {
         },
         include: {
           department: true, 
+          entity: true,
           customFieldValues: true,
           attachments: true,
           creator: true,
