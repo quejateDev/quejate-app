@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "PQRS" ADD COLUMN     "entityId" TEXT;
+
+-- AddForeignKey
+ALTER TABLE "PQRS" ADD CONSTRAINT "PQRS_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE SET NULL ON UPDATE CASCADE;

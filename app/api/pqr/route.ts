@@ -48,33 +48,45 @@ export async function POST(req: NextRequest) {
 
     const body = JSON.parse(jsonData as string);
 
-    // Validate required fields
-    if (!body.type || !body.departmentId) {
+    if (!body.type) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "El tipo de solicitud es requerido" },
         { status: 400 }
       );
     }
 
-    const pqrConfig = await prisma.pQRConfig.findFirst({
-      where: {
-        departmentId: body.departmentId,
-      },
-      select: {
-        maxResponseTime: true,
-      },
-    });
-
-    if (!pqrConfig) {
+    if (!body.entityId) {
       return NextResponse.json(
-        { error: "No PQR configuration found for this department" },
+        { error: "La entidad es requerida" },
         { status: 400 }
       );
     }
 
-    // Calculate due date based on maxTimeResponse (in days)
+    let maxResponseTime = 15; 
+
+    if (body.departmentId) {
+      const departmentConfig = await prisma.pQRConfig.findFirst({
+        where: { departmentId: body.departmentId },
+        select: { maxResponseTime: true },
+      });
+      
+      if (departmentConfig) {
+        maxResponseTime = departmentConfig.maxResponseTime;
+      }
+    } else {
+      const entityConfig = await prisma.pQRConfig.findFirst({
+        where: { entityId: body.entityId },
+        select: { maxResponseTime: true },
+      });
+      
+      if (entityConfig) {
+        maxResponseTime = entityConfig.maxResponseTime;
+      }
+    }
+
+    // Calcular fecha límite
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + pqrConfig.maxResponseTime);
+    dueDate.setDate(dueDate.getDate() + maxResponseTime);
 
     const consecutiveCode = await prisma.entityConsecutive.findFirst({
       where: {
@@ -106,6 +118,7 @@ export async function POST(req: NextRequest) {
           dueDate,
           anonymous: body.isAnonymous || false,
           departmentId: body.departmentId,
+          entityId: body.entityId,
           creatorId: body.creatorId,
           subject: body.subject,
           description: body.description,
@@ -133,6 +146,7 @@ export async function POST(req: NextRequest) {
         },
         include: {
           department: true, 
+          entity: true,
           customFieldValues: true,
           attachments: true,
           creator: true,

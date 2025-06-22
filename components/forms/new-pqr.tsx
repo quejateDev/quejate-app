@@ -11,18 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
-import { getDepartmentsService } from "@/services/api/Department.service";
-import {
-  Entity,
-  Department,
-  PQRSType,
-  User,
-  CustomField,
-} from "@prisma/client";
-import { useCallback, useEffect, useState } from "react";
-import { createPQRS } from "@/services/api/pqr.service";
-import { getEntities } from "@/services/api/entity.service";
+import { PQRSType } from "@prisma/client";
 import useAuthStore from "@/store/useAuthStore";
 import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
@@ -37,9 +26,7 @@ import {
 } from "../ui/command";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "../ui/file-upload";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+
 import {
   Form,
   FormField,
@@ -48,242 +35,30 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useLoginModal } from "@/providers/LoginModalProivder";
-
-type CustomFieldValue = {
-  name: string;
-  value: string;
-  type: string;
-  placeholder: string;
-  required: boolean;
-};
-
-type PQRSForm = {
-  type: PQRSType;
-  departmentId: Department["id"];
-  creatorId: User["id"];
-  dueDate: Date;
-  customFields: CustomFieldValue[];
-  isAnonymous: boolean;
-  isPrivate: boolean;
-  attachments: File[];
-};
+import { usePQRForm } from "@/hooks/usePQRForm";
 
 type NewPQRFormProps = {
   entityId: string;
 };
 
-const formSchema = z.object({
-  type: z.enum(["PETITION", "COMPLAINT", "CLAIM", "SUGGESTION", "REPORT"]),
-  departmentId: z.string().min(1, "Debe seleccionar un área"),
-  subject: z.string().min(1, "Describa brevemente el tema de su PQRSD"),
-  description: z.string().min(1, "Describa detalladamente su PQRSD"),
-  customFields: z.record(z.string()),
-  isAnonymous: z.boolean(),
-  isPrivate: z.boolean(),
-  attachments: z.array(
-    z.object({
-      url: z.string(),
-      size: z.number(),
-    })
-  ),
-});
-
 export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const { user } = useAuthStore();
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [customFields, setCustomFields] = useState<CustomField[]>([]);
-  const [pqr, setPqr] = useState<PQRSForm>({
-    type: "PETITION",
-    departmentId: "",
-    creatorId: user?.id || "",
-    dueDate: new Date(),
-    customFields: [],
-    isAnonymous: false,
-    isPrivate: true,
-    attachments: [],
-  });
-  const [selectedEntityId, setSelectedEntityId] = useState<string>(entityId);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-  const [openDepartment, setOpenDepartment] = useState(false);
-
   const { setIsOpen } = useLoginModal();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      type: "PETITION",
-      departmentId: "",
-      customFields: {},
-      isAnonymous: false,
-      isPrivate: true,
-      attachments: [],
-    },
-  });
-
-  const router = useRouter();
-
-  useEffect(() => {
-    if (user) {
-      setPqr((prev) => ({ ...prev, creatorId: user?.id || "" }));
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (selectedEntityId) {
-      fetchDepartments();
-    } else {
-      setDepartments([]);
-    }
-  }, [selectedEntityId]);
-
-  async function fetchDepartments() {
-    try {
-      const response = await getDepartmentsService();
-      // Filter departments by selected entity
-      const filteredDepartments = selectedEntityId
-        ? response.filter((dept) => dept.entityId === selectedEntityId)
-        : [];
-      setDepartments(filteredDepartments);
-
-      // Clear department selection when entity changes
-      if (
-        pqr.departmentId &&
-        !filteredDepartments.find((d) => d.id === pqr.departmentId)
-      ) {
-        setPqr((prev) => ({ ...prev, departmentId: "" }));
-      }
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Error al cargar los departamentos",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingInitial(false);
-    }
-  }
-
-  async function fetchCustomFields(departmentId: string) {
-    try {
-      const response = await fetch(`/api/area/${departmentId}/pqr-config`);
-      const data = await response.json();
-      setCustomFields(data?.customFields || []);
-
-      // Initialize all custom fields with empty values
-      setPqr((prev) => ({
-        ...prev,
-        customFields: (data?.customFields || []).map((field: CustomField) => ({
-          name: field.name,
-          value: "",
-          type: field.type,
-          placeholder: field.placeholder || "",
-          required: field.required || false,
-        })),
-      }));
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Error al cargar los campos personalizados",
-        variant: "destructive",
-      });
-    }
-  }
-
-  useEffect(() => {
-    if (selectedEntityId) {
-      fetchDepartments();
-      // Inicializar los custom fields en el formulario
-      const defaultCustomFields = customFields.reduce(
-        (acc, field) => ({
-          ...acc,
-          [field.name]: "",
-        }),
-        {}
-      );
-
-      form.setValue("customFields", defaultCustomFields);
-    }
-  }, [selectedEntityId, customFields, form]);
-
-  useEffect(() => {
-    if (form.getValues("departmentId")) {
-      fetchCustomFields(form.getValues("departmentId"));
-    }
-  }, [form.getValues("departmentId")]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-
-    try {
-      const formData = new FormData();
-
-      // Preparar los custom fields
-      const customFieldsData = customFields.map((field) => ({
-        name: field.name,
-        value: values.customFields[field.name] || "",
-        type: field.type,
-        required: field.required,
-        placeholder: field.placeholder || "",
-      }));
-
-      // Preparar los archivos adjuntos
-      const attachmentsData = values.attachments.map((attachment) => {
-        const extension =
-          attachment.url.split(".").pop()?.toLowerCase() || "unknown";
-
-        return {
-          url: attachment.url,
-          name: attachment.url.split("/").pop() || "",
-          type: extension,
-          size: attachment.size || 0,
-        };
-      });
-
-      formData.append(
-        "data",
-        JSON.stringify({
-          type: values.type,
-          departmentId: values.departmentId,
-          creatorId: user?.id,
-          dueDate: new Date(),
-          customFields: customFieldsData,
-          entityId: selectedEntityId,
-          isAnonymous: values.isAnonymous,
-          isPrivate: values.isPrivate,
-          attachments: attachmentsData,
-          subject: values.subject,
-          description: values.description,
-        })
-      );
-
-      const response = await createPQRS(formData);
-
-      if (response) {
-        toast({
-          title: "PQRSD creado",
-          description: "El PQRSD ha sido creado exitosamente",
-        });
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Error al crear el PQR",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  
+  const {
+    form,
+    departments,
+    customFields,
+    isLoading,
+    isLoadingInitial,
+    openDepartment,
+    setOpenDepartment,
+    onSubmit,
+  } = usePQRForm(entityId, user);
 
   if (isLoadingInitial) {
     return (
@@ -315,7 +90,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   value={form.getValues("type")}
                   onValueChange={(value: PQRSType) => {
                     form.setValue("type", value);
-                    setPqr((prev) => ({ ...prev, type: value }));
                   }}
                 >
                   <SelectTrigger>
@@ -330,16 +104,14 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   </SelectContent>
                 </Select>
               </div>
+
               <FormField
                 control={form.control}
                 name="departmentId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Área</FormLabel>
-                    <Popover
-                      open={openDepartment}
-                      onOpenChange={setOpenDepartment}
-                    >
+                    <FormLabel>Área (Opcional)</FormLabel>
+                    <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
@@ -348,10 +120,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                           className="w-full justify-between"
                         >
                           {field.value
-                            ? departments.find(
-                                (department) => department.id === field.value
-                              )?.name
-                            : "Seleccione un área..."}
+                            ? departments.find(department => department.id === field.value)?.name
+                            : "Seleccione un área ..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
@@ -359,17 +129,30 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         <Command className="w-full">
                           <CommandInput placeholder="Buscar área..." />
                           <CommandList className="max-h-[300px] w-full overflow-y-auto">
-                            <CommandEmpty>
-                              No se encontró ningún área.
-                            </CommandEmpty>
+                            <CommandEmpty>No se encontró ningún área.</CommandEmpty>
                             <CommandGroup className="w-full">
-                              {departments.map((department) => (
+                              <CommandItem
+                                value=""
+                                onSelect={() => {
+                                  field.onChange(undefined);
+                                  setOpenDepartment(false);
+                                }}
+                                className="w-full"
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    !field.value ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                La entidad no tiene áreas asignadas
+                              </CommandItem>
+                              {departments.map(department => (
                                 <CommandItem
                                   key={department.id}
                                   value={department.name}
                                   onSelect={() => {
                                     field.onChange(department.id);
-                                    fetchCustomFields(department.id);
                                     setOpenDepartment(false);
                                   }}
                                   className="w-full"
@@ -402,7 +185,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   <FormItem>
                     <FormLabel>Tema</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Asunto de la PQRSD" />
+                      <Input {...field} placeholder="Tema de la PQRSD" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -419,6 +202,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                       <Textarea
                         {...field}
                         placeholder="Descripción de la PQRSD"
+                        rows={5}
                       />
                     </FormControl>
                     <FormMessage />
@@ -426,14 +210,17 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 )}
               />
 
-              {customFields.map((field) => (
+              {customFields.map(field => (
                 <FormField
                   key={field.name}
                   control={form.control}
                   name={`customFields.${field.name}`}
                   render={({ field: formField }) => (
                     <FormItem>
-                      <FormLabel>{field.name}</FormLabel>
+                      <FormLabel>
+                        {field.name}
+                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                      </FormLabel>
                       <FormControl>
                         {field.type === "textarea" ? (
                           <Textarea
@@ -492,9 +279,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         <Checkbox
                           id="isAnonymous"
                           checked={field.value}
-                          onCheckedChange={(checked) =>
-                            field.onChange(checked as boolean)
-                          }
+                          onCheckedChange={checked => field.onChange(checked)}
                         />
                       </FormControl>
                       <FormLabel>
@@ -513,39 +298,34 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 <FormField
                   control={form.control}
                   name="isPrivate"
-                  disabled={user === null}
+                  disabled={!user}
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl className="m-0">
+                      <FormControl>
                         <Checkbox
                           id="isPrivate"
                           checked={!field.value}
-                          disabled={user === null}
-                          onCheckedChange={(checked) =>
-                            field.onChange(!checked)
-                          }
+                          disabled={!user}
+                          onCheckedChange={checked => field.onChange(!checked)}
                         />
                       </FormControl>
-                      <FormLabel
-                        className={`${user === null ? "line-through" : ""} flex flex-col gap-2`}
-                      >
+                      <FormLabel className={`${!user ? "line-through" : ""} flex flex-col gap-2`}>
                         <span>¿Desea publicar esta PQRSD en el muro?</span>
                       </FormLabel>
-                      {user === null && (
+                      {!user && (
                         <Tooltip>
                           <TooltipTrigger>
-                            <Info className="w-4 h-4" color="red" />
+                            <Info className="w-4 h-4 text-red-500" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Esta opción solo está permitida para usuario
-                            registrados
+                            Esta opción solo está permitida para usuarios registrados
                           </TooltipContent>
                         </Tooltip>
                       )}
                     </FormItem>
                   )}
                 />
-                {user === null && (
+                {!user && (
                   <span
                     className="text-blue-500 underline font-semibold cursor-pointer"
                     onClick={() => setIsOpen(true)}

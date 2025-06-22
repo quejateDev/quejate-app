@@ -29,6 +29,8 @@ model User {
   Like              Like[]
   notifications     Notification[]
   PQRS              PQRS[]
+  assignedPQRS      PQRS[]              @relation("AssignedPQRS")
+  statusHistory     PQRStatusHistory[]
   comments          Comment[]
   department        Department?         @relation(fields: [departmentId], references: [id])
   following         User[]              @relation("UserFollows")
@@ -67,14 +69,16 @@ model Entity {
   email             String?
   municipalityId    String?
   isVerified        Boolean             @default(false)
-  pqrConfig         PQRConfig?
   Department        Department[]
-  EntityConsecutive EntityConsecutive[]
+  pqrs              PQRS[]
   category          Category            @relation(fields: [categoryId], references: [id])
   Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
+  EntityConsecutive EntityConsecutive[]
+  EntityHasUser     EntityHasUser[]
+  pqrConfig         PQRConfig?
   users             User[]
+
   @@index([categoryId])
-  EntityHasUser EntityHasUser[]
 }
 
 model EntityConsecutive {
@@ -123,7 +127,6 @@ model OversightEntity {
   updatedAt   DateTime   @updatedAt
   categories  Category[]
 }
-
 model PQRS {
   id                String             @id @default(uuid())
   type              PQRSType
@@ -133,22 +136,28 @@ model PQRS {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   creatorId         String?
-  departmentId      String
-  subject           String?
-  description       String?
+  departmentId      String?
+  entityId          String? 
+  assignedToId      String?
   private           Boolean            @default(true)
+  consecutiveCode   String?
+  description       String?
+  subject           String?
   attachments       Attachment[]
-  customFieldValues CustomFieldValue[]
   comments          Comment[]
+  customFieldValues CustomFieldValue[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
   creator           User?              @relation(fields: [creatorId], references: [id])
-  department        Department         @relation(fields: [departmentId], references: [id])
+  assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id])
+  department        Department?         @relation(fields: [departmentId], references: [id])
+  entity            Entity?            @relation(fields: [entityId], references: [id])
   customFields      CustomField[]      @relation("CustomFieldToPQRS")
-  consecutiveCode   String?
+  statusHistory     PQRStatusHistory[]
 
   @@index([creatorId])
   @@index([departmentId])
+  @@index([assignedToId])
 }
 
 model Like {
@@ -160,7 +169,7 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([pqrId, userId])
-  @@index([pqrId])
+  @@index([pqrId])                                                                                                                                                                                                                                                                                                                                                                                                   
   @@index([userId])
 }
 
@@ -229,6 +238,7 @@ model CustomField {
   placeholder String?
   required    Boolean   @default(false)
   configId    String
+  isForAnonymous Boolean   @default(false)
   config      PQRConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
   PQRS        PQRS[]    @relation("CustomFieldToPQRS")
 
@@ -285,6 +295,20 @@ model RegionalDepartment {
   name         String         @unique(map: "regionaldepartment_name_key")
   createdat    DateTime?      @default(now()) @db.Timestamp(6)
   Municipality Municipality[]
+}
+
+model PQRStatusHistory {
+  id        String     @id @default(uuid())
+  status    PQRSStatus
+  comment   String?
+  createdAt DateTime   @default(now())
+  pqrId     String
+  userId    String
+  pqr       PQRS       @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@index([pqrId])
+  @@index([userId])
 }
 
 enum UserRole {

@@ -8,6 +8,11 @@ export async function GET(request: Request, { params }: any) {
       where: { id },
       include: {
         category: true,
+        pqrConfig: {
+          include: {
+            customFields: true,
+          },
+        },
       },
     });
 

@@ -98,6 +98,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           },
         },
       },
+      entity: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       likes: {
         select: {
           id: true,
@@ -133,7 +139,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   return (
     <div className="w-full">
       <Header/>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 mb-6">
         <div className="space-y-6">
           <div className="flex items-center mt-8 gap-2">
             <Play className="h-8 w-8 text-quaternary fill-current" />
