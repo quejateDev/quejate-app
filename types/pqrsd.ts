@@ -9,8 +9,8 @@ export interface PQR {
   private: boolean;
   createdAt: Date;
   updatedAt: Date;
-  subject: string;
-  description: string;
+  subject?: string | null;
+  description?: string | null;
   creator: {
     id: string;
     firstName: string;
