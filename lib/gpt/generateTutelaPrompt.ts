@@ -21,21 +21,59 @@ export const generateTutelaPrompt = ({
   daysExceeded: number;
   pqrDescription: string;
 }) => `
-Redacta una acción de tutela en Colombia teniendo en cuenta los siguientes datos, usando solo texto plano, sin negritas, sin cursivas, sin formato Markdown, ni símbolos como asteriscos.
+Redacta una acción de tutela completa y específica para Colombia, siguiendo la estructura legal establecida por la jurisprudencia constitucional colombiana, con los siguientes datos. 
 
-- Nombre del solicitante: ${fullName}
-- Documento de identidad: ${documentNumber}
-- Ciudad y departamento: ${city}, ${department}
-- Derecho fundamental vulnerado: ${rightViolated}
+INFORMACIÓN DEL CASO:
+- Solicitante: ${fullName}
+- Documento: ${documentNumber}
+- Ubicación: ${city}, ${department}
 - Entidad demandada: ${entity}
-- Fecha de radicación de la PQRSD: ${pqrDate}
 - Tipo de solicitud: ${pqrType}
-- Días hábiles transcurridos sin respuesta: ${daysExceeded}
-- Descripción de la solicitud: ${pqrDescription}
-- Fecha de la acción de tutela: ${new Date().toLocaleDateString('es-CO')}
+- Fecha de radicación PQRSD: ${pqrDate}
+- Días transcurridos sin respuesta: ${daysExceeded}
+- Derecho fundamental vulnerado: ${rightViolated}
+- Descripción del caso: ${pqrDescription}
+- Fecha de presentación de la tutela: ${new Date().toLocaleDateString('es-CO')}
 
-La tutela debe estar orientada a proteger el derecho fundamental de ${rightViolated}, el cual ha sido vulnerado por la falta de respuesta a una PQRSD dentro del tiempo legal (15 días hábiles). Especifica los hechos, derechos vulnerados, pretensiones y solicita respuesta inmediata.
+INSTRUCCIONES ESPECÍFICAS:
+1. Sigue la estructura legal colombiana para acciones de tutela
+2. Dirige la tutela al "Juzgado Civil Municipal de ${city}" (no uses indicaciones genéricas)
+3. Usa información concreta y específica, nunca pongas texto entre paréntesis con instrucciones
+4. Estructura obligatoria según normativa colombiana:
+   - SEÑOR JUEZ (encabezado dirigido al juez)
+   - Identificación completa del accionante
+   - Identificación de la entidad accionada
+   - HECHOS (numerados cronológicamente)
+   - DERECHOS FUNDAMENTALES VULNERADOS
+   - PRETENSIONES (lo que se solicita al juez)
+   - FUNDAMENTOS DE DERECHO (marco normativo aplicable)
+   - COMPETENCIA (por qué ese juzgado es competente)
+   - PROCEDIBILIDAD (requisitos de procedencia de la tutela)
+   - SOLICITUD FINAL
+5. Al final del documento, incluir la siguiente fórmula de cierre en líneas separadas:
+   "Atentamente,"
+   "${fullName}"
+   "C.C. ${documentNumber}"
 
-No incluir sección para firmar.
-No incluir título "Acción de tutela".
+CONTEXTO LEGAL COLOMBIANO:
+- Constitución Política de Colombia, artículo 86
+- Decreto 2591 de 1991 (reglamentario de la tutela)
+- El plazo legal para responder PQRSD es de 15 días hábiles (Ley 1755 de 2015)
+- Han transcurrido ${daysExceeded} días sin respuesta, configurando vía de hecho por omisión
+- Se vulnera el derecho fundamental ${rightViolated}
+- La tutela procede contra ${entity} por ser entidad pública/privada que presta servicio público
+- Competencia: Juzgado del lugar donde ocurre la vulneración (${city})
+
+FORMATO:
+- Solo texto plano, sin markdown, sin negritas, sin cursivas
+- No incluir título "Acción de Tutela"
+- No incluir sección de firmas
+- No usar paréntesis con instrucciones como "(indicar)", "(especificar)", etc.
+- Ser completamente específico en todos los datos
+
+EJEMPLO DE LO QUE NO DEBES HACER:
+"Juzgado (indicar competente)"
+"Entidad (nombre de la entidad)"
+"Derecho (especificar derecho)"
+Redacta el documento completo usando únicamente la información proporcionada, sin agregar indicaciones genéricas o texto entre paréntesis.
 `;

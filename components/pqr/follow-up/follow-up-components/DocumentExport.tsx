@@ -117,68 +117,133 @@ export function DocumentExport({
     try {
       const doc = new jsPDF();
 
-      const margin = 20;
+      const margins = {
+        top: 25,
+        bottom: 25,
+        left: 20,
+        right: 20
+      };
+      
       const pageWidth = doc.internal.pageSize.getWidth();
-      const maxWidth = pageWidth - margin * 2;
-      const lineHeight = 7;
-      let yPosition = 30;
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const maxWidth = pageWidth - margins.left - margins.right;
+      const lineHeight = 6;
+      const paragraphSpacing = 4;
+      let yPosition = margins.top;
+
+      const checkPageBreak = (requiredSpace: number = lineHeight) => {
+        if (yPosition + requiredSpace > pageHeight - margins.bottom) {
+          doc.addPage();
+          yPosition = margins.top;
+          return true;
+        }
+        return false;
+      };
+
+      const addTextWithPageControl = (text: string, x: number, fontSize: number = 11, fontStyle: string = 'normal') => {
+        doc.setFontSize(fontSize);
+        doc.setFont("helvetica", fontStyle);
+        
+        const textLines = doc.splitTextToSize(text, maxWidth - (x - margins.left));
+        const requiredSpace = textLines.length * lineHeight;
+        
+        checkPageBreak(requiredSpace);
+        
+        doc.text(textLines, x, yPosition);
+        yPosition += requiredSpace;
+      };
 
       doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text("ACCIÓN DE TUTELA", pageWidth / 2, 20, { align: "center" });
+      doc.text("ACCIÓN DE TUTELA", pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 15;
 
-      yPosition = 40;
-
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
+      doc.setLineWidth(0.5);
+      doc.line(margins.left, yPosition, pageWidth - margins.right, yPosition);
+      yPosition += 10;
 
       const lines = generatedDocument.split("\n");
-
-      lines.forEach((line) => {
-        if (line.trim() === "") {
-          yPosition += lineHeight;
+      
+      lines.forEach((line, index) => {
+        const trimmedLine = line.trim();
+        
+        if (trimmedLine === "") {
+          yPosition += paragraphSpacing;
           return;
         }
 
-        if (line.match(/^(HECHOS:|DERECHOS VULNERADOS:|PRETENSIONES:)/i)) {
-          doc.setFontSize(12);
-          doc.setFont("helvetica", "bold");
-          const textLines = doc.splitTextToSize(line, maxWidth);
-          doc.text(textLines, margin, yPosition);
-          yPosition += textLines.length * lineHeight + 2;
+        if (trimmedLine.match(/^(HECHOS:|DERECHOS VULNERADOS:|PRETENSIONES:|FUNDAMENTOS DE DERECHO:|SOLICITA:|NOTIFICACIONES:)/i)) {
+          if (index > 0) {
+            yPosition += paragraphSpacing * 2;
+            checkPageBreak(lineHeight * 2);
+          }
+          
+          addTextWithPageControl(trimmedLine, margins.left, 12, 'bold');
+          yPosition += paragraphSpacing;
+          return;
+        }
+
+        if (trimmedLine.match(/^\d+\./)) {
+          const parts = trimmedLine.split(".");
+          const number = parts[0] + ".";
+          const content = parts.slice(1).join(".").trim();
+          
+          const estimatedLines = Math.ceil(content.length / 80) + 1;
+          checkPageBreak(estimatedLines * lineHeight);
+          
           doc.setFontSize(11);
-          doc.setFont("helvetica", "normal");
-          return;
-        }
-
-        if (line.match(/^\d+\./)) {
-          const parts = line.split(".");
           doc.setFont("helvetica", "bold");
-          doc.text(parts[0] + ".", margin, yPosition);
-          doc.setFont("helvetica", "normal");
-          const remainingText = parts.slice(1).join(".").trim();
-          if (remainingText) {
-            const textLines = doc.splitTextToSize(remainingText, maxWidth - 10);
-            doc.text(textLines, margin + 10, yPosition);
-            yPosition += textLines.length * lineHeight;
+          doc.text(number, margins.left, yPosition);
+          
+
+          if (content) {
+            doc.setFont("helvetica", "normal");
+            const contentLines = doc.splitTextToSize(content, maxWidth - 15);
+            doc.text(contentLines, margins.left + 15, yPosition);
+            yPosition += contentLines.length * lineHeight;
           } else {
             yPosition += lineHeight;
           }
+          
+          yPosition += paragraphSpacing / 2;
           return;
         }
 
-        const textLines = doc.splitTextToSize(line, maxWidth);
-        doc.text(textLines, margin, yPosition);
-        yPosition += textLines.length * lineHeight;
-
-        if (yPosition > doc.internal.pageSize.getHeight() - 20) {
-          doc.addPage();
-          yPosition = 20;
+        if (trimmedLine.length > 0) {
+          const prevLine = index > 0 ? lines[index - 1].trim() : "";
+          if (prevLine.length > 0 && !prevLine.match(/^\d+\./) && !trimmedLine.match(/^(HECHOS:|DERECHOS VULNERADOS:|PRETENSIONES:)/i)) {
+            yPosition += paragraphSpacing / 2;
+          }
+          
+          addTextWithPageControl(trimmedLine, margins.left);
+          yPosition += paragraphSpacing / 2;
         }
       });
 
-      doc.setFontSize(10);
-      doc.setTextColor(100);
+      const totalPages = doc.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(128);
+        doc.setFont("helvetica", "normal");
+        
+        doc.text(
+          `Página ${i} de ${totalPages}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: "center" }
+        );
+
+        const generateDate = new Date().toLocaleDateString('es-CO');
+        doc.text(
+          `Generado: ${generateDate}`,
+          pageWidth - margins.right,
+          pageHeight - 10,
+          { align: "right" }
+        );
+      }
+
+      doc.setTextColor(0);
 
       doc.save(`tutela_${pqrData?.entity?.name || "documento"}.pdf`);
 
