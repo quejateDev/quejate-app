@@ -206,7 +206,9 @@ export default function ProfilePage() {
               </div>
               
               <h2 className="text-2xl font-semibold">{getFullName()}</h2>
-              <p className="text-sm text-muted-foreground">{currentUser?.email}</p>
+              <p className="text-sm text-muted-foreground break-words px-4">
+                {currentUser?.email}
+              </p>
             </CardHeader>
           </Card>
         </div>

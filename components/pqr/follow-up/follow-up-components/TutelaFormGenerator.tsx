@@ -117,6 +117,7 @@ export function TutelaFormGenerator({
               value={formData.fullName}
               onChange={handleChange}
               required
+              className="border-muted border"
             />
           </div>
 
@@ -128,6 +129,7 @@ export function TutelaFormGenerator({
               value={formData.documentNumber}
               onChange={handleChange}
               required
+              className="border-muted border"
             />
           </div>
 
@@ -145,10 +147,10 @@ export function TutelaFormGenerator({
                 }));
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger  className="border-muted border">
                 <SelectValue placeholder="Seleccione un departamento" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="border-muted border">
                 {departments.map((department) => (
                   <SelectItem key={department.id} value={department.id}>
                     {department.name}
@@ -174,7 +176,7 @@ export function TutelaFormGenerator({
               }}
               disabled={!selectedDepartment || loadingMunicipalities}
             >
-              <SelectTrigger>
+              <SelectTrigger  className="border-muted border">
                 <SelectValue
                   placeholder={
                     loadingMunicipalities
@@ -209,7 +211,7 @@ export function TutelaFormGenerator({
               }
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="border-muted border">
                 <SelectValue placeholder="Selecciona un derecho" />
               </SelectTrigger>
               <SelectContent>
@@ -229,7 +231,7 @@ export function TutelaFormGenerator({
               name="entity"
               value={formData.entity}
               readOnly
-              className="bg-gray-100"
+              className="bg-gray-100 border-muted border"
             />
           </div>
         </div>

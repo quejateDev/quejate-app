@@ -104,55 +104,38 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   </SelectContent>
                 </Select>
               </div>
-
-              <FormField
-                control={form.control}
-                name="departmentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Área (Opcional)</FormLabel>
-                    <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={openDepartment}
-                          className="w-full justify-between"
-                        >
-                          {field.value
-                            ? departments.find(department => department.id === field.value)?.name
-                            : "Seleccione un área ..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                        <Command className="w-full">
-                          <CommandInput placeholder="Buscar área..." />
-                          <CommandList className="max-h-[300px] w-full overflow-y-auto">
-                            <CommandEmpty>No se encontró ningún área.</CommandEmpty>
-                            <CommandGroup className="w-full">
-                              <CommandItem
-                                value=""
-                                onSelect={() => {
-                                  field.onChange(undefined);
-                                  setOpenDepartment(false);
-                                }}
-                                className="w-full"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    !field.value ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                La entidad no tiene áreas asignadas
-                              </CommandItem>
-                              {departments.map(department => (
+              
+              {departments.length > 0 && (
+                <FormField
+                  control={form.control}
+                  name="departmentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Área (Opcional)</FormLabel>
+                      <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openDepartment}
+                            className="w-full justify-between"
+                          >
+                            {field.value
+                              ? departments.find(department => department.id === field.value)?.name
+                              : "Seleccione un área ..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                          <Command className="w-full">
+                            <CommandInput placeholder="Buscar área..." />
+                            <CommandList className="max-h-[300px] w-full overflow-y-auto">
+                              <CommandEmpty>No se encontró ningún área.</CommandEmpty>
+                              <CommandGroup className="w-full">
                                 <CommandItem
-                                  key={department.id}
-                                  value={department.name}
+                                  value=""
                                   onSelect={() => {
-                                    field.onChange(department.id);
+                                    field.onChange(undefined);
                                     setOpenDepartment(false);
                                   }}
                                   className="w-full"
@@ -160,23 +143,42 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                                   <Check
                                     className={cn(
                                       "mr-2 h-4 w-4",
-                                      field.value === department.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
+                                      !field.value ? "opacity-100" : "opacity-0"
                                     )}
                                   />
-                                  {department.name}
+                                  La entidad no tiene áreas asignadas
                                 </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                                {departments.map(department => (
+                                  <CommandItem
+                                    key={department.id}
+                                    value={department.name}
+                                    onSelect={() => {
+                                      field.onChange(department.id);
+                                      setOpenDepartment(false);
+                                    }}
+                                    className="w-full"
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        field.value === department.id
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {department.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}

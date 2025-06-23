@@ -293,7 +293,7 @@ export function PQRFollowUpModal({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className={`
+        className={` bg-white
         ${showDocumentExport && generatedDocument ? "sm:max-w-3xl p-0 overflow-hidden flex flex-col max-h-[90vh] h-[90vh]" : ""}
         ${showTutelaForm ? "sm:max-w-xl" : ""}
         ${!showDocumentExport && !showTutelaForm ? "sm:max-w-md" : ""}
