@@ -38,9 +38,9 @@ export function TutelaFormGenerator({
     documentNumber: "",
     city: "",
     cityId: "",
-    department: pqrData.department.name,
+    department: pqrData.department?.name ?? "",
     rightViolated: "",
-    entity: pqrData.department.entity.name,
+    entity: pqrData.entity.name ?? "",
     pqrDescription: pqrData.description || "",
   });
 

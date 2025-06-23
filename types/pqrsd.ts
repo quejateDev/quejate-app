@@ -23,7 +23,7 @@ export interface PQR {
   entity: {
     id: string;
     name: string;
-  } | null;
+  };
   likes: { id: string; userId: string }[];
   customFieldValues: { name: string; value: string }[];
   attachments: {

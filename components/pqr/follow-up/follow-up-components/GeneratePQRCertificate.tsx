@@ -55,7 +55,7 @@ export async function GeneratePQRCertificate(data: PQR) {
     currentY += lineHeight;
 
     doc.text(
-      `Entidad: ${data.department?.entity?.name || "No especificada"}`,
+      `Entidad: ${data.entity?.name || "No especificada"}`,
       margin,
       currentY
     );

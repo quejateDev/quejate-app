@@ -91,7 +91,7 @@ export function DocumentExport({
       const blob = await Packer.toBlob(doc);
       saveAs(
         blob,
-        `tutela_${pqrData?.department.entity.name || "documento"}.docx`
+        `tutela_${pqrData?.entity?.name || "documento"}.docx`
       );
 
       toast({
@@ -180,7 +180,7 @@ export function DocumentExport({
       doc.setFontSize(10);
       doc.setTextColor(100);
 
-      doc.save(`tutela_${pqrData?.department.entity.name || "documento"}.pdf`);
+      doc.save(`tutela_${pqrData?.entity?.name || "documento"}.pdf`);
 
       toast({
         title: "Documento descargado",
@@ -320,9 +320,9 @@ export function DocumentExport({
         <h3 className="text-green-700 font-semibold text-xl mb-1">
           Acción de Tutela Generada Exitosamente
         </h3>
-        {pqrData?.department.entity.name && (
+        {pqrData?.entity?.name && (
           <div className="text-sm text-muted-foreground">
-            Contra: <strong>{pqrData.department.entity.name}</strong>
+            Contra: <strong>{pqrData.entity.name}</strong>
           </div>
         )}
       </div>

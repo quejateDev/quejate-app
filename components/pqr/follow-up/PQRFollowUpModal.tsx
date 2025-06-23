@@ -61,7 +61,7 @@ export function PQRFollowUpModal({
     const fetchOversightEntity = async () => {
       try {
         setIsLoading(true);
-        const entityId = pqrData.department?.entity?.id;
+        const entityId = pqrData.entity?.id;
         if (!entityId) {
           setError("No se pudo identificar la entidad");
           return;
@@ -96,7 +96,7 @@ export function PQRFollowUpModal({
     if (pqrType === "COMPLAINT" || pqrType === "REPORT") {
       fetchOversightEntity();
     }
-  }, [pqrType, pqrData.department?.entity?.id]);
+  }, [pqrType, pqrData.entity?.id]);
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
@@ -216,7 +216,7 @@ export function PQRFollowUpModal({
             ? `${pqrData.creator.firstName} ${pqrData.creator.lastName}`
             : "Anónimo",
           oversightEntity: oversightEntity.name,
-          entity: pqrData.department.entity.name,
+          entity: pqrData.entity?.name,
           pqrType: typeMap[pqrType].label,
           pqrDate: createdAtDate.toISOString().split("T")[0],
           daysExceeded: daysExceeded,
