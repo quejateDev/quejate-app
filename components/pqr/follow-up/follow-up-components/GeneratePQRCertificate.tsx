@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import logo from "@/public/logo2.svg";
+// import logo from "@/public/logo2.svg";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
@@ -19,8 +19,8 @@ export async function GeneratePQRCertificate(data: PQR) {
   };
 
   try {
-    const logoImage = await loadImage(logo.src);
-    doc.addImage(logoImage, "PNG", margin, currentY, 40, 20);
+    // const logoImage = await loadImage(logo.src);
+    // doc.addImage(logoImage, "PNG", margin, currentY, 40, 20);
     currentY += 30;
 
     doc.setFontSize(16);

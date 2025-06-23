@@ -7,7 +7,7 @@ export async function sendToGPT(prompt: string, errorMessage = "Error generando 
   try {
     const chatCompletion = await openai.chat.completions.create(
       {
-        model: "gpt-4o-mini",
+        model: "gpt-4o-2024-11-20",
         messages: [
           {
             role: "user",
