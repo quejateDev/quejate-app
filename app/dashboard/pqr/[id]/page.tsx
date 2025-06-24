@@ -70,6 +70,18 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             </p>
           </div>
 
+          <div>
+            <h3 className="font-semibold mb-2">Tema</h3>
+              <p className="mb-6">
+                {pqr.subject}
+              </p>
+            <h3 className="font-semibold mb-2">Descripción</h3>
+              <p>
+                {pqr.description}
+              </p>
+          </div>
+          <PQRCustomFields fields={pqr.customFieldValues} />
+          
           {/* Tiempo Restante */}
           <div>
             <h3 className="font-semibold mb-2">Tiempo de Respuesta</h3>
@@ -87,9 +99,6 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
                 : `${remainingDays} días restantes`}
             </Badge>
           </div>
-
-          {/* Campos Personalizados */}
-          <PQRCustomFields fields={pqr.customFieldValues} />
 
           {/* Archivos Adjuntos */}
           <PQRAttachments attachments={pqr.attachments} />
