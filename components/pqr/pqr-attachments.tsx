@@ -1,6 +1,6 @@
 "use client";
 
-import { FileIcon, ImageIcon } from "lucide-react";
+import { Paperclip } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 
@@ -70,8 +70,7 @@ export function PQRAttachments({ attachments }: PQRAttachmentsProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md hover:bg-secondary/80 transition-colors text-sm"
             >
-              <FileIcon className="w-4 h-4" />
-              {file.name}
+              <Paperclip className="w-4 h-4 no-hover" />
             </a>
           ))}
         </div>

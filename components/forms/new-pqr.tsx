@@ -146,7 +146,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                                       !field.value ? "opacity-100" : "opacity-0"
                                     )}
                                   />
-                                  La entidad no tiene áreas asignadas
+                                  Ningún área seleccionada
                                 </CommandItem>
                                 {departments.map(department => (
                                   <CommandItem
