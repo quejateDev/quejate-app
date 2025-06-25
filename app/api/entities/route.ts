@@ -42,6 +42,11 @@ export async function GET(req: Request) {
             },
           },
         },
+        _count: {
+          select: {
+            pqrs: true,
+          },
+        },
       },
     });
 
@@ -105,6 +110,11 @@ export async function POST(request: Request) {
         category: {
           select: {
             name: true,
+          },
+        },
+        _count: {
+          select: {
+            pqrs: true,
           },
         },
       },

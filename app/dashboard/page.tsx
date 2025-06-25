@@ -4,6 +4,8 @@ import { PQRFilters } from "@/components/filters/pqr-filters";
 import { Play } from "lucide-react";
 import PQRList from "@/components/pqr/pqrsd-list";
 import { Header } from "@/components/Header";
+import DashboardSidebar from "@/components/sidebars/UserSidebar";
+import EntitiesSidebar from "@/components/sidebars/EntitiesSidebar";
 
 interface PageProps {
   searchParams: Promise<{
@@ -140,16 +142,25 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <div className="w-full">
       <Header/>
       <div className="container mx-auto p-4 mb-6">
-        <div className="space-y-6">
-          <div className="flex items-center mt-8 gap-2">
-            <Play className="h-8 w-8 text-quaternary fill-current" />
-            <h1 className=" text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-primary">La comunidad opina</h1>
+        <div className="flex gap-6">
+          <div className="hidden lg:block mt-8">
+            <EntitiesSidebar />
           </div>
-          <PQRFilters entities={entities} departments={departments} />
-          <PQRList pqrs={pqrs} />
+          <div className="flex-1 space-y-6">
+            <div className="flex items-center mt-8 gap-2">
+              <Play className="h-8 w-8 text-quaternary fill-current" />
+              <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-primary">
+                La comunidad opina
+              </h1>
+            </div>
+            <PQRFilters entities={entities} departments={departments} />
+            <PQRList pqrs={pqrs} />
+          </div>
+          <div className="hidden lg:block mt-8">
+            <DashboardSidebar />
+          </div>
         </div>
       </div>
     </div>
-
   );
 }
