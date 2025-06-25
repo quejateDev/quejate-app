@@ -10,6 +10,7 @@ import usePQR from '@/hooks/usePQR';
 import useUser from '@/hooks/useUser';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
 
 export const dynamic = 'force-dynamic';
 
@@ -166,7 +167,7 @@ export default function ProfilePage() {
     <div className="container mx-auto p-4">
       <div className="grid gap-6 md:grid-cols-12">
         <div className="md:col-span-4">
-          <Card>
+          <Card className='mb-6'>
             <CardHeader className="text-center">
               <div className="relative mx-auto mb-6 w-32 h-32 group">
                 <Avatar className="h-32 w-32 border-2 border-primary">
@@ -211,6 +212,10 @@ export default function ProfilePage() {
               </p>
             </CardHeader>
           </Card>
+          <FavoritesSidebar 
+            userId={currentUser?.id || ''} 
+            className="w-full"
+          />
         </div>
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
