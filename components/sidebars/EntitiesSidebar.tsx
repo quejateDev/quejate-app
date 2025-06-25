@@ -99,7 +99,7 @@ export default function EntitiesSidebar({ className = "" }: EntitiesSidebarProps
 
   if (isLoading) {
     return (
-      <div className={`w-80 space-y-6 ${className}`}>
+      <div className={`w-60 space-y-6 ${className}`}>
         <Card>
           <CardContent className="pt-6">
             <div className="animate-pulse space-y-4">
@@ -123,7 +123,7 @@ export default function EntitiesSidebar({ className = "" }: EntitiesSidebarProps
   }
 
   return (
-    <div className={`w-80 space-y-6 ${className}`}>
+    <div className={`w-60 space-y-6 ${className}`}>
       {featuredEntities.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
