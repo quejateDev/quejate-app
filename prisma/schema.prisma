@@ -32,6 +32,7 @@ model User {
   assignedPQRS      PQRS[]              @relation("AssignedPQRS")
   statusHistory     PQRStatusHistory[]
   comments          Comment[]
+  favorites         UserFavoriteEntity[]
   department        Department?         @relation(fields: [departmentId], references: [id])
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
@@ -71,6 +72,7 @@ model Entity {
   isVerified        Boolean             @default(false)
   Department        Department[]
   pqrs              PQRS[]
+  favoritedBy       UserFavoriteEntity[]
   category          Category            @relation(fields: [categoryId], references: [id])
   Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
   EntityConsecutive EntityConsecutive[]
@@ -79,6 +81,18 @@ model Entity {
   users             User[]
 
   @@index([categoryId])
+}
+
+model UserFavoriteEntity {
+  id        String   @id @default(uuid())
+  userId    String
+  entityId  String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  entity    Entity   @relation(fields: [entityId], references: [id])
+  
+  @@unique([userId, entityId])
 }
 
 model EntityConsecutive {

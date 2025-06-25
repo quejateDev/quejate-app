@@ -8,7 +8,7 @@ export async function PATCH(
   ) {
     try {
       const { id } = await params;
-      const currentUserId = await getUserIdFromToken();;
+      const currentUserId = await getUserIdFromToken();
       
       if (!currentUserId) {
         return NextResponse.json(
