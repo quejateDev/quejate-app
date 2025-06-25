@@ -14,6 +14,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { Entity } from '@/types/entity';
+import Link from 'next/link';
 
 interface FavoritesState {
   favorites: Entity[];
@@ -151,67 +152,69 @@ const EntityCard: React.FC<{
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <Avatar className="h-12 w-12">
-            {entity.imageUrl ? (
-              <AvatarImage src={entity.imageUrl} alt={entity.name} />
-            ) : null}
-            <AvatarFallback className="bg-primary/10">
-              <Building2 className="h-6 w-6 text-primary" />
-            </AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-sm truncate">{entity.name}</h4>
-                <Badge className="text-xs mt-1 bg-secondary text-tertiary">
-                  {entity.category.name}
-                </Badge>
+    <Link href={`/dashboard/pqrs/create/${entity.id}`} passHref>
+      <Card className="hover:shadow-md transition-shadow cursor-pointer">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <Avatar className="h-12 w-12">
+              {entity.imageUrl ? (
+                <AvatarImage src={entity.imageUrl} alt={entity.name} />
+              ) : null}
+              <AvatarFallback className="bg-primary/10">
+                <Building2 className="h-6 w-6 text-primary" />
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm truncate">{entity.name}</h4>
+                  <Badge className="text-xs mt-1 bg-secondary text-tertiary">
+                    {entity.category.name}
+                  </Badge>
+                </div>
+                
+                {onToggleFavorite && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleToggleFavorite}
+                    disabled={isToggling}
+                    className="h-8 w-8 p-0 hover:bg-red-50"
+                  >
+                    {isToggling ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isFavorite ? (
+                      <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                    ) : (
+                      <Heart className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                )}
               </div>
               
-              {onToggleFavorite && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleToggleFavorite}
-                  disabled={isToggling}
-                  className="h-8 w-8 p-0 hover:bg-red-50"
-                >
-                  {isToggling ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : isFavorite ? (
-                    <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-                  ) : (
-                    <Heart className="h-4 w-4 text-gray-400" />
-                  )}
-                </Button>
+              {showLocation && entity.Municipality && (
+                <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3" />
+                  <span className="truncate">
+                    {entity.Municipality.name}
+                    {entity.Municipality.RegionalDepartment && 
+                      `, ${entity.Municipality.RegionalDepartment.name}`
+                    }
+                  </span>
+                </div>
+              )}
+              
+              {entity._count && entity._count.pqrs > 0 && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  {entity._count.pqrs} PQRSD registradas
+                </div>
               )}
             </div>
-            
-            {showLocation && entity.Municipality && (
-              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                <span className="truncate">
-                  {entity.Municipality.name}
-                  {entity.Municipality.RegionalDepartment && 
-                    `, ${entity.Municipality.RegionalDepartment.name}`
-                  }
-                </span>
-              </div>
-            )}
-            
-            {entity._count && entity._count.pqrs > 0 && (
-              <div className="text-xs text-muted-foreground mt-1">
-                {entity._count.pqrs} PQRSD registradas
-              </div>
-            )}
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 
