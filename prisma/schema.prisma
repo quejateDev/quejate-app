@@ -44,6 +44,36 @@ model User {
   EntityHasUser EntityHasUser[]
 }
 
+model Lawyer {
+  id              String     @id @default(uuid())
+  userId          String     @unique
+  user            User       @relation(fields: [userId], references: [id])
+  documentType     DocumentType
+  identityDocument String
+  specialties     String[]?
+  description     String?
+  feePerHour      Float?
+  feePerService   Float?
+  experienceYears Int        @default(0)
+  ratings         Rating[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model Rating {
+  id         String   @id @default(uuid())
+  lawyerId   String
+  lawyer     Lawyer   @relation(fields: [lawyerId], references: [id])
+  clientId   String
+  client     User     @relation(fields: [clientId], references: [id])
+  score      Int      @range(1, 5) // Puntuación de 1 a 5
+  createdAt  DateTime @default(now())
+
+  @@index([lawyerId])
+}
+
 model Department {
   id          String     @id @default(uuid())
   name        String
@@ -330,6 +360,7 @@ enum UserRole {
   ADMIN
   EMPLOYEE
   CLIENT
+  LAWYER
 }
 
 enum PQRSType {
@@ -353,4 +384,13 @@ enum FieldType {
   EMAIL
   FILE
   NUMBER
+}
+
+enum DocumentType {
+  CC
+  CE
+  PPT
+  NIT
+  PASSPORT
+  LICENSE
 }
