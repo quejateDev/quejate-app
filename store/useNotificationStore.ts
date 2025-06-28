@@ -2,14 +2,19 @@ import { create } from "zustand";
 
 export type Notification = {
   id: string;
-  type: "follow" | "mention" | "like";
+  type: "follow" | "mention" | "like" | "comment";
   message: string;
   read: boolean;
   createdAt: Date;
+  url?: string;
   data?: {
     followerId?: string;
     followerName?: string;
     followerImage?: string;
+    userId?: string;
+    userName?: string;
+    userImage?: string;
+    pqrId?: string;
   };
 };
 

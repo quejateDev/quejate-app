@@ -17,7 +17,7 @@ type Comment = {
 type CommentSectionProps = {
   pqrId: string;
   user: {
-    id?: string;
+    id: string;
     firstName?: string;
     lastName?: string;
     profilePicture?: string;
@@ -43,13 +43,13 @@ export function CommentSection({
   }, [initialComments]);
 
   const handleSubmit = async () => {
-    if (!commentText.trim() || !user) return;
+    if (!commentText.trim() || !user || !user.id) return;
 
     setIsSubmitting(true);
     try {
       const newComment = await createCommentService({
         text: commentText,
-        userId: user.id || "",
+        userId: user.id,
         pqrId: pqrId,
       });
       
@@ -58,6 +58,7 @@ export function CommentSection({
         user: {
           firstName: user.firstName || "Usuario", 
           lastName: user.lastName || "",        
+          profilePicture: user.profilePicture,
         },
       };
       
@@ -75,7 +76,7 @@ export function CommentSection({
   return (
     <div className="sm:px-4">
       <div className="flex items-center gap-2 mt-3">
-      <Avatar className="w-8 h-8 shrink-0">
+        <Avatar className="w-8 h-8 shrink-0">
           {user?.profilePicture ? (
             <AvatarImage 
               src={user.profilePicture} 
@@ -134,8 +135,7 @@ export function CommentSection({
       </div>
     </div>
   );
-};
-
+}
 
 function CommentItem({ comment }: { comment: Comment }) {
   return (

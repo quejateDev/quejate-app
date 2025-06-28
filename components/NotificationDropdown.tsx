@@ -14,10 +14,12 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import useAuthStore from "@/store/useAuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useRouter } from "next/navigation";
 
 export function NotificationDropdown() {
   const { notifications, unreadCount, setNotifications, markAsRead } = useNotificationStore();
   const { token } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -29,7 +31,11 @@ export function NotificationDropdown() {
         });
         if (!response.ok) throw new Error("Failed to fetch notifications");
         const data = await response.json();
-        setNotifications(data);
+        const parsedData = data.map((n: any) => ({
+          ...n,
+          createdAt: new Date(n.createdAt),
+        }));
+        setNotifications(parsedData);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -40,7 +46,7 @@ export function NotificationDropdown() {
     }
   }, [token, setNotifications]);
 
-  const handleMarkAsRead = async (id: string) => {
+    const handleMarkAsReadAndNavigate = async (id: string, url: string) => {
     try {
       const response = await fetch("/api/notifications", {
         method: "PATCH",
@@ -52,6 +58,11 @@ export function NotificationDropdown() {
       });
       if (!response.ok) throw new Error("Failed to mark notification as read");
       markAsRead(id);
+      if (url !== "#") {
+        setTimeout(() => {
+          router.push(url);
+        }, 100);
+      }
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -75,35 +86,64 @@ export function NotificationDropdown() {
             No tienes notificaciones
           </div>
         ) : (
-          notifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              className={`flex items-start gap-3 p-4 ${
-                !notification.read ? "bg-muted/50" : ""
-              }`}
-              onClick={() => handleMarkAsRead(notification.id)}
-            >
-              {notification.type === "follow" && notification.data?.followerImage && (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={notification.data.followerImage} />
-                  <AvatarFallback>
-                    {notification.data.followerName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-              )}
-              <div className="flex-1 space-y-1">
-                <p className="text-sm leading-none">
-                  {notification.message}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(notification.createdAt), {
-                    addSuffix: true,
-                    locale: es,
-                  })}
-                </p>
-              </div>
-            </DropdownMenuItem>
-          ))
+          notifications.map((notification) => {
+            let url = notification.url || "#";
+            if (
+              notification.type === "follow" &&
+              notification.data?.followerId
+            ) {
+              url = `/dashboard/profile/${notification.data.followerId}`;
+            }
+            let pqrsdId = notification.data?.pqrId || notification.data?.pqrId;
+            if (
+              (notification.type === "comment" || notification.type === "like") &&
+              pqrsdId
+            ) {
+              url = `/dashboard/profile/pqr/${pqrsdId}`;
+            }
+
+            let avatarImage = "";
+            let avatarFallback = "";
+            if (notification.type === "follow") {
+              avatarImage = notification.data?.followerImage || "";
+              avatarFallback = notification.data?.followerName?.[0] || "";
+            } else if (
+              (notification.type === "comment" || notification.type === "like")
+            ) {
+              avatarImage = notification.data?.userImage || "";
+              avatarFallback = notification.data?.userName?.[0] || "";
+            }
+
+            return (
+              <DropdownMenuItem
+                key={notification.id}
+                className={`flex items-start gap-3 p-4 ${
+                  !notification.read ? "bg-muted/50" : ""
+                } cursor-pointer`}
+                onClick={() => handleMarkAsReadAndNavigate(notification.id, url)}
+              >
+                {avatarImage && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={avatarImage} />
+                    <AvatarFallback>
+                      {avatarFallback}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm leading-none">
+                    {notification.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(notification.createdAt), {
+                      addSuffix: true,
+                      locale: es,
+                    })}
+                  </p>
+                </div>
+              </DropdownMenuItem>
+            );
+          })
         )}
       </DropdownMenuContent>
     </DropdownMenu>

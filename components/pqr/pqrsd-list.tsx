@@ -20,18 +20,28 @@ export default function PQRList({ pqrs }: PQRListProps) {
     }
   }, [authUser]);
 
-
   return (
     <div className="space-y-6">
-      {pqrs.map((pqr) => (
-        <PQRCard
-          key={pqr.id}
-          pqr={pqr}
-          initialLiked={pqr.likes?.length > 0}
-          user={currentUser || null}
-          isUserProfile={false}
-        />
-      ))}
+      {pqrs.map((pqr) => {
+        const safeUser =
+          currentUser && typeof currentUser.id === "string" && currentUser.id
+            ? {
+                id: currentUser.id,
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                profilePicture: currentUser.profilePicture ?? undefined,
+              }
+            : null;
+        return (
+          <PQRCard
+            key={pqr.id}
+            pqr={pqr}
+            initialLiked={pqr.likes?.length > 0}
+            user={safeUser}
+            isUserProfile={false}
+          />
+        );
+      })}
       {pqrs.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No hay PQRSD para mostrar</p>

@@ -9,6 +9,9 @@ interface User {
   name?: string;
   role?: UserRole;
   entity?: Entity;
+  firstName?: string;
+  lastName?: string;
+  profilePicture?: string;
 }
 
 interface AuthStore {

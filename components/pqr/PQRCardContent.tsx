@@ -20,7 +20,7 @@ return (
         {pqr.subject || "Sin título"}
         </h1>
         <p className="text-xs text-muted-foreground mb-5">
-        Entidad: {pqr.entity.name}
+        Entidad: {pqr.entity?.name || "Sin entidad"}
         </p>
         <p className="text-sm">
         {pqr.description || "Sin descripción"}

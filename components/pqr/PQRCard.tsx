@@ -14,9 +14,10 @@ export type PQRCardProps = {
   pqr: PQR;
   initialLiked?: boolean;
   user: {
-    id?: string;
+    id: string;
     firstName?: string;
     lastName?: string;
+    profilePicture?: string;
   } | null;
   isUserProfile?: boolean;
 };

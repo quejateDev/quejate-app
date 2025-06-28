@@ -1,50 +1,74 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
-
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const pqrId = (await params).id
-  
-  const { text, userId } = await request.json();
-  
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const { id: pqrId } = await params;
+    const { text, userId } = await request.json();
+
+    if (!text || !userId || !pqrId) {
+      return NextResponse.json(
+        { error: "Datos incompletos" },
+        { status: 400 }
+      );
+    }
+
     const comment = await prisma.comment.create({
       data: {
         text,
-        userId,
         pqrId,
+        userId,
       },
-    });
-
-    return NextResponse.json(comment, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: "Error creating comment" }, { status: 500 });
-  }
-}
-
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const pqrId = (await params).id
-
-  try {
-    const comments = await prisma.comment.findMany({
-      where: { pqrId },
       include: {
         user: {
           select: {
-            id: true,
             firstName: true,
             lastName: true,
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
+    });
+
+    const pqr = await prisma.pQRS.findUnique({
+      where: { id: pqrId },
+      select: {
+        creatorId: true,
+        creator: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json(comments);
+    if (!pqr || !pqr.creatorId) {
+      return NextResponse.json(comment, { status: 201 });
+    }
+
+    if (pqr.creatorId !== userId) {
+      await prisma.notification.create({
+        data: {
+          type: "comment",
+          userId: pqr.creatorId,
+          message: `${comment.user.firstName} ${comment.user.lastName} comentó tu PQRSD`,
+          data: {
+            pqrId: pqrId,
+            commentId: comment.id,
+            commenterId: userId,
+            commenterName: `${comment.user.firstName} ${comment.user.lastName}`,
+          },
+        },
+      });
+    } else {
+    }
+
+    return NextResponse.json(comment, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Error fetching comments" }, { status: 500 });
+    console.error("Error al crear comentario:", error);
+    return NextResponse.json(
+      { error: "Error al crear comentario" },
+      { status: 500 }
+    );
   }
 }

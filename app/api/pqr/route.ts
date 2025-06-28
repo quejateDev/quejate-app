@@ -11,13 +11,41 @@ interface FormFile extends File {
 export async function GET() {
   try {
     const pqrs = await prisma.pQRS.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       include: {
         department: true,
         customFieldValues: true,
         attachments: true,
+        creator: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+            email: true,
+          }
+        },
+        entity: true,
+        likes: {
+          select: {
+            id: true,
+            userId: true,
+          }
+        },
+        comments: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                profilePicture: true,
+              }
+            }
+          }
+        },
+        _count: {
+          select: { likes: true, comments: true }
+        }
       },
     });
 

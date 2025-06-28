@@ -54,18 +54,38 @@ export default function UserPQRs() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Mis Quejas y Reclamos</h1>
-      <div className="space-y-6">
-        {pqrs.map((pqr) => (
+  <div className="container mx-auto py-8">
+    <h1 className="text-2xl font-bold mb-6">Mis Quejas y Reclamos</h1>
+    <div className="space-y-6">
+      {pqrs.map((pqr) => {
+        const safeUser =
+          user && typeof user.id === "string" && user.id
+            ? {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePicture: user.profilePicture,
+              }
+            : null;
+
+        const safePqr = {
+          ...pqr,
+          entity: (pqr as any).entity ?? null,
+          attachments: (pqr as any).attachments ?? [],
+          comments: (pqr as any).comments ?? [],
+          _count: (pqr as any)._count ?? {},
+        };
+
+        return (
           <PQRCard
             key={pqr.id}
-            // @ts-ignore
-            pqr={pqr}
+            pqr={safePqr}
+            user={safeUser}
             initialLiked={pqr.likes.some((like) => like.userId === user?.id)}
           />
-        ))}
-      </div>
+        );
+      })}
     </div>
-  );
+  </div>
+);
 }

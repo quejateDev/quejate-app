@@ -22,12 +22,28 @@ export async function GET(request: Request, params: any) {
         private: isOwnProfile ? undefined : false
       },      
       include: {
-        likes: true,
+        likes: {
+          select: {
+            id: true,
+            userId: true,
+          }
+        },
         attachments: true,
-        comments: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                profilePicture: true,
+              }
+            }
+          }
+        },
         _count: {
           select: {
             likes: true,
+            comments: true,
           },
         },
         department: {
@@ -37,7 +53,15 @@ export async function GET(request: Request, params: any) {
         },
         entity: true,
         customFieldValues: true,
-        creator: true
+        creator: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+            email: true,
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc',
