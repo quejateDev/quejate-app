@@ -152,7 +152,7 @@ export default function ProfilePage() {
         <div className="space-y-4">
           {pqrs.map((pqr) => (
             //@ts-ignore
-            <PQRCard key={pqr.id} pqr={pqr} user={userProfile || null} isUserProfile={isOwnProfile} />
+            <PQRCard key={pqr.id} pqr={pqr} user={userProfile || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
           ))}
         </div>
       );

@@ -14,6 +14,8 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import useAuthStore from "@/store/useAuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Notification } from "@/types/notification";
+import Link from "next/link";
 
 export function NotificationDropdown() {
   const { notifications, unreadCount, setNotifications, markAsRead } = useNotificationStore();
@@ -57,6 +59,22 @@ export function NotificationDropdown() {
     }
   };
 
+  const getNotificationLink = (notification: Notification) => {
+    switch (notification.type) {
+      case 'follow':
+        return notification.data?.followerId 
+          ? `/dashboard/profile/${notification.data.followerId}` 
+          : '#';
+      case 'like':
+      case 'comment':
+        return notification.data?.pqrId 
+          ? `/dashboard/profile/pqr/${notification.data.pqrId}`
+          : '#';
+      default:
+        return '#';
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -76,33 +94,39 @@ export function NotificationDropdown() {
           </div>
         ) : (
           notifications.map((notification) => (
-            <DropdownMenuItem
+            <Link
               key={notification.id}
-              className={`flex items-start gap-3 p-4 ${
-                !notification.read ? "bg-muted/50" : ""
-              }`}
-              onClick={() => handleMarkAsRead(notification.id)}
+              href={getNotificationLink(notification)}
+              legacyBehavior
+              passHref
             >
-              {notification.type === "follow" && notification.data?.followerImage && (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={notification.data.followerImage} />
-                  <AvatarFallback>
-                    {notification.data.followerName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-              )}
-              <div className="flex-1 space-y-1">
-                <p className="text-sm leading-none">
-                  {notification.message}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(notification.createdAt), {
-                    addSuffix: true,
-                    locale: es,
-                  })}
-                </p>
-              </div>
-            </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`flex items-start gap-3 p-4 ${
+                  !notification.read ? "bg-muted/50" : ""
+                }`}
+                onClick={() => handleMarkAsRead(notification.id)}
+              >
+                {notification.type === "follow" && notification.data?.followerImage && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={notification.data.followerImage} />
+                    <AvatarFallback>
+                      {notification.data.followerName?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm leading-none">
+                    {notification.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(notification.createdAt), {
+                      addSuffix: true,
+                      locale: es,
+                    })}
+                  </p>
+                </div>
+              </DropdownMenuItem>
+            </Link>
           ))
         )}
       </DropdownMenuContent>
