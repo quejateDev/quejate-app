@@ -33,6 +33,8 @@ model User {
   statusHistory     PQRStatusHistory[]
   comments          Comment[]
   favorites         UserFavoriteEntity[]
+  givenRatings      Rating[]            @relation("ClientGivenRatings")
+  lawyerProfile     Lawyer?   
   department        Department?         @relation(fields: [departmentId], references: [id])
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
@@ -42,6 +44,38 @@ model User {
 
   @@index([departmentId])
   EntityHasUser EntityHasUser[]
+}
+
+model Lawyer {
+  id              String     @id @default(uuid())
+  userId          String     @unique
+  user            User       @relation(fields: [userId], references: [id])
+  documentType     DocumentType
+  identityDocument String
+  specialties     String[]
+  description     String?
+  feePerHour      Float?
+  feePerService   Float?
+  experienceYears Int        @default(0)
+  receivedRatings Rating[]   @relation("LawyerReceivedRatings")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model Rating {
+  id         String   @id @default(uuid())
+  lawyerId   String
+  lawyer     Lawyer   @relation(fields: [lawyerId], references: [id], name: "LawyerReceivedRatings")
+  clientId   String
+  client    User      @relation(fields: [clientId], references: [id], name: "ClientGivenRatings")
+  score      Int      
+  createdAt  DateTime @default(now())
+
+  @@unique([lawyerId, clientId])
+  @@index([lawyerId])
+  @@index([clientId])
 }
 
 model Department {
@@ -330,6 +364,7 @@ enum UserRole {
   ADMIN
   EMPLOYEE
   CLIENT
+  LAWYER
 }
 
 enum PQRSType {
@@ -353,4 +388,13 @@ enum FieldType {
   EMAIL
   FILE
   NUMBER
+}
+
+enum DocumentType {
+  CC
+  CE
+  PPT
+  NIT
+  PASSPORT
+  LICENSE
 }
