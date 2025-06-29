@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
@@ -9,6 +10,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const { text, userId } = await request.json();
   
   try {
+
+    const pqr = await prisma.pQRS.findUnique({
+      where: { id: pqrId },
+      select: { creatorId: true }
+    });
+
+    if (!pqr) {
+      return NextResponse.json({ error: "PQRS not found" }, { status: 404 });
+    }
+
+    if (!pqr.creatorId) {
+      return NextResponse.json({ error: "PQRS creator not found" }, { status: 400 });
+    }
+
     const comment = await prisma.comment.create({
       data: {
         text,
@@ -26,6 +41,28 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         },
       },
     });
+
+    if (userId !== pqr.creatorId) {
+      const commentingUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { firstName: true, lastName: true }
+      });
+
+      if (commentingUser) {
+        await prisma.notification.create({
+          data: {
+            type: "comment",
+            userId: pqr.creatorId,
+            message: `${commentingUser.firstName} ${commentingUser.lastName} ha comentado tu PQRSD`,
+            data: {
+              pqrId: pqrId,
+              followerId: userId,
+              followerName: `${commentingUser.firstName} ${commentingUser.lastName}`,
+            },
+          },
+        });
+      }
+    }
 
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {

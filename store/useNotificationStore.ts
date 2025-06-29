@@ -1,18 +1,5 @@
 import { create } from "zustand";
-
-export type Notification = {
-  id: string;
-  type: "follow" | "mention" | "like";
-  message: string;
-  read: boolean;
-  createdAt: Date;
-  data?: {
-    followerId?: string;
-    followerName?: string;
-    followerImage?: string;
-  };
-};
-
+import { Notification } from "@/types/notification"; 
 interface NotificationStore {
   notifications: Notification[];
   unreadCount: number;

@@ -11,10 +11,34 @@ export async function GET(
       id,
     },
     include: {
-      department: true,
-      creator: true,
-      customFieldValues: true
-    },
+        likes: true,
+        attachments: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profilePicture: true
+              }
+            }
+          }
+        },
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+        department: {
+          include: {
+            entity: true,
+          },
+        },
+        entity: true,
+        customFieldValues: true,
+        creator: true
+      },
   });
   return NextResponse.json(pqr);
 }
