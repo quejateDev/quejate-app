@@ -24,7 +24,18 @@ export async function GET(request: Request, params: any) {
       include: {
         likes: true,
         attachments: true,
-        comments: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profilePicture: true
+              }
+            }
+          }
+        },
         _count: {
           select: {
             likes: true,

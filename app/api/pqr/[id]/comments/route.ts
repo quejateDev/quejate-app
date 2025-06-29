@@ -15,6 +15,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         userId,
         pqrId,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(comment, { status: 201 });
@@ -35,6 +45,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             id: true,
             firstName: true,
             lastName: true,
+            profilePicture: true,
           },
         },
       },

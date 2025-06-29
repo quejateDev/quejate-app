@@ -152,7 +152,7 @@ export default function ProfilePage() {
         <div className="space-y-4">
           {pqrs.map((pqr) => (
             //@ts-ignore
-            <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} isUserProfile={isOwnProfile} />
+            <PQRCard key={pqr.id} pqr={pqr} user={userProfile || null} isUserProfile={isOwnProfile} />
           ))}
         </div>
       );

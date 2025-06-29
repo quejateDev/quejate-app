@@ -8,6 +8,7 @@ type Comment = {
   text: string;
   createdAt: string | Date;
   user: {
+    id: string;
     firstName: string;
     lastName: string;
     profilePicture?: string;
@@ -17,9 +18,9 @@ type Comment = {
 type CommentSectionProps = {
   pqrId: string;
   user: {
-    id?: string;
-    firstName?: string;
-    lastName?: string;
+    id: string;
+    firstName: string;
+    lastName: string;
     profilePicture?: string;
   } | null;
   initialComments: Comment[];
@@ -56,8 +57,10 @@ export function CommentSection({
       const commentWithUser = {
         ...newComment,
         user: {
-          firstName: user.firstName || "Usuario", 
-          lastName: user.lastName || "",        
+          id: user.id,
+          firstName: user.firstName, 
+          lastName: user.lastName,    
+          profilePicture: user.profilePicture || "",    
         },
       };
       
