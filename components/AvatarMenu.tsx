@@ -74,6 +74,7 @@ export default function AvatarMenu() {
             </DropdownMenuItem>
           </>
         ) : (
+        <>
           <DropdownMenuItem asChild>
             <Button
               onClick={() => setIsOpen(true)}
@@ -84,6 +85,16 @@ export default function AvatarMenu() {
               <span>Iniciar Sesión</span>
             </Button>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link
+              href="/signup"
+              className="flex items-center gap-2 w-full"
+            >
+              <User className="h-4 w-4" />
+              <span>Registrarme</span>
+            </Link>
+          </DropdownMenuItem>
+        </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

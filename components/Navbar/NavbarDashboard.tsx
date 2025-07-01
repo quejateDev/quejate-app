@@ -30,14 +30,6 @@ export default function NavbarDashboard() {
           </NavigationMenuLink>
         </Link>
       </NavigationMenuItem>
-      <NavigationMenuItem className="mx-2">
-        <Link href="/dashboard/social" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <Users className="h-4 w-4 mr-2" />
-            Explorar
-          </NavigationMenuLink>
-        </Link>
-      </NavigationMenuItem>
     </>
   );
 
@@ -78,6 +70,7 @@ export default function NavbarDashboard() {
                     <Link href="/dashboard" className="text-lg font-semibold flex items-center">
                       Inicio
                     </Link>
+                    {/* "Explorar" solo visible en móvil */}
                     <Link 
                       href="/dashboard/social" 
                       className="text-lg font-semibold flex items-center"

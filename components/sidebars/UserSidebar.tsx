@@ -10,6 +10,7 @@ import { User, Trophy, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { FollowButton } from '../Buttons/FollowButton';
 import { User as UserType } from '@/types/user';
+import useAuthStore from '@/store/useAuthStore';
 
 interface DashboardSidebarProps {
   className?: string;
@@ -19,21 +20,31 @@ export default function DashboardSidebar({ className = "" }: DashboardSidebarPro
   const [discoverUsers, setDiscoverUsers] = useState<UserType[]>([]);
   const [topUsers, setTopUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user: currentUser } = useAuthStore();
 
   useEffect(() => {
+    if (!currentUser) return;
+
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/users');
+        const response = await fetch('/api/users', {
+          headers: {
+            'x-user-id': currentUser.id ?? "",
+          } as Record<string, string>,
+        });
         if (response.ok) {
           const data: UserType[] = await response.json();
-          
+          const filtered = data.filter(
+            u => u.id !== currentUser.id && !u.isFollowing
+          );
+
           const sortedByPQRS = [...data].sort(
             (a, b) => (b._count?.PQRS || 0) - (a._count?.PQRS || 0)
           );
           setTopUsers(sortedByPQRS.slice(0, 5));
-          
-          const shuffledUsers = [...data].sort(() => Math.random() - 0.5);
+
+          const shuffledUsers = [...filtered].sort(() => Math.random() - 0.5);
           setDiscoverUsers(shuffledUsers.slice(0, 4));
         }
       } catch (error) {
@@ -44,7 +55,7 @@ export default function DashboardSidebar({ className = "" }: DashboardSidebarPro
     };
 
     fetchUsers();
-  }, []);
+  }, [currentUser]);
 
   const handleFollowChange = (
     userId: string,
