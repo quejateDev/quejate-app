@@ -37,14 +37,14 @@ export default function NavbarDashboard() {
     <nav className="border-b bg-secondary w-full">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <Link href="/dashboard" className="flex-shrink-0">
               <Logo className="h-8" />
             </Link>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="hidden md:block mx-4">
+          <div className="flex items-center gap-2">
+            <div className="hidden md:block">
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavItems />
@@ -52,7 +52,7 @@ export default function NavbarDashboard() {
               </NavigationMenu>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-8">
               <NotificationDropdown />
               <AvatarMenu />
             </div>
