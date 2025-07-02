@@ -83,7 +83,7 @@ export default function ProfilePage() {
                 {userProfile.firstName} {userProfile.lastName}
               </h2>
               <p className="text-sm text-muted-foreground">
-                @{userProfile.email}
+                {userProfile.email}
               </p>
             </div>
               {!isOwnProfile && (
