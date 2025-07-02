@@ -1,20 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-
-    const userId = req.headers.get("x-user-id");
-
-    let followingIds: string[] = [];
-    if (userId) {
-      const currentUser = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { following: { select: { id: true } } },
-      });
-      followingIds = currentUser?.following.map(f => f.id) ?? [];
-    }
-
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -37,12 +25,7 @@ export async function GET(req: Request) {
       take: 50,
     });
 
-    const usersWithIsFollowing = users.map(u => ({
-      ...u,
-      isFollowing: followingIds.includes(u.id),
-    }));
-
-    return NextResponse.json(usersWithIsFollowing);
+    return NextResponse.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
