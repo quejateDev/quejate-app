@@ -44,10 +44,17 @@ export default function ProfilePage() {
             </Card>
           </div>
           <div className="md:col-span-8">
-            <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse" />
-            {[...Array(3)].map((_, i) => (
-              <PQRSkeleton key={i} />
-            ))}
+            <h3 className="text-lg font-semibold mb-4">PQRSD Recientes</h3>
+            <div className="space-y-4">
+              {pqrsLoading ? (
+                [...Array(3)].map((_, i) => <PQRSkeleton key={i} />)
+              ) : pqrs?.length && pqrs.length > 0 ? (
+                // @ts-ignore
+                pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />)
+              ) : (
+                <p className="text-muted-foreground">No hay PQRSD publicadas</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
