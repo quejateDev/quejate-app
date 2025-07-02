@@ -11,27 +11,9 @@ import useUser from '@/hooks/useUser';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
+import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 
 export const dynamic = 'force-dynamic';
-
-const PQRSkeleton = () => (
-  <Card className="w-full">
-    <CardHeader>
-      <div className="space-y-3">
-        <div className="flex items-center space-x-3">
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
-          <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
-        </div>
-        <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-        <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
-        <div className="flex justify-between items-center pt-2">
-          <div className="h-3 bg-gray-200 rounded animate-pulse w-20"></div>
-          <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
-        </div>
-      </div>
-    </CardHeader>
-  </Card>
-);
 
 export default function ProfilePage() {
   const { user: currentUser } = useAuthStore();
@@ -90,14 +72,11 @@ export default function ProfilePage() {
         },
         body: JSON.stringify({ profilePicture: imageUrl }),
       });
-  
       const updateData = await updateResponse.json();
       console.log('Update response:', updateData);
-  
       if (!updateResponse.ok) {
         throw new Error(updateData.error || 'Error al actualizar el perfil');
       }
-      
       await Promise.all([
         fetchUser(currentUser.id),
         fetchUserPQRS(currentUser.id)
@@ -106,7 +85,6 @@ export default function ProfilePage() {
         title: 'Éxito',
         description: 'Foto de perfil actualizada correctamente',
       });
-  
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -178,7 +156,6 @@ export default function ProfilePage() {
                     {<User className="h-16 w-16 stroke-1" />}
                   </AvatarFallback>
                 </Avatar>
-                
                 <div 
                   onClick={triggerFileInput}
                   className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
@@ -188,7 +165,6 @@ export default function ProfilePage() {
                     <span className="text-xs font-medium">Cambiar foto</span>
                   </div>
                 </div>
-                
                 <Input 
                   ref={fileInputRef}
                   id="profile-picture" 
@@ -198,14 +174,12 @@ export default function ProfilePage() {
                   onChange={handleFileUpload}
                   disabled={isUploading}
                 />
-                
                 {isUploading && (
                   <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
                     <span className="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-white"></span>
                   </div>
                 )}
               </div>
-              
               <h2 className="text-2xl font-semibold">{getFullName()}</h2>
               <p className="text-sm text-muted-foreground break-words px-4">
                 {currentUser?.email}

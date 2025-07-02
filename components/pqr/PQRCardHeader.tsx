@@ -91,7 +91,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
                   alt={creatorName}
                   width={48}
                   height={48}
-                  className="rounded-full object-cover"
+                  className="rounded-full object-cover w-full h-full"
                 />
               ) : (
                 <span className="text-md">

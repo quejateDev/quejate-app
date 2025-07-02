@@ -1,25 +1,16 @@
 "use client";
 
-import useUser from "@/hooks/useUser";
-import useAuthStore from "@/store/useAuthStore";
-import { useEffect } from "react";
 import { PQRCard } from "./PQRCard";
 import { PQR } from "@/types/pqrsd";
+import { User } from "@/types/user";
+
 
 interface PQRListProps {
   pqrs: PQR[];
+  currentUser: User | null;
 }
 
-export default function PQRList({ pqrs }: PQRListProps) {
-  const { user: authUser } = useAuthStore();
-  const { user: currentUser, fetchUser } = useUser();
-
-  useEffect(() => {
-    if (authUser?.id) {
-      fetchUser(authUser.id);
-    }
-  }, [authUser]);
-
+export default function PQRList({ pqrs, currentUser }: PQRListProps) {
 
   return (
     <div className="space-y-6">

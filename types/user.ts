@@ -1,11 +1,21 @@
 export interface User {
   id: string;
-  email: string;
   firstName: string;
   lastName: string;
-  profilePicture?: string | null;
+  email: string;
+  profilePicture: string | null;
   role: string;
   isFollowing?: boolean;
+  followers?: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+  }>;
+  following?: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+  }>;
   _count: {
     followers: number;
     following: number;

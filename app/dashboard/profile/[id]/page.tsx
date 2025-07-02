@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { PQRCard } from "@/components/pqr/PQRCard";
+import { PQRSkeleton } from "@/components/pqr/pqr-skeleton";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "lucide-react";
@@ -17,11 +18,10 @@ export default function ProfilePage() {
   const params = useParams();
   const { id } = params;
   const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = useUser();
-  const { pqrs, fetchUserPQRS } = usePQR();
+  const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
 
   useEffect(() => {
     if (!id) return;
-
     fetchUser(id as string);
     fetchUserPQRS(id as string);
   }, [id]);
@@ -29,7 +29,34 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <p className="text-muted-foreground">Cargando perfil...</p>
+        <div className="grid gap-6 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <Card>
+              <CardHeader className="text-center">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div className="h-28 w-28 rounded-full bg-gray-200 animate-pulse mb-4" />
+                  <div className="h-6 w-32 bg-gray-200 rounded mb-2 animate-pulse" />
+                  <div className="h-4 w-40 bg-gray-200 rounded mb-2 animate-pulse" />
+                  <div className="h-4 w-24 bg-gray-200 rounded mb-2 animate-pulse" />
+                  <div className="h-4 w-28 bg-gray-200 rounded mb-2 animate-pulse" />
+                </div>
+              </CardHeader>
+            </Card>
+          </div>
+          <div className="md:col-span-8">
+            <h3 className="text-lg font-semibold mb-4">PQRSD Recientes</h3>
+            <div className="space-y-4">
+              {pqrsLoading ? (
+                [...Array(3)].map((_, i) => <PQRSkeleton key={i} />)
+              ) : pqrs?.length && pqrs.length > 0 ? (
+                // @ts-ignore
+                pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />)
+              ) : (
+                <p className="text-muted-foreground">No hay PQRSD publicadas</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -63,7 +90,7 @@ export default function ProfilePage() {
                 {userProfile.firstName} {userProfile.lastName}
               </h2>
               <p className="text-sm text-muted-foreground">
-                @{userProfile.email}
+                {userProfile.email}
               </p>
             </div>
               {!isOwnProfile && (
@@ -74,11 +101,9 @@ export default function ProfilePage() {
                     onFollowChange={(isFollowing, counts) => {
                       setUserProfile(prev => {
                         if (!prev) return prev;
-                        
                         const updatedFollowers = isFollowing
                           ? [...prev.followers, { id: currentUser?.id || '', username: currentUser?.name || '', firstName: '', lastName: '' }]
                           : prev.followers.filter(f => f.id !== currentUser?.id);
-                        
                         return {
                           ...prev,
                           followers: updatedFollowers,
@@ -107,7 +132,9 @@ export default function ProfilePage() {
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">PQRSD Recientes</h3>
           <div className="space-y-4">
-            {pqrs?.length && pqrs.length > 0 ? (
+            {pqrsLoading ? (
+              [...Array(3)].map((_, i) => <PQRSkeleton key={i} />)
+            ) : pqrs?.length && pqrs.length > 0 ? (
               // @ts-ignore
               pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />)
             ) : (

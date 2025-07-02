@@ -4,8 +4,9 @@ import { PQRFilters } from "@/components/filters/pqr-filters";
 import { Play } from "lucide-react";
 import PQRList from "@/components/pqr/pqrsd-list";
 import { Header } from "@/components/Header";
-import DashboardSidebar from "@/components/sidebars/UserSidebar";
 import EntitiesSidebar from "@/components/sidebars/EntitiesSidebar";
+import UserSidebar from "@/components/sidebars/UserSidebar";
+import { getCurrentUser } from "@/lib/auth";
 
 interface PageProps {
   searchParams: Promise<{
@@ -17,6 +18,8 @@ interface PageProps {
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
+
+  const currentUser = await getCurrentUser(); 
   // Fetch entities and departments for filters
   const entities = await prisma.entity.findMany({
     select: {
@@ -154,10 +157,10 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               </h1>
             </div>
             <PQRFilters entities={entities} departments={departments} />
-            <PQRList pqrs={pqrs} />
+            <PQRList pqrs={pqrs} currentUser = {currentUser || null} />
           </div>
           <div className="hidden lg:block mt-8">
-            <DashboardSidebar />
+            <UserSidebar currentUser = {currentUser || null} />
           </div>
         </div>
       </div>

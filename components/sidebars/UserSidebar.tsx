@@ -13,38 +13,44 @@ import { User as UserType } from '@/types/user';
 
 interface DashboardSidebarProps {
   className?: string;
+  currentUser: UserType | null;
 }
 
-export default function DashboardSidebar({ className = "" }: DashboardSidebarProps) {
+export default function UserSidebar({ className = "", currentUser }: DashboardSidebarProps) {
   const [discoverUsers, setDiscoverUsers] = useState<UserType[]>([]);
   const [topUsers, setTopUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch('/api/users');
-        if (response.ok) {
-          const data: UserType[] = await response.json();
-          
-          const sortedByPQRS = [...data].sort(
-            (a, b) => (b._count?.PQRS || 0) - (a._count?.PQRS || 0)
-          );
-          setTopUsers(sortedByPQRS.slice(0, 5));
-          
-          const shuffledUsers = [...data].sort(() => Math.random() - 0.5);
-          setDiscoverUsers(shuffledUsers.slice(0, 4));
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/users');
+      if (response.ok) {
+        const data: UserType[] = await response.json();
 
-    fetchUsers();
-  }, []);
+        const sortedByPQRS = [...data].sort(
+          (a, b) => (b._count?.PQRS || 0) - (a._count?.PQRS || 0)
+        );
+        setTopUsers(sortedByPQRS.slice(0, 5));
+        
+        const followingIds = currentUser?.following?.map(user => user.id) || [];
+        const filteredData = data.filter(user => 
+          user.id !== currentUser?.id && 
+          !followingIds.includes(user.id)
+        );
+        const shuffledUsers = [...filteredData].sort(() => Math.random() - 0.5);
+        setDiscoverUsers(shuffledUsers.slice(0, 4));
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchUsers();
+}, [currentUser?.id, currentUser?.following]);
 
   const handleFollowChange = (
     userId: string,
@@ -59,13 +65,6 @@ export default function DashboardSidebar({ className = "" }: DashboardSidebarPro
       )
     );
     
-    setTopUsers(prev => 
-      prev.map(user => 
-        user.id === userId 
-          ? { ...user, isFollowing, _count: counts || user._count }
-          : user
-      )
-    );
   };
 
   const UserAvatar = ({ user }: { user: UserType }) => (

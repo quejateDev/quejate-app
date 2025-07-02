@@ -30,14 +30,6 @@ export default function NavbarDashboard() {
           </NavigationMenuLink>
         </Link>
       </NavigationMenuItem>
-      <NavigationMenuItem className="mx-2">
-        <Link href="/dashboard/social" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <Users className="h-4 w-4 mr-2" />
-            Explorar
-          </NavigationMenuLink>
-        </Link>
-      </NavigationMenuItem>
     </>
   );
 
@@ -45,14 +37,14 @@ export default function NavbarDashboard() {
     <nav className="border-b bg-secondary w-full">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <Link href="/dashboard" className="flex-shrink-0">
               <Logo className="h-8" />
             </Link>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="hidden md:block mx-4">
+          <div className="flex items-center gap-2">
+            <div className="hidden md:block">
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavItems />
@@ -60,7 +52,7 @@ export default function NavbarDashboard() {
               </NavigationMenu>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-8">
               <NotificationDropdown />
               <AvatarMenu />
             </div>
@@ -78,6 +70,7 @@ export default function NavbarDashboard() {
                     <Link href="/dashboard" className="text-lg font-semibold flex items-center">
                       Inicio
                     </Link>
+                    {/* "Explorar" solo visible en móvil */}
                     <Link 
                       href="/dashboard/social" 
                       className="text-lg font-semibold flex items-center"
