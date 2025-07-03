@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import { DocumentType, DocumentTypeMapping } from "@/types/document-types";
+import useAuthStore from "@/store/useAuthStore";
 
 export interface LawyerFormData {
   documentType: string;
@@ -22,6 +23,7 @@ export interface VerificationStatus {
 
 export const useLawyerRegistration = () => {
   const router = useRouter();
+  const { user: currentUser } = useAuthStore();
   
   const [formData, setFormData] = useState<LawyerFormData>({
     documentType: "",
@@ -34,6 +36,7 @@ export const useLawyerRegistration = () => {
   });
   
   const [loading, setLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [verificationModal, setVerificationModal] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
   const [currentSpecialty, setCurrentSpecialty] = useState("");
@@ -88,6 +91,10 @@ export const useLawyerRegistration = () => {
     }));
   };
 
+  const canVerify = () => {
+    return formData.profilePicture !== null;
+  };
+
   const verifyLawyer = async (): Promise<boolean> => {
     try {
       const documentTypeInfo = DocumentTypeMapping[formData.documentType as DocumentType];
@@ -137,14 +144,71 @@ export const useLawyerRegistration = () => {
 
   const submitRegistration = async (): Promise<boolean> => {
     try {
+      let profilePictureUrl: string | undefined;
+
+      if (formData.profilePicture) {
+        setIsUploadingImage(true);
+        try {
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', formData.profilePicture);
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadFormData,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Error al subir la imagen');
+          }
+
+          const uploadData = await uploadResponse.json();
+          profilePictureUrl = uploadData.path || uploadData.url;
+
+          if (!profilePictureUrl) {
+            throw new Error('No se recibió URL de la imagen');
+          }
+
+          toast({
+            title: "Imagen subida",
+            description: "Tu foto de perfil se ha subido correctamente.",
+          });
+
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          toast({
+            title: "Error al subir imagen",
+            description: "Hubo un problema al subir tu foto de perfil, pero continuaremos con el registro.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsUploadingImage(false);
+        }
+      }
+
       const submissionData = {
-        ...formData,
+        documentType: formData.documentType,
+        identityDocument: formData.identityDocument,
         specialties: formData.specialties.split(",").map((s) => s.trim()),
+        description: formData.description,
         feePerHour: parseFloat(formData.feePerHour) || undefined,
         experienceYears: parseInt(formData.experienceYears, 10) || 0,
       };
 
-      await axios.post("/api/lawyer/register", submissionData);
+      const response = await axios.post("/api/lawyer/register", submissionData);
+
+      if (response.data && profilePictureUrl && currentUser?.id) {
+        try {
+          await fetch(`/api/users/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ profilePicture: profilePictureUrl }),
+          });
+        } catch (error) {
+          console.error("Error updating profile picture:", error);
+        }
+      }
 
       toast({
         title: "Registro exitoso",
@@ -181,10 +245,12 @@ export const useLawyerRegistration = () => {
   return {
     formData,
     loading,
+    isUploadingImage,
     verificationModal,
     verificationStatus,
     currentSpecialty,
     documentTypeOptions,
+    canVerify,
     handleChange,
     handleSelectChange,
     handleFileChange,

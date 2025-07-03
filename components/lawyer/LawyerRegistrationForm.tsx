@@ -24,6 +24,7 @@ interface LawyerRegistrationFormProps {
   currentSpecialty: string;
   documentTypeOptions: DocumentTypeOption[];
   loading: boolean;
+  isUploadingImage: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
@@ -38,6 +39,7 @@ export function LawyerRegistrationForm({
   currentSpecialty,
   documentTypeOptions,
   loading,
+  isUploadingImage,
   onSubmit,
   onChange,
   onSelectChange,
@@ -52,6 +54,7 @@ export function LawyerRegistrationForm({
         profilePicture={formData.profilePicture}
         onFileChange={onFileChange}
         disabled={loading}
+        isUploading={isUploadingImage}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

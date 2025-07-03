@@ -45,7 +45,7 @@ export default {
           foreground: '#005DD6'
         },
         destructive: {
-          DEFAULT: '#FF0000', 
+          DEFAULT: '#FF4D4D', 
           foreground: '#FFFFFF'
         },
         border: '#D8E6F8',
