@@ -2,33 +2,7 @@
 
 import { getUserService } from "@/services/api/User.service";
 import { useState } from "react";
-
-interface UserProfile {
-  id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isFollowing: boolean;
-  followers: Array<{
-    id: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-  }>;
-  following: Array<{
-    id: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-  }>;
-  profilePicture: string | null;
-  _count: {
-    followers: number;
-    following: number;
-    PQRS: number;
-  };
-}
+import { User as UserProfile } from "@/types/user";
 
 export default function useUser() {
   const [user, setUser] = useState<UserProfile | null>(null);

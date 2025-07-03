@@ -18,6 +18,7 @@ export async function GET(
         lastName: true,
         email: true,
         profilePicture: true,
+        role: true,
         followers: {
           select: {
             id: true,

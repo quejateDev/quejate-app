@@ -5,13 +5,13 @@ export interface User {
   email: string;
   profilePicture: string | null;
   role: string;
-  isFollowing?: boolean;
-  followers?: Array<{
+  isFollowing: boolean;
+  followers: Array<{
     id: string;
     firstName: string;
     lastName: string;
   }>;
-  following?: Array<{
+  following: Array<{
     id: string;
     firstName: string;
     lastName: string;
