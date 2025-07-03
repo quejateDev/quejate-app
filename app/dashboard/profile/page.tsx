@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { PQRCard } from '@/components/pqr/PQRCard';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Upload, User } from 'lucide-react';
+import { Upload, User, Scale, ArrowRight } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import usePQR from '@/hooks/usePQR';
 import useUser from '@/hooks/useUser';
 import { Input } from '@/components/ui/input';
@@ -190,6 +192,29 @@ export default function ProfilePage() {
             userId={currentUser?.id || ''} 
             className="w-full"
           />
+
+          {userProfile?.role !== 'LAWYER' && (
+            <Card className="mt-6 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Scale className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-primary">¿Eres Abogado?</h3>
+                <p className="text-sm text-muted-foreground">
+                  Regístrate como abogado para ofrecer tus servicios profesionales en nuestra plataforma y ayudar a usuarios con sus PQRSD.
+                </p>
+                <div className="pt-4">
+                  <Link href="/lawyer/register">
+                    <Button className="w-full" variant="default">
+                      Registrarme como Abogado
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+            </Card>
+          )}
+
         </div>
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>

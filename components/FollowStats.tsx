@@ -13,7 +13,6 @@ interface User {
   id: string;
   firstName: string;
   lastName: string;
-  username: string;
 }
 
 interface FollowStatsProps {
@@ -40,7 +39,7 @@ export function FollowStats({ followers, following }: FollowStatsProps) {
                   </AvatarFallback>
                 </Avatar>
                 <Link 
-                  href={`/dashboard/profile/${follower.username}`}
+                  href={`/dashboard/profile/${follower.id}`}
                   className="text-sm hover:underline"
                 >
                   {follower.firstName} {follower.lastName}
@@ -70,7 +69,7 @@ export function FollowStats({ followers, following }: FollowStatsProps) {
                   </AvatarFallback>
                 </Avatar>
                 <Link 
-                  href={`/dashboard/profile/${user.username}`}
+                  href={`/dashboard/profile/${user.id}`}
                   className="text-sm hover:underline"
                 >
                   {user.firstName} {user.lastName}
