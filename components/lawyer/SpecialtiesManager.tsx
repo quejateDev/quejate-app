@@ -24,12 +24,6 @@ export function SpecialtiesManager({
     .filter((s) => s.trim())
     .map((s) => s.trim());
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      onAddSpecialty();
-    }
-  };
 
   return (
     <div className="space-y-2">
@@ -40,7 +34,6 @@ export function SpecialtiesManager({
           placeholder="Ej: Derecho Penal"
           value={currentSpecialty}
           onChange={(e) => onCurrentSpecialtyChange(e.target.value)}
-          onKeyPress={handleKeyPress}
           className="border border-muted flex-1"
         />
         <Button

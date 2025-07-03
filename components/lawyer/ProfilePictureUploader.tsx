@@ -9,14 +9,15 @@ interface ProfilePictureUploaderProps {
   profilePicture: File | null;
   onFileChange: (file: File | null) => void;
   disabled?: boolean;
+  isUploading?: boolean;
 }
 
 export function ProfilePictureUploader({
   profilePicture,
   onFileChange,
   disabled = false,
+  isUploading = false,
 }: ProfilePictureUploaderProps) {
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerFileInput = () => {

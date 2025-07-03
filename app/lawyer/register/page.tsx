@@ -13,10 +13,12 @@ export default function LawyerRegistrationPage() {
   const {
     formData,
     loading,
+    isUploadingImage,
     verificationModal,
     verificationStatus,
     currentSpecialty,
     documentTypeOptions,
+    canVerify,
     handleChange,
     handleSelectChange,
     handleFileChange,
@@ -50,6 +52,8 @@ export default function LawyerRegistrationPage() {
             currentSpecialty={currentSpecialty}
             documentTypeOptions={documentTypeOptions}
             loading={loading}
+            isUploadingImage={isUploadingImage}
+            canVerify={canVerify}
             onSubmit={handleSubmit}
             onChange={handleChange}
             onSelectChange={handleSelectChange}
