@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ProfilePictureUploader } from "./ProfilePictureUploader";
 import { SpecialtiesManager } from "./SpecialtiesManager";
 import { LawyerFormData } from "@/hooks/useLawyerRegistration";
+import { Info } from "lucide-react";
 
 interface DocumentTypeOption {
   value: string;
@@ -25,6 +26,7 @@ interface LawyerRegistrationFormProps {
   documentTypeOptions: DocumentTypeOption[];
   loading: boolean;
   isUploadingImage: boolean;
+  canVerify: () => boolean;
   onSubmit: (e: React.FormEvent) => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
@@ -40,6 +42,7 @@ export function LawyerRegistrationForm({
   documentTypeOptions,
   loading,
   isUploadingImage,
+  canVerify,
   onSubmit,
   onChange,
   onSelectChange,
@@ -140,9 +143,25 @@ export function LawyerRegistrationForm({
         </div>
       </div>
 
-      <Button type="submit" className="w-full" isLoading={loading}>
-        Verificar datos
-      </Button>
+      <div className="space-y-3">
+        {!canVerify() && (
+          <div className="flex align-center items-center">
+            <Info className="h-4 w-4 mr-1 text-quaternary" />
+            <p className="text-xs text-quaternary align-center">
+              Debes subir una foto de perfil antes de poder verificar tu información.
+            </p>
+          </div>
+        )}
+        
+        <Button 
+          type="submit" 
+          className="w-full" 
+          isLoading={loading}
+          disabled={loading || !canVerify()}
+        >
+          Verificar datos
+        </Button>
+      </div>
     </form>
   );
 }
