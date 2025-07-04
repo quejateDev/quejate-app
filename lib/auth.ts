@@ -1,6 +1,6 @@
 
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "./utils";
 import prisma from "./prisma";
 import { User } from "@/types/user";
 
@@ -11,8 +11,8 @@ export async function getUserIdFromToken(): Promise<string | null> {
   if (!tokenCookie?.value) return null;
 
   try {
-    const decoded = jwt.verify(tokenCookie.value, process.env.JWT_SECRET!) as { id: string };
-    return decoded.id;
+    const decoded = await verifyToken(tokenCookie.value);
+    return decoded?.id || null;
   } catch (error) {
     console.error("Error al verificar el token:", error);
     return null;
