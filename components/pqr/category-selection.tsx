@@ -19,7 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { VerificationBadge } from "../ui/verification-badge";
+import { useFavoriteEntities } from "@/hooks/useFavoriteEntities";
 import dynamic from "next/dynamic";
 
 interface SimpleEntity {
@@ -64,25 +71,33 @@ const EntityCard: React.FC<{
       }}
       tabIndex={-1}
     >
-      <Button
-        variant="ghost"
-        size="icon"
-        data-fav-btn
-        className="absolute top-2 right-2 z-30 bg-white/80 hover:bg-gray-100 border border-gray-200 shadow"
-        style={{ boxShadow: '0 2px 8px 0 rgba(0,0,0,0.06)' }}
-        disabled={isToggling || favLoading || !userId}
-        onClick={handleToggleFavorite}
-        aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-      >
-        {isToggling || favLoading ? (
-          <Loader2 className="h-5 w-5 text-primary animate-spin" />
-        ) : (
-          <Heart className={cn(
-            "h-5 w-5 transition-colors",
-            isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 group-hover:text-primary"
-          )}/>
-        )}
-      </Button>
+      {userId && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              data-fav-btn
+              className="absolute top-2 right-2 z-30 hover:bg-gray-100"
+              disabled={isToggling || favLoading}
+              onClick={handleToggleFavorite}
+              aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            >
+              {isToggling || favLoading ? (
+                <Loader2 className="h-5 w-5 text-primary animate-spin" />
+              ) : (
+                <Heart className={cn(
+                  "h-5 w-5 transition-colors",
+                  isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 group-hover:text-primary"
+                )}/>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{isFavorite ? 'Quitar de entidades favoritas' : 'Agregar a entidades favoritas'}</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
       <div className="flex items-center justify-center w-full">
         <div className="relative w-32 h-32">
           {entity.imageUrl ? (
@@ -117,61 +132,6 @@ const LottiePlayer = dynamic(
   { ssr: false }
 );
 
-interface FavoritesState {
-  favorites: SimpleEntity[];
-  loading: boolean;
-  error: string | null;
-}
-const useFavorites = (userId: string) => {
-  const [state, setState] = useState<FavoritesState>({
-    favorites: [],
-    loading: true,
-    error: null
-  });
-  const fetchFavorites = async () => {
-    if (!userId) return;
-    try {
-      setState(prev => ({ ...prev, loading: true }));
-      const response = await fetch(`/api/users/${userId}/favorite-entities`);
-      if (!response.ok) throw new Error('Error al cargar favoritos');
-      const favorites = await response.json();
-      setState({ favorites, loading: false, error: null });
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      }));
-    }
-  };
-  const toggleFavorite = async (entityId: string) => {
-    if (!userId) {
-      console.error('No userId, no se puede actualizar favorito');
-      return;
-    }
-    try {
-      const response = await fetch(`/api/users/${userId}/favorite-entities`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entityId }),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error al actualizar favorito:', errorText);
-        throw new Error('Error al actualizar favorito');
-      }
-      const result = await response.json();
-      await fetchFavorites();
-      return result;
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      throw error;
-    }
-  };
-  useEffect(() => { if (userId) fetchFavorites(); }, [userId]);
-  return { ...state, toggleFavorite, refetch: fetchFavorites };
-};
-
 interface SimpleEntity {
   id: string;
   name: string;
@@ -192,9 +152,9 @@ export function CategorySelection({
   categories,
   onEntitySelect,
 }: CategorySelectionProps) {
-  const user = useAuthStore(state => state.user);
-  const userId = user?.id ?? "";
-  const { favorites, loading: favLoading, toggleFavorite } = useFavorites(userId);
+  const { user } = useAuthStore();
+  const userId = user?.id || "";
+  const { favorites, loading: favLoading, toggleFavorite } = useFavoriteEntities<SimpleEntity>(userId);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [entitySearchQuery, setEntitySearchQuery] = useState("");
@@ -280,7 +240,8 @@ export function CategorySelection({
   };
 
   return (
-    <div className="space-y-6">
+    <TooltipProvider>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">
           {selectedCategory ? (
@@ -458,5 +419,6 @@ export function CategorySelection({
         )}
       </div>
     </div>
+    </TooltipProvider>
   );
 }

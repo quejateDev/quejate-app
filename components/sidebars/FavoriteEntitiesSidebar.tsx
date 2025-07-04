@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -15,83 +15,13 @@ import {
 } from 'lucide-react';
 import { Entity } from '@/types/entity';
 import Link from 'next/link';
-
-interface FavoritesState {
-  favorites: Entity[];
-  loading: boolean;
-  error: string | null;
-}
+import { useFavoriteEntities } from '@/hooks/useFavoriteEntities';
 
 interface EntitiesState {
   entities: Entity[];
   loading: boolean;
   error: string | null;
 }
-
-const useFavorites = (userId: string) => {
-  const [state, setState] = useState<FavoritesState>({
-    favorites: [],
-    loading: true,
-    error: null
-  });
-
-  const fetchFavorites = async () => {
-    try {
-      setState(prev => ({ ...prev, loading: true }));
-      const response = await fetch(`/api/users/${userId}/favorite-entities`);
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar favoritos');
-      }
-      
-      const favorites = await response.json();
-      setState({ favorites, loading: false, error: null });
-    } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        loading: false, 
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      }));
-    }
-  };
-
-  const toggleFavorite = async (entityId: string) => {
-    try {
-      const response = await fetch(`/api/users/${userId}/favorite-entities`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ entityId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al actualizar favorito');
-      }
-
-      const result = await response.json();
-
-      await fetchFavorites();
-      
-      return result;
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    if (userId) {
-      fetchFavorites();
-    }
-  }, [userId]);
-
-  return {
-    ...state,
-    toggleFavorite,
-    refetch: fetchFavorites
-  };
-};
 
 const useEntities = () => {
   const [state, setState] = useState<EntitiesState>({
@@ -135,8 +65,7 @@ const EntityCard: React.FC<{
   entity: Entity;
   isFavorite?: boolean;
   onToggleFavorite?: (entityId: string) => Promise<void>;
-  showLocation?: boolean;
-}> = ({ entity, isFavorite = false, onToggleFavorite, showLocation = true }) => {
+}> = ({ entity, isFavorite = false, onToggleFavorite }) => {
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
@@ -151,7 +80,6 @@ const EntityCard: React.FC<{
     }
   };
 
-  // Only the entity name is a link now; the rest of the card is not clickable
   return (
     <Card className="hover:shadow-md transition-shadow mb-3">
       <CardContent className="p-4">
@@ -194,7 +122,7 @@ const EntityCard: React.FC<{
                 </Button>
               )}
             </div>
-            {showLocation && entity.Municipality && (
+            {entity.Municipality && (
               <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
                 <span className="truncate">
@@ -203,11 +131,6 @@ const EntityCard: React.FC<{
                     `, ${entity.Municipality.RegionalDepartment.name}`
                   }
                 </span>
-              </div>
-            )}
-            {entity._count && entity._count.pqrs > 0 && (
-              <div className="text-xs text-muted-foreground mt-1">
-                {entity._count.pqrs} PQRSD registradas
               </div>
             )}
           </div>
@@ -222,13 +145,13 @@ const FavoritesSidebar: React.FC<{
   userId: string;
   className?: string;
 }> = ({ userId, className = "" }) => {
-  const { favorites, loading, error, toggleFavorite } = useFavorites(userId);
+  const { favorites, loading, error, toggleFavorite } = useFavoriteEntities<Entity>(userId);
   const { entities, loading: entitiesLoading, fetchEntities } = useEntities();
   const [showAddFavorites, setShowAddFavorites] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const availableEntities = entities.filter(entity => {
-    const isFavorite = favorites.some(fav => fav.id === entity.id);
+    const isFavorite = favorites.some((fav: Entity) => fav.id === entity.id);
     const matchesSearch = entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          entity.category.name.toLowerCase().includes(searchTerm.toLowerCase());
     return !isFavorite && matchesSearch;
@@ -348,13 +271,12 @@ const FavoritesSidebar: React.FC<{
         ) : (
           <div className="space-y-3">
             {favorites.length > 0 ? (
-              favorites.map((entity) => (
+              favorites.map((entity: Entity) => (
                 <EntityCard
                   key={entity.id}
                   entity={entity}
                   isFavorite={true}
                   onToggleFavorite={handleToggleFavorite}
-                  showLocation={false}
                 />
               ))
             ) : (
