@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
 export default function ProfilePage() {
   const { user: currentUser } = useAuthStore();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
-  const { user: userProfile, fetchUser } = useUser();
+  const { user: userProfile, fetchUser, isLoading: userLoading } = useUser();
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -193,7 +193,7 @@ export default function ProfilePage() {
             className="w-full"
           />
 
-          {userProfile?.role !== 'LAWYER' && (
+          {userProfile?.role !== 'LAWYER' && !userLoading  && (
             <Card className="mt-6 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
               <CardHeader className="text-center">
                 <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
