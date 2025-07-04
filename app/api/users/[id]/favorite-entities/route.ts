@@ -23,9 +23,25 @@ export async function GET( request: Request, { params }: any) {
             name: true,
             description: true,
             imageUrl: true,
+            isVerified: true,
             category: {
               select: {
                 name: true
+              }
+            },
+            Municipality: {
+              select: {
+                name: true,
+                RegionalDepartment: {
+                  select: {
+                    name: true
+                  }
+                }
+              }
+            },
+            _count: {
+              select: {
+                pqrs: true
               }
             }
           }
