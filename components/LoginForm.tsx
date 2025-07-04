@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ export default function LoginForm({ onClose }: { onClose: () => void }) {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,13 +61,16 @@ export default function LoginForm({ onClose }: { onClose: () => void }) {
         })}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
 
         document.cookie = `token=${userData.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
-        // Optional: Show success message
         toast({
           title: "Inicio de sesión exitoso",
           description: "Bienvenido de nuevo!",
           variant: "default",
         });
+
         onClose();
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 200);
       } else if (response.status === 403) {
         // Show verification modal if email is not verified
         setShowVerificationModal(true);
