@@ -16,7 +16,7 @@ interface AuthStore {
   token?: string;
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 // Helper function to set auth headers
@@ -38,11 +38,21 @@ const useAuthStore = create<AuthStore>()(
         setAuthHeaders(token);
         set({ user, token, isAuthenticated: true });
       },
-      logout: () => {
+      logout: async () => {
         setAuthHeaders(undefined);
         console.log("logout");
         set({ user: null, token: undefined, isAuthenticated: false });
-        // remove all cookies
+
+        localStorage.removeItem("auth-storage");
+        
+        try {
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include",
+          });
+        } catch (error) {
+          console.error("Error calling logout endpoint:", error);
+        }
         document.cookie.split(";").forEach(function (c) {
           console.log(c);
           document.cookie = c

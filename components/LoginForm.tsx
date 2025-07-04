@@ -66,11 +66,9 @@ export default function LoginForm({ onClose }: { onClose: () => void }) {
           description: "Bienvenido de nuevo!",
           variant: "default",
         });
-
+        
+        router.push("/dashboard");
         onClose();
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 200);
       } else if (response.status === 403) {
         // Show verification modal if email is not verified
         setShowVerificationModal(true);
