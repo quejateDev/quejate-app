@@ -1,13 +1,13 @@
 "use client";
-
-import { Category, RegionalDepartment, Municipality } from "@prisma/client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../ui/card";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { ChevronLeft, ImageIcon, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Category, RegionalDepartment, Municipality } from "@prisma/client";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { Heart, Loader2, ChevronLeft, ImageIcon, Search } from "lucide-react";
+import useAuthStore from "@/store/useAuthStore";
 import {
   getMunicipalitiesByDepartment,
   getRegionalDepartments,
@@ -22,10 +22,155 @@ import {
 import { VerificationBadge } from "../ui/verification-badge";
 import dynamic from "next/dynamic";
 
+interface SimpleEntity {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  municipalityId: string | null;
+  isVerified: boolean;
+}
+const EntityCard: React.FC<{
+  entity: SimpleEntity;
+  isFavorite: boolean;
+  onToggleFavorite: (entityId: string) => Promise<void>;
+  onEntitySelect: (id: string) => void;
+  favLoading: boolean;
+  userId?: string;
+}> = ({ entity, isFavorite, onToggleFavorite, onEntitySelect, favLoading, userId }) => {
+  const [isToggling, setIsToggling] = useState(false);
+  useEffect(() => {
+    if (!favLoading) setIsToggling(false);
+  }, [favLoading]);
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isToggling || favLoading || !userId) return;
+    setIsToggling(true);
+    try {
+      await onToggleFavorite(entity.id);
+    } finally {
+    }
+  };
+  return (
+    <Card
+      className={cn(
+        "relative p-4 cursor-pointer hover:border-primary transition-colors",
+        "flex flex-col items-center justify-center gap-4"
+      )}
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          onEntitySelect(entity.id);
+        }
+      }}
+      tabIndex={-1}
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        data-fav-btn
+        className="absolute top-2 right-2 z-30 bg-white/80 hover:bg-gray-100 border border-gray-200 shadow"
+        style={{ boxShadow: '0 2px 8px 0 rgba(0,0,0,0.06)' }}
+        disabled={isToggling || favLoading || !userId}
+        onClick={handleToggleFavorite}
+        aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+      >
+        {isToggling || favLoading ? (
+          <Loader2 className="h-5 w-5 text-primary animate-spin" />
+        ) : (
+          <Heart className={cn(
+            "h-5 w-5 transition-colors",
+            isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 group-hover:text-primary"
+          )}/>
+        )}
+      </Button>
+      <div className="flex items-center justify-center w-full">
+        <div className="relative w-32 h-32">
+          {entity.imageUrl ? (
+            <Image
+              src={entity.imageUrl}
+              alt={entity.name}
+              fill
+              className="object-cover rounded-lg"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-gray-400">Sin imagen</span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-2">
+        <h3 className="font-semibold text-center">{entity.name}</h3>
+        {entity.isVerified && <VerificationBadge />}
+      </div>
+      {entity.description && (
+        <p className="text-xs text-gray-500 text-center line-clamp-2 px-2">
+          {entity.description}
+        </p>
+      )}
+    </Card>
+  );
+};
+
 const LottiePlayer = dynamic(
   () => import("@lottiefiles/react-lottie-player").then(mod => mod.Player),
   { ssr: false }
 );
+
+interface FavoritesState {
+  favorites: SimpleEntity[];
+  loading: boolean;
+  error: string | null;
+}
+const useFavorites = (userId: string) => {
+  const [state, setState] = useState<FavoritesState>({
+    favorites: [],
+    loading: true,
+    error: null
+  });
+  const fetchFavorites = async () => {
+    if (!userId) return;
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      const response = await fetch(`/api/users/${userId}/favorite-entities`);
+      if (!response.ok) throw new Error('Error al cargar favoritos');
+      const favorites = await response.json();
+      setState({ favorites, loading: false, error: null });
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      }));
+    }
+  };
+  const toggleFavorite = async (entityId: string) => {
+    if (!userId) {
+      console.error('No userId, no se puede actualizar favorito');
+      return;
+    }
+    try {
+      const response = await fetch(`/api/users/${userId}/favorite-entities`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entityId }),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error al actualizar favorito:', errorText);
+        throw new Error('Error al actualizar favorito');
+      }
+      const result = await response.json();
+      await fetchFavorites();
+      return result;
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      throw error;
+    }
+  };
+  useEffect(() => { if (userId) fetchFavorites(); }, [userId]);
+  return { ...state, toggleFavorite, refetch: fetchFavorites };
+};
 
 interface SimpleEntity {
   id: string;
@@ -47,19 +192,17 @@ export function CategorySelection({
   categories,
   onEntitySelect,
 }: CategorySelectionProps) {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const user = useAuthStore(state => state.user);
+  const userId = user?.id ?? "";
+  const { favorites, loading: favLoading, toggleFavorite } = useFavorites(userId);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [entitySearchQuery, setEntitySearchQuery] = useState("");
   const [departments, setDepartments] = useState<RegionalDepartment[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
-    string | null
-  >(null);
-  const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<
-    string | null
-  >(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
+  const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<{ [id: string]: boolean }>({});
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -126,6 +269,15 @@ export function CategorySelection({
           );
         })
     : [];
+
+  const handleToggleFavorite = async (entityId: string) => {
+    setToggling((prev) => ({ ...prev, [entityId]: true }));
+    try {
+      await toggleFavorite(entityId);
+    } finally {
+      setToggling((prev) => ({ ...prev, [entityId]: false }));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -239,38 +391,15 @@ export function CategorySelection({
         {selectedCategory ? (
           filteredEntities && filteredEntities.length > 0 ? (
             filteredEntities.map((entity) => (
-              <Card
+              <EntityCard
                 key={entity.id}
-                className={cn(
-                  "p-4 cursor-pointer hover:border-primary transition-colors",
-                  "flex flex-col items-center justify-center gap-4"
-                )}
-                onClick={() => onEntitySelect(entity.id)}
-              >
-                <div className="relative w-32 h-32">
-                  {entity.imageUrl ? (
-                    <Image
-                      src={entity.imageUrl}
-                      alt={entity.name}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-400">Sin imagen</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <h3 className="font-semibold text-center">{entity.name}</h3>
-                  {entity.isVerified && <VerificationBadge />}
-                </div>
-                {entity.description && (
-                  <p className="text-xs text-gray-500 text-center line-clamp-2 px-2">
-                    {entity.description}
-                  </p>
-                )}
-              </Card>
+                entity={entity}
+                isFavorite={favorites.some((fav: SimpleEntity) => fav.id === entity.id)}
+                favLoading={!!toggling[entity.id]}
+                onToggleFavorite={handleToggleFavorite}
+                onEntitySelect={onEntitySelect}
+                userId={userId}
+              />
             ))
           ) : (
             <p className="text-left text-sm text-gray-500 col-span-full">
