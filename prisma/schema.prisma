@@ -34,6 +34,7 @@ model User {
   comments          Comment[]
   favorites         UserFavoriteEntity[]
   givenRatings      Rating[]            @relation("ClientGivenRatings")
+  lawyerRequests    LawyerRequest[]
   lawyerProfile     Lawyer?   
   department        Department?         @relation(fields: [departmentId], references: [id])
   following         User[]              @relation("UserFollows")
@@ -58,10 +59,31 @@ model Lawyer {
   feePerService   Float?
   experienceYears Int        @default(0)
   receivedRatings Rating[]   @relation("LawyerReceivedRatings")
+  lawyerRequests  LawyerRequest[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   @@index([userId])
+}
+
+model LawyerRequest {
+  id          String                @id @default(uuid())
+  userId      String
+  lawyerId    String
+  pqrId       String?
+  message     String
+  serviceType String?
+  status      LawyerRequestStatus   @default(PENDING)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lawyer      Lawyer                @relation(fields: [lawyerId], references: [id], onDelete: Cascade)
+  pqr         PQRS?                 @relation(fields: [pqrId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([lawyerId])
+  @@index([pqrId])
 }
 
 model Rating {
@@ -175,6 +197,7 @@ model OversightEntity {
   updatedAt   DateTime   @updatedAt
   categories  Category[]
 }
+
 model PQRS {
   id                String             @id @default(uuid())
   type              PQRSType
@@ -196,6 +219,7 @@ model PQRS {
   customFieldValues CustomFieldValue[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
+  lawyerRequests    LawyerRequest[]
   creator           User?              @relation(fields: [creatorId], references: [id])
   assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id])
   department        Department?         @relation(fields: [departmentId], references: [id])
@@ -397,4 +421,11 @@ enum DocumentType {
   NIT
   PASSPORT
   LICENSE
+}
+
+enum LawyerRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
 }
