@@ -1,6 +1,5 @@
 import { Lawyer } from "./lawyer";
-
-export interface LawyerProfileData extends Lawyer {
+export interface LawyerData extends Lawyer {
   id: string;
   userId: string;
   documentType: string;

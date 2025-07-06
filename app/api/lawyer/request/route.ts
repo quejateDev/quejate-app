@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserIdFromToken } from "@/lib/auth";
 import { LawyerRequestStatus } from "@prisma/client";
+import { createLawyerRequestNotification, createNewRequestNotificationForLawyer } from "@/lib/helpers/notificationHelpers";
 
 export async function GET(request: Request) {
   try {
@@ -185,9 +186,23 @@ export async function POST(request: Request) {
             }
           }
         },
-        pqr: true
+        pqr: {
+          select: {
+            id: true,
+            subject: true,
+            description: true
+          }
+        }
       }
     });
+
+    const clientName = `${lawyerRequest.user.firstName} ${lawyerRequest.user.lastName}`;
+    await createNewRequestNotificationForLawyer(
+      lawyer.id,
+      clientName,
+      lawyerRequest.id,
+      lawyerRequest.pqr?.subject || undefined
+    );
 
     return NextResponse.json(lawyerRequest, { status: 201 });
 
@@ -278,9 +293,31 @@ export async function PATCH(request: Request) {
             email: true
           }
         },
+        lawyer: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        },
         pqr: true
       }
     });
+
+    if (newStatus === 'ACCEPTED' || newStatus === 'REJECTED') {
+      const lawyerName = `${updatedRequest.lawyer.user.firstName} ${updatedRequest.lawyer.user.lastName}`;
+      const notificationType = newStatus === 'ACCEPTED' ? 'lawyer_request_accepted' : 'lawyer_request_rejected';
+      
+      await createLawyerRequestNotification(
+        updatedRequest.userId,
+        notificationType,
+        lawyerName,
+        requestId
+      );
+    }
 
     return NextResponse.json(updatedRequest, { status: 200 });
 

@@ -13,7 +13,7 @@ import { UserBasic } from '@/types/user-basic';
 import { PaginationData } from '@/types/pagination';
 import { LawyerRequestStatus } from '@prisma/client';
 import { formatDate } from '@/lib/dateUtils';
-
+import { statusConfig } from '@/constants/status-request';
 
 interface PQR {
   id: string;
@@ -35,12 +35,6 @@ interface LawyerRequestsResponse {
   pagination: PaginationData;
 }
 
-const statusConfig = {
-  PENDING: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  ACCEPTED: { label: 'Aceptado', color: 'bg-blue-100 text-blue-800', icon: Check },
-  REJECTED: { label: 'Rechazado', color: 'bg-red-100 text-red-800', icon: X },
-  COMPLETED: { label: 'Completado', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-};
 
 export function LawyerRequestsList() {
   const [requests, setRequests] = useState<LawyerRequest[]>([]);
@@ -185,7 +179,7 @@ export function LawyerRequestsList() {
                 return (
                   <div key={request.id} className="border rounded-lg p-4 space-y-3 overflow-hidden">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
-                    <div className="min-w-0">
+                    <div className="w-full">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Avatar className="h-8 w-8">
                             <AvatarImage 
@@ -238,9 +232,9 @@ export function LawyerRequestsList() {
                         <Separator />
 
                         {request.pqr && (
-                            <div className="flex justify-between items-start space-y-2">
+                            <div className="flex justify-between items-start space-y-2 pt-6">
                               <div>
-                                <h3 className="mt-6 mb-2 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                                <h3 className="mb-2 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                                   PQRSD Relacionada
                                 </h3>
                                 <p className="text-sm text-gray-700 mb-1">{request.pqr.subject}</p>

@@ -12,10 +12,10 @@ import {
   Calendar,
   CheckCircle
 } from "lucide-react";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 
 interface LawyerDetailModalProps {
-  lawyer: LawyerProfileData;
+  lawyer: LawyerData;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRequestService: () => void;

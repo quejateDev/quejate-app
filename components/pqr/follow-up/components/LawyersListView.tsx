@@ -14,7 +14,7 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 import { PQR } from "@/types/pqrsd";
 import { useLawyersList } from "../hooks/useLawyersList";
 import { LawyerDetailModal } from "./LawyerDetailModal";
@@ -27,7 +27,7 @@ interface LawyersListViewProps {
 
 export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
   const { lawyers, isLoading, error, sendLawyerRequest } = useLawyersList();
-  const [selectedLawyer, setSelectedLawyer] = useState<LawyerProfileData | null>(null);
+  const [selectedLawyer, setSelectedLawyer] = useState<LawyerData | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
@@ -36,12 +36,12 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const handleViewDetail = (lawyer: LawyerProfileData) => {
+  const handleViewDetail = (lawyer: LawyerData) => {
     setSelectedLawyer(lawyer);
     setShowDetailModal(true);
   };
 
-  const handleRequestService = (lawyer: LawyerProfileData) => {
+  const handleRequestService = (lawyer: LawyerData) => {
     setSelectedLawyer(lawyer);
     setShowRequestModal(true);
   };

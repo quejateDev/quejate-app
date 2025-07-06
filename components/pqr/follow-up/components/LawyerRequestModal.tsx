@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 import { PQR } from "@/types/pqrsd";
 
 interface LawyerRequestModalProps {
-  lawyer: LawyerProfileData;
+  lawyer: LawyerData;
   pqrData: PQR;
   open: boolean;
   onOpenChange: (open: boolean) => void;

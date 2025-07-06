@@ -91,6 +91,7 @@ export async function POST(
         data: {
           followerId: updatedUser?.id,
           followerName: updatedUser?.firstName + " " + updatedUser?.lastName,
+          followerImage: updatedUser?.profilePicture || null,
         },
       },
     });

@@ -16,13 +16,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { LawyerProfileUpdateData } from "@/hooks/useLawyerProfile";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 
 interface LawyerProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: LawyerProfileUpdateData) => Promise<void>;
-  initialData: LawyerProfileData | null;
+  initialData: LawyerData | null;
 }
 
 export function LawyerProfileEditModal({
