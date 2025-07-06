@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/dateUtils";
 import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqr/pqr-custom-fields";
 import { typeMap } from "@/constants/pqrMaps";

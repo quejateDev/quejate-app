@@ -1,10 +1,5 @@
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profilePicture: string | null;
-  role: string;
+import { UserBasic } from "./user-basic";
+export interface User extends UserBasic {
   isFollowing: boolean;
   followers: Array<{
     id: string;
