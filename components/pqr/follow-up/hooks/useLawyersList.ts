@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 
 export function useLawyersList() {
-  const [lawyers, setLawyers] = useState<LawyerProfileData[]>([]);
+  const [lawyers, setLawyers] = useState<LawyerData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

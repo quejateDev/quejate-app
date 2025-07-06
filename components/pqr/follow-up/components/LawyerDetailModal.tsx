@@ -12,10 +12,10 @@ import {
   Calendar,
   CheckCircle
 } from "lucide-react";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 
 interface LawyerDetailModalProps {
-  lawyer: LawyerProfileData;
+  lawyer: LawyerData;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRequestService: () => void;
@@ -50,17 +50,17 @@ export function LawyerDetailModal({
             <div className="flex items-center gap-4">
               <Avatar className="h-24 w-24 border-2 border-quaternary">
                 <AvatarImage 
-                  src={lawyer.profilePicture || undefined} 
-                  alt={`${lawyer.firstName} ${lawyer.lastName}`}
+                  src={lawyer.user.profilePicture || undefined} 
+                  alt={`${lawyer.user.firstName} ${lawyer.user.lastName}`}
                 />
                 <AvatarFallback className="text-lg">
-                  {lawyer.firstName?.[0]}{lawyer.lastName?.[0]}
+                  {lawyer.user.firstName?.[0]}{lawyer.user.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
               
               <div className="space-y-1">
                 <h3 className="text-xl font-semibold">
-                  {lawyer.firstName} {lawyer.lastName}
+                  {lawyer.user.firstName} {lawyer.user.lastName}
                 </h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   Abogado Verificado
@@ -90,12 +90,12 @@ export function LawyerDetailModal({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.email}</span>
+                  <span>{lawyer.user.email}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.phone || 'No disponible'}</span>
+                  <span>{lawyer.user.phone || 'No disponible'}</span>
                 </div>
                 
               </div>

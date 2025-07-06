@@ -14,7 +14,7 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 import { PQR } from "@/types/pqrsd";
 import { useLawyersList } from "../hooks/useLawyersList";
 import { LawyerDetailModal } from "./LawyerDetailModal";
@@ -27,7 +27,7 @@ interface LawyersListViewProps {
 
 export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
   const { lawyers, isLoading, error, sendLawyerRequest } = useLawyersList();
-  const [selectedLawyer, setSelectedLawyer] = useState<LawyerProfileData | null>(null);
+  const [selectedLawyer, setSelectedLawyer] = useState<LawyerData | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
@@ -36,12 +36,12 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const handleViewDetail = (lawyer: LawyerProfileData) => {
+  const handleViewDetail = (lawyer: LawyerData) => {
     setSelectedLawyer(lawyer);
     setShowDetailModal(true);
   };
 
-  const handleRequestService = (lawyer: LawyerProfileData) => {
+  const handleRequestService = (lawyer: LawyerData) => {
     setSelectedLawyer(lawyer);
     setShowRequestModal(true);
   };
@@ -185,9 +185,9 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
               <CardContent className="p-4">
                 <div className="flex items-start space-x-4">
                   <Avatar className="w-12 h-12 flex-shrink-0">
-                    <AvatarImage src={lawyer.profilePicture || ""} />
+                    <AvatarImage src={lawyer.user.profilePicture || ""} />
                     <AvatarFallback className="text-sm font-semibold">
-                      {getInitials(lawyer.firstName, lawyer.lastName)}
+                      {getInitials(lawyer.user.firstName, lawyer.user.lastName)}
                     </AvatarFallback>
                   </Avatar>
 
@@ -196,7 +196,7 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
                       <div className="space-y-1">
                         <div className=" flex items-center space-x-2">
                             <h3 className="font-medium text-gray-900">
-                                {lawyer.firstName} {lawyer.lastName} -
+                                {lawyer.user.firstName} {lawyer.user.lastName} -
                             </h3>
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="ml-1 text-sm font-medium">

@@ -49,7 +49,8 @@ export async function GET(request: Request) {
                   firstName: true,
                   lastName: true,
                   email: true,
-                  profilePicture: true
+                  profilePicture: true,
+                  phone: true
                 }
               },
               receivedRatings: {

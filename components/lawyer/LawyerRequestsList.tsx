@@ -13,7 +13,7 @@ import { UserBasic } from '@/types/user-basic';
 import { PaginationData } from '@/types/pagination';
 import { LawyerRequestStatus } from '@prisma/client';
 import { formatDate } from '@/lib/dateUtils';
-
+import { statusConfig } from '@/constants/status-request';
 
 interface PQR {
   id: string;
@@ -35,12 +35,6 @@ interface LawyerRequestsResponse {
   pagination: PaginationData;
 }
 
-const statusConfig = {
-  PENDING: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  ACCEPTED: { label: 'Aceptado', color: 'bg-blue-100 text-blue-800', icon: Check },
-  REJECTED: { label: 'Rechazado', color: 'bg-red-100 text-red-800', icon: X },
-  COMPLETED: { label: 'Completado', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-};
 
 export function LawyerRequestsList() {
   const [requests, setRequests] = useState<LawyerRequest[]>([]);

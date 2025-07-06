@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import useAuthStore from "@/store/useAuthStore";
-import { LawyerProfileData } from "@/types/lawyer-profile";
+import { LawyerData } from "@/types/lawyer-profile";
 
 
 
@@ -16,7 +16,7 @@ export interface LawyerProfileUpdateData {
 
 export const useLawyerProfile = () => {
   const { user } = useAuthStore();
-  const [lawyerData, setLawyerData] = useState<LawyerProfileData | null>(null);
+  const [lawyerData, setLawyerData] = useState<LawyerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
