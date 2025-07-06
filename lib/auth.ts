@@ -32,6 +32,7 @@ export async function getCurrentUser(): Promise<User | null> {
         lastName: true,
         email: true,
         profilePicture: true,
+        phone: true,
         role: true,
         followers: {
           select: {
