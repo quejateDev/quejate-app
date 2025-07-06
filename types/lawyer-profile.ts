@@ -1,6 +1,6 @@
-import { Lawyer } from "./lawyer";
+import { UserBasic } from "./user-basic";
 
-export interface LawyerProfileData extends Lawyer {
+export interface LawyerProfileData extends UserBasic {
   id: string;
   userId: string;
   documentType: string;

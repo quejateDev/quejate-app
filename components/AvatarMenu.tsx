@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogIn, LogOut, User } from "lucide-react";
+import { LogIn, LogOut, User, Scale } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
 import useUser from "@/hooks/useUser";
@@ -63,6 +63,15 @@ export default function AvatarMenu() {
               >
                 <User className="h-4 w-4" />
                 <span>Ver Perfil</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href="/dashboard/lawyer-requests"
+                className="flex items-center gap-2"
+              >
+                <Scale className="h-4 w-4" />
+                <span>Mis Solicitudes de Abogados</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem

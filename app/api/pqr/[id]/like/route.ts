@@ -66,7 +66,7 @@ export async function POST(request: NextRequest, { params }: any) {
       if (userId !== updatedPQR.creator.id) {
         const likingUser = await prisma.user.findUnique({
           where: { id: userId },
-          select: { firstName: true, lastName: true }
+          select: { firstName: true, lastName: true, profilePicture: true },
         });
     
         if (likingUser) {
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest, { params }: any) {
                 pqrId: pqrId,
                 followerId: userId,
                 followerName: `${likingUser.firstName} ${likingUser.lastName}`,
+                followerImage: likingUser.profilePicture || null,
               },
             },
           });

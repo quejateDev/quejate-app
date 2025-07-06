@@ -50,17 +50,17 @@ export function LawyerDetailModal({
             <div className="flex items-center gap-4">
               <Avatar className="h-24 w-24 border-2 border-quaternary">
                 <AvatarImage 
-                  src={lawyer.user.profilePicture || undefined} 
-                  alt={`${lawyer.user.firstName} ${lawyer.user.lastName}`}
+                  src={lawyer.profilePicture || undefined} 
+                  alt={`${lawyer.firstName} ${lawyer.lastName}`}
                 />
                 <AvatarFallback className="text-lg">
-                  {lawyer.user.firstName?.[0]}{lawyer.user.lastName?.[0]}
+                  {lawyer.firstName?.[0]}{lawyer.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
               
               <div className="space-y-1">
                 <h3 className="text-xl font-semibold">
-                  {lawyer.user.firstName} {lawyer.user.lastName}
+                  {lawyer.firstName} {lawyer.lastName}
                 </h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   Abogado Verificado
@@ -90,12 +90,12 @@ export function LawyerDetailModal({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.user.email}</span>
+                  <span>{lawyer.email}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.user.phone || 'No disponible'}</span>
+                  <span>{lawyer.phone || 'No disponible'}</span>
                 </div>
                 
               </div>

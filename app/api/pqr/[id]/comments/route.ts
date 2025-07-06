@@ -45,7 +45,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (userId !== pqr.creatorId) {
       const commentingUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { firstName: true, lastName: true }
+        select: { firstName: true, lastName: true, profilePicture: true },
       });
 
       if (commentingUser) {
@@ -58,6 +58,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
               pqrId: pqrId,
               followerId: userId,
               followerName: `${commentingUser.firstName} ${commentingUser.lastName}`,
+              followerImage: commentingUser.profilePicture || null,
             },
           },
         });

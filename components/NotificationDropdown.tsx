@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell } from "lucide-react";
+import { Bell, Scale } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -70,6 +70,11 @@ export function NotificationDropdown() {
         return notification.data?.pqrId 
           ? `/dashboard/profile/pqr/${notification.data.pqrId}`
           : '#';
+      case 'lawyer_request_accepted':
+      case 'lawyer_request_rejected':
+        return '/dashboard/lawyer-requests';
+      case 'new_lawyer_request':
+        return '/dashboard/lawyer';
       default:
         return '#';
     }
@@ -106,13 +111,22 @@ export function NotificationDropdown() {
                 }`}
                 onClick={() => handleMarkAsRead(notification.id)}
               >
-                {notification.type === "follow" && notification.data?.followerImage && (
+                {(notification.type === "follow" || 
+                notification.type === "like" || 
+                notification.type === "comment") && (
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={notification.data.followerImage} />
+                    <AvatarImage src={notification.data?.followerImage} />
                     <AvatarFallback>
-                      {notification.data.followerName?.[0]}
+                      {notification.data?.followerName?.[0]}
                     </AvatarFallback>
                   </Avatar>
+                )}
+                {(notification.type === "lawyer_request_accepted" || 
+                  notification.type === "lawyer_request_rejected" || 
+                  notification.type === "new_lawyer_request") && (
+                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Scale className="h-4 w-4 text-blue-600" />
+                  </div>
                 )}
                 <div className="flex-1 space-y-1">
                   <p className="text-sm leading-none">
