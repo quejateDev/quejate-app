@@ -6,6 +6,7 @@ import { usePQRFollowUp } from "./hooks/usePQRFollowUp";
 import { MainOptionsView } from "./components/MainOptionsView";
 import { TutelaFormView } from "./components/TutelaFormView";
 import { DocumentExportView } from "./components/DocumentExportView";
+import { LawyersListView } from "./components/LawyersListView";
 
 type PQRFollowUpModalProps = {
   open: boolean;
@@ -29,12 +30,14 @@ export function PQRFollowUpModal({
     isGenerating,
     generatedDocument,
     showDocumentExport,
+    showLawyersList,
     handleOptionSelect,
     handleClose,
     handleGenerateDocument,
     handleMouseEnter,
     handleMouseLeave,
     setShowTutelaForm,
+    setShowLawyersList,
   } = usePQRFollowUp(pqrType, pqrData, onOpenChange);
 
   const getDialogClassName = () => {
@@ -43,6 +46,9 @@ export function PQRFollowUpModal({
     }
     if (showTutelaForm) {
       return "sm:max-w-xl";
+    }
+    if (showLawyersList) {
+      return "sm:max-w-2xl";
     }
     return "sm:max-w-md";
   };
@@ -67,6 +73,15 @@ export function PQRFollowUpModal({
           isLoading={isGenerating}
           onGenerateDocument={handleGenerateDocument}
           onClose={() => setShowTutelaForm(false)}
+        />
+      );
+    }
+
+    if (showLawyersList) {
+      return (
+        <LawyersListView
+          pqrData={pqrData}
+          onBack={() => setShowLawyersList(false)}
         />
       );
     }

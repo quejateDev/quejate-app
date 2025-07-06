@@ -22,6 +22,7 @@ export function usePQRFollowUp(
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDocument, setGeneratedDocument] = useState<string | null>(null);
   const [showDocumentExport, setShowDocumentExport] = useState(false);
+  const [showLawyersList, setShowLawyersList] = useState(false);
 
   useEffect(() => {
     const fetchOversightEntity = async () => {
@@ -52,11 +53,7 @@ export function usePQRFollowUp(
     setSelectedOption(option);
 
     if (option === "abogado") {
-      toast({
-        title: "Información",
-        description: "No hay abogados disponibles en este momento",
-        variant: "default",
-      });
+      setShowLawyersList(true);
       return;
     }
 
@@ -79,6 +76,7 @@ export function usePQRFollowUp(
       setSelectedOption(null);
       setShowTutelaForm(false);
       setShowDocumentExport(false);
+      setShowLawyersList(false);
       setGeneratedDocument(null);
       setOversightEntity(null);
       setError(null);
@@ -194,6 +192,7 @@ export function usePQRFollowUp(
     isGenerating,
     generatedDocument,
     showDocumentExport,
+    showLawyersList,
     handleOptionSelect,
     handleClose,
     handleGenerateDocument,
@@ -201,5 +200,6 @@ export function usePQRFollowUp(
     handleMouseEnter,
     handleMouseLeave,
     setShowTutelaForm,
+    setShowLawyersList,
   };
 }

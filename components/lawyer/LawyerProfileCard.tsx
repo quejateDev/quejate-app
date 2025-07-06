@@ -14,7 +14,7 @@ import {
   Calendar, 
   DollarSign,
   Star,
-  Briefcase
+  CheckCircle
 } from "lucide-react";
 import { useLawyerProfile, LawyerProfileUpdateData } from "@/hooks/useLawyerProfile";
 import { LawyerProfileEditModal } from "@/components/lawyer/LawyerProfileEditModal";
@@ -111,8 +111,8 @@ export function LawyerProfileCard() {
                   {user.firstName} {user.lastName}
                 </h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Briefcase className="h-4 w-4" />
                   Abogado Verificado
+                  <CheckCircle className="h-4 w-4 text-green-500" />
                 </p>
                 {averageRating > 0 && (
                   <div className="flex items-center gap-1">
