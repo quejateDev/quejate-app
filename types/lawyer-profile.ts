@@ -1,4 +1,6 @@
-export interface LawyerProfileData {
+import { Lawyer } from "./lawyer";
+
+export interface LawyerProfileData extends Lawyer {
   id: string;
   userId: string;
   documentType: string;
@@ -10,11 +12,4 @@ export interface LawyerProfileData {
   experienceYears: number;
   averageRating: number;
   ratingCount: number;
-  user: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    profilePicture: string | null;
-    phone: string | null;
-  };
 }
