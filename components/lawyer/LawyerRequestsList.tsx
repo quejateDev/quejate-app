@@ -14,6 +14,7 @@ import { PaginationData } from '@/types/pagination';
 import { LawyerRequestStatus } from '@prisma/client';
 import { formatDate } from '@/lib/dateUtils';
 import { statusConfig } from '@/constants/status-request';
+import { toast } from '@/hooks/use-toast';
 
 interface PQR {
   id: string;
@@ -96,6 +97,13 @@ export function LawyerRequestsList() {
       }
 
       await fetchRequests(pagination.page, statusFilter === 'ALL' ? undefined : statusFilter);
+      if (newStatus === 'ACCEPTED') {
+      toast({
+          title: 'Solicitud Aceptada',
+          description: 'La solicitud ha sido aceptada exitosamente, contacta al cliente para continuar con el proceso.',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       console.error('Error updating status:', error);
     } finally {
