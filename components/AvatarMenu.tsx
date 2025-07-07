@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogIn, LogOut, User, Scale } from "lucide-react";
+import { LogIn, LogOut, User, Scale, MailPlus } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
 import useUser from "@/hooks/useUser";
@@ -65,15 +65,28 @@ export default function AvatarMenu() {
                 <span>Ver Perfil</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link
-                href="/dashboard/lawyer-requests"
-                className="flex items-center gap-2"
-              >
-                <Scale className="h-4 w-4" />
-                <span>Mis Solicitudes de Abogados</span>
-              </Link>
-            </DropdownMenuItem>
+            {user.role === "CLIENT" || user.role === "LAWYER" ? (
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/dashboard/lawyer-requests"
+                  className="flex items-center gap-2"
+                >
+                  <Scale className="h-4 w-4" />
+                  <span>Mis Solicitudes de Abogados</span>
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
+            {user.role === "LAWYER" ? (
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/dashboard/lawyer"
+                  className="flex items-center gap-2"
+                >
+                  <MailPlus className="h-4 w-4" />
+                  <span>Mis Solicitudes de Asesoría</span>
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuItem
               className="flex items-center gap-2 text-red-600"
               onClick={handleLogout}
@@ -83,27 +96,24 @@ export default function AvatarMenu() {
             </DropdownMenuItem>
           </>
         ) : (
-        <>
-          <DropdownMenuItem asChild>
-            <Button
-              onClick={() => setIsOpen(true)}
-              variant="ghost"
-              className="flex items-center gap-2"
-            >
-              <LogIn className="h-4 w-4" />
-              <span>Iniciar Sesión</span>
-            </Button>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link
-              href="/signup"
-              className="flex items-center gap-2 w-full"
-            >
-              <User className="h-4 w-4" />
-              <span>Registrarme</span>
-            </Link>
-          </DropdownMenuItem>
-        </>
+          <>
+            <DropdownMenuItem asChild>
+              <Button
+                onClick={() => setIsOpen(true)}
+                variant="ghost"
+                className="flex items-center gap-2"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Iniciar Sesión</span>
+              </Button>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/signup" className="flex items-center gap-2 w-full">
+                <User className="h-4 w-4" />
+                <span>Registrarme</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
