@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
+import { addMembreteBackground } from "@/utils/pdfMembrete";
 
 import {
   Copy,
@@ -110,18 +111,19 @@ export function DocumentExport({
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!generatedDocument) return;
 
     setIsDownloading(true);
     try {
       const doc = new jsPDF();
+      await addMembreteBackground(doc);
 
       const margins = {
-        top: 25,
-        bottom: 25,
-        left: 20,
-        right: 20
+        top: 60,
+        bottom: 35,
+        left: 30,
+        right: 30
       };
       
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -131,23 +133,24 @@ export function DocumentExport({
       const paragraphSpacing = 4;
       let yPosition = margins.top;
 
-      const checkPageBreak = (requiredSpace: number = lineHeight) => {
+      const checkPageBreak = async (requiredSpace: number = lineHeight) => {
         if (yPosition + requiredSpace > pageHeight - margins.bottom) {
           doc.addPage();
+          await addMembreteBackground(doc);
           yPosition = margins.top;
           return true;
         }
         return false;
       };
 
-      const addTextWithPageControl = (text: string, x: number, fontSize: number = 11, fontStyle: string = 'normal') => {
+      const addTextWithPageControl = async (text: string, x: number, fontSize: number = 11, fontStyle: string = 'normal') => {
         doc.setFontSize(fontSize);
         doc.setFont("helvetica", fontStyle);
         
         const textLines = doc.splitTextToSize(text, maxWidth - (x - margins.left));
         const requiredSpace = textLines.length * lineHeight;
         
-        checkPageBreak(requiredSpace);
+        await checkPageBreak(requiredSpace);
         
         doc.text(textLines, x, yPosition);
         yPosition += requiredSpace;
@@ -164,23 +167,24 @@ export function DocumentExport({
 
       const lines = generatedDocument.split("\n");
       
-      lines.forEach((line, index) => {
+      for (let index = 0; index < lines.length; index++) {
+        const line = lines[index];
         const trimmedLine = line.trim();
         
         if (trimmedLine === "") {
           yPosition += paragraphSpacing;
-          return;
+          continue;
         }
 
         if (trimmedLine.match(/^(HECHOS:|DERECHOS VULNERADOS:|PRETENSIONES:|FUNDAMENTOS DE DERECHO:|SOLICITA:|NOTIFICACIONES:)/i)) {
           if (index > 0) {
             yPosition += paragraphSpacing * 2;
-            checkPageBreak(lineHeight * 2);
+            await checkPageBreak(lineHeight * 2);
           }
           
-          addTextWithPageControl(trimmedLine, margins.left, 12, 'bold');
+          await addTextWithPageControl(trimmedLine, margins.left, 12, 'bold');
           yPosition += paragraphSpacing;
-          return;
+          continue;
         }
 
         if (trimmedLine.match(/^\d+\./)) {
@@ -189,7 +193,7 @@ export function DocumentExport({
           const content = parts.slice(1).join(".").trim();
           
           const estimatedLines = Math.ceil(content.length / 80) + 1;
-          checkPageBreak(estimatedLines * lineHeight);
+          await checkPageBreak(estimatedLines * lineHeight);
           
           doc.setFontSize(11);
           doc.setFont("helvetica", "bold");
@@ -206,7 +210,7 @@ export function DocumentExport({
           }
           
           yPosition += paragraphSpacing / 2;
-          return;
+          continue;
         }
 
         if (trimmedLine.length > 0) {
@@ -215,34 +219,11 @@ export function DocumentExport({
             yPosition += paragraphSpacing / 2;
           }
           
-          addTextWithPageControl(trimmedLine, margins.left);
+          await addTextWithPageControl(trimmedLine, margins.left);
           yPosition += paragraphSpacing / 2;
         }
-      });
-
-      const totalPages = doc.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(128);
-        doc.setFont("helvetica", "normal");
-        
-        doc.text(
-          `Página ${i} de ${totalPages}`,
-          pageWidth / 2,
-          pageHeight - 10,
-          { align: "center" }
-        );
-
-        const generateDate = new Date().toLocaleDateString('es-CO');
-        doc.text(
-          `Generado: ${generateDate}`,
-          pageWidth - margins.right,
-          pageHeight - 10,
-          { align: "right" }
-        );
       }
-
+      
       doc.setTextColor(0);
 
       doc.save(`tutela_${pqrData?.entity?.name || "documento"}.pdf`);
