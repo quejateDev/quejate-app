@@ -73,7 +73,7 @@ export function LawyerProfileCard() {
     );
   }
 
-  const { user, specialties, description, experienceYears, feePerHour, averageRating, ratingCount, documentType, identityDocument } = lawyerData;
+  const { user, isVerified, specialties, description, experienceYears, feePerHour, averageRating, ratingCount, documentType, identityDocument } = lawyerData;
 
   return (
     <>
@@ -110,10 +110,18 @@ export function LawyerProfileCard() {
                 <h3 className="text-xl font-semibold">
                   {user.firstName} {user.lastName}
                 </h3>
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  Abogado Verificado
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                </p>
+
+                {isVerified ? (
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    Abogado Verificado
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    Abogado en proceso de verificación
+                    <CheckCircle className="h-4 w-4 text-yellow-500" />
+                  </p>
+                )}
                 {averageRating > 0 && (
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />

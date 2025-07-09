@@ -16,7 +16,8 @@ export async function GET(
             firstName: true,
             lastName: true,
             profilePicture: true,
-            email: true
+            email: true,
+            isVerified: true
           }
         },
         receivedRatings: true

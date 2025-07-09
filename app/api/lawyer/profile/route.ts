@@ -21,7 +21,8 @@ export async function GET() {
             lastName: true,
             profilePicture: true,
             email: true,
-            phone: true
+            phone: true,
+            isVerified: true
           }
         },
         receivedRatings: true

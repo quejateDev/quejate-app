@@ -41,7 +41,7 @@ export function LawyerDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white p-6">
         <DialogHeader>
           <DialogTitle>Perfil del Abogado</DialogTitle>
         </DialogHeader>
@@ -62,10 +62,17 @@ export function LawyerDetailModal({
                 <h3 className="text-xl font-semibold">
                   {lawyer.user.firstName} {lawyer.user.lastName}
                 </h3>
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  Abogado Verificado
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                </p>
+                {lawyer.isVerified ? (
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    Abogado Verificado
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    Abogado en proceso de verificación
+                    <CheckCircle className="h-4 w-4 text-yellow-500" />
+                  </p>
+                )}
                 {lawyer.averageRating > 0 && (
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
@@ -84,29 +91,10 @@ export function LawyerDetailModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                Información de Contacto
-              </h4>
-              
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.user.email}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.user.phone || 'No disponible'}</span>
-                </div>
-                
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Información Profesional
               </h4>
               
-              <div className="space-y-2">
+              <div className="space-y-2 pb-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span>{lawyer.experienceYears} {lawyer.experienceYears === 1 ? 'año' : 'años'} de experiencia</span>
@@ -119,13 +107,20 @@ export function LawyerDetailModal({
                   </div>
                 )}
               </div>
+              {lawyer.description && (
+              <>
+                <p className="text-sm leading-relaxed text-gray-700">
+                    {lawyer.description}
+                </p>
+              </>
+            )}
             </div>
           </div>
 
           <Separator />
 
           {lawyer.specialties && lawyer.specialties.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 pb-3">
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Especialidades
               </h4>
@@ -139,19 +134,6 @@ export function LawyerDetailModal({
             </div>
           )}
 
-          {lawyer.description && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                  Descripción Profesional
-                </h4>
-                <p className="text-sm leading-relaxed text-gray-700">
-                  {lawyer.description}
-                </p>
-              </div>
-            </>
-          )}
       </DialogContent>
     </Dialog>
   );
