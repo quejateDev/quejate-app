@@ -18,7 +18,8 @@ export async function GET(request: Request) {
             lastName: true,
             profilePicture: true,
             email: true,
-            phone: true
+            phone: true,
+            isVerified: true
           }
         },
         receivedRatings: true

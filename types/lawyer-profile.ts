@@ -5,6 +5,7 @@ export interface LawyerData extends Lawyer {
   documentType: string;
   identityDocument: string;
   specialties: string[];
+  isVerified: boolean;
   description: string | null;
   feePerHour: number | null;
   feePerService: number | null;

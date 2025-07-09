@@ -52,6 +52,7 @@ model Lawyer {
   userId          String     @unique
   user            User       @relation(fields: [userId], references: [id])
   documentType     DocumentType
+  isVerified       Boolean    @default(false)
   identityDocument String
   specialties     String[]
   description     String?
