@@ -74,9 +74,10 @@ model LawyerRequest {
   message     String
   serviceType String?
   status      LawyerRequestStatus   @default(PENDING)
+  clientContactEmail     String?  
+  clientContactPhone     String?
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
-  
   user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   lawyer      Lawyer                @relation(fields: [lawyerId], references: [id], onDelete: Cascade)
   pqr         PQRS?                 @relation(fields: [pqrId], references: [id], onDelete: SetNull)
@@ -93,6 +94,7 @@ model Rating {
   clientId   String
   client    User      @relation(fields: [clientId], references: [id], name: "ClientGivenRatings")
   score      Int      
+  comment    String?
   createdAt  DateTime @default(now())
 
   @@unique([lawyerId, clientId])
@@ -125,12 +127,14 @@ model Entity {
   imageUrl          String?
   email             String?
   municipalityId    String?
+  regionalDepartmentId String?
   isVerified        Boolean             @default(false)
   Department        Department[]
   pqrs              PQRS[]
   favoritedBy       UserFavoriteEntity[]
   category          Category            @relation(fields: [categoryId], references: [id])
   Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
+  RegionalDepartment   RegionalDepartment?  @relation(fields: [regionalDepartmentId], references: [id], onUpdate: NoAction)
   EntityConsecutive EntityConsecutive[]
   EntityHasUser     EntityHasUser[]
   pqrConfig         PQRConfig?
@@ -182,8 +186,6 @@ model Category {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   imageUrl          String?
-  oversightEntityId String?
-  oversightEntity   OversightEntity? @relation(fields: [oversightEntityId], references: [id])
   entities          Entity[]
 }
 
@@ -195,7 +197,6 @@ model OversightEntity {
   description String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  categories  Category[]
 }
 
 model PQRS {
@@ -359,14 +360,15 @@ model Municipality {
   name                 String
   regionalDepartmentId String
   Entity               Entity[]
-  RegionalDepartment   RegionalDepartment @relation(fields: [regionalDepartmentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "municipality_regionaldepartmentid_fkey")
+  RegionalDepartment   RegionalDepartment @relation(fields: [regionalDepartmentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model RegionalDepartment {
   id           String         @id(map: "regionaldepartment_pkey")
   name         String         @unique(map: "regionaldepartment_name_key")
-  createdat    DateTime?      @default(now()) @db.Timestamp(6)
+  createdAt    DateTime?      @default(now()) @db.Timestamp(6)
   Municipality Municipality[]
+  Entity       Entity[]
 }
 
 model PQRStatusHistory {
