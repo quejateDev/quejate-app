@@ -58,10 +58,12 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
   const handleSubmitRequest = async (
     lawyerId: string,
     message: string,
+    clientContactEmail?: string,
+    clientContactPhone?: string,
     pqrId?: string
   ) => {
     setIsSubmittingRequest(true);
-    const success = await sendLawyerRequest(lawyerId, message, pqrId);
+    const success = await sendLawyerRequest(lawyerId, message, clientContactEmail, clientContactPhone, pqrId);
     setIsSubmittingRequest(false);
     return success;
   };
