@@ -148,8 +148,10 @@ export async function GeneratePQRCertificate(data: PQR) {
     currentY += lineHeight;
 
     const currentDate = new Date();
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
     doc.text(
-      `Certificado generado el: ${currentDate.toLocaleDateString()} a las ${currentDate.toLocaleTimeString()}`,
+      "Contacto: admin@quejate.com.co | https://quejate.com.co",
       margin,
       currentY
     );

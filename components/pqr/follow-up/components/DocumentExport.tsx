@@ -220,28 +220,16 @@ export function DocumentExport({
         }
       });
 
-      const totalPages = doc.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(128);
-        doc.setFont("helvetica", "normal");
-        
-        doc.text(
-          `Página ${i} de ${totalPages}`,
-          pageWidth / 2,
-          pageHeight - 10,
-          { align: "center" }
-        );
-
-        const generateDate = new Date().toLocaleDateString('es-CO');
-        doc.text(
-          `Generado: ${generateDate}`,
-          pageWidth - margins.right,
-          pageHeight - 10,
-          { align: "right" }
-        );
-      }
+      doc.setPage(doc.getNumberOfPages());
+      doc.setFontSize(9);
+      doc.setTextColor(128);
+      doc.setFont("helvetica", "normal");
+      doc.text(
+        "Contacto: admin@quejate.com.co | https://quejate.com.co",
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: "center" }
+      );
 
       doc.setTextColor(0);
 

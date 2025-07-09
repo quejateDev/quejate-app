@@ -123,7 +123,7 @@ export default function EntitiesSidebar({ className = "" }: EntitiesSidebarProps
   }
 
   return (
-    <div className={`w-60 space-y-6 ${className}`}>
+    <div className={`w-60 space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}>
       {featuredEntities.length > 0 && (
         <Card>
           <CardHeader className="pb-3">

@@ -98,7 +98,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
 
   if (isLoading) {
     return (
-      <div className={`w-80 space-y-6 ${className}`}>
+      <div className={`w-80 space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}>
         <Card>
           <CardContent className="pt-6">
             <div className="animate-pulse space-y-4">
@@ -122,7 +122,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
   }
 
   return (
-    <div className={`w-80 space-y-6 ${className}`}>
+    <div className={`w-80 space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}>
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">

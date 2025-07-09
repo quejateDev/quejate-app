@@ -16,6 +16,12 @@ export default function Footer() {
             <p className="text-white">
               Email: admin@quejate.com.co
               <br />
+              <a
+                href="/legal"
+                className="text-blue-200 underline hover:text-blue-400 mt-2 inline-block"
+              >
+                Políticas de Privacidad y Términos
+              </a>
             </p>
           </div>
           <div>

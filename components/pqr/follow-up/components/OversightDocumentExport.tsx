@@ -75,6 +75,14 @@ export function OversightDocumentExport({
           yPosition = 20;
         }
       });
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        "Contacto: admin@quejate.com.co | https://quejate.com.co",
+        pageWidth / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: "center" }
+      );
 
       doc.save(`reporte_ente_control_${pqrData?.entity?.name || "documento"}.pdf`);
 
@@ -90,6 +98,7 @@ export function OversightDocumentExport({
         variant: "destructive",
       });
     } finally {
+
       setIsDownloading(false);
     }
   };
