@@ -185,7 +185,7 @@ export function LawyerProfileCard() {
 
           <Separator />
 
-          {specialties && specialties.length > 0 && (
+          {specialties && specialties.length > 1 && (
             <div className="space-y-3">
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Especialidades

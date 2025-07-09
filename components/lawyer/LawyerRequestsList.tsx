@@ -27,6 +27,8 @@ interface LawyerRequest {
   message: string;
   status: LawyerRequestStatus;
   createdAt: string;
+  clientContactEmail?: string;
+  clientContactPhone?: string;
   user: UserBasic;
   pqr?: PQR;
 }
@@ -206,24 +208,31 @@ export function LawyerRequestsList() {
                             {statusConfig[request.status].label}
                           </Badge>
                         </div>
-                 
 
-                        <div className="space-y-2 my-6">
+                        { (request.status === 'ACCEPTED' || request.status === 'COMPLETED') 
+                        && (request.clientContactEmail || request.clientContactPhone) && (
+                          <div className="space-y-2 my-6">
                             <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                                 Información de Contacto
                             </h3>
-                            <div className="flex items-center gap-2 text-sm">
-                                <Mail className="h-4 w-4 text-muted-foreground" />
-                                <span>{request.user.email}</span>
+                            <div className="flex flex-col sm:flex-row gap-2 pb-3">
+                              {request.clientContactEmail && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Mail className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.clientContactEmail}</span>
+                                </div>
+                              )}
+                              {request.clientContactPhone && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.clientContactPhone}</span>
+                                </div>
+                              )}
                             </div>
-                            <div className="flex items-center gap-2 text-sm">
-                                <Phone className="h-4 w-4 text-muted-foreground" />
-                                <span>{request.user.phone || 'No disponible'}</span>
-                            </div>
-                            
+                            <Separator />
                         </div>
+                        )}
 
-                        <Separator />
 
                         <div className="space-y-2 my-6">
                           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
@@ -231,9 +240,6 @@ export function LawyerRequestsList() {
                           </h3>
                           <p className="text-gray-800 mb-2 mr-2 break-all whitespace-normal overflow-hidden">
                               {request.message}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Solicitud creada: {formatDate(request.createdAt)}
                           </p>
                         </div>
 
@@ -248,6 +254,9 @@ export function LawyerRequestsList() {
                                 <p className="text-sm text-gray-700 mb-1">{request.pqr.subject}</p>
                                 <p className="text-xs text-gray-500 line-clamp-2">
                                   {request.pqr.description}
+                                </p>
+                                <p className="text-xs text-gray-500 pt-4">
+                                  Solicitud creada: {formatDate(request.createdAt)}
                                 </p>
                               </div>
                               <Button
