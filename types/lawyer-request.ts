@@ -4,6 +4,8 @@ export interface LawyerRequest {
   id: string;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED';
   message: string;
+  clientContactEmail?: string;
+  clientContactPhone?: string;
   createdAt: string;
   updatedAt: string;
   lawyer: {

@@ -103,11 +103,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const { lawyerId, message, pqrId } = await request.json();
+    const { lawyerId, message, pqrId, clientContactEmail, clientContactPhone } = await request.json();
 
     if (!lawyerId || !message) {
       return NextResponse.json(
         { error: "Faltan campos obligatorios: lawyerId y message" },
+        { status: 400 }
+      );
+    }
+
+    if (!clientContactEmail && !clientContactPhone) {
+      return NextResponse.json(
+        { error: "Debes proporcionar al menos un método de contacto (email o teléfono)" },
         { status: 400 }
       );
     }
@@ -165,6 +172,8 @@ export async function POST(request: Request) {
         lawyerId: lawyer.id,
         pqrId: pqrId || null,
         message,
+        clientContactEmail: clientContactEmail || null,
+        clientContactPhone: clientContactPhone || null,
         status: "PENDING"
       },
       include: {

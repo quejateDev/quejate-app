@@ -58,10 +58,12 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
   const handleSubmitRequest = async (
     lawyerId: string,
     message: string,
+    clientContactEmail?: string,
+    clientContactPhone?: string,
     pqrId?: string
   ) => {
     setIsSubmittingRequest(true);
-    const success = await sendLawyerRequest(lawyerId, message, pqrId);
+    const success = await sendLawyerRequest(lawyerId, message, clientContactEmail, clientContactPhone, pqrId);
     setIsSubmittingRequest(false);
     return success;
   };
@@ -229,8 +231,8 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
                           </p>
                         </div>
                       </div>
-
-                      {lawyer.specialties && lawyer.specialties.length > 0 && (
+                              
+                      {lawyer.specialties && lawyer.specialties.length > 1 && (
                         <div className="mt-2 mb-4">
                           <div className="flex flex-wrap gap-1">
                             {lawyer.specialties
@@ -252,7 +254,7 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
                         </div>
                       )}
 
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 pt-3">
                         <Button
                           variant="outline"
                           size="sm"
