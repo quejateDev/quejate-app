@@ -1,12 +1,12 @@
 import { jsPDF } from "jspdf";
-import { addMembreteBackground } from "@/utils/pdfMembrete";
+import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
 // import logo from "@/public/logo2.svg";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
 export async function GeneratePQRCertificate(data: PQR) {
-  const doc = new jsPDF();
-  await addMembreteBackground(doc);
+  const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");
+  const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
   const margin = 30;
   let currentY = margin + 20;
   const maxY = doc.internal.pageSize.getHeight() - 35;
@@ -16,7 +16,9 @@ export async function GeneratePQRCertificate(data: PQR) {
   const checkNewPage = async (requiredSpace: number) => {
     if (currentY + requiredSpace > maxY) {
       doc.addPage();
-      await addMembreteBackground(doc, undefined, undefined, true);
+      const width = doc.internal.pageSize.getWidth();
+      const height = doc.internal.pageSize.getHeight();
+      doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
       currentY = margin + 20;
     }
   };

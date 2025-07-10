@@ -11,50 +11,22 @@ export async function getImageBase64(url: string): Promise<string> {
   });
 }
 
-/**
- * Agrega el membrete de fondo y el isotipo en el centro de cada página del PDF.
- * @param doc Instancia de jsPDF
- * @param membreteUrl Ruta pública del PNG de fondo (por defecto: "/MembreteWeb.png")
- * @param isotipoUrl Ruta pública del PNG del isotipo (por defecto: "/IsotipoVector.png")
- */
-export async function addMembreteBackground(
-  doc: jsPDF,
+export async function createPdfWithMembrete(
   membreteUrl = "/MembreteWeb.png",
-  isotipoUrl = "/IsotipoVector.png",
-  onlyCurrentPage?: boolean,
-  membreteImgBase64?: string,
-  isotipoImgBase64?: string
-) {
-  let membreteImg = membreteImgBase64;
-  let isotipoImg = isotipoImgBase64;
-  if (!membreteImg || !isotipoImg) {
-    [membreteImg, isotipoImg] = await Promise.all([
-      getImageBase64(membreteUrl),
-      getImageBase64(isotipoUrl)
-    ]);
-  }
+  orientation: 'portrait' | 'landscape' = 'portrait',
+  format: string = 'a4'
+): Promise<jsPDF> {
+  const doc = new jsPDF({
+    orientation,
+    unit: 'mm',
+    format
+  });
+  
+  const membreteImg = await getImageBase64(membreteUrl);
 
-  if (onlyCurrentPage) {
-    const width = doc.internal.pageSize.getWidth();
-    const height = doc.internal.pageSize.getHeight();
-    doc.addImage(membreteImg, "PNG", 0, 0, width, height);
-    const isotipoWidth = width * 0.4;
-    const isotipoHeight = isotipoWidth;
-    const isotipoX = (width - isotipoWidth) / 2;
-    const isotipoY = height / 2 - isotipoHeight / 2;
-    doc.addImage(isotipoImg, "PNG", isotipoX, isotipoY, isotipoWidth, isotipoHeight);
-  } else {
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      const width = doc.internal.pageSize.getWidth();
-      const height = doc.internal.pageSize.getHeight();
-      doc.addImage(membreteImg, "PNG", 0, 0, width, height);
-      const isotipoWidth = width * 0.4;
-      const isotipoHeight = isotipoWidth;
-      const isotipoX = (width - isotipoWidth) / 2;
-      const isotipoY = height / 2 - isotipoHeight / 2;
-      doc.addImage(isotipoImg, "PNG", isotipoX, isotipoY, isotipoWidth, isotipoHeight);
-    }
-  }
+  const width = doc.internal.pageSize.getWidth();
+  const height = doc.internal.pageSize.getHeight();
+  doc.addImage(membreteImg, "PNG", 0, 0, width, height);
+  
+  return doc;
 }

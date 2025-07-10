@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
-import jsPDF from "jspdf";
-import { addMembreteBackground } from "@/utils/pdfMembrete";
+import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
 import {
   Download,
   Loader2,
@@ -31,8 +30,8 @@ export function OversightDocumentExport({
 
     setIsDownloading(true);
     try {
-      const doc = new jsPDF();
-      await addMembreteBackground(doc);
+      const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");      
+      const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
 
       const margin = 30;
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -75,7 +74,9 @@ export function OversightDocumentExport({
 
         if (yPosition > doc.internal.pageSize.getHeight() - 35) {
           doc.addPage();
-          await addMembreteBackground(doc);
+          const width = doc.internal.pageSize.getWidth();
+          const height = doc.internal.pageSize.getHeight();
+          doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
           yPosition = 60;
         }
       }
