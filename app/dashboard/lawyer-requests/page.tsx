@@ -133,14 +133,6 @@ export default function LawyerRequestsPage() {
                             <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                               Información del Abogado
                             </h3>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Mail className="h-4 w-4 text-muted-foreground" />
-                              <span>{request.lawyer.user.email}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm">
-                                <Phone className="h-4 w-4 text-muted-foreground" />
-                                <span>{request.lawyer.user.phone || 'No disponible'}</span>
-                            </div>
                             <div className="flex items-center space-x-1 mt-1">
                               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                               <span className="text-sm text-gray-600">
@@ -152,6 +144,22 @@ export default function LawyerRequestsPage() {
                               <span className="text-sm text-gray-500 ml-2">
                                 • {request.lawyer.experienceYears} años de experiencia
                               </span>
+                            </div>
+                            <div>
+                              {request.status === 'ACCEPTED' || request.status === 'COMPLETED' && (
+                                <div className='py-4'>
+                                  <h3 className='font-semibold text-sm text-muted-foreground'>Contacto</h3>
+                                  <div className="flex items-center gap-2 text-sm">
+                                  <Mail className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.lawyer.user.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.lawyer.user.phone || 'No disponible'}</span>
+                                </div>
+                                </div>
+                              )}
+                              <p className='pt-3'>{request.lawyer.description}</p>
                             </div>
                             <div className="pt-3">
                               <Separator />
