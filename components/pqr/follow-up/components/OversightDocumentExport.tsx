@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
-import jsPDF from "jspdf";
+import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
 import {
   Download,
   Loader2,
@@ -25,34 +25,36 @@ export function OversightDocumentExport({
 }: OversightDocumentExportProps) {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!generatedDocument) return;
 
     setIsDownloading(true);
     try {
-      const doc = new jsPDF();
+      const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");      
+      const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
 
-      const margin = 20;
+      const margin = 30;
       const pageWidth = doc.internal.pageSize.getWidth();
       const maxWidth = pageWidth - margin * 2;
       const lineHeight = 7;
-      let yPosition = 30;
+      let yPosition = 60;
 
       doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text(`DOCUMENTO PARA ${oversightEntity}`, pageWidth / 2, 20, { align: "center" });
+      doc.text(`DOCUMENTO PARA ${oversightEntity?.name || "ENTE DE CONTROL"}`, pageWidth / 2, 40, { align: "center" });
 
-      yPosition = 40;
+      yPosition = 70;
 
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
 
       const lines = generatedDocument.split("\n");
 
-      lines.forEach((line) => {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
         if (line.trim() === "") {
           yPosition += lineHeight;
-          return;
+          continue;
         }
 
         if (line.match(/^(HECHOS:|MOTIVOS:|SOLICITUD:|CONCLUSIONES:)/i)) {
@@ -63,18 +65,21 @@ export function OversightDocumentExport({
           yPosition += textLines.length * lineHeight + 2;
           doc.setFontSize(11);
           doc.setFont("helvetica", "normal");
-          return;
+          continue;
         }
 
         const textLines = doc.splitTextToSize(line, maxWidth);
         doc.text(textLines, margin, yPosition);
         yPosition += textLines.length * lineHeight;
 
-        if (yPosition > doc.internal.pageSize.getHeight() - 20) {
+        if (yPosition > doc.internal.pageSize.getHeight() - 35) {
           doc.addPage();
-          yPosition = 20;
+          const width = doc.internal.pageSize.getWidth();
+          const height = doc.internal.pageSize.getHeight();
+          doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
+          yPosition = 60;
         }
-      });
+      }
 
       doc.save(`reporte_ente_control_${pqrData?.entity?.name || "documento"}.pdf`);
 
