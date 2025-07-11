@@ -1,28 +1,27 @@
-import { jsPDF } from "jspdf";
-// import logo from "@/public/logo2.svg";
+import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
 export async function GeneratePQRCertificate(data: PQR) {
-  const doc = new jsPDF();
-  const margin = 15;
-  let currentY = margin;
-  const maxY = 280;
+  const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");
+  const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
+  const margin = 30;
+  let currentY = margin + 20;
+  const maxY = doc.internal.pageSize.getHeight() - 35;
   const lineHeight = 7;
   const sectionSpacing = 10;
 
-  const checkNewPage = (requiredSpace: number) => {
+  const checkNewPage = async (requiredSpace: number) => {
     if (currentY + requiredSpace > maxY) {
       doc.addPage();
-      currentY = margin;
+      const width = doc.internal.pageSize.getWidth();
+      const height = doc.internal.pageSize.getHeight();
+      doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
+      currentY = margin + 20;
     }
   };
 
   try {
-    // const logoImage = await loadImage(logo.src);
-    // doc.addImage(logoImage, "PNG", margin, currentY, 40, 20);
-    currentY += 30;
-
     doc.setFontSize(16);
     doc.setTextColor(40, 40, 40);
     doc.text("CERTIFICADO DE RADICACIÓN PQRSD", 105, currentY, {
@@ -61,7 +60,7 @@ export async function GeneratePQRCertificate(data: PQR) {
     );
     currentY += sectionSpacing * 2;
 
-    checkNewPage(25);
+    await checkNewPage(25);
     doc.setFont("helvetica", "bold");
     doc.text("Información del Solicitante", margin, currentY);
     currentY += lineHeight * 1.5;
@@ -80,7 +79,7 @@ export async function GeneratePQRCertificate(data: PQR) {
     }
     currentY += sectionSpacing * 2;
 
-    checkNewPage(25);
+    await checkNewPage(25);
     doc.setFont("helvetica", "bold");
     doc.text("Detalles de la Solicitud", margin, currentY);
     currentY += lineHeight * 1.5;
@@ -92,13 +91,13 @@ export async function GeneratePQRCertificate(data: PQR) {
     }
 
     if (data.description) {
-      checkNewPage(20);
+      await checkNewPage(20);
       doc.text("Descripción:", margin, currentY);
       currentY += lineHeight;
 
       const descriptionLines = doc.splitTextToSize(data.description, 180);
       for (const line of descriptionLines) {
-        checkNewPage(lineHeight);
+        await checkNewPage(lineHeight);
         doc.text(line, margin, currentY);
         currentY += lineHeight;
       }
@@ -106,15 +105,15 @@ export async function GeneratePQRCertificate(data: PQR) {
     }
 
     if (data.attachments && data.attachments.length > 0) {
-      checkNewPage(20);
+      await checkNewPage(20);
 
       doc.setFont("helvetica", "bold");
       doc.text("Archivos Adjuntos", margin, currentY);
       currentY += lineHeight * 1.5;
 
       doc.setFont("helvetica", "normal");
-      data.attachments.forEach((file) => {
-        checkNewPage(lineHeight * 2);
+      for (const file of data.attachments) {
+        await checkNewPage(lineHeight * 2);
 
         const fileInfo = `- ${file.type} (${formatFileSize(file.size)})`;
         doc.text(fileInfo, margin, currentY);
@@ -133,11 +132,11 @@ export async function GeneratePQRCertificate(data: PQR) {
         doc.setTextColor(0, 0, 0);
 
         currentY += lineHeight;
-      });
+      }
       currentY += sectionSpacing;
     }
 
-    checkNewPage(20);
+    await checkNewPage(20);
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
     doc.text(
@@ -148,10 +147,8 @@ export async function GeneratePQRCertificate(data: PQR) {
     currentY += lineHeight;
 
     const currentDate = new Date();
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
     doc.text(
-      "Contacto: admin@quejate.com.co | https://quejate.com.co",
+      `Certificado generado el: ${currentDate.toLocaleDateString()} a las ${currentDate.toLocaleTimeString()}`,
       margin,
       currentY
     );
@@ -161,15 +158,6 @@ export async function GeneratePQRCertificate(data: PQR) {
   }
 
   return doc.output('blob');
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
 }
 
 function formatDate(date: Date | string): string {
