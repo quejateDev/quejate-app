@@ -4,28 +4,22 @@ export default function Footer() {
   return (
     <footer className="bg-tertiary text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Quejate</h3>
-            <p className="text-white">
-              Solución integral para la gestión de PQRSD en tu organización
+        <div className="grid md:grid-flow-col md:auto-cols-auto gap-8">
+          <div className="min-w-[200px] max-w-[300px]">
+            <h3 className="text-md font-semibold mb-4">Quejate</h3>
+            <p className="text-white text-sm">
+              Solución integral para la gestión de PQRSD en tu organización para mejorar la atención al cliente y optimizar procesos internos. Tambien contamos con un chatbot para resolver inquietudes frecuentes de manera rápida y eficiente.
             </p>
           </div>
           <div>
-            <h3 className="text-xl font-semibold mb-4">Contacto</h3>
-            <p className="text-white">
+            <h3 className="text-md font-semibold mb-4">Contacto</h3>
+            <p className="text-white text-sm">
               Email: admin@quejate.com.co
               <br />
-              <a
-                href="/legal"
-                className="text-blue-200 underline hover:text-blue-400 mt-2 inline-block"
-              >
-                Políticas de Privacidad y Términos
-              </a>
             </p>
           </div>
           <div>
-            <h3 className="text-xl font-bold mb-4">Síguenos</h3>
+            <h3 className="text-md font-bold mb-4">Síguenos</h3>
             <div className="flex space-x-4">
               <a href="https://www.instagram.com/qujateco/" target="_blank" rel="noopener noreferrer">
                 <InstagramIcon className="w-6 h-6" />
@@ -35,6 +29,15 @@ export default function Footer() {
               </a>
               
             </div>
+          </div>
+          <div>
+            <h3 className="text-md font-semibold mb-4">Legal</h3>
+            <a
+                href="/legal"
+                className="hover:text-quaternary text-sm transition-colors duration-300"
+              >
+                Términos y Condiciones
+              </a>
           </div>
         </div>
       </div>

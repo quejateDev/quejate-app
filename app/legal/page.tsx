@@ -6,14 +6,6 @@ const LegalPage = () => {
   return (
     <div className="max-w-3xl mx-auto py-12 px-4">
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 md:p-12">
-        <div className="mb-8 flex justify-start">
-          <Link href="/dashboard">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold shadow hover:bg-primary/90 transition">
-              <ArrowLeft className="w-4 h-4" />
-              Volver
-            </button>
-          </Link>
-        </div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-center text-primary mb-8 tracking-tight">Políticas de Privacidad y Términos de Uso</h1>
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-primary mb-3 flex items-center gap-2">
@@ -51,9 +43,17 @@ const LegalPage = () => {
           </h2>
           <p className="text-base text-slate-700">
             Si tienes dudas sobre nuestras políticas, puedes contactarnos al correo{" "}
-            <a href="mailto:soporte@quejate.com" className="text-blue-600 underline hover:text-blue-800">soporte@quejate.com</a>.
+            <a href="mailto:soporte@quejate.com" className="text-blue-600 underline hover:text-blue-800">admin@quejate.com</a>.
           </p>
         </section>
+        <div className="mt-8 flex justify-end">
+          <Link href="/dashboard">
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold shadow hover:bg-primary/90 transition">
+              <ArrowLeft className="w-4 h-4" />
+              Volver
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
