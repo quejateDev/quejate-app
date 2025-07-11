@@ -133,14 +133,6 @@ export default function LawyerRequestsPage() {
                             <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                               Información del Abogado
                             </h3>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Mail className="h-4 w-4 text-muted-foreground" />
-                              <span>{request.lawyer.user.email}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm">
-                                <Phone className="h-4 w-4 text-muted-foreground" />
-                                <span>{request.lawyer.user.phone || 'No disponible'}</span>
-                            </div>
                             <div className="flex items-center space-x-1 mt-1">
                               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                               <span className="text-sm text-gray-600">
@@ -153,24 +145,43 @@ export default function LawyerRequestsPage() {
                                 • {request.lawyer.experienceYears} años de experiencia
                               </span>
                             </div>
-                          </div>
-
-                          <Separator />
-
-                          <div className="space-y-2 my-6">
-                            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                              Especialidades
-                            </h3>
-                            <div className="flex flex-wrap gap-1">
-                              {request.lawyer.specialties.map((specialty, index) => (
-                                <Badge key={index} className="text-xs bq-primary text-white">
-                                  {specialty}
-                                </Badge>
-                              ))}
+                            <div>
+                              {request.status === 'ACCEPTED' || request.status === 'COMPLETED' && (
+                                <div className='py-4'>
+                                  <h3 className='font-semibold text-sm text-muted-foreground'>Contacto</h3>
+                                  <div className="flex items-center gap-2 text-sm">
+                                  <Mail className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.lawyer.user.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.lawyer.user.phone || 'No disponible'}</span>
+                                </div>
+                                </div>
+                              )}
+                              <p className='pt-3'>{request.lawyer.description}</p>
+                            </div>
+                            <div className="pt-3">
+                              <Separator />
                             </div>
                           </div>
 
-                          <Separator />
+                            
+                          { request.lawyer.specialties.length >= 1 && (
+                            <div className="space-y-2 my-6">
+                              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                                Especialidades
+                              </h3>
+                              <div className="flex flex-wrap gap-1 pb-3">
+                                {request.lawyer.specialties.map((specialty, index) => (
+                                  <Badge key={index} className="text-xs bq-primary text-white">
+                                    {specialty}
+                                  </Badge>
+                                ))}
+                              </div>
+                              <Separator />
+                            </div>
+                          )}
 
                           <div className="space-y-2 my-6">
                             <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
@@ -179,16 +190,28 @@ export default function LawyerRequestsPage() {
                             <p className="text-gray-800 mb-2 mr-2 break-all whitespace-normal overflow-hidden">
                               {request.message}
                             </p>
-                            <p className="text-xs text-gray-500">
-                              Solicitud creada: {formatDate(request.createdAt)}
-                            </p>
-                            {request.updatedAt !== request.createdAt && (
-                              <p className="text-xs text-gray-500">
-                                Actualizada: {formatDate(request.updatedAt)}
-                              </p>
-                            )}
                           </div>
 
+                          <Separator />
+                          <div className="space-y-2 my-6">
+                            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                              Tu Información de Contacto
+                            </h3>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              {request.clientContactEmail && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Mail className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.clientContactEmail}</span>
+                                </div>
+                              )}
+                              {request.clientContactPhone && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <span>{request.clientContactPhone}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                           {request.pqr && (
                             <>
                               <Separator />
@@ -198,6 +221,14 @@ export default function LawyerRequestsPage() {
                                     PQRSD Relacionada
                                   </h3>
                                   <p className="text-sm text-gray-700 mb-1">{request.pqr.subject}</p>
+                                  <p className="text-xs text-gray-500 pt-4">
+                                    Solicitud creada: {formatDate(request.createdAt)}
+                                  </p>
+                                  {request.updatedAt !== request.createdAt && (
+                                    <p className="text-xs text-gray-500">
+                                      Actualizada: {formatDate(request.updatedAt)}
+                                    </p>
+                                  )}
                                 </div>
                                 <Button
                                   size="sm"

@@ -83,7 +83,7 @@ export function LawyerProfileEditModal({
     try {
       const updateData: LawyerProfileUpdateData = {
         description: formData.description || undefined,
-        feePerHour: formData.feePerHour ? parseFloat(formData.feePerHour) : undefined,
+        feePerHour: formData.feePerHour === "" ? null : parseFloat(formData.feePerHour),
         experienceYears: parseInt(formData.experienceYears, 10) || 0,
         specialties: formData.specialties,
       };

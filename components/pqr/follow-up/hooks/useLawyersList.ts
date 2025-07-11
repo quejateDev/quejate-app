@@ -40,6 +40,8 @@ export function useLawyersList() {
   const sendLawyerRequest = async (
     lawyerId: string,
     message: string,
+    clientContactEmail?: string,
+    clientContactPhone?: string,
     pqrId?: string
   ) => {
     try {
@@ -51,6 +53,8 @@ export function useLawyersList() {
         body: JSON.stringify({
           lawyerId,
           message,
+          clientContactEmail,
+          clientContactPhone,
           pqrId,
         }),
       });

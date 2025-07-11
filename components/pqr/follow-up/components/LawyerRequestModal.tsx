@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { LawyerData } from "@/types/lawyer-profile";
@@ -17,6 +18,8 @@ interface LawyerRequestModalProps {
   onSubmitRequest: (
     lawyerId: string,
     message: string,
+    clientContactEmail?: string,
+    clientContactPhone?: string,
     pqrId?: string
   ) => Promise<boolean>;
   isLoading?: boolean;
@@ -31,6 +34,9 @@ export function LawyerRequestModal({
   isLoading = false,
 }: LawyerRequestModalProps) {
   const [message, setMessage] = useState("");
+  const [clientContactEmail, setClientContactEmail] = useState("");
+  const [clientContactPhone, setClientContactPhone] = useState("");
+  const [contactError, setContactError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,14 +45,25 @@ export function LawyerRequestModal({
       return;
     }
 
+    if (!clientContactEmail.trim() && !clientContactPhone.trim()) {
+      setContactError("Debes proporcionar al menos un método de contacto (email o teléfono)");
+      return;
+    }
+
+    setContactError("");
+
     const success = await onSubmitRequest(
       lawyer.id,
       message.trim(),
+      clientContactEmail.trim() || undefined,
+      clientContactPhone.trim() || undefined,
       pqrData.id
     );
 
     if (success) {
       setMessage("");
+      setClientContactEmail("");
+      setClientContactPhone("");
       onOpenChange(false);
     }
   };
@@ -90,6 +107,51 @@ export function LawyerRequestModal({
             <p className="text-xs text-gray-500">
               Incluye detalles relevantes sobre tu caso y qué esperas del servicio legal.
             </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                Información de contacto
+              </Label>
+              <p className="text-xs text-gray-500">
+                Proporciona al menos un método de contacto para que el abogado pueda comunicarse contigo
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="clientContactEmail" className="text-sm">
+                  Email de contacto
+                </Label>
+                <Input
+                  id="clientContactEmail"
+                  type="email"
+                  placeholder="tu@email.com"
+                  value={clientContactEmail}
+                  onChange={(e) => setClientContactEmail(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="clientContactPhone" className="text-sm">
+                  Teléfono de contacto
+                </Label>
+                <Input
+                  id="clientContactPhone"
+                  type="tel"
+                  placeholder="Ej: +57 300 123 4567"
+                  value={clientContactPhone}
+                  onChange={(e) => setClientContactPhone(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+            </div>
+
+            {contactError && (
+              <p className="text-sm text-red-600 mt-2">{contactError}</p>
+            )}
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
