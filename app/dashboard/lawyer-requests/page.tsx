@@ -167,7 +167,7 @@ export default function LawyerRequestsPage() {
                           </div>
 
                             
-                          { request.lawyer.specialties.length > 1 && (
+                          { request.lawyer.specialties.length >= 1 && (
                             <div className="space-y-2 my-6">
                               <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                                 Especialidades
