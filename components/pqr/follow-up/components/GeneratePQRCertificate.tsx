@@ -1,6 +1,4 @@
-import { jsPDF } from "jspdf";
 import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
-// import logo from "@/public/logo2.svg";
 import { typeMap } from "@/constants/pqrMaps";
 import { PQR } from "@/types/pqrsd";
 
@@ -160,15 +158,6 @@ export async function GeneratePQRCertificate(data: PQR) {
   }
 
   return doc.output('blob');
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
 }
 
 function formatDate(date: Date | string): string {
