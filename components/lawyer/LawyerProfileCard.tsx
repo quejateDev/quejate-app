@@ -183,10 +183,9 @@ export function LawyerProfileCard() {
             </div>
           </div>
 
-          <Separator />
-
-          {specialties && specialties.length > 1 && (
+          {specialties && specialties.length >= 1 && (
             <div className="space-y-3">
+              <Separator />
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Especialidades
               </h4>

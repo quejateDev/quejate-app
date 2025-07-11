@@ -232,7 +232,7 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
                         </div>
                       </div>
                               
-                      {lawyer.specialties && lawyer.specialties.length > 1 && (
+                      {lawyer.specialties && lawyer.specialties.length >= 1 && (
                         <div className="mt-2 mb-4">
                           <div className="flex flex-wrap gap-1">
                             {lawyer.specialties
