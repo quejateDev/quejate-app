@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="min-w-[200px] max-w-[300px]">
             <h3 className="text-md font-semibold mb-4">Quejate</h3>
             <p className="text-white text-sm">
-              Solución integral para la gestión de PQRSD en tu organización para mejorar la atención al cliente y optimizar procesos internos. Tambien contamos con un chatbot para resolver inquietudes frecuentes de manera rápida y eficiente.
+              Solución integral para la gestión de PQRSD en tu organización.
             </p>
           </div>
           <div>
