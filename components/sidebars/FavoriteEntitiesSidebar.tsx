@@ -207,7 +207,7 @@ const FavoritesSidebar: React.FC<{
   }
 
   return (
-    <Card className={`sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}>
+    <Card className={`sticky top-24 h-auto overflow-y-auto ${className}`}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Mis Favoritos</h3>
