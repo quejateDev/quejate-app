@@ -107,6 +107,8 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
               </p>
             </div>
           </div>
+          
+          { isUserProfile && (
           <div className="flex items-center gap-2">
             <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
             {showAlert && (
@@ -125,6 +127,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
 
