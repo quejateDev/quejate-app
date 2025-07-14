@@ -8,6 +8,7 @@ import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { PQRAlertModal } from "./PQRAlertModal";
 import { toast } from "@/hooks/use-toast";
 import { PQR } from "@/types/pqrsd";
+import { AvatarFallback, Avatar, AvatarImage } from "../ui/avatar";
 
 type PQRCardHeaderProps = {
   pqr: PQR;
@@ -119,23 +120,16 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
       <div className="hidden md:block">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full border-tertiary border bg-muted">
-              {pqr.anonymous ? (
-                <User className="h-6 w-6 stroke-1" />
-              ) : pqr.creator?.profilePicture ? (
-                <Image
-                  src={pqr.creator.profilePicture}
-                  alt={creatorName}
-                  width={48}
-                  height={48}
-                  className="rounded-full object-cover w-full h-full"
-                />
+            <Avatar className="h-10 w-10 border border-quaternary">
+              {pqr.anonymous || !pqr.creator?.profilePicture ? (
+                  <AvatarFallback className="bg-muted-foreground/10">
+                    <User className="h-5 w-5 stroke-1 text-quaternary" />
+                  </AvatarFallback>
               ) : (
-                <span className="text-md">
-                  {creatorName.charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
+                <AvatarImage src={pqr.creator.profilePicture} alt={creatorName} />
+                )
+              }
+            </Avatar>
             <div>
               <p className="text-sm font-semibold">{creatorName}</p>
               <p className="text-xs text-muted-foreground">

@@ -46,7 +46,7 @@ export default function AvatarMenu() {
             }
           />
           <AvatarFallback className="bg-muted-foreground/10">
-            <User className="h-6 w-6 stroke-1" />
+            <User className="h-6 w-6 stroke-1 text-quaternary" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

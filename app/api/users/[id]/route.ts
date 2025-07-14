@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserIdFromToken } from "@/lib/auth";
+import bcrypt from 'bcryptjs';
 
 export async function GET(
   request: Request,
@@ -19,6 +20,7 @@ export async function GET(
         email: true,
         profilePicture: true,
         role: true,
+        phone: true,
         followers: {
           select: {
             id: true,
@@ -90,8 +92,8 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { profilePicture } = await request.json();
-    const currentUserId = await getUserIdFromToken();;
+    const body = await request.json();
+    const currentUserId = await getUserIdFromToken();
     
     if (!currentUserId) {
       return NextResponse.json(
@@ -107,21 +109,101 @@ export async function PATCH(
       );
     }
 
-    if (!profilePicture || !isValidUrl(profilePicture)) {
+    const bodyKeys = Object.keys(body);
+    if (bodyKeys.length === 1 && bodyKeys[0] === 'profilePicture') {
+
+      if (!body.profilePicture || !isValidUrl(body.profilePicture)) {
+        return NextResponse.json(
+          { error: "URL de imagen no válida" },
+          { status: 400 }
+        );
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id },
+        data: { profilePicture: body.profilePicture },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          profilePicture: true
+        }
+      });
+
+      return NextResponse.json(updatedUser);
+    }
+
+    const { firstName, lastName, phone, profilePicture, currentPassword, newPassword } = body;
+
+    if (!firstName || !lastName || !phone || firstName.trim() === '' || lastName.trim() === '' || phone.trim() === '') {
+      return NextResponse.json(
+        { error: "Nombre, apellido y teléfono son requeridos" },
+        { status: 400 }
+      );
+    }
+
+    if (profilePicture && profilePicture.trim() !== '' && !isValidUrl(profilePicture)) {
       return NextResponse.json(
         { error: "URL de imagen no válida" },
         { status: 400 }
       );
     }
 
+    const updateData: any = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      phone: phone.trim(),
+    };
+
+    if (profilePicture === null || profilePicture === '') {
+      updateData.profilePicture = null;
+    } else if (profilePicture && profilePicture.trim() !== '') {
+      updateData.profilePicture = profilePicture;
+    }
+
+    if (newPassword) {
+      if (!currentPassword) {
+        return NextResponse.json(
+          { error: "Contraseña actual es requerida para cambiar la contraseña" },
+          { status: 400 }
+        );
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: { password: true }
+      });
+
+      if (!user) {
+        return NextResponse.json(
+          { error: "Usuario no encontrado" },
+          { status: 404 }
+        );
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+      if (!isCurrentPasswordValid) {
+        return NextResponse.json(
+          { error: "Contraseña actual incorrecta" },
+          { status: 400 }
+        );
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      updateData.password = hashedNewPassword;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: { profilePicture },
+      data: updateData,
       select: {
         id: true,
         firstName: true,
         lastName: true,
         email: true,
+        phone: true,
         profilePicture: true
       }
     });
@@ -129,9 +211,9 @@ export async function PATCH(
     return NextResponse.json(updatedUser);
 
   } catch (error) {
-    console.error("Error updating profile picture:", error);
+    console.error("Error updating user profile:", error);
     return NextResponse.json(
-      { error: "Error al actualizar la foto de perfil" },
+      { error: "Error al actualizar el perfil" },
       { status: 500 }
     );
   }
