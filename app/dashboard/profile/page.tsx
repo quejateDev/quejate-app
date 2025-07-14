@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PQRCard } from '@/components/pqr/PQRCard';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Upload, User, Scale, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { User, Scale, ArrowRight, Edit2 } from 'lucide-react';
 import useAuthStore from '@/store/useAuthStore';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import usePQR from '@/hooks/usePQR';
 import useUser from '@/hooks/useUser';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
 import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
+import { UserProfileEditModal, UserProfileUpdateData } from '@/components/forms/UserProfileEdit';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,9 +21,8 @@ export default function ProfilePage() {
   const { user: currentUser } = useAuthStore();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
   const { user: userProfile, fetchUser, isLoading: userLoading } = useUser();
-  const [isUploading, setIsUploading] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -39,68 +38,55 @@ export default function ProfilePage() {
 
   const isOwnProfile = userProfile ? userProfile.id === currentUser?.id : false;
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-  
-    if (!currentUser?.id) return;
-  
-    setIsUploading(true);
-  
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-  
-      const uploadResponse = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-  
-      if (!uploadResponse.ok) {
-        throw new Error('Error al subir la imagen');
-      }
-  
-      const uploadData = await uploadResponse.json();
-      const imageUrl = uploadData.path || uploadData.url;
-  
-      if (!imageUrl) {
-        throw new Error('No se recibió URL de la imagen');
-      }
+  const handleEditProfile = () => {
+    setIsEditModalOpen(true);
+  };
 
-      const updateResponse = await fetch(`/api/users/${currentUser.id}`, {
+  const handleSaveProfile = async (updateData: UserProfileUpdateData): Promise<boolean> => {
+    if (!currentUser?.id) {
+      toast({
+        title: "Error",
+        description: "No se puede actualizar el perfil",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      
+      const response = await fetch(`/api/users/${currentUser.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profilePicture: imageUrl }),
+        body: JSON.stringify(updateData),
       });
-      const updateData = await updateResponse.json();
-      console.log('Update response:', updateData);
-      if (!updateResponse.ok) {
-        throw new Error(updateData.error || 'Error al actualizar el perfil');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('Error response:', errorData);
+        throw new Error(errorData.error || 'Error al actualizar el perfil');
       }
-      await Promise.all([
-        fetchUser(currentUser.id),
-        fetchUserPQRS(currentUser.id)
-      ]);
+
+      const responseData = await response.json();
+      
       toast({
         title: 'Éxito',
-        description: 'Foto de perfil actualizada correctamente',
+        description: 'Perfil actualizado correctamente',
       });
+      
+      window.location.reload();
+
+      return true;
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error updating profile:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Ocurrió un error',
+        description: error instanceof Error ? error.message : 'Error desconocido',
         variant: 'destructive',
       });
-    } finally {
-      setIsUploading(false);
+      return false;
     }
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
   };
 
   const getFullName = () => {
@@ -149,38 +135,25 @@ export default function ProfilePage() {
         <div className="md:col-span-4">
           <Card className='mb-6'>
             <CardHeader className="text-center">
-              <div className="relative mx-auto mb-6 w-32 h-32 group">
+              <div className="flex justify-between items-start mb-4">
+                <div></div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleEditProfile}
+                  className="flex items-center gap-2"
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Editar
+                </Button>
+              </div>
+              <div className="mx-auto mb-6 w-32 h-32">
                 <Avatar className="h-32 w-32 border-2 border-primary">
-                  {userProfile?.profilePicture ? (
-                    <AvatarImage src={userProfile.profilePicture} alt={getFullName()} />
-                  ) : null}
+                  <AvatarImage src={userProfile?.profilePicture || ""} alt={getFullName()} />
                   <AvatarFallback className="bg-muted-foreground/10">
-                    {<User className="h-16 w-16 stroke-1" />}
+                    <User className="h-16 w-16 stroke-1" />
                   </AvatarFallback>
                 </Avatar>
-                <div 
-                  onClick={triggerFileInput}
-                  className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
-                >
-                  <div className="text-white flex flex-col items-center">
-                    <Upload className="h-6 w-6 mb-1" />
-                    <span className="text-xs font-medium">Cambiar foto</span>
-                  </div>
-                </div>
-                <Input 
-                  ref={fileInputRef}
-                  id="profile-picture" 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
-                  onChange={handleFileUpload}
-                  disabled={isUploading}
-                />
-                {isUploading && (
-                  <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
-                    <span className="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-white"></span>
-                  </div>
-                )}
               </div>
               <h2 className="text-2xl font-semibold">{getFullName()}</h2>
               <p className="text-sm text-muted-foreground break-words px-4">
@@ -221,6 +194,13 @@ export default function ProfilePage() {
           {renderPQRSContent()}
         </div>
       </div>
+      
+      <UserProfileEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveProfile}
+        initialData={userProfile || undefined}
+      />
     </div>
   );
 }
