@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -58,17 +59,22 @@ const EntityCard: React.FC<{
     } finally {
     }
   };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-fav-btn]')) {
+      return;
+    }
+    onEntitySelect(entity.id);
+  };
+
   return (
     <Card
       className={cn(
         "relative p-4 cursor-pointer hover:border-primary transition-colors",
         "flex flex-col items-center justify-center gap-4"
       )}
-      onClick={e => {
-        if (e.target === e.currentTarget) {
-          onEntitySelect(entity.id);
-        }
-      }}
+      onClick={handleCardClick}
       tabIndex={-1}
     >
       {userId && (
@@ -152,6 +158,7 @@ export function CategorySelection({
   categories,
   onEntitySelect,
 }: CategorySelectionProps) {
+  const router = useRouter();
   const { user } = useAuthStore();
   const userId = user?.id || "";
   const { favorites, loading: favLoading, toggleFavorite } = useFavoriteEntities<SimpleEntity>(userId);
@@ -163,6 +170,11 @@ export function CategorySelection({
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
   const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<string | null>(null);
   const [toggling, setToggling] = useState<{ [id: string]: boolean }>({});
+
+  // Función para manejar la selección de entidad con redirección del lado del cliente
+  const handleEntitySelect = (entityId: string) => {
+    router.push(`/dashboard/pqrs/create/${entityId}`);
+  };
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -358,7 +370,7 @@ export function CategorySelection({
                 isFavorite={favorites.some((fav: SimpleEntity) => fav.id === entity.id)}
                 favLoading={!!toggling[entity.id]}
                 onToggleFavorite={handleToggleFavorite}
-                onEntitySelect={onEntitySelect}
+                onEntitySelect={handleEntitySelect}
                 userId={userId}
               />
             ))
