@@ -37,6 +37,7 @@ Estos scripts permiten cargar datos de forma automatizada desde archivos CSV/Exc
   - Supabase (URL y API Key)
   - AWS S3 (Access Key y Secret)
 - Archivos de datos en la carpeta `/data` con los nombres exactos
+- Archivos de los iconos en la carpeta `/icons` con los nombres exactos
 
 ---
 
