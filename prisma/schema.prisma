@@ -106,6 +106,7 @@ model Rating {
 model Department {
   id          String     @id @default(uuid())
   name        String
+  email       String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   description String?
@@ -298,10 +299,10 @@ model PQRConfig {
   autoAssign      Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  departmentId    String        @unique
+  departmentId    String?       @unique
   entityId        String?       @unique
   customFields    CustomField[]
-  department      Department    @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  department      Department?   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   entity          Entity?       @relation(fields: [entityId], references: [id], onDelete: Cascade)
 }
 
