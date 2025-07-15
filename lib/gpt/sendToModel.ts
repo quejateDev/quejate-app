@@ -2,7 +2,8 @@ import { openai } from "../openai";
 
 export async function sendToGPT(prompt: string, errorMessage = "Error generando el contenido"): Promise<string> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45000);
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
 
   try {
     const chatCompletion = await openai.chat.completions.create(
