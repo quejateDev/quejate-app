@@ -15,6 +15,7 @@ export default async function CreatePQRPage() {
           description: true,
           imageUrl: true,
           municipalityId: true,
+          regionalDepartmentId: true,
           isVerified: true,
         },
       },

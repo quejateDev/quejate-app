@@ -36,6 +36,7 @@ interface SimpleEntity {
   description: string | null;
   imageUrl: string | null;
   municipalityId: string | null;
+  regionalDepartmentId: string | null;
   isVerified: boolean;
 }
 const EntityCard: React.FC<{
@@ -138,14 +139,6 @@ const LottiePlayer = dynamic(
   { ssr: false }
 );
 
-interface SimpleEntity {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  municipalityId: string | null;
-  isVerified: boolean;
-}
 
 interface CategorySelectionProps {
   categories: (Category & {
@@ -170,6 +163,7 @@ export function CategorySelection({
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
   const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<string | null>(null);
   const [toggling, setToggling] = useState<{ [id: string]: boolean }>({});
+  const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
 
   // Función para manejar la selección de entidad con redirección del lado del cliente
   const handleEntitySelect = (entityId: string) => {
@@ -191,17 +185,21 @@ export function CategorySelection({
   useEffect(() => {
     if (selectedDepartmentId) {
       const fetchMunicipalities = async () => {
+        setLoadingMunicipalities(true);
         try {
           const data =
             await getMunicipalitiesByDepartment(selectedDepartmentId);
           setMunicipalities(data);
         } catch (error) {
           console.error("Error fetching municipalities:", error);
+        } finally {
+          setLoadingMunicipalities(false);
         }
       };
       fetchMunicipalities();
     } else {
       setMunicipalities([]);
+      setLoadingMunicipalities(false);
     }
   }, [selectedDepartmentId]);
 
@@ -224,11 +222,14 @@ export function CategorySelection({
             .toLowerCase()
             .includes(entitySearchQuery.toLowerCase());
           const matchesDescription = entity.description
-            ?.toLowerCase()
-            .includes(entitySearchQuery.toLowerCase());
+            ? entity.description.toLowerCase().includes(entitySearchQuery.toLowerCase())
+            : true;
+          
           const matchesDepartment = selectedDepartmentId
-            ? entity.municipalityId &&
-              municipalities.some((m) => m.id === entity.municipalityId)
+            ? loadingMunicipalities 
+              ? true
+              : entity.regionalDepartmentId === selectedDepartmentId ||
+                (entity.municipalityId && municipalities.some((m) => m.id === entity.municipalityId))
             : true;
           const matchesMunicipality = selectedMunicipalityId
             ? entity.municipalityId === selectedMunicipalityId
