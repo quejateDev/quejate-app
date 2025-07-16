@@ -107,13 +107,13 @@ const EntityCard: React.FC<{
         </Tooltip>
       )}
       <div className="flex items-center justify-center w-full">
-        <div className="relative w-32 h-32">
+        <div className="relative w-16 h-16 py-4">
           {entity.imageUrl ? (
             <Image
               src={entity.imageUrl}
               alt={entity.name}
               fill
-              className="object-cover rounded-lg"
+              className="object-contain rounded-lg"
             />
           ) : (
             <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
@@ -123,7 +123,7 @@ const EntityCard: React.FC<{
         </div>
       </div>
       <div className="flex items-center justify-center gap-2">
-        <h3 className="font-semibold text-center">{entity.name}</h3>
+        <h3 className="font-semibold text-center">{formatText(entity.name)}</h3>
         {entity.isVerified && <VerificationBadge />}
       </div>
       {entity.description && (
