@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Heart, 
   HeartOff, 
@@ -16,6 +17,7 @@ import {
 import { Entity } from '@/types/entity';
 import Link from 'next/link';
 import { useFavoriteEntities } from '@/hooks/useFavoriteEntities';
+import { formatText } from '@/utils/formatText';
 
 interface EntitiesState {
   entities: Entity[];
@@ -82,7 +84,7 @@ const EntityCard: React.FC<{
 
   return (
     <Card className="hover:shadow-md transition-shadow mb-3">
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-start gap-3">
           <Avatar className="h-12 w-12">
             {entity.imageUrl ? (
@@ -96,12 +98,12 @@ const EntityCard: React.FC<{
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <Link href={`/dashboard/pqrs/create/${entity.id}`}>
-                  <h4 className="font-medium text-sm truncate hover:text-primary transition-colors cursor-pointer">
-                    {entity.name}
+                  <h4 className="font-medium text-sm break-words hover:text-primary transition-colors cursor-pointer leading-tight">
+                    {formatText(entity.name)}
                   </h4>
                 </Link>
-                <Badge className="text-xs mt-1 bg-secondary text-tertiary">
-                  {entity.category.name}
+                <Badge className="text-xs mt-1 bg-secondary text-tertiary hover:bg-secondary">
+                  {formatText(entity.category.name)}
                 </Badge>
               </div>
               {onToggleFavorite && (
@@ -207,7 +209,7 @@ const FavoritesSidebar: React.FC<{
   }
 
   return (
-    <Card className={`sticky top-24 h-auto overflow-y-auto ${className}`}>
+    <Card className={`${className}`}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Mis Favoritos</h3>
@@ -249,16 +251,18 @@ const FavoritesSidebar: React.FC<{
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
             ) : availableEntities.length > 0 ? (
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {availableEntities.map((entity) => (
-                  <EntityCard
-                    key={entity.id}
-                    entity={entity}
-                    isFavorite={false}
-                    onToggleFavorite={handleToggleFavorite}
-                  />
-                ))}
-              </div>
+              <ScrollArea className="h-80">
+                <div className="space-y-3 pr-3">
+                  {availableEntities.map((entity) => (
+                    <EntityCard
+                      key={entity.id}
+                      entity={entity}
+                      isFavorite={false}
+                      onToggleFavorite={handleToggleFavorite}
+                    />
+                  ))}
+                </div>
+              </ScrollArea>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <Building2 className="h-12 w-12 mx-auto mb-2 opacity-50" />
@@ -269,26 +273,28 @@ const FavoritesSidebar: React.FC<{
             )}
           </div>
         ) : (
-          <div className="space-y-3">
-            {favorites.length > 0 ? (
-              favorites.map((entity: Entity) => (
-                <EntityCard
-                  key={entity.id}
-                  entity={entity}
-                  isFavorite={true}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <HeartOff className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No tienes favoritos aún</p>
-                <p className="text-xs mt-1">
-                  Haz clic en agregar para añadir entidades a tus favoritos
-                </p>
-              </div>
-            )}
-          </div>
+          <ScrollArea className="h-96">
+            <div className="space-y-3 pr-3">
+              {favorites.length > 0 ? (
+                favorites.map((entity: Entity) => (
+                  <EntityCard
+                    key={entity.id}
+                    entity={entity}
+                    isFavorite={true}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <HeartOff className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No tienes favoritos aún</p>
+                  <p className="text-xs mt-1">
+                    Haz clic en agregar para añadir entidades a tus favoritos
+                  </p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
         )}
       </CardContent>
     </Card>

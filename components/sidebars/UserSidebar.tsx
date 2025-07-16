@@ -176,7 +176,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[300px]">
-            <div className="space-y-4">
+            <div className="space-y-4 pr-2">
               {topUsers.map((user, index) => (
                 <div key={user.id}>
                   <div className="flex items-center gap-3 mt-4">

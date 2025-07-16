@@ -133,61 +133,63 @@ export default function ProfilePage() {
     <div className="container mx-auto p-4">
       <div className="grid gap-6 md:grid-cols-12">
         <div className="md:col-span-4">
-          <Card className='mb-6'>
-            <CardHeader className="text-center">
-              <div className="flex justify-between items-start mb-4">
-                <div></div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleEditProfile}
-                  className="flex items-center gap-2"
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Editar
-                </Button>
-              </div>
-              <div className="mx-auto mb-6 w-32 h-32">
-                <Avatar className="h-32 w-32 border-2 border-primary">
-                  <AvatarImage src={userProfile?.profilePicture || ""} alt={getFullName()} />
-                  <AvatarFallback className="bg-muted-foreground/10">
-                    <User className="h-16 w-16 stroke-1" />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <h2 className="text-2xl font-semibold">{getFullName()}</h2>
-              <p className="text-sm text-muted-foreground break-words px-4">
-                {currentUser?.email}
-              </p>
-            </CardHeader>
-          </Card>
-          <FavoritesSidebar 
-            userId={currentUser?.id || ''} 
-            className="w-full"
-          />
-
-          {userProfile?.role !== 'LAWYER' && !userLoading  && (
-            <Card className="mt-6 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="sticky top-4 space-y-6">
+            <Card>
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Scale className="h-8 w-8 text-primary" />
+                <div className="flex justify-between items-start mb-4">
+                  <div></div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleEditProfile}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                    Editar
+                  </Button>
                 </div>
-                <h3 className="text-lg font-semibold text-primary">¿Eres Abogado?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Regístrate como abogado para ofrecer tus servicios profesionales en nuestra plataforma y ayudar a usuarios con sus PQRSD.
+                <div className="mx-auto mb-6 w-32 h-32">
+                  <Avatar className="h-32 w-32 border-2 border-primary">
+                    <AvatarImage src={userProfile?.profilePicture || ""} alt={getFullName()} />
+                    <AvatarFallback className="bg-muted-foreground/10">
+                      <User className="h-16 w-16 stroke-1" />
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <h2 className="text-2xl font-semibold">{getFullName()}</h2>
+                <p className="text-sm text-muted-foreground break-words px-4">
+                  {currentUser?.email}
                 </p>
-                <div className="pt-4">
-                  <Link href="/lawyer/register">
-                    <Button className="w-full" variant="default">
-                      Registrarme como Abogado
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
               </CardHeader>
             </Card>
-          )}
+            
+            <FavoritesSidebar 
+              userId={currentUser?.id || ''} 
+              className="w-full"
+            />
 
+            {userProfile?.role !== 'LAWYER' && !userLoading && (
+              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Scale className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-primary">¿Eres Abogado?</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Regístrate como abogado para ofrecer tus servicios profesionales en nuestra plataforma y ayudar a usuarios con sus PQRSD.
+                  </p>
+                  <div className="pt-4">
+                    <Link href="/lawyer/register">
+                      <Button className="w-full" variant="default">
+                        Registrarme como Abogado
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+              </Card>
+            )}
+          </div>
         </div>
         <div className="md:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>

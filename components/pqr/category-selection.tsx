@@ -29,6 +29,7 @@ import {
 import { VerificationBadge } from "../ui/verification-badge";
 import { useFavoriteEntities } from "@/hooks/useFavoriteEntities";
 import dynamic from "next/dynamic";
+import { formatText } from "@/utils/formatText";
 
 interface SimpleEntity {
   id: string;
@@ -328,7 +329,7 @@ export function CategorySelection({
                 <SelectContent>
                   {departments.map((department) => (
                     <SelectItem key={department.id} value={department.id}>
-                      {department.name}
+                      {formatText(department.name)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -350,7 +351,7 @@ export function CategorySelection({
                   <SelectContent>
                     {municipalities.map((municipality) => (
                       <SelectItem key={municipality.id} value={municipality.id}>
-                        {municipality.name}
+                        {formatText(municipality.name)}
                       </SelectItem>
                     ))}
                   </SelectContent>
