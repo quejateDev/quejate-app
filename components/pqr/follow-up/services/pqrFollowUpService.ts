@@ -22,7 +22,7 @@ export class PQRFollowUpService {
   }
 
   async generateTutelaDocument(documentData: any): Promise<string> {
-    const response = await fetch("/api/legal-docs", {
+    const response = await fetch("/api/legal-docs/tutela", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
