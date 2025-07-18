@@ -119,17 +119,19 @@ export function LawyerDetailModal({
 
           <Separator />
 
-          {lawyer.specialties && lawyer.specialties.length >= 1 && (
+          {lawyer.specialties.filter(s => s.trim() !== "").length >= 1 && (
             <div className="space-y-3 pb-3">
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Especialidades
               </h4>
               <div className="flex flex-wrap gap-2">
-                {lawyer.specialties.map((specialty: string, index: number) => (
-                  <Badge key={index} className="text-xs bg-primary text-white">
-                    {specialty}
-                  </Badge>
-                ))}
+                {lawyer.specialties
+                  .filter((s) => s.trim() !== "")
+                  .map((specialty: string, index: number) => (
+                    <Badge key={index} className="text-xs bg-primary text-white">
+                      {specialty}
+                    </Badge>
+                  ))}
               </div>
             </div>
           )}

@@ -18,6 +18,7 @@ import { FUNDAMENTAL_RIGHTS } from "@/constants/fundamental-rights";
 import { PQR } from "@/types/pqrsd";
 import { typeMap } from "@/constants/pqrMaps";
 import { Loader2 } from "lucide-react";
+import { formatText } from "@/utils/formatText";
 
 type TutelaFormGeneratorProps = {
   onGenerateDocument: (formData: TutelaFormData) => void;
@@ -153,7 +154,7 @@ export function TutelaFormGenerator({
               <SelectContent className="border-muted border">
                 {departments.map((department) => (
                   <SelectItem key={department.id} value={department.id}>
-                    {department.name}
+                    {formatText(department.name)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -192,7 +193,7 @@ export function TutelaFormGenerator({
               <SelectContent>
                 {municipalities.map((municipality) => (
                   <SelectItem key={municipality.id} value={municipality.id}>
-                    {municipality.name}
+                    {formatText(municipality.name)}
                   </SelectItem>
                 ))}
               </SelectContent>

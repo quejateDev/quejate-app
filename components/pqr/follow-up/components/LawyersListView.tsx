@@ -237,6 +237,7 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
                           <div className="flex flex-wrap gap-1">
                             {lawyer.specialties
                               .slice(0, 3)
+                              .filter(s => s.trim() !== "") 
                               .map((specialty, index) => (
                                 <Badge
                                   key={index}
