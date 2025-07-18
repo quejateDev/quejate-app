@@ -32,11 +32,11 @@ export async function GET( request: NextRequest, { params }: any) {
             Municipality: {
               select: {
                 name: true,
-                RegionalDepartment: {
-                  select: {
-                    name: true
-                  }
-                }
+              }
+            },
+            RegionalDepartment: {
+              select: {
+                name: true
               }
             },
             _count: {

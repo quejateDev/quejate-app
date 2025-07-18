@@ -94,7 +94,7 @@ export default function ProfilePage() {
     return `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
   };
 
-  if (!currentUser) {
+  if (!currentUser && !userLoading) {
     return (
       <div className="container mx-auto p-4">
         <p className="text-muted-foreground">Por favor inicia sesión para ver tu perfil</p>
@@ -131,8 +131,8 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="grid gap-6 md:grid-cols-12">
-        <div className="md:col-span-4">
+      <div className="grid gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-4">
           <div className="sticky top-4 space-y-6">
             <Card>
               <CardHeader className="text-center">
@@ -191,7 +191,7 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
-        <div className="md:col-span-8">
+        <div className="lg:col-span-8">
           <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
           {renderPQRSContent()}
         </div>

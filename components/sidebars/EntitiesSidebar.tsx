@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { Entity } from '@/types/entity';
+import { formatText } from '@/utils/formatText';
 
 interface EntitiesSidebarProps {
   className?: string;
@@ -149,7 +150,7 @@ export default function EntitiesSidebar({ className = "" }: EntitiesSidebarProps
                     <div className="flex items-center gap-1 mt-1">
                       <MapPin className="h-3 w-3 text-muted-foreground" />
                       <p className="text-xs text-muted-foreground truncate">
-                        {entity.Municipality.name}
+                        {formatText(entity.Municipality.name)}
                       </p>
                     </div>
                   )}

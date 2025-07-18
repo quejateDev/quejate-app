@@ -35,11 +35,11 @@ export async function GET(req: Request) {
         Municipality: {
           select: {
             name: true,
-            RegionalDepartment: {
-              select: {
-                name: true,
-              },
-            },
+          },
+        },
+        RegionalDepartment: {
+          select: {
+            name: true,
           },
         },
         _count: {
