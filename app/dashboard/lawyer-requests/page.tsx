@@ -7,7 +7,7 @@ import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Star, MessageSquare, ChevronLeft, ChevronRight, Eye, Mail, Phone } from 'lucide-react';
+import { Star, MessageSquare, ChevronLeft, ChevronRight, Eye, Mail, Phone, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/dateUtils';
 import { LawyerRequest, ApiResponse } from '@/types/lawyer-request';
@@ -114,10 +114,10 @@ export default function LawyerRequestsPage() {
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                         <div className="w-full">
                           <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-8 w-8 border border-primary">
                               <AvatarImage src={request.lawyer.user.profilePicture} />
-                              <AvatarFallback>
-                                {request.lawyer.user.firstName[0]}{request.lawyer.user.lastName[0]}
+                              <AvatarFallback className="bg-muted-foreground/10">
+                                <User className="h-5 w-5 stroke-1" />
                               </AvatarFallback>
                             </Avatar>
                             <h3 className="font-semibold text-lg break-words">
@@ -166,8 +166,8 @@ export default function LawyerRequestsPage() {
                             </div>
                           </div>
 
-                            
-                          { request.lawyer.specialties.length >= 1 && (
+
+                          { request.lawyer.specialties.filter(s => s.trim() !== "").length >= 1 && (
                             <div className="space-y-2 my-6">
                               <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                                 Especialidades

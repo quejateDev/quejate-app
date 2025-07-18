@@ -183,7 +183,7 @@ export function LawyerProfileCard() {
             </div>
           </div>
 
-          {specialties && specialties.length >= 1 && (
+          {specialties.filter(s => s.trim() !== "").length >= 1 && (
             <div className="space-y-3">
               <Separator />
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">

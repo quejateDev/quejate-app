@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Eye, Check, X, Clock, CheckCircle, Mail, Phone } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Check, X, Clock, CheckCircle, Mail, Phone, User } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { UserBasic } from '@/types/user-basic';
@@ -191,13 +191,13 @@ export function LawyerRequestsList() {
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                     <div className="w-full">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <Avatar className="h-8 w-8">
+                          <Avatar className="h-8 w-8 border border-primary">
                             <AvatarImage 
                               src={request.user.profilePicture || undefined} 
                               alt={`${request.user.firstName} ${request.user.lastName}`}
                             />
-                            <AvatarFallback className="text-lg">
-                              {request.user.firstName?.[0]}{request.user.lastName?.[0]}
+                            <AvatarFallback className="bg-muted-foreground/10">
+                              <User className="h-5 w-5 stroke-1" />
                             </AvatarFallback>
                           </Avatar>
                           <h3 className="font-semibold text-lg break-words">
