@@ -65,6 +65,11 @@ export function CreateRatingModal({
 
   useEffect(() => {
     if (isOpen && lawyerUserId) {
+      setScore(0);
+      setComment("");
+      setExistingRating(null);
+      setIsEditing(false);
+      setCheckingExisting(false);
       checkExistingRating();
     }
   }, [isOpen, lawyerUserId, checkExistingRating]);

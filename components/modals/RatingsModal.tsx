@@ -57,6 +57,16 @@ export function RatingsModal({ isOpen, onClose, lawyerUserId, lawyerName }: Rati
     if (isOpen && lawyerUserId) {
       fetchRatings(1);
       setPagination(prev => ({ ...prev, page: 1 }));
+    } else if (!isOpen) {
+      setRatings([]);
+      setLoading(true);
+      setAverageScore(0);
+      setPagination({
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0
+      });
     }
   }, [isOpen, lawyerUserId, fetchRatings]);
 

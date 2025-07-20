@@ -44,7 +44,6 @@ export default function LawyerRequestsPage() {
     lawyerUserId: '',
     lawyerName: ''
   });
-  const [userRatings, setUserRatings] = useState<Record<string, boolean>>({});
   const router = useRouter();
 
   const fetchRequests = async (status?: string, page: number = 1) => {
@@ -106,46 +105,7 @@ export default function LawyerRequestsPage() {
 
   const refreshRequests = async () => {
     await fetchRequests(selectedStatus, currentPage);
-    if (requests.length > 0) {
-      loadUserRatings(requests);
-    }
   };
-
-  const loadUserRatings = useCallback(async (requests: LawyerRequest[]) => {
-    const checkUserRating = async (lawyerUserId: string) => {
-      try {
-        const response = await fetch(`/api/lawyer/rating/my-rating?lawyerId=${lawyerUserId}`);
-        if (response.ok) {
-          const data = await response.json();
-          return !!data.rating;
-        }
-      } catch (error) {
-        console.error('Error checking user rating:', error);
-      }
-      return false;
-    };
-
-    const completedRequests = requests.filter(req => req.status === 'COMPLETED');
-    const ratingChecks = await Promise.all(
-      completedRequests.map(async (request) => {
-        const hasRating = await checkUserRating(request.lawyer.user.id);
-        return { lawyerId: request.lawyer.user.id, hasRating };
-      })
-    );
-    
-    const ratingsMap: Record<string, boolean> = {};
-    ratingChecks.forEach(({ lawyerId, hasRating }) => {
-      ratingsMap[lawyerId] = hasRating;
-    });
-    
-    setUserRatings(ratingsMap);
-  }, []);
-
-  useEffect(() => {
-    if (requests.length > 0) {
-      loadUserRatings(requests);
-    }
-  }, [requests, loadUserRatings]);
 
   if (loading) {
     return (
@@ -390,12 +350,7 @@ export default function LawyerRequestsPage() {
         
         <CreateRatingModal
           isOpen={createRatingModal.isOpen}
-          onClose={() => {
-            setCreateRatingModal(prev => ({ ...prev, isOpen: false }));
-            if (requests.length > 0) {
-              loadUserRatings(requests);
-            }
-          }}
+          onClose={() => setCreateRatingModal(prev => ({ ...prev, isOpen: false }))}
           lawyerUserId={createRatingModal.lawyerUserId}
           lawyerName={createRatingModal.lawyerName}
           onRatingCreated={refreshRequests}
