@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Star, MessageSquare, ChevronLeft, ChevronRight, Eye, Mail, Phone, User } from 'lucide-react';
+import { Star, MessageSquare, ChevronLeft, ChevronRight, Eye, Mail, Phone, User, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/dateUtils';
 import { LawyerRequest, ApiResponse } from '@/types/lawyer-request';
 import { statusConfig } from '@/constants/status-request';
+import { RatingsModal } from '@/components/modals/RatingsModal';
+import { CreateRatingModal } from '@/components/modals/CreateRatingModal';
 
 export default function LawyerRequestsPage() {
   const [requests, setRequests] = useState<LawyerRequest[]>([]);
@@ -24,6 +26,25 @@ export default function LawyerRequestsPage() {
     limit: 10,
     totalPages: 0
   });
+  const [ratingsModal, setRatingsModal] = useState<{
+    isOpen: boolean;
+    lawyerUserId: string;
+    lawyerName: string;
+  }>({
+    isOpen: false,
+    lawyerUserId: '',
+    lawyerName: ''
+  });
+  const [createRatingModal, setCreateRatingModal] = useState<{
+    isOpen: boolean;
+    lawyerUserId: string;
+    lawyerName: string;
+  }>({
+    isOpen: false,
+    lawyerUserId: '',
+    lawyerName: ''
+  });
+  const [userRatings, setUserRatings] = useState<Record<string, boolean>>({});
   const router = useRouter();
 
   const fetchRequests = async (status?: string, page: number = 1) => {
@@ -66,6 +87,65 @@ export default function LawyerRequestsPage() {
     setSelectedStatus(newStatus);
     setCurrentPage(1);
   };
+
+  const handleRatingsClick = (lawyerUserId: string, lawyerName: string) => {
+    setRatingsModal({
+      isOpen: true,
+      lawyerUserId,
+      lawyerName
+    });
+  };
+
+  const handleCreateRatingClick = (lawyerUserId: string, lawyerName: string) => {
+    setCreateRatingModal({
+      isOpen: true,
+      lawyerUserId,
+      lawyerName
+    });
+  };
+
+  const refreshRequests = async () => {
+    await fetchRequests(selectedStatus, currentPage);
+    if (requests.length > 0) {
+      loadUserRatings(requests);
+    }
+  };
+
+  const loadUserRatings = useCallback(async (requests: LawyerRequest[]) => {
+    const checkUserRating = async (lawyerUserId: string) => {
+      try {
+        const response = await fetch(`/api/lawyer/rating/my-rating?lawyerId=${lawyerUserId}`);
+        if (response.ok) {
+          const data = await response.json();
+          return !!data.rating;
+        }
+      } catch (error) {
+        console.error('Error checking user rating:', error);
+      }
+      return false;
+    };
+
+    const completedRequests = requests.filter(req => req.status === 'COMPLETED');
+    const ratingChecks = await Promise.all(
+      completedRequests.map(async (request) => {
+        const hasRating = await checkUserRating(request.lawyer.user.id);
+        return { lawyerId: request.lawyer.user.id, hasRating };
+      })
+    );
+    
+    const ratingsMap: Record<string, boolean> = {};
+    ratingChecks.forEach(({ lawyerId, hasRating }) => {
+      ratingsMap[lawyerId] = hasRating;
+    });
+    
+    setUserRatings(ratingsMap);
+  }, []);
+
+  useEffect(() => {
+    if (requests.length > 0) {
+      loadUserRatings(requests);
+    }
+  }, [requests, loadUserRatings]);
 
   if (loading) {
     return (
@@ -133,18 +213,36 @@ export default function LawyerRequestsPage() {
                             <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                               Información del Abogado
                             </h3>
-                            <div className="flex items-center space-x-1 mt-1">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm text-gray-600">
-                                {getAverageRating(request.lawyer.receivedRatings).toFixed(1)}
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                ({request.lawyer.receivedRatings.length} reseñas)
-                              </span>
-                              <span className="text-sm text-gray-500 ml-2">
-                                • {request.lawyer.experienceYears} años de experiencia
-                              </span>
+                            <div className="flex items-center">
+                          <div 
+                            className="flex items-center space-x-1 mt-1 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => handleRatingsClick(request.lawyer.user.id, `${request.lawyer.user.firstName} ${request.lawyer.user.lastName}`)}
+                          >
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm text-gray-600">
+                              {getAverageRating(request.lawyer.receivedRatings).toFixed(1)}
+                            </span>
+                            <span className="text-sm text-gray-500 underline">
+                              ({request.lawyer.receivedRatings.length} {request.lawyer.receivedRatings.length === 1 ? 'reseña' : 'reseñas'})
+                            </span>
+                          </div>
+                          
+                          {request.status === 'COMPLETED' && (
+                            <div className="flex flex-col gap-2 ml-4">
+                              <Button
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCreateRatingClick(request.lawyer.user.id, `${request.lawyer.user.firstName} ${request.lawyer.user.lastName}`);
+                                }}
+                                className="w-8 h-8 rounded-full bg-secondary text-quaternary hover:bg-secondary-dark flex items-center justify-center ml-2"
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
                             </div>
+                          )}
+                        </div>
+                          
                             <div>
                               {request.status === 'ACCEPTED' || request.status === 'COMPLETED' && (
                                 <div className='py-4'>
@@ -282,6 +380,26 @@ export default function LawyerRequestsPage() {
             </>
           )}
         </CardContent>
+        
+        <RatingsModal
+          isOpen={ratingsModal.isOpen}
+          onClose={() => setRatingsModal(prev => ({ ...prev, isOpen: false }))}
+          lawyerUserId={ratingsModal.lawyerUserId}
+          lawyerName={ratingsModal.lawyerName}
+        />
+        
+        <CreateRatingModal
+          isOpen={createRatingModal.isOpen}
+          onClose={() => {
+            setCreateRatingModal(prev => ({ ...prev, isOpen: false }));
+            if (requests.length > 0) {
+              loadUserRatings(requests);
+            }
+          }}
+          lawyerUserId={createRatingModal.lawyerUserId}
+          lawyerName={createRatingModal.lawyerName}
+          onRatingCreated={refreshRequests}
+        />
     </div>
   );
 }

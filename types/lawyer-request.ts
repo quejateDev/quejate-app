@@ -15,6 +15,7 @@ export interface LawyerRequest {
     feePerHour?: number;
     experienceYears: number;
     user: {
+      id: string;
       firstName: string;
       lastName: string;
       email: string;
