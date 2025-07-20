@@ -8,21 +8,27 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const lawyer = await prisma.lawyer.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
-            email: true,
-            isVerified: true
+    const [lawyer, ratingAggregate] = await Promise.all([
+      prisma.lawyer.findUnique({
+        where: { id },
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+              email: true,
+              isVerified: true
+            }
           }
-        },
-        receivedRatings: true
-      }
-    });
+        }
+      }),
+      prisma.rating.aggregate({
+        where: { lawyerId: id },
+        _avg: { score: true },
+        _count: true
+      })
+    ]);
 
     if (!lawyer) {
       return NextResponse.json(
@@ -31,14 +37,10 @@ export async function GET(
       );
     }
 
-    const averageRating = lawyer.receivedRatings.length > 0 
-      ? lawyer.receivedRatings.reduce((sum, rating) => sum + rating.score, 0) / lawyer.receivedRatings.length
-      : 0;
-
     return NextResponse.json({
       ...lawyer,
-      averageRating,
-      ratingCount: lawyer.receivedRatings.length
+      averageRating: ratingAggregate._avg.score || 0,
+      ratingCount: ratingAggregate._count
     });
 
   } catch (error) {

@@ -18,9 +18,11 @@ import {
 } from "lucide-react";
 import { useLawyerProfile, LawyerProfileUpdateData } from "@/hooks/useLawyerProfile";
 import { LawyerProfileEditModal } from "@/components/lawyer/LawyerProfileEditModal";
+import { RatingsModal } from "../modals/RatingsModal";
 
 export function LawyerProfileCard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showRatingsModal, setShowRatingsModal] = useState(false);
   const { 
     lawyerData, 
     loading, 
@@ -123,14 +125,20 @@ export function LawyerProfileCard() {
                   </p>
                 )}
                 {averageRating > 0 && (
-                  <div className="flex items-center gap-1">
+                  <div 
+                    className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      setShowRatingsModal(true);
+                    }}
+                  >
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium">{averageRating.toFixed(1)}</span>
+                    <span className="text-sm font-medium">{lawyerData.averageRating.toFixed(1)}</span>
                     <span className="text-sm text-muted-foreground">
-                      ({ratingCount} {ratingCount === 1 ? 'valoración' : 'valoraciones'})
+                      ({lawyerData.ratingCount} {lawyerData.ratingCount === 1 ? 'reseña' : 'reseñas'})
                     </span>
                   </div>
                 )}
+                
               </div>
             </div>
           </div>
@@ -183,7 +191,7 @@ export function LawyerProfileCard() {
             </div>
           </div>
 
-          {specialties && specialties.length >= 1 && (
+          {specialties.filter(s => s.trim() !== "").length >= 1 && (
             <div className="space-y-3">
               <Separator />
               <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
@@ -215,7 +223,14 @@ export function LawyerProfileCard() {
 
         </CardContent>
       </Card>
-
+      
+      <RatingsModal
+        isOpen={showRatingsModal}
+        onClose={() => setShowRatingsModal(false)}
+        lawyerUserId={lawyerData.userId}
+        lawyerName={`${lawyerData.user.firstName} ${lawyerData.user.lastName}`}
+      />
+            
       <LawyerProfileEditModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
