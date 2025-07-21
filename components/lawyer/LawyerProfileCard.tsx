@@ -19,6 +19,7 @@ import {
 import { useLawyerProfile, LawyerProfileUpdateData } from "@/hooks/useLawyerProfile";
 import { LawyerProfileEditModal } from "@/components/lawyer/LawyerProfileEditModal";
 import { RatingsModal } from "../modals/RatingsModal";
+import { formatDate } from "@/lib/dateUtils";
 
 export function LawyerProfileCard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -75,7 +76,7 @@ export function LawyerProfileCard() {
     );
   }
 
-  const { user, isVerified, specialties, description, experienceYears, feePerHour, averageRating, ratingCount, documentType, identityDocument } = lawyerData;
+  const { user, isVerified, specialties, description, feePerHour, averageRating, createdAt, ratingCount, documentType, identityDocument } = lawyerData;
 
   return (
     <>
@@ -178,7 +179,7 @@ export function LawyerProfileCard() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{experienceYears} {experienceYears === 1 ? 'año' : 'años'} de experiencia</span>
+                  <span>Desde {formatDate(createdAt)} en la plataforma</span>
                 </div>
                 
                 {feePerHour && (
