@@ -162,20 +162,7 @@ export function LawyerRegistrationForm({
             placeholder="$ COP"
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="experienceYears">Años de Experiencia</Label>
-          <Input
-            id="experienceYears"
-            name="experienceYears"
-            type="number"
-            value={formData.experienceYears}
-            onChange={onChange}
-            required
-            className="border border-muted"
-            min="0"
-          />
-        </div>
+
       </div>
 
       <div className="space-y-3">

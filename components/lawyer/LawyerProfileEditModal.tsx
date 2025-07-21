@@ -34,7 +34,6 @@ export function LawyerProfileEditModal({
   const [formData, setFormData] = useState({
     description: "",
     feePerHour: "",
-    experienceYears: "",
     specialties: [] as string[],
   });
   const [currentSpecialty, setCurrentSpecialty] = useState("");
@@ -45,7 +44,6 @@ export function LawyerProfileEditModal({
       setFormData({
         description: initialData.description || "",
         feePerHour: initialData.feePerHour?.toString() || "",
-        experienceYears: initialData.experienceYears.toString() || "",
         specialties: [...initialData.specialties],
       });
     }
@@ -84,7 +82,6 @@ export function LawyerProfileEditModal({
       const updateData: LawyerProfileUpdateData = {
         description: formData.description || undefined,
         feePerHour: formData.feePerHour === "" ? null : parseFloat(formData.feePerHour),
-        experienceYears: parseInt(formData.experienceYears, 10) || 0,
         specialties: formData.specialties,
       };
 
@@ -120,20 +117,6 @@ export function LawyerProfileEditModal({
               value={formData.description}
               onChange={handleInputChange}
               className="min-h-[100px] border-muted"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="experienceYears">Años de Experiencia</Label>
-            <Input
-              id="experienceYears"
-              name="experienceYears"
-              type="number"
-              min="0"
-              value={formData.experienceYears}
-              onChange={handleInputChange}
-              className="border-muted"
-              required
             />
           </div>
 

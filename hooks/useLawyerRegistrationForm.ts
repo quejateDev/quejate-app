@@ -9,7 +9,6 @@ export interface LawyerFormData {
   specialties: string;
   description: string;
   feePerHour: string;
-  experienceYears: string;
   profilePicture: File | null;
 }
 
@@ -21,7 +20,6 @@ const initialFormData: LawyerFormData = {
   specialties: "",
   description: "",
   feePerHour: "",
-  experienceYears: "",
   profilePicture: null,
 };
 
@@ -112,10 +110,6 @@ export const useLawyerRegistrationForm = () => {
       errors.push("Descripción profesional es requerida");
     }
 
-    if (!formData.experienceYears || parseInt(formData.experienceYears) < 0) {
-      errors.push("Años de experiencia válidos son requeridos");
-    }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -129,8 +123,7 @@ export const useLawyerRegistrationForm = () => {
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s),
-      feePerHour: parseFloat(formData.feePerHour) || undefined,
-      experienceYears: parseInt(formData.experienceYears, 10) || 0,
+      feePerHour: parseFloat(formData.feePerHour) || undefined
     };
   };
 

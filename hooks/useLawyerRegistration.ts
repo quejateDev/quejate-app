@@ -14,7 +14,6 @@ export interface LawyerFormData {
   specialties: string;
   description: string;
   feePerHour: string;
-  experienceYears: string;
   profilePicture: File | null;
 }
 
@@ -35,7 +34,6 @@ export const useLawyerRegistration = () => {
     specialties: "",
     description: "",
     feePerHour: "",
-    experienceYears: "",
     profilePicture: null,
   });
   
@@ -286,7 +284,6 @@ export const useLawyerRegistration = () => {
         specialties: formData.specialties.split(",").map((s) => s.trim()),
         description: formData.description,
         feePerHour: parseFloat(formData.feePerHour) || undefined,
-        experienceYears: parseInt(formData.experienceYears, 10) || 0,
       };
 
       const response = await axios.post("/api/lawyer/register", submissionData);

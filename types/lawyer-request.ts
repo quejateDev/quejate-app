@@ -13,7 +13,6 @@ export interface LawyerRequest {
     specialties: string[];
     description?: string;
     feePerHour?: number;
-    experienceYears: number;
     user: {
       id: string;
       firstName: string;

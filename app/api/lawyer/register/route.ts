@@ -12,7 +12,6 @@ interface LawyerRegistrationRequest {
   description?: string;
   feePerHour?: number;
   feePerService?: number;
-  experienceYears?: number;
 }
 
 export async function POST(request: Request) {
@@ -48,8 +47,7 @@ export async function POST(request: Request) {
         specialties: requestBody.specialties,
         description: requestBody.description,
         feePerHour: requestBody.feePerHour,
-        feePerService: requestBody.feePerService,
-        experienceYears: requestBody.experienceYears || 0
+        feePerService: requestBody.feePerService
       }
     });
 

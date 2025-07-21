@@ -60,7 +60,6 @@ model Lawyer {
   description     String?
   feePerHour      Float?
   feePerService   Float?
-  experienceYears Int        @default(0)
   receivedRatings Rating[]   @relation("LawyerReceivedRatings")
   lawyerRequests  LawyerRequest[]
   createdAt       DateTime   @default(now())
