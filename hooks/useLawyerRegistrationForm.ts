@@ -4,6 +4,8 @@ import { DocumentType, DocumentTypeMapping } from "@/types/document-types";
 export interface LawyerFormData {
   documentType: string;
   identityDocument: string;
+  identityDocumentImage: File | null;
+  professionalCardImage: File | null;
   specialties: string;
   description: string;
   feePerHour: string;
@@ -14,6 +16,8 @@ export interface LawyerFormData {
 const initialFormData: LawyerFormData = {
   documentType: "",
   identityDocument: "",
+  identityDocumentImage: null,
+  professionalCardImage: null,
   specialties: "",
   description: "",
   feePerHour: "",
@@ -31,7 +35,7 @@ export const useLawyerRegistrationForm = () => {
       label: DocumentTypeMapping[value].label,
     })
   );
-
+  
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -72,6 +76,14 @@ export const useLawyerRegistrationForm = () => {
     setFormData((prev) => ({ ...prev, profilePicture: file }));
   };
 
+  const handleIdentityDocumentImageChange = (file: File) => {
+    setFormData((prev) => ({ ...prev, identityDocumentImage: file }));
+  };
+
+  const handleProfessionalCardImageChange = (file: File) => {
+    setFormData((prev) => ({ ...prev, professionalCardImage: file }));
+  };
+
   const resetForm = () => {
     setFormData(initialFormData);
     setCurrentSpecialty("");
@@ -86,6 +98,14 @@ export const useLawyerRegistrationForm = () => {
 
     if (!formData.identityDocument.trim()) {
       errors.push("Número de documento es requerido");
+    }
+
+    if (!formData.identityDocumentImage) {
+      errors.push("Imagen del documento de identidad es requerida");
+    }
+
+    if (!formData.professionalCardImage) {
+      errors.push("Imagen de la tarjeta profesional es requerida");
     }
 
     if (!formData.description.trim()) {
@@ -133,6 +153,8 @@ export const useLawyerRegistrationForm = () => {
     handleAddSpecialty,
     removeSpecialty,
     handleProfilePictureChange,
+    handleIdentityDocumentImageChange,
+    handleProfessionalCardImageChange,
 
     resetForm,
     validateForm,
