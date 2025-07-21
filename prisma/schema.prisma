@@ -54,8 +54,8 @@ model Lawyer {
   documentType     DocumentType
   isVerified       Boolean    @default(false)
   identityDocument String
-  identityDocumentImage   String?
-  professionalCardImage   String?
+  identityDocumentImage   String
+  professionalCardImage   String
   specialties     String[]
   description     String?
   feePerHour      Float?
