@@ -72,9 +72,9 @@ export function NotificationDropdown() {
           : '#';
       case 'lawyer_request_accepted':
       case 'lawyer_request_rejected':
-        return '/dashboard/lawyer-requests';
+        return '/lawyer-requests';
       case 'new_lawyer_request':
-        return '/dashboard/lawyer';
+        return '/lawyer';
       default:
         return '#';
     }

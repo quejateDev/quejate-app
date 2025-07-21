@@ -68,7 +68,7 @@ export default function AvatarMenu() {
             {user.role === "CLIENT" || user.role === "LAWYER" ? (
               <DropdownMenuItem asChild>
                 <Link
-                  href="/dashboard/lawyer-requests"
+                  href="/lawyer-requests"
                   className="flex items-center gap-2"
                 >
                   <Scale className="h-4 w-4" />
@@ -79,7 +79,7 @@ export default function AvatarMenu() {
             {user.role === "LAWYER" ? (
               <DropdownMenuItem asChild>
                 <Link
-                  href="/dashboard/lawyer"
+                  href="/lawyer"
                   className="flex items-center gap-2"
                 >
                   <MailPlus className="h-4 w-4" />

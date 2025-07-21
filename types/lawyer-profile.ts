@@ -10,5 +10,6 @@ export interface LawyerData extends Lawyer {
   feePerHour: number | null;
   feePerService: number | null;
   averageRating: number;
+  createdAt: string;
   ratingCount: number;
 }
