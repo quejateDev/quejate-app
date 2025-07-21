@@ -34,6 +34,8 @@ interface LawyerRegistrationFormProps {
   onFileChange: (file: File | null) => void;
   onIdentityDocumentImageChange: (file: File) => void;
   onProfessionalCardImageChange: (file: File) => void;
+  onRemoveIdentityDocumentImage: () => void;
+  onRemoveProfessionalCardImage: () => void;
   onCurrentSpecialtyChange: (value: string) => void;
   onAddSpecialty: () => void;
   onRemoveSpecialty: (index: number) => void;
@@ -52,6 +54,8 @@ export function LawyerRegistrationForm({
   onFileChange,
   onIdentityDocumentImageChange,
   onProfessionalCardImageChange,
+  onRemoveIdentityDocumentImage,
+  onRemoveProfessionalCardImage,
   onCurrentSpecialtyChange,
   onAddSpecialty,
   onRemoveSpecialty,
@@ -104,6 +108,7 @@ export function LawyerRegistrationForm({
           label="Documento de Identidad"
           file={formData.identityDocumentImage}
           onFileChange={onIdentityDocumentImageChange}
+          onFileRemove={onRemoveIdentityDocumentImage}
           disabled={loading}
           isUploading={isUploadingImage}
           required={true}
@@ -115,6 +120,7 @@ export function LawyerRegistrationForm({
           label="Tarjeta Profesional"
           file={formData.professionalCardImage}
           onFileChange={onProfessionalCardImageChange}
+          onFileRemove={onRemoveProfessionalCardImage}
           disabled={loading}
           isUploading={isUploadingImage}
           required={true}

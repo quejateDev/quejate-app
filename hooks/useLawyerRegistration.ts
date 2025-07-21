@@ -75,6 +75,14 @@ export const useLawyerRegistration = () => {
     setFormData((prev) => ({ ...prev, professionalCardImage: file }));
   };
 
+  const handleRemoveIdentityDocumentImage = () => {
+    setFormData((prev) => ({ ...prev, identityDocumentImage: null }));
+  };
+
+  const handleRemoveProfessionalCardImage = () => {
+    setFormData((prev) => ({ ...prev, professionalCardImage: null }));
+  };
+
   const handleAddSpecialty = () => {
     if (currentSpecialty.trim()) {
       setFormData((prev) => ({
@@ -343,6 +351,8 @@ export const useLawyerRegistration = () => {
     handleFileChange,
     handleIdentityDocumentImageChange,
     handleProfessionalCardImageChange,
+    handleRemoveIdentityDocumentImage,
+    handleRemoveProfessionalCardImage,
     handleAddSpecialty,
     handleRemoveSpecialty,
     handleSubmit,
