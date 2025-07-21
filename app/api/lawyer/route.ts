@@ -42,7 +42,6 @@ export async function GET(request: Request) {
         description: lawyer.description,
         feePerHour: lawyer.feePerHour,
         feePerService: lawyer.feePerService,
-        experienceYears: lawyer.experienceYears,
         averageRating: parseFloat(averageRating.toFixed(1)),
         ratingCount,
         user: lawyer.user,

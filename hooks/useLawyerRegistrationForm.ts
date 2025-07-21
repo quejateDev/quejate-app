@@ -4,20 +4,22 @@ import { DocumentType, DocumentTypeMapping } from "@/types/document-types";
 export interface LawyerFormData {
   documentType: string;
   identityDocument: string;
+  identityDocumentImage: File | null;
+  professionalCardImage: File | null;
   specialties: string;
   description: string;
   feePerHour: string;
-  experienceYears: string;
   profilePicture: File | null;
 }
 
 const initialFormData: LawyerFormData = {
   documentType: "",
   identityDocument: "",
+  identityDocumentImage: null,
+  professionalCardImage: null,
   specialties: "",
   description: "",
   feePerHour: "",
-  experienceYears: "",
   profilePicture: null,
 };
 
@@ -31,7 +33,7 @@ export const useLawyerRegistrationForm = () => {
       label: DocumentTypeMapping[value].label,
     })
   );
-
+  
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -72,6 +74,14 @@ export const useLawyerRegistrationForm = () => {
     setFormData((prev) => ({ ...prev, profilePicture: file }));
   };
 
+  const handleIdentityDocumentImageChange = (file: File) => {
+    setFormData((prev) => ({ ...prev, identityDocumentImage: file }));
+  };
+
+  const handleProfessionalCardImageChange = (file: File) => {
+    setFormData((prev) => ({ ...prev, professionalCardImage: file }));
+  };
+
   const resetForm = () => {
     setFormData(initialFormData);
     setCurrentSpecialty("");
@@ -88,12 +98,16 @@ export const useLawyerRegistrationForm = () => {
       errors.push("Número de documento es requerido");
     }
 
-    if (!formData.description.trim()) {
-      errors.push("Descripción profesional es requerida");
+    if (!formData.identityDocumentImage) {
+      errors.push("Imagen del documento de identidad es requerida");
     }
 
-    if (!formData.experienceYears || parseInt(formData.experienceYears) < 0) {
-      errors.push("Años de experiencia válidos son requeridos");
+    if (!formData.professionalCardImage) {
+      errors.push("Imagen de la tarjeta profesional es requerida");
+    }
+
+    if (!formData.description.trim()) {
+      errors.push("Descripción profesional es requerida");
     }
 
     return {
@@ -109,8 +123,7 @@ export const useLawyerRegistrationForm = () => {
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s),
-      feePerHour: parseFloat(formData.feePerHour) || undefined,
-      experienceYears: parseInt(formData.experienceYears, 10) || 0,
+      feePerHour: parseFloat(formData.feePerHour) || undefined
     };
   };
 
@@ -133,6 +146,8 @@ export const useLawyerRegistrationForm = () => {
     handleAddSpecialty,
     removeSpecialty,
     handleProfilePictureChange,
+    handleIdentityDocumentImageChange,
+    handleProfessionalCardImageChange,
 
     resetForm,
     validateForm,

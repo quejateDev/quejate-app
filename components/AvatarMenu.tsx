@@ -68,7 +68,7 @@ export default function AvatarMenu() {
             {user.role === "CLIENT" || user.role === "LAWYER" ? (
               <DropdownMenuItem asChild>
                 <Link
-                  href="/dashboard/lawyer-requests"
+                  href="/dashboard/lawyer/lawyer-requests"
                   className="flex items-center gap-2"
                 >
                   <Scale className="h-4 w-4" />

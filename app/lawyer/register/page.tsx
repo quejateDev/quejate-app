@@ -22,6 +22,10 @@ export default function LawyerRegistrationPage() {
     handleChange,
     handleSelectChange,
     handleFileChange,
+    handleIdentityDocumentImageChange,
+    handleProfessionalCardImageChange,
+    handleRemoveIdentityDocumentImage,
+    handleRemoveProfessionalCardImage,
     handleAddSpecialty,
     handleRemoveSpecialty,
     handleSubmit,
@@ -58,6 +62,10 @@ export default function LawyerRegistrationPage() {
             onChange={handleChange}
             onSelectChange={handleSelectChange}
             onFileChange={handleFileChange}
+            onIdentityDocumentImageChange={handleIdentityDocumentImageChange}
+            onProfessionalCardImageChange={handleProfessionalCardImageChange}
+            onRemoveIdentityDocumentImage={handleRemoveIdentityDocumentImage}
+            onRemoveProfessionalCardImage={handleRemoveProfessionalCardImage}
             onCurrentSpecialtyChange={setCurrentSpecialty}
             onAddSpecialty={handleAddSpecialty}
             onRemoveSpecialty={handleRemoveSpecialty}

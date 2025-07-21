@@ -10,7 +10,6 @@ import { LawyerData } from "@/types/lawyer-profile";
 export interface LawyerProfileUpdateData {
   description?: string;
   feePerHour?: number | null;
-  experienceYears?: number;
   specialties?: string[];
 }
 

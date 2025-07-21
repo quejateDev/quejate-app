@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { LawyerData } from "@/types/lawyer-profile";
 import { RatingsModal } from "@/components/modals/RatingsModal";
+import { formatDateWithoutTime } from "@/lib/dateUtils";
 
 interface LawyerDetailModalProps {
   lawyer: LawyerData;
@@ -104,13 +105,13 @@ export function LawyerDetailModal({
               <div className="space-y-2 pb-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{lawyer.experienceYears} {lawyer.experienceYears === 1 ? 'año' : 'años'} de experiencia</span>
+                  <span>Desde el {formatDateWithoutTime(lawyer.createdAt)} en la plataforma</span>
                 </div>
 
                 {lawyer.feePerHour && (
                   <div className="flex items-center gap-2 text-sm">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span>${lawyer.feePerHour.toLocaleString()} COP/hora</span>
+                    <span>{lawyer.feePerHour.toLocaleString()} COP/hora</span>
                   </div>
                 )}
               </div>

@@ -6,11 +6,12 @@ import { DocumentType } from "@prisma/client";
 interface LawyerRegistrationRequest {
   documentType: string;
   identityDocument: string;
+  identityDocumentImage: string;
+  professionalCardImage: string;
   specialties: string[];
   description?: string;
   feePerHour?: number;
   feePerService?: number;
-  experienceYears?: number;
 }
 
 export async function POST(request: Request) {
@@ -41,11 +42,12 @@ export async function POST(request: Request) {
         userId,
         documentType: requestBody.documentType as DocumentType,
         identityDocument: requestBody.identityDocument,
+        identityDocumentImage: requestBody.identityDocumentImage,
+        professionalCardImage: requestBody.professionalCardImage,
         specialties: requestBody.specialties,
         description: requestBody.description,
         feePerHour: requestBody.feePerHour,
-        feePerService: requestBody.feePerService,
-        experienceYears: requestBody.experienceYears || 0
+        feePerService: requestBody.feePerService
       }
     });
 

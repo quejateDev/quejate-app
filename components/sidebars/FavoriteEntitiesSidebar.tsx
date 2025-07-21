@@ -203,7 +203,7 @@ const FavoritesSidebar: React.FC<{
   return (
     <Card className={`${className} min-h-0 flex flex-col`}>
       <CardHeader className="pb-3 shrink-0">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mr-3">
           <h3 className="text-base font-semibold">Mis Favoritos</h3>
           <Button
             variant={"outline"}
@@ -218,7 +218,7 @@ const FavoritesSidebar: React.FC<{
               </>
             ) : (
               <>
-                <Heart className="h-3 w-3 mr-1" />
+                <Heart className="h-3 w-3" />
               </>
             )}
           </Button>

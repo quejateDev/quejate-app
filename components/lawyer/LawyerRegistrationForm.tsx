@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ProfilePictureUploader } from "./ProfilePictureUploader";
+import { DocumentUploader } from "./DocumentUploader";
 import { SpecialtiesManager } from "./SpecialtiesManager";
 import { LawyerFormData } from "@/hooks/useLawyerRegistration";
 import { Info } from "lucide-react";
@@ -31,6 +32,10 @@ interface LawyerRegistrationFormProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
   onFileChange: (file: File | null) => void;
+  onIdentityDocumentImageChange: (file: File) => void;
+  onProfessionalCardImageChange: (file: File) => void;
+  onRemoveIdentityDocumentImage: () => void;
+  onRemoveProfessionalCardImage: () => void;
   onCurrentSpecialtyChange: (value: string) => void;
   onAddSpecialty: () => void;
   onRemoveSpecialty: (index: number) => void;
@@ -47,6 +52,10 @@ export function LawyerRegistrationForm({
   onChange,
   onSelectChange,
   onFileChange,
+  onIdentityDocumentImageChange,
+  onProfessionalCardImageChange,
+  onRemoveIdentityDocumentImage,
+  onRemoveProfessionalCardImage,
   onCurrentSpecialtyChange,
   onAddSpecialty,
   onRemoveSpecialty,
@@ -93,6 +102,32 @@ export function LawyerRegistrationForm({
         </div>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <DocumentUploader
+          id="identityDocumentImage"
+          label="Documento de Identidad"
+          file={formData.identityDocumentImage}
+          onFileChange={onIdentityDocumentImageChange}
+          onFileRemove={onRemoveIdentityDocumentImage}
+          disabled={loading}
+          isUploading={isUploadingImage}
+          required={true}
+          helpText="Sube una imagen clara de tu documento de identidad (cédula, pasaporte, etc.)"
+        />
+        
+        <DocumentUploader
+          id="professionalCardImage"
+          label="Tarjeta Profesional"
+          file={formData.professionalCardImage}
+          onFileChange={onProfessionalCardImageChange}
+          onFileRemove={onRemoveProfessionalCardImage}
+          disabled={loading}
+          isUploading={isUploadingImage}
+          required={true}
+          helpText="Sube una imagen clara de tu tarjeta profesional de abogado"
+        />
+      </div>
+
       <SpecialtiesManager
         specialties={formData.specialties}
         currentSpecialty={currentSpecialty}
@@ -127,20 +162,7 @@ export function LawyerRegistrationForm({
             placeholder="$ COP"
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="experienceYears">Años de Experiencia</Label>
-          <Input
-            id="experienceYears"
-            name="experienceYears"
-            type="number"
-            value={formData.experienceYears}
-            onChange={onChange}
-            required
-            className="border border-muted"
-            min="0"
-          />
-        </div>
+
       </div>
 
       <div className="space-y-3">
@@ -148,7 +170,7 @@ export function LawyerRegistrationForm({
           <div className="flex align-center items-center">
             <Info className="h-4 w-4 mr-1 text-quaternary" />
             <p className="text-xs text-quaternary align-center">
-              Debes subir una foto de perfil antes de poder verificar tu información.
+              Debes subir una foto de perfil, documento de identidad y tarjeta profesional antes de poder verificar tu información.
             </p>
           </div>
         )}

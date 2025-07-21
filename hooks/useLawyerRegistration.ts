@@ -9,10 +9,11 @@ import useAuthStore from "@/store/useAuthStore";
 export interface LawyerFormData {
   documentType: string;
   identityDocument: string;
+  identityDocumentImage: File | null;
+  professionalCardImage: File | null;
   specialties: string;
   description: string;
   feePerHour: string;
-  experienceYears: string;
   profilePicture: File | null;
 }
 
@@ -28,10 +29,11 @@ export const useLawyerRegistration = () => {
   const [formData, setFormData] = useState<LawyerFormData>({
     documentType: "",
     identityDocument: "",
+    identityDocumentImage: null,
+    professionalCardImage: null,
     specialties: "",
     description: "",
     feePerHour: "",
-    experienceYears: "",
     profilePicture: null,
   });
   
@@ -63,6 +65,22 @@ export const useLawyerRegistration = () => {
     setFormData((prev) => ({ ...prev, profilePicture: file }));
   };
 
+  const handleIdentityDocumentImageChange = (file: File) => {
+    setFormData((prev) => ({ ...prev, identityDocumentImage: file }));
+  };
+
+  const handleProfessionalCardImageChange = (file: File) => {
+    setFormData((prev) => ({ ...prev, professionalCardImage: file }));
+  };
+
+  const handleRemoveIdentityDocumentImage = () => {
+    setFormData((prev) => ({ ...prev, identityDocumentImage: null }));
+  };
+
+  const handleRemoveProfessionalCardImage = () => {
+    setFormData((prev) => ({ ...prev, professionalCardImage: null }));
+  };
+
   const handleAddSpecialty = () => {
     if (currentSpecialty.trim()) {
       setFormData((prev) => ({
@@ -92,7 +110,9 @@ export const useLawyerRegistration = () => {
   };
 
   const canVerify = () => {
-    return formData.profilePicture !== null;
+    return formData.profilePicture !== null && 
+           formData.identityDocumentImage !== null && 
+           formData.professionalCardImage !== null;
   };
 
   const verifyLawyer = async (): Promise<boolean> => {
@@ -145,9 +165,12 @@ export const useLawyerRegistration = () => {
   const submitRegistration = async (): Promise<boolean> => {
     try {
       let profilePictureUrl: string | undefined;
+      let identityDocumentImageUrl: string | undefined;
+      let professionalCardImageUrl: string | undefined;
 
+      setIsUploadingImage(true);
+      
       if (formData.profilePicture) {
-        setIsUploadingImage(true);
         try {
           const uploadFormData = new FormData();
           uploadFormData.append('file', formData.profilePicture);
@@ -158,40 +181,109 @@ export const useLawyerRegistration = () => {
           });
 
           if (!uploadResponse.ok) {
-            throw new Error('Error al subir la imagen');
+            throw new Error('Error al subir la imagen de perfil');
           }
 
           const uploadData = await uploadResponse.json();
           profilePictureUrl = uploadData.path || uploadData.url;
 
           if (!profilePictureUrl) {
-            throw new Error('No se recibió URL de la imagen');
+            throw new Error('No se recibió URL de la imagen de perfil');
           }
 
-          toast({
-            title: "Imagen subida",
-            description: "Tu foto de perfil se ha subido correctamente.",
-          });
-
         } catch (error) {
-          console.error('Error uploading image:', error);
+          console.error('Error uploading profile picture:', error);
           toast({
-            title: "Error al subir imagen",
-            description: "Hubo un problema al subir tu foto de perfil, pero continuaremos con el registro.",
+            title: "Error al subir imagen de perfil",
+            description: "Hubo un problema al subir tu foto de perfil.",
             variant: "destructive",
           });
-        } finally {
           setIsUploadingImage(false);
+          return false;
         }
       }
+
+      if (formData.identityDocumentImage) {
+        try {
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', formData.identityDocumentImage);
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadFormData,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Error al subir el documento de identidad');
+          }
+
+          const uploadData = await uploadResponse.json();
+          identityDocumentImageUrl = uploadData.path || uploadData.url;
+
+          if (!identityDocumentImageUrl) {
+            throw new Error('No se recibió URL del documento de identidad');
+          }
+
+        } catch (error) {
+          console.error('Error uploading identity document:', error);
+          toast({
+            title: "Error al subir documento de identidad",
+            description: "Hubo un problema al subir tu documento de identidad.",
+            variant: "destructive",
+          });
+          setIsUploadingImage(false);
+          return false;
+        }
+      }
+      
+      if (formData.professionalCardImage) {
+        try {
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', formData.professionalCardImage);
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadFormData,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Error al subir la tarjeta profesional');
+          }
+
+          const uploadData = await uploadResponse.json();
+          professionalCardImageUrl = uploadData.path || uploadData.url;
+
+          if (!professionalCardImageUrl) {
+            throw new Error('No se recibió URL de la tarjeta profesional');
+          }
+
+        } catch (error) {
+          console.error('Error uploading professional card:', error);
+          toast({
+            title: "Error al subir tarjeta profesional",
+            description: "Hubo un problema al subir tu tarjeta profesional.",
+            variant: "destructive",
+          });
+          setIsUploadingImage(false);
+          return false;
+        }
+      }
+
+      setIsUploadingImage(false);
+
+      toast({
+        title: "Archivos subidos",
+        description: "Todos los documentos se han subido correctamente.",
+      });
 
       const submissionData = {
         documentType: formData.documentType,
         identityDocument: formData.identityDocument,
+        identityDocumentImage: identityDocumentImageUrl,
+        professionalCardImage: professionalCardImageUrl,
         specialties: formData.specialties.split(",").map((s) => s.trim()),
         description: formData.description,
         feePerHour: parseFloat(formData.feePerHour) || undefined,
-        experienceYears: parseInt(formData.experienceYears, 10) || 0,
       };
 
       const response = await axios.post("/api/lawyer/register", submissionData);
@@ -254,6 +346,10 @@ export const useLawyerRegistration = () => {
     handleChange,
     handleSelectChange,
     handleFileChange,
+    handleIdentityDocumentImageChange,
+    handleProfessionalCardImageChange,
+    handleRemoveIdentityDocumentImage,
+    handleRemoveProfessionalCardImage,
     handleAddSpecialty,
     handleRemoveSpecialty,
     handleSubmit,

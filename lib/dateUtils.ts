@@ -7,3 +7,11 @@ export function formatDate(date: Date | string): string {
     minute: "2-digit",
   });
 }
+
+export function formatDateWithoutTime(date: Date | string): string {
+  return new Date(date).toLocaleString("es-CO", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+}

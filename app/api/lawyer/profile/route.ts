@@ -66,7 +66,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { description, feePerHour, experienceYears, specialties } = body;
+    const { description, feePerHour, specialties } = body;
 
     const existingLawyer = await prisma.lawyer.findUnique({
       where: { userId }
@@ -84,7 +84,6 @@ export async function PATCH(request: Request) {
       data: {
         description: description || existingLawyer.description,
         feePerHour: feePerHour !== undefined ? feePerHour : existingLawyer.feePerHour,
-        experienceYears: experienceYears !== undefined ? experienceYears : existingLawyer.experienceYears,
         specialties: specialties || existingLawyer.specialties,
       },
       include: {
