@@ -13,12 +13,14 @@ import {
   MessageSquare,
   Loader2,
   AlertCircle,
+  Calendar,
 } from "lucide-react";
 import { LawyerData } from "@/types/lawyer-profile";
 import { PQR } from "@/types/pqrsd";
 import { useLawyersList } from "../hooks/useLawyersList";
 import { LawyerDetailModal } from "./LawyerDetailModal";
 import { LawyerRequestModal } from "./LawyerRequestModal";
+import { formatDateWithoutTime } from "@/lib/dateUtils";
 
 interface LawyersListViewProps {
   pqrData: PQR;
@@ -223,12 +225,10 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
                                 : "Sin calificaciones"}
                             </span>
                           </div>
-
-                          <p className="text-sm text-gray-600">
-                            {lawyer.experienceYears} año
-                            {lawyer.experienceYears !== 1 ? "s" : ""} de
-                            experiencia
-                          </p>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Desde el {formatDateWithoutTime(lawyer.createdAt)} en la plataforma</span>
+                          </div>
                         </div>
                       </div>
                               
