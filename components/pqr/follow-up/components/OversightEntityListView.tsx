@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Building2, Mail, Phone, MapPin } from "lucide-react";
 import { OversightEntity } from "../types";
+import { formatText } from "@/utils/formatText";
 
 type OversightEntityListViewProps = {
   entities: OversightEntity[];
@@ -108,7 +109,7 @@ export function OversightEntityListView({
           <p className="text-sm text-amber-800">
             <strong>Importante:</strong> Al seleccionar un ente de control, se generará automáticamente 
             un documento oficial para presentar tu caso. Este documento incluirá todos los detalles 
-            de tu solicitud y será formato para el proceso de escalamiento.
+            de tu solicitud.
           </p>
         </div>
       </div>
@@ -148,8 +149,8 @@ export function OversightEntityListView({
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3" />
                         <span>
-                          {entity.Municipality?.name && `${entity.Municipality.name}, `}
-                          {entity.RegionalDepartment?.name}
+                          {entity.Municipality?.name && `${formatText(entity.Municipality.name)}, `}
+                          {formatText(entity.RegionalDepartment?.name)}
                         </span>
                       </div>
                     )}

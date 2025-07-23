@@ -28,7 +28,6 @@ export function OversightDocumentLoadingView({
         <div className="flex justify-center mb-4">
           <div className="relative">
             <FileText className="h-16 w-16 text-blue-600" />
-            <Loader2 className="h-6 w-6 text-blue-600 animate-spin absolute -bottom-1 -right-1" />
           </div>
         </div>
         
@@ -38,13 +37,12 @@ export function OversightDocumentLoadingView({
         
         <p className="text-muted-foreground mb-4">
           Estamos preparando el documento oficial para presentar ante el ente de control seleccionado.
-          Este proceso puede tomar unos momentos.
+          Este proceso puede tomar unos segundos.
         </p>
         
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
           <p className="text-sm text-blue-800">
-            El documento incluirá toda la información relevante de tu solicitud y 
-            los datos necesarios para el proceso de escalamiento.
+            El documento incluirá toda la información relevante de tu solicitud.
           </p>
         </div>
       </div>
