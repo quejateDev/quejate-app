@@ -26,8 +26,7 @@ export function FollowUpOptionsList({
 
   const getOversightDescription = () => {
     if (error) return error;
-    if (oversightEntity) return `Presentar pruebas ante ${oversightEntity.name}`;
-    return "No se encontró un ente de control";
+    return "Enviar a ente de control competente";
   };
 
   return (
@@ -40,7 +39,11 @@ export function FollowUpOptionsList({
         {availableOptions.map((optionKey: string) => {
           const option = followUpOptions[optionKey as keyof typeof followUpOptions];
           const isOversight = optionKey === "oversight";
-          const isDisabled = isOversight && (!!error || !oversightEntity);
+          
+          const isDisabled = isOversight && 
+            !(pqrType === "COMPLAINT" || pqrType === "REPORT") && 
+            (!!error || !oversightEntity);
+            
           const description = isOversight ? getOversightDescription() : option.description;
 
           return (

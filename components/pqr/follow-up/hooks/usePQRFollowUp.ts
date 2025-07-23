@@ -13,41 +13,68 @@ export function usePQRFollowUp(
 ) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [oversightEntity, setOversightEntity] = useState<OversightEntity | null>(null);
-  const [isLoading, setIsLoading] = useState(
-    pqrType === "COMPLAINT" || pqrType === "REPORT" ? true : false
-  );
+  const [oversightEntities, setOversightEntities] = useState<OversightEntity[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingEntities, setIsLoadingEntities] = useState(false);
+  const [isGeneratingOversightDoc, setIsGeneratingOversightDoc] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hoverState, setHoverState] = useState<string | null>(null);
   const [showTutelaForm, setShowTutelaForm] = useState(false);
+  const [showOversightEntityList, setShowOversightEntityList] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDocument, setGeneratedDocument] = useState<string | null>(null);
   const [showDocumentExport, setShowDocumentExport] = useState(false);
   const [showLawyersList, setShowLawyersList] = useState(false);
 
   useEffect(() => {
-    const fetchOversightEntity = async () => {
-      if (!(pqrType === "COMPLAINT" || pqrType === "REPORT")) return;
+    if (pqrType === "COMPLAINT" || pqrType === "REPORT") {
+      setOversightEntity(null);
+      setOversightEntities([]);
+      setError(null);
+    }
+  }, [pqrType]);
 
-      try {
-        setIsLoading(true);
-        const entityId = pqrData.entity?.id;
-        if (!entityId) {
-          setError("No se pudo identificar la entidad");
-          return;
-        }
+  const fetchOversightEntitiesByLocation = async () => {
+    try {
+      setIsLoadingEntities(true);
+      setError(null);
 
-        const oversightEntity = await pqrFollowUpService.getOversightEntity(entityId);
-        setOversightEntity(oversightEntity);
-      } catch (error) {
-        console.error("Error:", error);
-        setError("Error al cargar información del ente de control");
-      } finally {
-        setIsLoading(false);
+      const entityId = pqrData.entity?.id;
+      if (!entityId) {
+        setError("No se pudo identificar la entidad");
+        return;
       }
-    };
 
-    fetchOversightEntity();
-  }, [pqrType, pqrData.entity?.id]);
+      const entityResponse = await fetch(`/api/entities/${entityId}`);
+      if (!entityResponse.ok) {
+        throw new Error("Error al obtener información de la entidad");
+      }
+
+      const entityData = await entityResponse.json();
+      
+      if (!entityData.regionalDepartmentId) {
+        setError("La entidad no tiene departamento asignado");
+        return;
+      }
+
+      const entities = await pqrFollowUpService.getOversightEntitiesByLocation(
+        entityData.regionalDepartmentId,
+        entityData.municipalityId || undefined
+      );
+
+      setOversightEntities(entities);
+      
+      if (entities.length === 0) {
+        setError("No se encontraron entes de control para esta ubicación");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Error al cargar entes de control");
+      setOversightEntities([]);
+    } finally {
+      setIsLoadingEntities(false);
+    }
+  };
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
@@ -63,11 +90,19 @@ export function usePQRFollowUp(
     }
 
     if (option === "oversight") {
-      handleGenerateOversightDocument();
+      setShowOversightEntityList(true);
+      fetchOversightEntitiesByLocation();
       return;
     }
 
     onOpenChange(false);
+  };
+
+  const handleOversightEntitySelect = (entity: OversightEntity) => {
+    setOversightEntity(entity);
+    setShowOversightEntityList(false);
+    setIsGeneratingOversightDoc(true);
+    handleGenerateOversightDocument(entity);
   };
 
   const handleClose = () => {
@@ -75,10 +110,13 @@ export function usePQRFollowUp(
     setTimeout(() => {
       setSelectedOption(null);
       setShowTutelaForm(false);
+      setShowOversightEntityList(false);
+      setIsGeneratingOversightDoc(false);
       setShowDocumentExport(false);
       setShowLawyersList(false);
       setGeneratedDocument(null);
       setOversightEntity(null);
+      setOversightEntities([]);
       setError(null);
     }, 300);
   };
@@ -128,13 +166,14 @@ export function usePQRFollowUp(
     }
   };
 
-  const handleGenerateOversightDocument = async () => {
-    if (!oversightEntity) return;
+  const handleGenerateOversightDocument = async (selectedEntity?: OversightEntity) => {
+    const entityToUse = selectedEntity || oversightEntity;
+    if (!entityToUse) return;
 
     setIsGenerating(true);
     const loadingToast = toast({
       title: "Generando documento",
-      description: "Estamos preparando el documento...",
+      description: "Estamos preparando el documento para el ente de control...",
       variant: "default",
       duration: Infinity,
     });
@@ -150,7 +189,7 @@ export function usePQRFollowUp(
         fullName: pqrData.creator
           ? `${pqrData.creator.firstName} ${pqrData.creator.lastName}`
           : "Anónimo",
-        oversightEntity: oversightEntity.name,
+        oversightEntity: entityToUse.name,
         entity: pqrData.entity?.name,
         pqrType: typeMap[pqrType].label,
         pqrDate: createdAtDate.toISOString().split("T")[0],
@@ -160,6 +199,7 @@ export function usePQRFollowUp(
 
       const document = await pqrFollowUpService.generateOversightDocument(documentData);
       setGeneratedDocument(document);
+      setIsGeneratingOversightDoc(false);
       setShowDocumentExport(true);
 
       toast({
@@ -169,6 +209,7 @@ export function usePQRFollowUp(
       });
     } catch (error) {
       console.error("Error generating oversight document:", error);
+      setIsGeneratingOversightDoc(false);
       toast({
         title: "Error",
         description: "Hubo un problema al generar el documento",
@@ -185,15 +226,20 @@ export function usePQRFollowUp(
   return {
     selectedOption,
     oversightEntity,
+    oversightEntities,
     isLoading,
+    isLoadingEntities,
+    isGeneratingOversightDoc,
     error,
     hoverState,
     showTutelaForm,
+    showOversightEntityList,
     isGenerating,
     generatedDocument,
     showDocumentExport,
     showLawyersList,
     handleOptionSelect,
+    handleOversightEntitySelect,
     handleClose,
     handleGenerateDocument,
     handleGenerateOversightDocument,
@@ -201,5 +247,6 @@ export function usePQRFollowUp(
     handleMouseLeave,
     setShowTutelaForm,
     setShowLawyersList,
+    setShowOversightEntityList,
   };
 }

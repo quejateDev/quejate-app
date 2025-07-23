@@ -32,6 +32,16 @@ export type OversightEntity = {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  description: string;
+  phone?: string;
+  description?: string;
+  regionalDepartmentId: string;
+  municipalityId?: string;
+  Municipality?: {
+    id: string;
+    name: string;
+  };
+  RegionalDepartment: {
+    id: string;
+    name: string;
+  };
 };

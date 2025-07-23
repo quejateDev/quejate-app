@@ -1,24 +1,25 @@
 import { OversightEntity } from "../types";
 
 export class PQRFollowUpService {
-  async getOversightEntity(entityId: string): Promise<OversightEntity> {
-    const entityResponse = await fetch(`/api/entities/${entityId}`);
-    if (!entityResponse.ok) throw new Error("Error al obtener entidad");
-
-    const entityData = await entityResponse.json();
-    const categoryId = entityData.category?.id;
-    if (!categoryId) {
-      throw new Error("La entidad no tiene categoría asignada");
+  
+  async getOversightEntitiesByLocation(
+    regionalDepartmentId: string,
+    municipalityId?: string
+  ): Promise<OversightEntity[]> {
+    const params = new URLSearchParams({
+      regionalDepartmentId,
+    });
+    
+    if (municipalityId) {
+      params.append("municipalityId", municipalityId);
     }
 
-    const oversightResponse = await fetch(
-      `/api/category/${categoryId}/oversight-entity`
-    );
-    if (!oversightResponse.ok)
-      throw new Error("Error al obtener ente de control");
+    const response = await fetch(`/api/oversight-entity/by-location?${params}`);
+    if (!response.ok) {
+      throw new Error("Error al obtener entes de control");
+    }
 
-    const { oversightEntity } = await oversightResponse.json();
-    return oversightEntity;
+    return response.json();
   }
 
   async generateTutelaDocument(documentData: any): Promise<string> {
