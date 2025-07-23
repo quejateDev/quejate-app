@@ -7,6 +7,8 @@ import { MainOptionsView } from "./components/MainOptionsView";
 import { TutelaFormView } from "./components/TutelaFormView";
 import { DocumentExportView } from "./components/DocumentExportView";
 import { LawyersListView } from "./components/LawyersListView";
+import { OversightEntityListView } from "./components/OversightEntityListView";
+import { OversightDocumentLoadingView } from "./components/OversightDocumentLoadingView";
 
 type PQRFollowUpModalProps = {
   open: boolean;
@@ -24,20 +26,26 @@ export function PQRFollowUpModal({
   const {
     selectedOption,
     oversightEntity,
+    oversightEntities,
     isLoading,
+    isLoadingEntities,
+    isGeneratingOversightDoc,
     error,
     showTutelaForm,
+    showOversightEntityList,
     isGenerating,
     generatedDocument,
     showDocumentExport,
     showLawyersList,
     handleOptionSelect,
+    handleOversightEntitySelect,
     handleClose,
     handleGenerateDocument,
     handleMouseEnter,
     handleMouseLeave,
     setShowTutelaForm,
     setShowLawyersList,
+    setShowOversightEntityList,
   } = usePQRFollowUp(pqrType, pqrData, onOpenChange);
 
   const getDialogClassName = () => {
@@ -47,7 +55,7 @@ export function PQRFollowUpModal({
     if (showTutelaForm) {
       return "sm:max-w-xl";
     }
-    if (showLawyersList) {
+    if (showLawyersList || showOversightEntityList || isGeneratingOversightDoc) {
       return "sm:max-w-2xl";
     }
     return "sm:max-w-md";
@@ -86,11 +94,32 @@ export function PQRFollowUpModal({
       );
     }
 
+    if (showOversightEntityList) {
+      return (
+        <OversightEntityListView
+          entities={oversightEntities}
+          isLoading={isLoadingEntities}
+          error={error}
+          onEntitySelect={handleOversightEntitySelect}
+          onBack={() => setShowOversightEntityList(false)}
+        />
+      );
+    }
+
+    if (isGeneratingOversightDoc && oversightEntity) {
+      return (
+        <OversightDocumentLoadingView
+          oversightEntityName={oversightEntity.name}
+          onBack={handleClose}
+        />
+      );
+    }
+
     return (
       <MainOptionsView
         pqrType={pqrType}
-        oversightEntity={oversightEntity}
-        error={error}
+        oversightEntity={null}
+        error={null}
         onOptionSelect={handleOptionSelect}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
