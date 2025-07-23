@@ -8,81 +8,80 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())
+  id                String               @id @default(uuid())
   password          String
   firstName         String
   lastName          String
-  email             String              @unique
+  email             String               @unique
   phone             String
   role              UserRole
-  isActive          Boolean             @default(true)
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
   departmentId      String?
   emailVerified     DateTime?
-  verificationToken String?             @unique
+  verificationToken String?              @unique
   resetToken        String?
   resetTokenExpiry  DateTime?
-  isVerified        Boolean             @default(false)
+  entityId          String?
+  isActive          Boolean              @default(true)
+  isVerified        Boolean              @default(false)
   profilePicture    String?
+  comments          Comment[]
   EmailVerification EmailVerification[]
+  EntityHasUser     EntityHasUser[]
+  lawyerProfile     Lawyer?
+  lawyerRequests    LawyerRequest[]
   Like              Like[]
   notifications     Notification[]
+  assignedPQRS      PQRS[]               @relation("AssignedPQRS")
   PQRS              PQRS[]
-  assignedPQRS      PQRS[]              @relation("AssignedPQRS")
   statusHistory     PQRStatusHistory[]
-  comments          Comment[]
+  givenRatings      Rating[]             @relation("ClientGivenRatings")
+  department        Department?          @relation(fields: [departmentId], references: [id])
+  Entity            Entity?              @relation(fields: [entityId], references: [id])
   favorites         UserFavoriteEntity[]
-  givenRatings      Rating[]            @relation("ClientGivenRatings")
-  lawyerRequests    LawyerRequest[]
-  lawyerProfile     Lawyer?   
-  department        Department?         @relation(fields: [departmentId], references: [id])
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
 
-  entityId          String?
-  Entity            Entity?             @relation(fields: [entityId], references: [id])
-
   @@index([departmentId])
-  EntityHasUser EntityHasUser[]
 }
 
 model Lawyer {
-  id              String     @id @default(uuid())
-  userId          String     @unique
-  user            User       @relation(fields: [userId], references: [id])
-  documentType     DocumentType
-  isVerified       Boolean    @default(false)
-  identityDocument String
-  identityDocumentImage   String
-  professionalCardImage   String
-  specialties     String[]
-  description     String?
-  feePerHour      Float?
-  feePerService   Float?
-  receivedRatings Rating[]   @relation("LawyerReceivedRatings")
-  lawyerRequests  LawyerRequest[]
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id                    String          @id @default(uuid())
+  userId                String          @unique
+  documentType          DocumentType
+  identityDocument      String
+  specialties           String[]
+  description           String?
+  feePerHour            Float?
+  feePerService         Float?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  isVerified            Boolean         @default(false)
+  identityDocumentImage String
+  professionalCardImage String
+  user                  User            @relation(fields: [userId], references: [id])
+  lawyerRequests        LawyerRequest[]
+  receivedRatings       Rating[]        @relation("LawyerReceivedRatings")
 
   @@index([userId])
 }
 
 model LawyerRequest {
-  id          String                @id @default(uuid())
-  userId      String
-  lawyerId    String
-  pqrId       String?
-  message     String
-  serviceType String?
-  status      LawyerRequestStatus   @default(PENDING)
-  clientContactEmail     String?  
-  clientContactPhone     String?
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lawyer      Lawyer                @relation(fields: [lawyerId], references: [id], onDelete: Cascade)
-  pqr         PQRS?                 @relation(fields: [pqrId], references: [id], onDelete: SetNull)
+  id                 String              @id @default(uuid())
+  userId             String
+  lawyerId           String
+  pqrId              String?
+  message            String
+  serviceType        String?
+  status             LawyerRequestStatus @default(PENDING)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  clientContactEmail String?
+  clientContactPhone String?
+  lawyer             Lawyer              @relation(fields: [lawyerId], references: [id], onDelete: Cascade)
+  pqr                PQRS?               @relation(fields: [pqrId], references: [id])
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([lawyerId])
@@ -90,14 +89,14 @@ model LawyerRequest {
 }
 
 model Rating {
-  id         String   @id @default(uuid())
-  lawyerId   String
-  lawyer     Lawyer   @relation(fields: [lawyerId], references: [id], name: "LawyerReceivedRatings")
-  clientId   String
-  client    User      @relation(fields: [clientId], references: [id], name: "ClientGivenRatings")
-  score      Int      
-  comment    String?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  lawyerId  String
+  clientId  String
+  score     Int
+  createdAt DateTime @default(now())
+  comment   String?
+  client    User     @relation("ClientGivenRatings", fields: [clientId], references: [id])
+  lawyer    Lawyer   @relation("LawyerReceivedRatings", fields: [lawyerId], references: [id])
 
   @@unique([lawyerId, clientId])
   @@index([lawyerId])
@@ -107,11 +106,11 @@ model Rating {
 model Department {
   id          String     @id @default(uuid())
   name        String
-  email       String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   description String?
   entityId    String
+  email       String
   entity      Entity     @relation(fields: [entityId], references: [id])
   pqrConfig   PQRConfig?
   pqrs        PQRS[]
@@ -121,27 +120,27 @@ model Department {
 }
 
 model Entity {
-  id                String              @id @default(uuid())
-  name              String
-  description       String?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  categoryId        String
-  imageUrl          String?
-  email             String?
-  municipalityId    String?
+  id                   String               @id @default(uuid())
+  name                 String
+  description          String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  categoryId           String
+  imageUrl             String?
+  email                String?
+  municipalityId       String?
+  isVerified           Boolean              @default(false)
   regionalDepartmentId String?
-  isVerified        Boolean             @default(false)
-  Department        Department[]
-  pqrs              PQRS[]
-  favoritedBy       UserFavoriteEntity[]
-  category          Category            @relation(fields: [categoryId], references: [id])
-  Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
+  Department           Department[]
+  category             Category             @relation(fields: [categoryId], references: [id])
+  Municipality         Municipality?        @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
   RegionalDepartment   RegionalDepartment?  @relation(fields: [regionalDepartmentId], references: [id], onUpdate: NoAction)
-  EntityConsecutive EntityConsecutive[]
-  EntityHasUser     EntityHasUser[]
-  pqrConfig         PQRConfig?
-  users             User[]
+  EntityConsecutive    EntityConsecutive[]
+  EntityHasUser        EntityHasUser[]
+  pqrConfig            PQRConfig?
+  pqrs                 PQRS[]
+  users                User[]
+  favoritedBy          UserFavoriteEntity[]
 
   @@index([categoryId])
 }
@@ -151,59 +150,58 @@ model UserFavoriteEntity {
   userId    String
   entityId  String
   createdAt DateTime @default(now())
-  
-  user      User     @relation(fields: [userId], references: [id])
   entity    Entity   @relation(fields: [entityId], references: [id])
-  
+  user      User     @relation(fields: [userId], references: [id])
+
   @@unique([userId, entityId])
 }
 
 model EntityConsecutive {
   id          String    @id @default(uuid())
   entityId    String
-  entity      Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   code        String    @unique
   consecutive Int       @default(1)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
+  entity      Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([entityId])
 }
 
 model EntityHasUser {
-  id        String   @id @default(uuid())
-  entityId  String
-  userId    String
-  role      UserRole
-  entity    Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id       String   @id @default(uuid())
+  entityId String
+  userId   String
+  role     UserRole
+  entity   Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([entityId])
   @@index([userId])
 }
 
 model Category {
-  id                String           @id @default(uuid())
-  name              String           @unique
-  description       String?
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  imageUrl          String?
-  entities          Entity[]
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  imageUrl    String?
+  entities    Entity[]
 }
 
 model OversightEntity {
-  id          String     @id @default(uuid())
-  name        String     @unique
-  email       String
-  phone       String?
-  description String?
+  id                   String              @id @default(uuid())
+  name                 String              @unique
+  email                String
+  phone                String?
+  description          String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  municipalityId       String?
   regionalDepartmentId String?
-  municipalityId String?
-  Municipality      Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
-  RegionalDepartment   RegionalDepartment?  @relation(fields: [regionalDepartmentId], references: [id], onUpdate: NoAction)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  Municipality         Municipality?       @relation(fields: [municipalityId], references: [id], onUpdate: NoAction)
+  RegionalDepartment   RegionalDepartment? @relation(fields: [regionalDepartmentId], references: [id], onUpdate: NoAction)
 }
 
 model PQRS {
@@ -216,24 +214,24 @@ model PQRS {
   updatedAt         DateTime           @updatedAt
   creatorId         String?
   departmentId      String?
-  entityId          String 
-  assignedToId      String?
   private           Boolean            @default(true)
   consecutiveCode   String?
   description       String?
   subject           String?
+  assignedToId      String?
+  entityId          String
   attachments       Attachment[]
   comments          Comment[]
   customFieldValues CustomFieldValue[]
+  lawyerRequests    LawyerRequest[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
-  lawyerRequests    LawyerRequest[]
-  creator           User?              @relation(fields: [creatorId], references: [id])
   assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id])
-  department        Department?         @relation(fields: [departmentId], references: [id])
-  entity            Entity            @relation(fields: [entityId], references: [id])
-  customFields      CustomField[]      @relation("CustomFieldToPQRS")
+  creator           User?              @relation(fields: [creatorId], references: [id])
+  department        Department?        @relation(fields: [departmentId], references: [id])
+  entity            Entity             @relation(fields: [entityId], references: [id])
   statusHistory     PQRStatusHistory[]
+  customFields      CustomField[]      @relation("CustomFieldToPQRS")
 
   @@index([creatorId])
   @@index([departmentId])
@@ -249,22 +247,22 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([pqrId, userId])
-  @@index([pqrId])                                                                                                                                                                                                                                                                                                                                                                                                   
+  @@index([pqrId])
   @@index([userId])
 }
 
 model Comment {
   id        String   @id @default(uuid())
-  text      String   
+  text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String   
-  pqrId     String  
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade) 
+  userId    String
+  pqrId     String
+  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId]) 
-  @@index([pqrId])  
+  @@index([userId])
+  @@index([pqrId])
 }
 
 model PQRCustomField {
@@ -312,15 +310,15 @@ model PQRConfig {
 }
 
 model CustomField {
-  id          String    @id @default(uuid())
-  name        String
-  type        String
-  placeholder String?
-  required    Boolean   @default(false)
-  configId    String
+  id             String    @id @default(uuid())
+  name           String
+  type           String
+  placeholder    String?
+  required       Boolean   @default(false)
+  configId       String
   isForAnonymous Boolean   @default(false)
-  config      PQRConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
-  PQRS        PQRS[]    @relation("CustomFieldToPQRS")
+  config         PQRConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  PQRS           PQRS[]    @relation("CustomFieldToPQRS")
 
   @@index([configId])
 }
@@ -367,16 +365,16 @@ model Municipality {
   name                 String
   regionalDepartmentId String
   Entity               Entity[]
-  OversightEntity     OversightEntity[]
   RegionalDepartment   RegionalDepartment @relation(fields: [regionalDepartmentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  OversightEntity      OversightEntity[]
 }
 
 model RegionalDepartment {
-  id           String         @id(map: "regionaldepartment_pkey")
-  name         String         @unique(map: "regionaldepartment_name_key")
-  createdAt    DateTime?      @default(now()) @db.Timestamp(6)
-  Municipality Municipality[]
-  Entity       Entity[]
+  id              String            @id(map: "regionaldepartment_pkey")
+  name            String            @unique(map: "regionaldepartment_name_key")
+  createdAt       DateTime?         @default(now()) @db.Timestamp(6)
+  Entity          Entity[]
+  Municipality    Municipality[]
   OversightEntity OversightEntity[]
 }
 
@@ -395,10 +393,10 @@ model PQRStatusHistory {
 }
 
 enum UserRole {
-  SUPER_ADMIN
   ADMIN
   EMPLOYEE
   CLIENT
+  SUPER_ADMIN
   LAWYER
 }
 
