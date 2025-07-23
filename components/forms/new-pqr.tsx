@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PQRSType } from "@prisma/client";
 import useAuthStore from "@/store/useAuthStore";
 import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
@@ -85,24 +84,33 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
           >
             <div className="grid gap-4 pt-6">
               <div>
-                <Label>Tipo de Solicitud</Label>
-                <Select
-                  value={form.getValues("type")}
-                  onValueChange={(value: PQRSType) => {
-                    form.setValue("type", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccione el tipo de solicitud" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PETITION">Petición</SelectItem>
-                    <SelectItem value="COMPLAINT">Queja</SelectItem>
-                    <SelectItem value="CLAIM">Reclamo</SelectItem>
-                    <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
-                    <SelectItem value="REPORT">Denuncia</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Solicitud</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione el tipo de solicitud" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="PETITION">Petición</SelectItem>
+                          <SelectItem value="COMPLAINT">Queja</SelectItem>
+                          <SelectItem value="CLAIM">Reclamo</SelectItem>
+                          <SelectItem value="SUGGESTION">Sugerencia</SelectItem>
+                          <SelectItem value="REPORT">Denuncia</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
               </div>
               
               {departments.length > 0 && (
