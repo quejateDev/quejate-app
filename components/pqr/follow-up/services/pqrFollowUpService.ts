@@ -1,4 +1,5 @@
 import { OversightEntity } from "../types";
+import useAuthStore from "@/store/useAuthStore";
 
 export class PQRFollowUpService {
   
@@ -26,14 +27,21 @@ export class PQRFollowUpService {
     const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
     if (!apiUrl) throw new Error("URL de API no configurada");
 
+    const { token } = useAuthStore.getState();
+    
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(apiUrl, {
       method: "POST",
       mode: "cors",
       credentials: 'include',
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': 'Bearer token'
-      },
+      headers,
       body: JSON.stringify(documentData),
     });
 
@@ -45,7 +53,7 @@ export class PQRFollowUpService {
     return data.tutela;
   }
 
-  async generateOversightDocument(documentData: any): Promise<string> {
+async generateOversightDocument(documentData: any): Promise<string> {
     const response = await fetch("/api/legal-docs/oversight", {
       method: "POST",
       headers: {
