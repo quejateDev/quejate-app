@@ -1,7 +1,9 @@
 import PqrCreationEmail from "@/emails/pqr-creation";
 import VerificationEmail from "@/emails/VerificationEmail";
 import ResetPasswordEmail from "@/emails/ResetPasswordEmail";
+import OversightCreationEmail from "@/emails/oversight-control-creation";
 import { Resend } from "resend";
+import OversightNotificationEmail from "@/emails/oversight-notification";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -53,6 +55,87 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     to: [email],
     subject: "Restablece tu contraseña - Quejate",
     react: ResetPasswordEmail({ userName: email, token: token }),
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function sendOversightDocumentEmail(
+  oversightEmail: string,
+  oversightName: string,
+  entityName: string,
+  creatorInfo: {
+    name: string;
+    email: string;
+    phone?: string;
+  },
+  pqrUrl: string,
+  documentUrl: string
+) {
+  try {
+    const response = await fetch(documentUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch document: ${response.statusText}`);
+    }
+    
+    const pdfBuffer = await response.arrayBuffer();
+    const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+
+    const { data, error } = await resend.emails.send({
+      from: "noresponder@quejate.com.co",
+      to: [oversightEmail],
+      subject: `Documento de Supervisión - ${entityName}`,
+      react: OversightNotificationEmail({
+        oversightName,
+        entityName,
+        creatorInfo,
+        pqrUrl,
+        documentUrl,
+      }),
+      attachments: [
+        {
+          filename: `reporte_ente_control_${entityName}.pdf`,
+          content: pdfBase64,
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error sending oversight document email:', error);
+    throw error;
+  }
+}
+
+export async function sendOversightCreationConfirmationEmail(
+  userEmail: string,
+  userName: string,
+  pqrUrl: string
+) {
+  const creationDate = new Date().toLocaleDateString('es-CO', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const { data, error } = await resend.emails.send({
+    from: "noresponder@quejate.com.co",
+    to: [userEmail],
+    subject: "Confirmación de Solicitud de Supervisión - Quejate",
+    react: OversightCreationEmail({
+      userName,
+      creationDate,
+      pqrLink: pqrUrl,
+    }),
   });
 
   if (error) {
