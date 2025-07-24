@@ -15,7 +15,7 @@ export const generateOversightPrompt = ({
   daysExceeded: number;
   pqrDescription: string;
 }) => `
-Redacta un documento formal dirigido al ente de control competente en Colombia, denunciando la vulneración de derechos por falta de respuesta a una PQRSD. El documento debe ser profesional, claro y contener toda la información relevante, usando solo texto plano, sin negritas, sin cursivas, sin formato Markdown, ni símbolos como asteriscos.
+Redacta un documento formal dirigido al ente de control competente en Colombia, denunciando la vulneración de derechos por falta de respuesta a una ${pqrType}. El documento debe ser profesional, claro y contener toda la información relevante, usando solo texto plano, sin negritas, sin cursivas, sin formato Markdown, ni símbolos como asteriscos.
 
 - Nombre del solicitante: ${fullName}
 - Entidad demandada: ${entity}
