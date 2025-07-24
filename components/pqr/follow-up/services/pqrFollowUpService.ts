@@ -29,8 +29,10 @@ export class PQRFollowUpService {
     const response = await fetch(apiUrl, {
       method: "POST",
       mode: "cors",
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer token'
       },
       body: JSON.stringify(documentData),
     });
