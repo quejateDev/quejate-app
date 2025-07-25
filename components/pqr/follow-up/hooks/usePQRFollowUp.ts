@@ -6,6 +6,7 @@ import { typeMap } from "@/constants/pqrMaps";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { OversightEntity, TutelaFormData } from "../types";
 import { pqrFollowUpService } from "../services/pqrFollowUpService";
+import { formatText } from "@/utils/formatText";
 
 export function usePQRFollowUp(
   pqrType: keyof typeof typeMap,
@@ -210,8 +211,8 @@ export function usePQRFollowUp(
         pqrDate: createdAtDate.toISOString().split("T")[0],
         daysExceeded: daysExceeded,
         pqrDescription: pqrData.description || "",
-        department: entityData.RegionalDepartment?.name || "No especificado",
-        city: entityData.Municipality?.name || undefined,
+        department: formatText(entityData.RegionalDepartment?.name || "No especificado"),
+        city: formatText(entityData.Municipality?.name || undefined),
       };
 
       const document = await pqrFollowUpService.generateOversightDocument(documentData);

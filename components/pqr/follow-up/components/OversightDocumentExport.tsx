@@ -11,6 +11,7 @@ import {
   Send
 } from "lucide-react";
 import { OversightEntity } from "../types";
+import { typeMap } from "@/constants/pqrMaps";
 
 interface OversightDocumentExportProps {
   generatedDocument: string;
@@ -96,13 +97,25 @@ export function OversightDocumentExport({
     const pageWidth = doc.internal.pageSize.getWidth();
     const maxWidth = pageWidth - margin * 2;
     const lineHeight = 6;
-    let yPosition = 60;
+    let yPosition = 80;
+    const typeLabel = typeMap[pqrData.type].label;
 
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text(`DOCUMENTO PARA ${oversightEntity?.name || "ENTE DE CONTROL"}`, pageWidth / 2, 40, { align: "center" });
+    
+    const fullTitle = `Solicitud de Intervención por Incumplimiento en la Respuesta de ${typeLabel}`;
+    
+    const titleLines = doc.splitTextToSize(fullTitle, maxWidth);
+    
+    let titleY = 60;
+    
+    titleLines.forEach((line: string) => {
+        doc.text(line, pageWidth / 2, titleY, { align: "center" });
+        titleY += lineHeight + 2;
+    });
 
-    yPosition = 70;
+
+    yPosition = titleY + 10; 
 
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
@@ -110,40 +123,40 @@ export function OversightDocumentExport({
     const lines = generatedDocument.split("\n");
 
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.trim() === "") {
-        yPosition += lineHeight * 0.5;
-        continue;
-      }
+        const line = lines[i];
+        if (line.trim() === "") {
+            yPosition += lineHeight * 0.5;
+            continue;
+        }
 
-      if (line.match(/^(HECHOS:|MOTIVOS:|SOLICITUD:|CONCLUSIONES:)/i)) {
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
+        if (line.match(/^(HECHOS:|MOTIVOS:|SOLICITUD:|CONCLUSIONES:)/i)) {
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            const textLines = doc.splitTextToSize(line, maxWidth);
+            doc.text(textLines, margin, yPosition);
+            yPosition += textLines.length * lineHeight + 1;
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
+            continue;
+        }
+
         const textLines = doc.splitTextToSize(line, maxWidth);
-        doc.text(textLines, margin, yPosition);
-        yPosition += textLines.length * lineHeight + 1;
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "normal");
-        continue;
-      }
 
-      const textLines = doc.splitTextToSize(line, maxWidth);
+        doc.text(textLines, margin, yPosition, { align: "justify", maxWidth: maxWidth });
+        yPosition += textLines.length * lineHeight;
 
-      doc.text(textLines, margin, yPosition, { align: "justify", maxWidth: maxWidth });
-      yPosition += textLines.length * lineHeight;
-
-      if (yPosition > doc.internal.pageSize.getHeight() - 35) {
-        doc.addPage();
-        const width = doc.internal.pageSize.getWidth();
-        const height = doc.internal.pageSize.getHeight();
-        doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
-        yPosition = 60;
-      }
+        if (yPosition > doc.internal.pageSize.getHeight() - 35) {
+            doc.addPage();
+            const width = doc.internal.pageSize.getWidth();
+            const height = doc.internal.pageSize.getHeight();
+            doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
+            yPosition = 60;
+        }
     }
 
     const pdfBlob = doc.output('blob');
     return pdfBlob;
-  };
+};
 
   const handleSendEmail = async () => {
     if (!oversightEntity?.email) {
