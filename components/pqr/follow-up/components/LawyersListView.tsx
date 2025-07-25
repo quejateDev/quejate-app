@@ -39,7 +39,7 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
   };
 
   const lawyerCount = lawyers.filter(
-    (lawyer) => lawyer.user.id !== pqrData.creator?.id
+    (lawyer) => lawyer.user.id !== pqrData.creator?.id && lawyer.isVerified
   ).length;
 
   const handleViewDetail = (lawyer: LawyerData) => {
@@ -193,7 +193,7 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
 
         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
           {lawyers
-            .filter((lawyer) => lawyer.user.id !== pqrData.creator?.id)
+            .filter((lawyer) => lawyer.user.id !== pqrData.creator?.id && lawyer.isVerified)
             .map((lawyer) => (
               <Card
                 key={lawyer.id}
