@@ -162,10 +162,10 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
             <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto flex items-center justify-center">
               <MessageSquare className="h-8 w-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-primary">
               No hay abogados disponibles
             </h3>
-            <p className="text-gray-600">
+            <p className="text-primary">
               En este momento no hay abogados registrados en la plataforma.
             </p>
           </div>
