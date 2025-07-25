@@ -127,7 +127,7 @@ const EntityCard: React.FC<{
         {entity.isVerified && <VerificationBadge />}
       </div>
       {entity.description && (
-        <p className="text-xs text-gray-500 text-center line-clamp-2 px-2">
+        <p className="text-xs text-gray-500 text-justify line-clamp-2 px-2">
           {entity.description}
         </p>
       )}
@@ -166,7 +166,7 @@ export function CategorySelection({
   const [toggling, setToggling] = useState<{ [id: string]: boolean }>({});
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
 
-  // Función para manejar la selección de entidad con redirección del lado del cliente
+
   const handleEntitySelect = (entityId: string) => {
     router.push(`/dashboard/pqrs/create/${entityId}`);
   };
@@ -420,7 +420,7 @@ export function CategorySelection({
               </div>
               <h3 className="font-semibold text-center">{category.name}</h3>
               {category.description && (
-                <p className="text-xs text-gray-500 text-left px-2">
+                <p className="text-xs text-gray-500 text-justify px-2">
                   {category.description}
                 </p>
               )}
