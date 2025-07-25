@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { PQR } from "@/types/pqrsd";
+import { LawyerData } from "@/types/lawyer-profile";
 import { typeMap } from "@/constants/pqrMaps";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { OversightEntity, TutelaFormData } from "../types";
@@ -25,6 +26,8 @@ export function usePQRFollowUp(
   const [generatedDocument, setGeneratedDocument] = useState<string | null>(null);
   const [showDocumentExport, setShowDocumentExport] = useState(false);
   const [showLawyersList, setShowLawyersList] = useState(false);
+  const [showLawyerRequestModal, setShowLawyerRequestModal] = useState(false);
+  const [selectedLawyer, setSelectedLawyer] = useState<LawyerData | null>(null);
 
   useEffect(() => {
     if (pqrType === "COMPLAINT" || pqrType === "REPORT") {
@@ -223,6 +226,12 @@ export function usePQRFollowUp(
   const handleMouseEnter = (option: string) => setHoverState(option);
   const handleMouseLeave = () => setHoverState(null);
 
+  const handleLawyerSelected = (lawyer: LawyerData) => {
+    setSelectedLawyer(lawyer);
+    setShowLawyersList(false);
+    setShowLawyerRequestModal(true);
+  };
+
   return {
     selectedOption,
     oversightEntity,
@@ -238,6 +247,8 @@ export function usePQRFollowUp(
     generatedDocument,
     showDocumentExport,
     showLawyersList,
+    showLawyerRequestModal,
+    selectedLawyer,
     handleOptionSelect,
     handleOversightEntitySelect,
     handleClose,
@@ -245,8 +256,10 @@ export function usePQRFollowUp(
     handleGenerateOversightDocument,
     handleMouseEnter,
     handleMouseLeave,
+    handleLawyerSelected,
     setShowTutelaForm,
     setShowLawyersList,
     setShowOversightEntityList,
+    setShowLawyerRequestModal,
   };
 }
