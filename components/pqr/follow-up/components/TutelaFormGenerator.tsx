@@ -187,7 +187,7 @@ export function TutelaFormGenerator({
                         : "Seleccione un municipio"
                   }
                 >
-                  {formData.city}
+                  {formatText(formData.city)}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>

@@ -2,7 +2,7 @@ import { OversightEntity } from "../types";
 import useAuthStore from "@/store/useAuthStore";
 
 export class PQRFollowUpService {
-  
+
   async getOversightEntitiesByLocation(
     regionalDepartmentId: string,
     municipalityId?: string
@@ -10,7 +10,7 @@ export class PQRFollowUpService {
     const params = new URLSearchParams({
       regionalDepartmentId,
     });
-    
+
     if (municipalityId) {
       params.append("municipalityId", municipalityId);
     }
@@ -24,24 +24,11 @@ export class PQRFollowUpService {
   }
 
   async generateTutelaDocument(documentData: any): Promise<string> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
-    if (!apiUrl) throw new Error("URL de API no configurada");
-
-    const { token } = useAuthStore.getState();
-    
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(apiUrl, {
+    const response = await fetch("/api/legal-docs", {
       method: "POST",
-      mode: "cors",
-      credentials: 'include',
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(documentData),
     });
 
@@ -53,7 +40,7 @@ export class PQRFollowUpService {
     return data.tutela;
   }
 
-async generateOversightDocument(documentData: any): Promise<string> {
+  async generateOversightDocument(documentData: any): Promise<string> {
     const response = await fetch("/api/legal-docs/oversight", {
       method: "POST",
       headers: {
