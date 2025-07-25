@@ -187,6 +187,18 @@ export function usePQRFollowUp(
         throw new Error("Fecha de creación inválida");
       }
 
+      const entityId = pqrData.entity?.id;
+      if (!entityId) {
+        throw new Error("No se pudo identificar la entidad");
+      }
+
+      const entityResponse = await fetch(`/api/entities/${entityId}`);
+      if (!entityResponse.ok) {
+        throw new Error("Error al obtener información de la entidad");
+      }
+
+      const entityData = await entityResponse.json();
+
       const daysExceeded = calculateBusinessDaysExceeded(pqrData.createdAt);
       const documentData = {
         fullName: pqrData.creator
@@ -198,6 +210,8 @@ export function usePQRFollowUp(
         pqrDate: createdAtDate.toISOString().split("T")[0],
         daysExceeded: daysExceeded,
         pqrDescription: pqrData.description || "",
+        department: entityData.RegionalDepartment?.name || "No especificado",
+        city: entityData.Municipality?.name || undefined,
       };
 
       const document = await pqrFollowUpService.generateOversightDocument(documentData);
@@ -226,7 +240,7 @@ export function usePQRFollowUp(
   const handleMouseEnter = (option: string) => setHoverState(option);
   const handleMouseLeave = () => setHoverState(null);
 
-  const handleLawyerSelected = (lawyer: LawyerData) => {
+  const handleLawyerSelected = (lawyer: any) => {
     setSelectedLawyer(lawyer);
     setShowLawyersList(false);
     setShowLawyerRequestModal(true);

@@ -92,10 +92,10 @@ export function OversightDocumentExport({
     const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");      
     const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
 
-    const margin = 30;
+    const margin = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
     const maxWidth = pageWidth - margin * 2;
-    const lineHeight = 7;
+    const lineHeight = 6;
     let yPosition = 60;
 
     doc.setFontSize(16);
@@ -112,7 +112,7 @@ export function OversightDocumentExport({
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (line.trim() === "") {
-        yPosition += lineHeight;
+        yPosition += lineHeight * 0.5;
         continue;
       }
 
@@ -121,14 +121,15 @@ export function OversightDocumentExport({
         doc.setFont("helvetica", "bold");
         const textLines = doc.splitTextToSize(line, maxWidth);
         doc.text(textLines, margin, yPosition);
-        yPosition += textLines.length * lineHeight + 2;
+        yPosition += textLines.length * lineHeight + 1;
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
         continue;
       }
 
       const textLines = doc.splitTextToSize(line, maxWidth);
-      doc.text(textLines, margin, yPosition);
+
+      doc.text(textLines, margin, yPosition, { align: "justify", maxWidth: maxWidth });
       yPosition += textLines.length * lineHeight;
 
       if (yPosition > doc.internal.pageSize.getHeight() - 35) {
