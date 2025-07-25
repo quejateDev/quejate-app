@@ -18,8 +18,7 @@ export async function GET(request: Request) {
             lastName: true,
             profilePicture: true,
             email: true,
-            phone: true,
-            isVerified: true
+            phone: true
           }
         },
         receivedRatings: true
@@ -42,6 +41,7 @@ export async function GET(request: Request) {
         description: lawyer.description,
         feePerHour: lawyer.feePerHour,
         feePerService: lawyer.feePerService,
+        isVerified: lawyer.isVerified,
         averageRating: parseFloat(averageRating.toFixed(1)),
         ratingCount,
         user: lawyer.user,

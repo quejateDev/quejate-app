@@ -7,8 +7,10 @@ import { MainOptionsView } from "./components/MainOptionsView";
 import { TutelaFormView } from "./components/TutelaFormView";
 import { DocumentExportView } from "./components/DocumentExportView";
 import { LawyersListView } from "./components/LawyersListView";
+import { LawyerRequestModal } from "./components/LawyerRequestModal";
 import { OversightEntityListView } from "./components/OversightEntityListView";
 import { OversightDocumentLoadingView } from "./components/OversightDocumentLoadingView";
+import { useLawyersList } from "./hooks/useLawyersList";
 
 type PQRFollowUpModalProps = {
   open: boolean;
@@ -23,6 +25,7 @@ export function PQRFollowUpModal({
   pqrType,
   pqrData,
 }: PQRFollowUpModalProps) {
+  const { sendLawyerRequest } = useLawyersList();
   const {
     selectedOption,
     oversightEntity,
@@ -37,15 +40,19 @@ export function PQRFollowUpModal({
     generatedDocument,
     showDocumentExport,
     showLawyersList,
+    showLawyerRequestModal,
+    selectedLawyer,
     handleOptionSelect,
     handleOversightEntitySelect,
     handleClose,
     handleGenerateDocument,
     handleMouseEnter,
     handleMouseLeave,
+    handleLawyerSelected,
     setShowTutelaForm,
     setShowLawyersList,
     setShowOversightEntityList,
+    setShowLawyerRequestModal,
   } = usePQRFollowUp(pqrType, pqrData, onOpenChange);
 
   const getDialogClassName = () => {
@@ -90,6 +97,7 @@ export function PQRFollowUpModal({
         <LawyersListView
           pqrData={pqrData}
           onBack={() => setShowLawyersList(false)}
+          onLawyerSelected={handleLawyerSelected}
         />
       );
     }
@@ -128,10 +136,29 @@ export function PQRFollowUpModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className={`bg-white ${getDialogClassName()}`}>
-        {renderContent()}
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className={`bg-white ${getDialogClassName()}`}>
+          {renderContent()}
+        </DialogContent>
+      </Dialog>
+
+      {selectedLawyer && (
+        <LawyerRequestModal
+          lawyer={selectedLawyer}
+          pqrData={pqrData}
+          open={showLawyerRequestModal}
+          onOpenChange={setShowLawyerRequestModal}
+          onSubmitRequest={async (lawyerId, message, clientContactEmail, clientContactPhone, pqrId) => {
+            const success = await sendLawyerRequest(lawyerId, message, clientContactEmail, clientContactPhone, pqrId);
+            if (success) {
+              setShowLawyerRequestModal(false);
+              handleClose();
+            }
+            return success;
+          }}
+        />
+      )}
+    </>
   );
 }

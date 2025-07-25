@@ -13,6 +13,8 @@ export async function GET(request: Request, { params }: any) {
             customFields: true,
           },
         },
+        RegionalDepartment: true,
+        Municipality: true,
       },
     });
 

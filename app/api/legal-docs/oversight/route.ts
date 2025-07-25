@@ -13,6 +13,8 @@ export async function POST(req: NextRequest) {
       pqrDate,
       daysExceeded,
       pqrDescription,
+      department,
+      city,
     } = body;
 
     if (
@@ -22,7 +24,8 @@ export async function POST(req: NextRequest) {
       !pqrType ||
       !pqrDate ||
       daysExceeded == null ||
-      !pqrDescription
+      !pqrDescription ||
+      !department
     ) {
       return NextResponse.json(
         { error: "Faltan datos para generar el documento de reporte" },
@@ -38,6 +41,8 @@ export async function POST(req: NextRequest) {
       pqrDate,
       daysExceeded,
       pqrDescription,
+      department,
+      city,
     });
 
     const documentText = await sendToGPT(prompt, "Error generando documento de reporte");

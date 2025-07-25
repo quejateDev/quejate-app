@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { PQR } from "@/types/pqrsd";
+import { LawyerData } from "@/types/lawyer-profile";
 import { typeMap } from "@/constants/pqrMaps";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { OversightEntity, TutelaFormData } from "../types";
 import { pqrFollowUpService } from "../services/pqrFollowUpService";
+import { formatText } from "@/utils/formatText";
 
 export function usePQRFollowUp(
   pqrType: keyof typeof typeMap,
@@ -25,6 +27,8 @@ export function usePQRFollowUp(
   const [generatedDocument, setGeneratedDocument] = useState<string | null>(null);
   const [showDocumentExport, setShowDocumentExport] = useState(false);
   const [showLawyersList, setShowLawyersList] = useState(false);
+  const [showLawyerRequestModal, setShowLawyerRequestModal] = useState(false);
+  const [selectedLawyer, setSelectedLawyer] = useState<LawyerData | null>(null);
 
   useEffect(() => {
     if (pqrType === "COMPLAINT" || pqrType === "REPORT") {
@@ -184,6 +188,18 @@ export function usePQRFollowUp(
         throw new Error("Fecha de creación inválida");
       }
 
+      const entityId = pqrData.entity?.id;
+      if (!entityId) {
+        throw new Error("No se pudo identificar la entidad");
+      }
+
+      const entityResponse = await fetch(`/api/entities/${entityId}`);
+      if (!entityResponse.ok) {
+        throw new Error("Error al obtener información de la entidad");
+      }
+
+      const entityData = await entityResponse.json();
+
       const daysExceeded = calculateBusinessDaysExceeded(pqrData.createdAt);
       const documentData = {
         fullName: pqrData.creator
@@ -195,6 +211,8 @@ export function usePQRFollowUp(
         pqrDate: createdAtDate.toISOString().split("T")[0],
         daysExceeded: daysExceeded,
         pqrDescription: pqrData.description || "",
+        department: formatText(entityData.RegionalDepartment?.name || "No especificado"),
+        city: formatText(entityData.Municipality?.name || undefined),
       };
 
       const document = await pqrFollowUpService.generateOversightDocument(documentData);
@@ -223,6 +241,12 @@ export function usePQRFollowUp(
   const handleMouseEnter = (option: string) => setHoverState(option);
   const handleMouseLeave = () => setHoverState(null);
 
+  const handleLawyerSelected = (lawyer: any) => {
+    setSelectedLawyer(lawyer);
+    setShowLawyersList(false);
+    setShowLawyerRequestModal(true);
+  };
+
   return {
     selectedOption,
     oversightEntity,
@@ -238,6 +262,8 @@ export function usePQRFollowUp(
     generatedDocument,
     showDocumentExport,
     showLawyersList,
+    showLawyerRequestModal,
+    selectedLawyer,
     handleOptionSelect,
     handleOversightEntitySelect,
     handleClose,
@@ -245,8 +271,10 @@ export function usePQRFollowUp(
     handleGenerateOversightDocument,
     handleMouseEnter,
     handleMouseLeave,
+    handleLawyerSelected,
     setShowTutelaForm,
     setShowLawyersList,
     setShowOversightEntityList,
+    setShowLawyerRequestModal,
   };
 }

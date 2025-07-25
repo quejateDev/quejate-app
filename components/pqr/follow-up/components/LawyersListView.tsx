@@ -19,20 +19,18 @@ import { LawyerData } from "@/types/lawyer-profile";
 import { PQR } from "@/types/pqrsd";
 import { useLawyersList } from "../hooks/useLawyersList";
 import { LawyerDetailModal } from "./LawyerDetailModal";
-import { LawyerRequestModal } from "./LawyerRequestModal";
 import { formatDateWithoutTime } from "@/lib/dateUtils";
 
 interface LawyersListViewProps {
   pqrData: PQR;
   onBack: () => void;
+  onLawyerSelected?: (lawyer: LawyerData) => void;
 }
 
-export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
-  const { lawyers, isLoading, error, sendLawyerRequest } = useLawyersList();
+export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersListViewProps) {
+  const { lawyers, isLoading, error } = useLawyersList();
   const [selectedLawyer, setSelectedLawyer] = useState<LawyerData | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -48,32 +46,14 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
   };
 
   const handleRequestService = (lawyer: LawyerData) => {
-    setSelectedLawyer(lawyer);
-    setShowRequestModal(true);
+    onLawyerSelected?.(lawyer);
   };
 
   const handleDetailModalRequestService = () => {
+    if (selectedLawyer) {
+      onLawyerSelected?.(selectedLawyer);
+    }
     setShowDetailModal(false);
-    setShowRequestModal(true);
-  };
-
-  const handleSubmitRequest = async (
-    lawyerId: string,
-    message: string,
-    clientContactEmail?: string,
-    clientContactPhone?: string,
-    pqrId?: string
-  ) => {
-    setIsSubmittingRequest(true);
-    const success = await sendLawyerRequest(lawyerId, message, clientContactEmail, clientContactPhone, pqrId);
-    setIsSubmittingRequest(false);
-    return success;
-  };
-
-  const closeModals = () => {
-    setShowDetailModal(false);
-    setShowRequestModal(false);
-    setSelectedLawyer(null);
   };
 
   if (isLoading) {
@@ -162,10 +142,10 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
             <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto flex items-center justify-center">
               <MessageSquare className="h-8 w-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-primary">
               No hay abogados disponibles
             </h3>
-            <p className="text-gray-600">
+            <p className="text-primary">
               En este momento no hay abogados registrados en la plataforma.
             </p>
           </div>
@@ -283,23 +263,12 @@ export function LawyersListView({ pqrData, onBack }: LawyersListViewProps) {
       </div>
 
       {selectedLawyer && (
-        <>
-          <LawyerDetailModal
-            lawyer={selectedLawyer}
-            open={showDetailModal}
-            onOpenChange={setShowDetailModal}
-            onRequestService={handleDetailModalRequestService}
-          />
-
-          <LawyerRequestModal
-            lawyer={selectedLawyer}
-            pqrData={pqrData}
-            open={showRequestModal}
-            onOpenChange={setShowRequestModal}
-            onSubmitRequest={handleSubmitRequest}
-            isLoading={isSubmittingRequest}
-          />
-        </>
+        <LawyerDetailModal
+          lawyer={selectedLawyer}
+          open={showDetailModal}
+          onOpenChange={setShowDetailModal}
+          onRequestService={handleDetailModalRequestService}
+        />
       )}
     </>
   );
