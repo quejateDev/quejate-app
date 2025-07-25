@@ -43,64 +43,78 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
 
   return (
     <div className="container mx-auto py-10 space-y-8">
-      {/* Encabezado */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl font-bold">
-              {typeMap[pqr.type].label} #{pqr.id} #{pqr.id}
-            </CardTitle>
-            <p className="text-muted-foreground mt-2">
-              {pqr.entity.name}
-              {pqr.department ? ` - ${pqr.department.name}` : ""}
-            </p>
-          </div>
+        <CardHeader className="bg-muted py-3 mb-6 rounded-t-md">
+          <CardTitle className="text-2xl font-bold text-start">
+            No. Radicado {pqr.consecutiveCode}
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Información del Creador */}
-          <div>
-            <h3 className="font-semibold mb-2">Creado por</h3>
-            <p>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="font-semibold">Entidad a la cual se realizó la solicitud:</div>
+            <div>{pqr.entity.name}</div>
+
+            <div className="font-semibold">Ciudadano:</div>
+            <div>
               {pqr.anonymous || !pqr.creator
                 ? "Anónimo"
                 : `${pqr.creator?.firstName} ${pqr.creator?.lastName}`}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {formatDate(pqr.createdAt)}
-            </p>
+            </div>
+
+            <div className="font-semibold">Tipo de requerimiento:</div>
+            <div>{typeMap[pqr.type].label}</div>
+
+            <div className="font-semibold">Asunto:</div>
+            <div>{pqr.subject}</div>
+
+            <div className="font-semibold">Fecha de creación:</div>
+            <div>{formatDate(pqr.createdAt)}</div>
+
+            <div className="font-semibold">Fecha de vencimiento:</div>
+            <div>{formatDate(pqr.dueDate)}</div>
+
+            <div className="font-semibold">Estado:</div>
+            <div>
+              <Badge
+                variant={
+                  remainingDays <= 0
+                    ? "destructive"
+                    : remainingDays <= 3
+                    ? "warning"
+                    : "default"
+                }
+              >
+                {remainingDays <= 0
+                  ? "Vencido"
+                  : `${remainingDays} días restantes`}
+              </Badge>
+            </div>
+
+            {pqr.department && (
+              <>
+                <div className="font-semibold">Departamento y municipio:</div>
+                <div>{pqr.department.name}</div>
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="bg-muted py-3 mb-6 rounded-t-md">
+          <CardTitle className="text-xl font-bold">Contenido de la Solicitud</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="font-semibold">Asunto:</h3>
+            <p className="text-gray-700">{pqr.subject}</p>
+
+            <h3 className="font-semibold mt-4">Descripción:</h3>
+            <p className="text-gray-700">{pqr.description}</p>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-2">Tema</h3>
-              <p className="mb-6">
-                {pqr.subject}
-              </p>
-            <h3 className="font-semibold mb-2">Descripción</h3>
-              <p>
-                {pqr.description}
-              </p>
-          </div>
           <PQRCustomFields fields={pqr.customFieldValues} />
-          
-          {/* Tiempo Restante */}
-          <div>
-            <h3 className="font-semibold mb-2">Tiempo de Respuesta</h3>
-            <Badge
-              variant={
-                remainingDays <= 0
-                  ? "destructive"
-                  : remainingDays <= 3
-                  ? "warning"
-                  : "default"
-              }
-            >
-              {remainingDays <= 0
-                ? "Vencido"
-                : `${remainingDays} días restantes`}
-            </Badge>
-          </div>
 
-          {/* Archivos Adjuntos */}
           <PQRAttachments attachments={pqr.attachments} />
         </CardContent>
       </Card>
