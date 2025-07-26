@@ -23,7 +23,10 @@ export class PQRFollowUpService {
   }
 
   async generateTutelaDocument(documentData: any): Promise<string> {
-    const response = await fetch("/api/legal-docs", {
+    const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
+    if (!apiUrl) throw new Error("URL de API no configurada");
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
