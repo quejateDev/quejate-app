@@ -69,4 +69,15 @@ import {
 } from "@/components/pqr/follow-up";
 ```
 
+## Generación de Documentación
+Para generar los documentos como tutelas y otros documentos relacionados, puedes utilizar el servicio `pqrFollowUpService` que encapsula la lógica de generación y exportación de documentos.
+
+Se usa una lambda function de AWS para la generación de documentos, la cual se invoca desde el servicio. Esto debido a que el despliegue en vercel no permite solicitudes que demoren más de 10 segundos.
+
+
+Variables de entorno configuradas:
+NEXT_PUBLIC_API_GATEWAY_URL: Endpoint de la Lambda
+OPENAI_API_KEY: (Gestionado en Lambda)
+
+
 

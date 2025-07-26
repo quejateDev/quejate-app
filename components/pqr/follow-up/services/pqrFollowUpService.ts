@@ -22,7 +22,7 @@ export class PQRFollowUpService {
     return response.json();
   }
 
-  async generateTutelaDocument(documentData: any): Promise<string> {
+  private async generateDocument(documentType: string, documentData: any): Promise<string> {
     const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
     if (!apiUrl) throw new Error("URL de API no configurada");
 
@@ -31,24 +31,10 @@ export class PQRFollowUpService {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(documentData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Error al generar el documento");
-    }
-
-    const data = await response.json();
-    return data.tutela;
-  }
-
-  async generateOversightDocument(documentData: any): Promise<string> {
-    const response = await fetch("/api/legal-docs/oversight", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(documentData),
+      body: JSON.stringify({
+        documentType,
+        ...documentData
+      }),
     });
 
     if (!response.ok) {
@@ -57,6 +43,14 @@ export class PQRFollowUpService {
 
     const data = await response.json();
     return data.document;
+  }
+
+  async generateTutelaDocument(documentData: any): Promise<string> {
+    return this.generateDocument("tutela", documentData);
+  }
+
+  async generateOversightDocument(documentData: any): Promise<string> {
+    return this.generateDocument("oversight", documentData);
   }
 }
 
