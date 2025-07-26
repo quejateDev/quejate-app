@@ -10,7 +10,7 @@ import { LawyersListView } from "./components/LawyersListView";
 import { LawyerRequestModal } from "./components/LawyerRequestModal";
 import { OversightEntityListView } from "./components/OversightEntityListView";
 import { OversightDocumentLoadingView } from "./components/OversightDocumentLoadingView";
-import { useLawyersList } from "./hooks/useLawyersList";
+import { sendLawyerRequest } from "./utils/lawyerRequestUtils";
 
 type PQRFollowUpModalProps = {
   open: boolean;
@@ -25,7 +25,6 @@ export function PQRFollowUpModal({
   pqrType,
   pqrData,
 }: PQRFollowUpModalProps) {
-  const { sendLawyerRequest } = useLawyersList();
   const {
     selectedOption,
     oversightEntity,

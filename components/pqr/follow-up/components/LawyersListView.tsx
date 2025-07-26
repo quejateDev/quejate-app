@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,9 +28,13 @@ interface LawyersListViewProps {
 }
 
 export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersListViewProps) {
-  const { lawyers, isLoading, error } = useLawyersList();
+  const { lawyers, isLoading, error, fetchLawyers } = useLawyersList();
   const [selectedLawyer, setSelectedLawyer] = useState<LawyerData | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+
+  useEffect(() => {
+    fetchLawyers();
+  }, [fetchLawyers]);
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();

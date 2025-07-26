@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import { LawyerData } from "@/types/lawyer-profile";
 
@@ -7,7 +7,7 @@ export function useLawyersList() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLawyers = async () => {
+  const fetchLawyers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
@@ -31,13 +31,9 @@ export function useLawyersList() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchLawyers();
   }, []);
 
-  const sendLawyerRequest = async (
+  const sendLawyerRequest = useCallback(async (
     lawyerId: string,
     message: string,
     clientContactEmail?: string,
@@ -80,7 +76,7 @@ export function useLawyersList() {
       });
       return false;
     }
-  };
+  }, []);
 
   return {
     lawyers,
