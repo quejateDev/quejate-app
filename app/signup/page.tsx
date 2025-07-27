@@ -10,6 +10,13 @@ import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import VerificationModal from "@/components/modals/verification-modal";
+import dynamic from "next/dynamic";
+
+// Dynamically import ReCAPTCHA to avoid SSR issues
+// @ts-ignore
+const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
+  ssr: false,
+});
 
 export default function Signup() {
   const router = useRouter();
@@ -23,6 +30,7 @@ export default function Signup() {
   });
   const [loading, setLoading] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
@@ -36,11 +44,23 @@ export default function Signup() {
       if (formData.password !== formData.confirmPassword) {
         return toast({
           title: "Error",
-          description: "Las contrasenas no coinciden",
+          description: "Las contraseñas no coinciden",
           variant: "destructive",
         });
       }
-      await axios.post("/api/auth/signup", formData);
+
+      if (!recaptchaToken) {
+        return toast({
+          title: "Error",
+          description: "Por favor completa la verificación reCAPTCHA",
+          variant: "destructive",
+        });
+      }
+
+      await axios.post("/api/auth/signup", {
+        ...formData,
+        recaptchaToken
+      });
 
       // Show verification modal instead of redirecting
       setShowVerificationModal(true);
@@ -48,11 +68,26 @@ export default function Signup() {
       console.error(error);
 
       if (axios.isAxiosError(error) && error.response?.status === 400) {
-        return toast({
-          title: "Error",
-          description: "El correo electrónico ya existe",
-          variant: "destructive",
-        });
+        const errorMessage = error.response.data?.error;
+        if (errorMessage === 'reCAPTCHA verification failed') {
+          return toast({
+            title: "Error",
+            description: "Verificación reCAPTCHA fallida. Por favor, inténtalo de nuevo.",
+            variant: "destructive",
+          });
+        } else if (errorMessage === 'reCAPTCHA token is required') {
+          return toast({
+            title: "Error",
+            description: "Por favor completa la verificación reCAPTCHA",
+            variant: "destructive",
+          });
+        } else {
+          return toast({
+            title: "Error",
+            description: "El correo electrónico ya existe",
+            variant: "destructive",
+          });
+        }
       }
 
       toast({
@@ -197,6 +232,16 @@ export default function Signup() {
                     required
                   />
                 </div>
+              </div>
+
+              {/* reCAPTCHA */}
+              <div className="flex justify-center">
+                {/* @ts-ignore */}
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                  onChange={(token) => setRecaptchaToken(token)}
+                  onExpired={() => setRecaptchaToken(null)}
+                />
               </div>
 
               <Button
