@@ -81,6 +81,7 @@ export function DocumentExport({
                         }),
                       ],
                       spacing: { after: 200 },
+                      alignment: AlignmentType.JUSTIFIED,
                     })
                 ),
             ],
@@ -144,7 +145,7 @@ export function DocumentExport({
         return false;
       };
 
-      const addTextWithPageControl = async (text: string, x: number, fontSize: number = 11, fontStyle: string = 'normal') => {
+      const addTextWithPageControl = async (text: string, x: number, fontSize: number = 11, fontStyle: string = 'normal', align: string = 'justify') => {
         doc.setFontSize(fontSize);
         doc.setFont("helvetica", fontStyle);
         
@@ -153,7 +154,34 @@ export function DocumentExport({
         
         await checkPageBreak(requiredSpace);
         
-        doc.text(textLines, x, yPosition);
+        if (align === 'justify' && textLines.length > 1) {
+          // Aplicar justificación manual para párrafos
+          textLines.forEach((line: string, index: number) => {
+            if (index < textLines.length - 1) { // No justificar la última línea
+              const words = line.trim().split(' ');
+              if (words.length > 1) {
+                const totalTextWidth = words.reduce((acc, word) => acc + doc.getTextWidth(word), 0);
+                const totalSpaceWidth = maxWidth - (x - margins.left) - totalTextWidth;
+                const spaceWidth = totalSpaceWidth / (words.length - 1);
+                
+                let currentX = x;
+                words.forEach((word, wordIndex) => {
+                  doc.text(word, currentX, yPosition + (index * lineHeight));
+                  if (wordIndex < words.length - 1) {
+                    currentX += doc.getTextWidth(word) + spaceWidth;
+                  }
+                });
+              } else {
+                doc.text(line, x, yPosition + (index * lineHeight));
+              }
+            } else {
+              doc.text(line, x, yPosition + (index * lineHeight));
+            }
+          });
+        } else {
+          doc.text(textLines, x, yPosition);
+        }
+        
         yPosition += requiredSpace;
       };
 
@@ -183,7 +211,7 @@ export function DocumentExport({
             await checkPageBreak(lineHeight * 2);
           }
           
-          await addTextWithPageControl(trimmedLine, margins.left, 12, 'bold');
+          await addTextWithPageControl(trimmedLine, margins.left, 12, 'bold', 'left');
           yPosition += paragraphSpacing;
           continue;
         }
@@ -426,7 +454,9 @@ export function DocumentExport({
                 <h1 className="text-2xl font-bold text-center mb-6">
                   ACCIÓN DE TUTELA
                 </h1>
-                {generatedDocument}
+                <div className="whitespace-pre-wrap text-justify leading-relaxed">
+                  {generatedDocument}
+                </div>
               </div>
             </div>
           </div>
