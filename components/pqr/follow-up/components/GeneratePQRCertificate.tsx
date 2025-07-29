@@ -250,6 +250,21 @@ export async function GeneratePQRCertificate(data: PQR) {
     await checkNewPage(lineHeight * 2); 
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
+    
+    doc.setTextColor(0, 0, 255);
+    doc.textWithLink(
+      "Ver detalle de la PQRSD en la plataforma",
+      margins.left,
+      currentY,
+      {
+        url: `https://quejate.com.co/dashboard/pqr/${data.id}`,
+        underline: true,
+      }
+    );
+    doc.setTextColor(100, 100, 100);
+    
+    currentY += lineHeight + sectionSpacing;
+    
     const certText = "Este documento certifica que la solicitud fue enviada correctamente y se encuentra registrada en nuestro sistema. El presente certificado sirve como comprobante de radicación de su PQRSD.";
     await addLongTextWithPageBreaks(certText, margins.left, 10, 'normal', 'justify');
 
