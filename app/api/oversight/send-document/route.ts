@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const pqrUrl = `${process.env.NEXTAUTH_URL}/dashboard/pqr/${pqrData.id}`;
+    const pqrUrl = `https://quejate.com.co/dashboard/pqr/${pqrData.id}`;
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
