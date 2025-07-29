@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -25,6 +24,7 @@ import {
 } from "../ui/command";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "../ui/file-upload";
+import dynamic from "next/dynamic";
 
 import {
   Form,
@@ -39,6 +39,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useLoginModal } from "@/providers/LoginModalProivder";
 import { usePQRForm } from "@/hooks/usePQRForm";
+
+// Dynamically import ReCAPTCHA to avoid SSR issues
+// @ts-ignore
+const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
+  ssr: false,
+});
+
 
 type NewPQRFormProps = {
   entityId: string;
@@ -57,6 +64,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     openDepartment,
     setOpenDepartment,
     onSubmit,
+    recaptchaToken,
+    setRecaptchaToken,
   } = usePQRForm(entityId, user);
 
   if (isLoadingInitial) {
@@ -347,6 +356,16 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   Si marca esta opción, su queja será visible para otras
                   personas en la sección de denuncias públicas.
                 </p>
+              </div>
+
+              {/* reCAPTCHA */}
+              <div className="flex justify-center">
+                {/* @ts-ignore */}
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                  onChange={(token: string | null) => setRecaptchaToken(token)}
+                  onExpired={() => setRecaptchaToken(null)}
+                />
               </div>
 
               <Button type="submit" disabled={isLoading}>

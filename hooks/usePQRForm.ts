@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -35,6 +35,7 @@ export const formSchema = z.object({
 export const usePQRForm = (entityId: string, user: User | null) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [pqr, setPqr] = useState({
     type: "PETITION" as PQRSType,
     departmentId: "",
@@ -70,15 +71,7 @@ export const usePQRForm = (entityId: string, user: User | null) => {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (selectedEntityId) {
-      fetchDepartments();
-    } else {
-      setDepartments([]);
-    }
-  }, [selectedEntityId]);
-
-  async function fetchDepartments() {
+  const fetchDepartments = useCallback(async () => {
     try {
       const response = await getDepartmentsService();
       const filteredDepartments = selectedEntityId
@@ -100,7 +93,15 @@ export const usePQRForm = (entityId: string, user: User | null) => {
     } finally {
       setIsLoadingInitial(false);
     }
-  }
+  }, [selectedEntityId, pqr.departmentId, form]);
+
+  useEffect(() => {
+    if (selectedEntityId) {
+      fetchDepartments();
+    } else {
+      setDepartments([]);
+    }
+  }, [selectedEntityId, fetchDepartments]);
 
   async function fetchCustomFields(departmentId: string) {
     if (!departmentId) {
@@ -134,16 +135,26 @@ export const usePQRForm = (entityId: string, user: User | null) => {
     }
   }
 
+  const watchedDepartmentId = form.watch("departmentId");
+
   useEffect(() => {
-    const departmentId = form.getValues("departmentId");
-    if (departmentId) {
-      fetchCustomFields(departmentId);
+    if (watchedDepartmentId) {
+      fetchCustomFields(watchedDepartmentId);
     } else {
       setCustomFields([]);
     }
-  }, [form.getValues("departmentId")]);
+  }, [watchedDepartmentId]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!recaptchaToken) {
+      toast({
+        title: "Error",
+        description: "Por favor completa la verificación reCAPTCHA",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -177,6 +188,7 @@ export const usePQRForm = (entityId: string, user: User | null) => {
           attachments: attachmentsData,
           subject: values.subject,
           description: values.description,
+          recaptchaToken: recaptchaToken,
         })
       );
 
@@ -189,13 +201,28 @@ export const usePQRForm = (entityId: string, user: User | null) => {
         });
         router.push("/dashboard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({
-        title: "Error",
-        description: "Error al crear el PQR",
-        variant: "destructive",
-      });
+      
+      if (error.response?.data?.error === 'reCAPTCHA verification failed') {
+        toast({
+          title: "Error",
+          description: "Verificación reCAPTCHA fallida. Por favor, inténtalo de nuevo.",
+          variant: "destructive",
+        });
+      } else if (error.response?.data?.error === 'reCAPTCHA token is required') {
+        toast({
+          title: "Error",
+          description: "Por favor completa la verificación reCAPTCHA",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Error al crear el PQR",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -210,5 +237,7 @@ export const usePQRForm = (entityId: string, user: User | null) => {
     openDepartment,
     setOpenDepartment,
     onSubmit,
+    recaptchaToken,
+    setRecaptchaToken,
   };
 };
