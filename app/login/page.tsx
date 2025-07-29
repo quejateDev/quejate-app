@@ -166,7 +166,7 @@ export default function Login() {
               <div className="text-xs text-muted-foreground text-center mb-4">
                 Al iniciar sesión, aceptas nuestros{" "}
                 <Link
-                  href="/terms"
+                  href="/legal"
                   className="text-blue-500 hover:text-blue-600 hover:underline underline-offset-4"
                 >
                   términos y condiciones
