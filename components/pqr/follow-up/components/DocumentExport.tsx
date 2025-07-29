@@ -17,15 +17,6 @@ import {
   FileCheck,
   Info,
 } from "lucide-react";
-import {
-  Document,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  AlignmentType,
-  Packer,
-} from "docx";
-import saveAs from "file-saver";
 import { GeneratePQRCertificate } from "./GeneratePQRCertificate";
 
 interface StepProps {
@@ -45,71 +36,6 @@ export function DocumentExport({
   const [isDownloading, setIsDownloading] = useState(false);
   const [activeTab, setActiveTab] = useState("preview");
   const [copySuccess, setCopySuccess] = useState(false);
-
-  const handleDownloadWord = async () => {
-    if (!generatedDocument) return;
-
-    setIsDownloading(true);
-    try {
-      const doc = new Document({
-        sections: [
-          {
-            properties: {},
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: "ACCIÓN DE TUTELA",
-                    bold: true,
-                    size: 24,
-                  }),
-                ],
-                heading: HeadingLevel.HEADING_1,
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 400 },
-              }),
-              ...generatedDocument
-                .split("\n")
-                .filter(Boolean)
-                .map(
-                  (line) =>
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: line,
-                          size: 24,
-                        }),
-                      ],
-                      spacing: { after: 200 },
-                      alignment: AlignmentType.JUSTIFIED,
-                    })
-                ),
-            ],
-          },
-        ],
-      });
-
-      const blob = await Packer.toBlob(doc);
-      saveAs(
-        blob,
-        `tutela_${pqrData?.entity?.name || "documento"}.docx`
-      );
-
-      toast({
-        title: "Documento descargado",
-        description: "El archivo Word se ha generado correctamente",
-      });
-    } catch (error) {
-      console.error("Error al generar Word:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo generar el documento Word",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
   const handleDownloadPDF = async () => {
     if (!generatedDocument) return;
@@ -479,7 +405,7 @@ export function DocumentExport({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
+            <div className="grid grid-cols-1 gap-4 w-full max-w-xl">
               <Button
                 variant="outline"
                 className="h-24 md:h-32 flex-col gap-2 md:gap-3 border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300 transition-all shadow-sm"
@@ -499,29 +425,6 @@ export function DocumentExport({
                   </span>
                   <span className="text-xs text-muted-foreground">
                     Documento no editable (.pdf)
-                  </span>
-                </div>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-24 md:h-32 flex-col gap-2 md:gap-3 border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm"
-                onClick={handleDownloadWord}
-                disabled={isDownloading}
-              >
-                {isDownloading ? (
-                  <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-blue-500" />
-                ) : (
-                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <FileText className="h-5 w-5 md:h-6 md:w-6 text-blue-500" />
-                  </div>
-                )}
-                <div className="flex flex-col">
-                  <span className="font-medium text-blue-700">
-                    Formato Word
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    Documento editable (.docx)
                   </span>
                 </div>
               </Button>
