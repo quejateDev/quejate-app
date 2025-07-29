@@ -95,7 +95,7 @@ const EntityItem: React.FC<{
       <div className="flex-1 min-w-0">
         <Link href={`/dashboard/pqrs/create/${entity.id}`}>
           <h4 className="font-medium text-sm hover:text-primary transition-colors cursor-pointer leading-tight">
-            {formatText(entity.name)}
+            {entity.name}
           </h4>
         </Link>
         

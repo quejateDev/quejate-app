@@ -123,7 +123,7 @@ const EntityCard: React.FC<{
         </div>
       </div>
       <div className="flex items-center justify-center gap-2">
-        <h3 className="font-semibold text-center">{formatText(entity.name)}</h3>
+        <h3 className="font-semibold text-center">{entity.name}</h3>
         {entity.isVerified && <VerificationBadge />}
       </div>
       {entity.description && (
