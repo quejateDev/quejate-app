@@ -49,7 +49,7 @@
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.487.0",
-    "next": "^15.1.2",
+    "next": "^15.2.4",
     "next-auth": "^4.24.11",
     "openai": "^4.96.0",
     "prismjs": "^1.30.0",
