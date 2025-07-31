@@ -9,12 +9,12 @@ datasource db {
 
 model User {
   id                String               @id @default(uuid())
-  password          String
-  firstName         String
-  lastName          String
+  password          String?
+  firstName         String?
+  lastName          String?
   email             String               @unique
-  phone             String
-  role              UserRole
+  phone             String?
+  role              UserRole             @default(CLIENT)
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
   departmentId      String?
@@ -42,6 +42,10 @@ model User {
   favorites         UserFavoriteEntity[]
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
+  
+  // NextAuth.js relations
+  accounts          Account[]
+  sessions          Session[]
 
   @@index([departmentId])
 }
@@ -437,4 +441,45 @@ enum LawyerRequestStatus {
   ACCEPTED
   REJECTED
   COMPLETED
+}
+
+// NextAuth.js Models
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+ 
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
