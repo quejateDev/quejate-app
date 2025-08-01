@@ -219,7 +219,7 @@ export const usePQRForm = (entityId: string, user: User | null) => {
       } else {
         toast({
           title: "Error",
-          description: "Error al crear el PQR",
+          description: "Error al crear el PQRSD",
           variant: "destructive",
         });
       }
