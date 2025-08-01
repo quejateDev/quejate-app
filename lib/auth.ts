@@ -1,87 +1,72 @@
+import NextAuth from "next-auth"
+import Google from "next-auth/providers/google"
+import Credentials from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import prisma from "./prisma"
+import { schema } from "./schema"
+import { v4 as uuid } from "uuid";
+import { encode as defaultEncode } from "next-auth/jwt";
 
-import { cookies } from "next/headers";
-import { verifyToken } from "./utils";
-import prisma from "./prisma";
-import { User } from "@/types/user";
+const adapter = PrismaAdapter(prisma);
 
-export async function getUserIdFromToken(): Promise<string | null> {
-  const cookieStore = await cookies();
-  const tokenCookie = cookieStore.get("token");
+export const { auth, handlers, signIn } = NextAuth({
+    adapter,
+    providers: [Google, 
+        Credentials({
+            credentials: {
+                email: {},
+                password: {},
+            },
 
-  if (!tokenCookie?.value) return null;
+            authorize: async (credentials) => {
+            
+            const validatedCredentials = schema.parse(credentials);
+            const user = await prisma.user.findFirst({
+                where: { 
+                    email: validatedCredentials.email, 
+                    password: validatedCredentials?.password 
+                },
+            });
 
-  try {
-    const decoded = await verifyToken(tokenCookie.value);
-    return decoded?.id || null;
-  } catch (error) {
-    console.error("Error al verificar el token:", error);
-    return null;
-  }
-}
-
-export async function getCurrentUser(): Promise<User | null> {
-  try {
-    const userId = await getUserIdFromToken();
-    if (!userId) return null;
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        profilePicture: true,
-        phone: true,
-        role: true,
-        followers: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true
-          }
-        },
-        following: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true
-          }
-        },
-        _count: {
-          select: {
-            followers: true,
-            following: true,
-            PQRS: true
-          }
-        }
-      }
-    });
-
-    if (!user) return null;
-
-    let isFollowing = false;
-    if (userId) {
-      const followCheck = await prisma.user.findFirst({
-        where: {
-          id: userId,
-          following: {
-            some: {
-              id: user.id
+            if (!user) {
+                throw new Error("Invalid credentials");
             }
-          }
+
+            return user;
+        },
+    }),
+    ],
+
+    callbacks: {
+        async jwt({ token, account }) {
+            if (account?.provider === "credentials") {
+                token.credentials = true;
+            }
+            return token;
+        },
+    },
+    jwt: {
+    encode: async function (params) {
+      if (params.token?.credentials) {
+        const sessionToken = uuid();
+
+        if (!params.token.sub) {
+          throw new Error("No user ID found in token");
         }
-      });
-      isFollowing = !!followCheck;
-    }
 
-    return {
-      ...user,
-      isFollowing
-    };
-  } catch (error) {
-    console.error("Error fetching current user:", error);
-    return null;
-  }
-}
+        const createdSession = await adapter?.createSession?.({
+          sessionToken: sessionToken,
+          userId: params.token.sub,
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        });
 
+        if (!createdSession) {
+          throw new Error("Failed to create session");
+        }
+
+        return sessionToken;
+      }
+      return defaultEncode(params);
+    },
+},
+})

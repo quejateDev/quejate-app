@@ -66,6 +66,7 @@
     "sonner": "^2.0.3",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "uuidv4": "^6.2.13",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"
   },
