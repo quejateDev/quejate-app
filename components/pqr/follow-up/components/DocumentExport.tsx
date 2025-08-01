@@ -421,7 +421,7 @@ export function DocumentExport({
                 )}
                 <div className="flex flex-col">
                   <span className="font-medium text-red-700">
-                    Formato PDF
+                    Tutela
                   </span>
                   <span className="text-xs text-muted-foreground">
                     Documento no editable (.pdf)
