@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { crc32 } from "crc";
+import { generateUniqueConsecutiveCode } from "@/lib/consecutiveUtils";
 
 export async function GET(req: Request) {
   try {
@@ -68,27 +68,12 @@ export async function POST(request: Request) {
 
     if (!categoryId) {
       return NextResponse.json(
-        { error: "Category ID is required" },
+        { error: 'Category ID is required' },
         { status: 400 }
       );
     }
 
-    const getInitials = (name: string): string => {
-      const words = name.split(" ").filter(word => word.length > 0);
-      let initials = words.map(word => word[0]?.toUpperCase() ?? '').join('');
-
-      if (initials.length < 2) {
-        initials = (initials + initials.charAt(0).repeat(2)).slice(0, 2);
-      } else {
-        initials = initials.slice(0, 2);
-      }
-
-      return initials;
-    };
-
-    const initials = getInitials(name);
-    const hash = crc32(name).toString(16).slice(0, 2).toUpperCase();
-    const consecutiveCode = `${initials}-${hash}`; 
+    const consecutiveCode = await generateUniqueConsecutiveCode(name);
 
     const entity = await prisma.entity.create({
       data: {
@@ -119,9 +104,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json(entity);
   } catch (error) {
-    console.error("Error creating entity:", error);
+    console.error('Error creating entity:', error);
     return NextResponse.json(
-      { error: "Error creating entity" },
+      { 
+        error: 'Error creating entity',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
