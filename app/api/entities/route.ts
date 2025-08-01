@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { crc32 } from "crc";
 
 export async function GET(req: Request) {
   try {
@@ -72,26 +73,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // for consecutive code initiality take the first 2 letter of the name
-    let consecutiveCode = name.split(" ").map((word: string) => word[0]).join("").toUpperCase();
+    const getInitials = (name: string): string => {
+      const words = name.split(" ").filter(word => word.length > 0);
+      let initials = words.map(word => word[0]?.toUpperCase() ?? '').join('');
 
-    let codeExists = true;
-
-    while (codeExists) {
-      // check if code is already in use
-      const entityWithCode = await prisma.entityConsecutive.findFirst({
-        where: {
-          code: consecutiveCode,
-        },
-      });
-
-      if (!entityWithCode) {
-        codeExists = false;
+      if (initials.length < 2) {
+        initials = (initials + initials.charAt(0).repeat(2)).slice(0, 2);
       } else {
-        // if code is already in use, add another letter
-        consecutiveCode = `${consecutiveCode}${name.split(" ").map((word: string) => word[0]).join("").toUpperCase()}`;
+        initials = initials.slice(0, 2);
       }
-    }
+
+      return initials;
+    };
+
+    const initials = getInitials(name);
+    const hash = crc32(name).toString(16).slice(0, 2).toUpperCase();
+    const consecutiveCode = `${initials}-${hash}`; 
 
     const entity = await prisma.entity.create({
       data: {
