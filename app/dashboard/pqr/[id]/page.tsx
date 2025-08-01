@@ -71,7 +71,7 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             <div className="font-semibold">Fecha de creación:</div>
             <div>{formatDate(pqr.createdAt)}</div>
 
-            <div className="font-semibold">Plazo máximo de respuesta:</div>
+            <div className="font-semibold">Fecha límite de respuesta:</div>
             <div>{formatDateWithoutTime(calculateDueDate(pqr.createdAt))}</div>
 
             <div className="font-semibold">Estado:</div>
