@@ -28,9 +28,9 @@ export async function GET(req: Request) {
         email: true,
         municipalityId: true,
         regionalDepartmentId: true,
-        category: { select: { id: true, name: true } }
+        category: { select: { id: true, name: true } },
+        _count: { select: { pqrs: true } }
       },
-      _count: { select: { pqrs: true } },
     });
 
     const departmentMap = new Map<string, string>();
