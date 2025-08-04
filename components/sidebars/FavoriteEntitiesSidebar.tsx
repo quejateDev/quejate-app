@@ -100,13 +100,13 @@ const EntityItem: React.FC<{
         </Link>
         
         <div className="mt-1 space-y-1">
-          {entity.RegionalDepartment && (
+          {entity.department && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="h-3 w-3 shrink-0" />
               <span>
-                {formatText(entity.RegionalDepartment.name)}
-                {entity.Municipality && 
-                  `, ${formatText(entity.Municipality.name)}`}
+                {formatText(entity.department)}
+                {entity.municipality && 
+                  `, ${formatText(entity.municipality)}`}
               </span>
             </div>
           )}
@@ -146,8 +146,7 @@ const FavoritesSidebar: React.FC<{
 
   const availableEntities = entities.filter(entity => {
     const isFavorite = favorites.some((fav: Entity) => fav.id === entity.id);
-    const matchesSearch = entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         entity.category.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = entity.name.toLowerCase().includes(searchTerm.toLowerCase());
     return !isFavorite && matchesSearch;
   });
 
