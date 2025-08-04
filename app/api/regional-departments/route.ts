@@ -1,27 +1,18 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-
+import data from "@/data/colombia-geo.json";
 
 export async function GET() {
   try {
-    const departments = await prisma.regionalDepartment.findMany({
-      orderBy: {
-        name: "asc",
-      },
-      include: {
-        Municipality: { 
-          select: { name: true },
-        },
-      },
-    });
+    const sortedDepartments = data.departments.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
 
-    return NextResponse.json(departments);
+    return NextResponse.json(sortedDepartments);
   } catch (error) {
-    console.error("Error fetching regional departments:", error);
+    console.error("Error fetching departments:", error);
     return NextResponse.json(
-      { error: "Error fetching regional departments" },
+      { error: "Error fetching departments" },
       { status: 500 }
     );
   }
 }
-
