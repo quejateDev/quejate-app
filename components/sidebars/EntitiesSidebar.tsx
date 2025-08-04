@@ -146,11 +146,11 @@ export default function EntitiesSidebar({ className = "" }: EntitiesSidebarProps
                   <p className="text-xs text-muted-foreground truncate">
                     {entity.category.name}
                   </p>
-                  {entity.Municipality && (
+                  {entity.municipality && (
                     <div className="flex items-center gap-1 mt-1">
                       <MapPin className="h-3 w-3 text-muted-foreground" />
                       <p className="text-xs text-muted-foreground truncate">
-                        {formatText(entity.Municipality.name)}
+                        {formatText(entity.municipality)}
                       </p>
                     </div>
                   )}
