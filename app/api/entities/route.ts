@@ -27,19 +27,29 @@ export async function GET(req: Request) {
       orderBy: {
         name: "asc",
       },
-      include: {
-        category: {
-          select: {
-            name: true,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        createdAt: true,
+        imageUrl: true,
+        email: true,
+        category:
+          {
+            select: {
+              id: true,
+              name: true,
+            },
           },
-        },
         Municipality: {
           select: {
+            id: true,
             name: true,
           },
         },
         RegionalDepartment: {
           select: {
+            id: true,
             name: true,
           },
         },
