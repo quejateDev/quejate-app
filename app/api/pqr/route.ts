@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
               })),
             },
           },
-          consecutiveCode: `${consecutiveCode.code}-${fechaConsecutivo}-${consecutiveCode.consecutive}`,
+          consecutiveCode: `${consecutiveCode.code}-${fechaConsecutivo}`,
         },
         include: {
           department: true, 

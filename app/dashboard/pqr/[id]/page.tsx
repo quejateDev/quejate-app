@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/dateUtils";
+import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
 import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqr/pqr-custom-fields";
-import { typeMap } from "@/constants/pqrMaps";
+import { statusMap, typeMap } from "@/constants/pqrMaps";
+import { calculateDueDate } from "@/utils/dateHelpers";
 
 interface PQRDetailPageProps {
   params: Promise<{ id: string }>;
@@ -70,23 +71,13 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             <div className="font-semibold">Fecha de creación:</div>
             <div>{formatDate(pqr.createdAt)}</div>
 
-            <div className="font-semibold">Fecha de vencimiento:</div>
-            <div>{formatDate(pqr.dueDate)}</div>
+            <div className="font-semibold">Fecha límite de respuesta:</div>
+            <div>{formatDateWithoutTime(calculateDueDate(pqr.createdAt))}</div>
 
             <div className="font-semibold">Estado:</div>
             <div>
-              <Badge
-                variant={
-                  remainingDays <= 0
-                    ? "destructive"
-                    : remainingDays <= 3
-                    ? "warning"
-                    : "default"
-                }
-              >
-                {remainingDays <= 0
-                  ? "Vencido"
-                  : `${remainingDays} días restantes`}
+              <Badge variant={statusMap[pqr.status].variant}>
+                {statusMap[pqr.status].label}
               </Badge>
             </div>
 

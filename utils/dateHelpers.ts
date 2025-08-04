@@ -45,3 +45,17 @@ export function calculateBusinessDaysExceeded(createdAt: Date, daysThreshold = 1
 
     return exceededDays;
 }
+
+export function calculateDueDate(createdAt: Date, businessDaysToAdd = 15): Date {
+    const dueDate = new Date(createdAt);
+    let businessDaysCount = 0;
+    
+    while (businessDaysCount < businessDaysToAdd) {
+        dueDate.setDate(dueDate.getDate() + 1);
+        if (isBusinessDay(dueDate, COLOMBIAN_HOLIDAYS)) {
+            businessDaysCount++;
+        }
+    }
+    
+    return dueDate;
+}

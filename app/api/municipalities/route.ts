@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import data from "@/data/colombia-geo.json";
 
 export async function GET(request: Request) {
   try {
@@ -13,16 +13,22 @@ export async function GET(request: Request) {
       );
     }
 
-    const municipalities = await prisma.municipality.findMany({
-      where: {
-        regionalDepartmentId: departmentId,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
+    const department = data.departments.find(
+      (dept) => dept.id === departmentId
+    );
 
-    return NextResponse.json(municipalities);
+    if (!department) {
+      return NextResponse.json(
+        { error: "Department not found" },
+        { status: 404 }
+      );
+    }
+
+    const sortedMunicipalities = department.municipalities.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    return NextResponse.json(sortedMunicipalities);
   } catch (error) {
     console.error("Error fetching municipalities:", error);
     return NextResponse.json(
