@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generateUniqueConsecutiveCode } from "@/lib/consecutiveUtils";
+import geoData from "@/data/colombia-geo.json";
 
 export async function GET(req: Request) {
   try {
@@ -11,47 +12,51 @@ export async function GET(req: Request) {
     let whereClause = {};
 
     if (municipalityId) {
-      whereClause = {
-        municipalityId: municipalityId,
-      };
+      whereClause = { municipalityId };
     } else if (departmentId) {
-      whereClause = {
-        Municipality: {
-          regionalDepartmentId: departmentId,
-        },
-      };
+      whereClause = { regionalDepartmentId: departmentId };
     }
 
     const entities = await prisma.entity.findMany({
       where: whereClause,
-      orderBy: {
-        name: "asc",
-      },
-      include: {
-        category: {
-          select: {
-            name: true,
-          },
-        },
-        Municipality: {
-          select: {
-            name: true,
-          },
-        },
-        RegionalDepartment: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            pqrs: true,
-          },
-        },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        imageUrl: true,
+        email: true,
+        municipalityId: true,
+        regionalDepartmentId: true,
+        category: { select: { id: true, name: true } },
+        _count: { select: { pqrs: true } }
       },
     });
 
-    return NextResponse.json(entities);
+    const departmentMap = new Map<string, string>();
+    const municipalityMap = new Map<string, {name: string, departmentId: string}>();
+
+    geoData.departments.forEach(dept => {
+      departmentMap.set(dept.id, dept.name);
+      dept.municipalities.forEach(mun => {
+        municipalityMap.set(mun.id, {name: mun.name, departmentId: dept.id});
+      });
+    });
+
+    const enrichedEntities = entities.map(entity => {
+      const municipalityInfo = entity.municipalityId ? municipalityMap.get(entity.municipalityId) : null;
+      const departmentName = entity.regionalDepartmentId 
+        ? departmentMap.get(entity.regionalDepartmentId) 
+        : (municipalityInfo ? departmentMap.get(municipalityInfo.departmentId) : null);
+
+      return {
+        ...entity,
+        municipality: municipalityInfo?.name || null,
+        department: departmentName || null
+      };
+    });
+
+    return NextResponse.json(enrichedEntities);
   } catch (error) {
     console.error("Error fetching entities:", error);
     return NextResponse.json(

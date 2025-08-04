@@ -9,12 +9,8 @@ export interface Entity {
   category: {
     name: string;
   };
-  RegionalDepartment?: {
-    name: string;
-  };
-  Municipality?: {
-    name: string;
-  };
+  municipality?: string | null;
+  department?: string | null; 
   _count?: {
     pqrs: number;
   };

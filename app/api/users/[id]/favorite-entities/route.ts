@@ -1,18 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserIdFromToken } from "@/lib/auth";
+import geoData from "@/data/colombia-geo.json";
 
-export async function GET( request: NextRequest, { params }: any) {
+export async function GET(request: NextRequest, { params }: any) {
   try {
     const { id: userId } = await params;
     const currentUserId = await getUserIdFromToken();
 
     if (!currentUserId) {
-        return NextResponse.json(
-          { error: "No autorizado, inicie sesión nuevamente" },
-          { status: 401 }
-        );
-      }
+      return NextResponse.json(
+        { error: "No autorizado, inicie sesión nuevamente" },
+        { status: 401 }
+      );
+    }
+
+    const departmentMap = new Map<string, string>();
+    const municipalityMap = new Map<string, { name: string, departmentId: string }>();
+
+    geoData.departments.forEach(dept => {
+      departmentMap.set(dept.id, dept.name);
+      dept.municipalities.forEach(mun => {
+        municipalityMap.set(mun.id, {
+          name: mun.name,
+          departmentId: dept.id
+        });
+      });
+    });
 
     const favorites = await prisma.userFavoriteEntity.findMany({
       where: { userId },
@@ -21,39 +35,31 @@ export async function GET( request: NextRequest, { params }: any) {
           select: {
             id: true,
             name: true,
-            description: true,
             imageUrl: true,
-            isVerified: true,
-            category: {
-              select: {
-                name: true
-              }
-            },
-            Municipality: {
-              select: {
-                name: true,
-              }
-            },
-            RegionalDepartment: {
-              select: {
-                name: true
-              }
-            },
-            _count: {
-              select: {
-                pqrs: true
-              }
-            }
-          }
-        }
+            municipalityId: true,
+            regionalDepartmentId: true,
+          },
+        },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(favorites.map(fav => fav.entity));
+    const result = favorites.map((fav) => {
+      const entity = fav.entity;
+      const municipalityInfo = entity.municipalityId ? municipalityMap.get(entity.municipalityId) : null;
+      
+      const departmentName = entity.regionalDepartmentId 
+        ? departmentMap.get(entity.regionalDepartmentId)
+        : (municipalityInfo ? departmentMap.get(municipalityInfo.departmentId) : null);
 
+      return {
+        ...entity,
+        municipality: municipalityInfo?.name || null,
+        department: departmentName || null
+      };
+    });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching favorites:", error);
     return NextResponse.json(
