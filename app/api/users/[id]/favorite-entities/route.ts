@@ -5,7 +5,7 @@ import geoData from "@/data/colombia-geo.json";
 
 export async function GET(request: NextRequest, { params }: any) {
   try {
-    const { id: userId } = params;
+    const { id: userId } = await params;
     const currentUserId = await getUserIdFromToken();
 
     if (!currentUserId) {
