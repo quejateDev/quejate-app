@@ -9,10 +9,9 @@ datasource db {
 
 model User {
   id                String               @id @default(uuid())
-  password          String
-  firstName         String?
-  lastName          String?
-  email             String               @unique
+  password          String?
+  name         String?
+  email             String?               @unique
   phone             String?
   role              UserRole             @default(CLIENT)
   createdAt         DateTime             @default(now())
@@ -25,7 +24,7 @@ model User {
   entityId          String?
   isActive          Boolean              @default(true)
   isVerified        Boolean              @default(false)
-  profilePicture    String?
+  image    String?
   comments          Comment[]
   EmailVerification EmailVerification[]
   EntityHasUser     EntityHasUser[]
