@@ -475,10 +475,11 @@ model Session {
 }
 
 model VerificationToken {
-  identifier String
-  token      String
+  id         String   @id @default(cuid())
+  email      String
+  token      String @unique
   expires    DateTime
- 
-  @@unique([identifier, token])
+
+  @@unique([email, token])
   @@map("verification_tokens")
 }
