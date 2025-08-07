@@ -39,7 +39,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         verificationToken.token
     );
 
-    return { success: "Usuario registrado con éxito" };
+    return { success: "Se ha enviado un correo de verificación" };
 }
 
  
