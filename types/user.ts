@@ -3,13 +3,11 @@ export interface User extends UserBasic {
   isFollowing: boolean;
   followers: Array<{
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string | null;
   }>;
   following: Array<{
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string | null;
   }>;
   _count: {
     followers: number;
