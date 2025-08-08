@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import bcrypt from 'bcryptjs';
+import { currentUser } from "@/lib/auth";
 
 export async function GET(
   request: Request,
@@ -9,30 +9,27 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         email: true,
-        profilePicture: true,
+        image: true,
         role: true,
         phone: true,
         followers: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
           }
         },
         following: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
           }
         },
         _count: {
@@ -56,7 +53,7 @@ export async function GET(
     if (currentUserId) {
       const followCheck = await prisma.user.findFirst({
         where: {
-          id: currentUserId,
+          id: currentUserId.id,
           following: {
             some: {
               id: user.id,
@@ -93,8 +90,8 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const currentUserId = await getUserIdFromToken();
-    
+    const currentUserId = await currentUser();
+
     if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -102,7 +99,7 @@ export async function PATCH(
       );
     }
 
-    if (currentUserId !== id) {
+    if (currentUserId.id !== id) {
       return NextResponse.json(
         { error: "No tienes permiso para actualizar este perfil" },
         { status: 403 }
@@ -121,13 +118,12 @@ export async function PATCH(
 
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: { profilePicture: body.profilePicture },
+        data: { image: body.profilePicture },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          name: true,
           email: true,
-          profilePicture: true
+          image: true
         }
       });
 
@@ -175,9 +171,9 @@ export async function PATCH(
         select: { password: true }
       });
 
-      if (!user) {
+      if (!user || !user.password) {
         return NextResponse.json(
-          { error: "Usuario no encontrado" },
+          { error: "Usuario no encontrado o no tiene contraseña establecida" },
           { status: 404 }
         );
       }
@@ -200,11 +196,10 @@ export async function PATCH(
       data: updateData,
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         email: true,
         phone: true,
-        profilePicture: true
+        image: true
       }
     });
 

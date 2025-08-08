@@ -14,19 +14,7 @@ export async function GET(request: Request) {
       where: {
         OR: [
           {
-            firstName: {
-              contains: query,
-              mode: "insensitive",
-            },
-          },
-          {
-            lastName: {
-              contains: query,
-              mode: "insensitive",
-            },
-          },
-          {
-            lastName: {
+            name: {
               contains: query,
               mode: "insensitive",
             },
@@ -35,8 +23,7 @@ export async function GET(request: Request) {
       },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         role: true,
       },
       take: 5,

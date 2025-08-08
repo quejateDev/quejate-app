@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const userId = await getUserIdFromToken();
-    if (!userId) {
+    const currentUserId = await currentUser();
+    if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -13,13 +13,12 @@ export async function GET() {
     }
 
     const lawyer = await prisma.lawyer.findUnique({
-      where: { userId },
+      where: { userId: currentUserId?.id },
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
             email: true,
             phone: true,
             isVerified: true
@@ -57,8 +56,8 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    const userId = await getUserIdFromToken();
-    if (!userId) {
+    const currentUserId = await currentUser();
+    if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -69,7 +68,7 @@ export async function PATCH(request: Request) {
     const { description, feePerHour, specialties } = body;
 
     const existingLawyer = await prisma.lawyer.findUnique({
-      where: { userId }
+      where: { userId: currentUserId?.id }
     });
 
     if (!existingLawyer) {
@@ -80,7 +79,7 @@ export async function PATCH(request: Request) {
     }
 
     const updatedLawyer = await prisma.lawyer.update({
-      where: { userId },
+      where: { userId: currentUserId?.id },
       data: {
         description: description || existingLawyer.description,
         feePerHour: feePerHour !== undefined ? feePerHour : existingLawyer.feePerHour,
@@ -89,9 +88,8 @@ export async function PATCH(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
             email: true
           }
         },

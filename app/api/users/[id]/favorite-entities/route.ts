@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import geoData from "@/data/colombia-geo.json";
+import { currentUser } from "@/lib/auth";
 
 export async function GET(request: NextRequest, { params }: any) {
   try {
     const { id: userId } = await params;
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest, { params }: any) {
 export async function POST( request: NextRequest, { params }: any) {
   try {
     const { id: userId } = await params;
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
     const { entityId } = await request.json();
 
     if (!currentUserId) {

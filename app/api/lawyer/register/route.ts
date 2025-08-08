@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import { DocumentType } from "@prisma/client";
+import { currentUser } from "@/lib/auth";
 
 interface LawyerRegistrationRequest {
   documentType: string;
@@ -16,8 +16,8 @@ interface LawyerRegistrationRequest {
 
 export async function POST(request: Request) {
   try {
-    const userId = await getUserIdFromToken();
-    if (!userId) {
+    const currentUserId = await currentUser();
+    if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const requestBody: LawyerRegistrationRequest = await request.json();
     
     const existingLawyer = await prisma.lawyer.findUnique({
-      where: { userId }
+      where: { userId: currentUserId?.id }
     });
     
     if (existingLawyer) {
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     const lawyer = await prisma.lawyer.create({
       data: {
-        userId,
+        userId: currentUserId?.id,
         documentType: requestBody.documentType as DocumentType,
         identityDocument: requestBody.identityDocument,
         identityDocumentImage: requestBody.identityDocumentImage,
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     });
 
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: currentUserId?.id },
       data: { role: 'LAWYER' }
     });
 

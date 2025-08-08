@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import { LawyerRequestStatus } from "@prisma/client";
 import { createLawyerRequestNotification, createNewRequestNotificationForLawyer } from "@/lib/helpers/notificationHelpers";
+import { currentUser } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
-
+    const currentUserId = await currentUser();
     if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -22,7 +21,7 @@ export async function GET(request: Request) {
 
     const lawyer = await prisma.lawyer.findUnique({
       where: {
-        userId: currentUserId,
+        userId: currentUserId?.id,
         user: {
           isActive: true
         }
@@ -47,11 +46,10 @@ export async function GET(request: Request) {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
+              name: true,
               email: true,
               phone: true,
-              profilePicture: true
+              image: true
             }
           },
           pqr: {
@@ -94,7 +92,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -121,7 +119,7 @@ export async function POST(request: Request) {
 
     const client = await prisma.user.findUnique({
       where: {
-        id: currentUserId,
+        id: currentUserId?.id,
         isActive: true
       }
     });
@@ -154,7 +152,7 @@ export async function POST(request: Request) {
       const pqr = await prisma.pQRS.findUnique({
         where: {
           id: pqrId,
-          creatorId: currentUserId
+          creatorId: currentUserId?.id
         }
       });
 
@@ -168,7 +166,7 @@ export async function POST(request: Request) {
 
     const lawyerRequest = await prisma.lawyerRequest.create({
       data: {
-        userId: currentUserId,
+        userId: currentUserId?.id,
         lawyerId: lawyer.id,
         pqrId: pqrId || null,
         message,
@@ -179,8 +177,7 @@ export async function POST(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
+            name: true,
             email: true
           }
         },
@@ -188,8 +185,7 @@ export async function POST(request: Request) {
           include: {
             user: {
               select: {
-                firstName: true,
-                lastName: true,
+                name: true,
                 email: true
               }
             }
@@ -205,7 +201,7 @@ export async function POST(request: Request) {
       }
     });
 
-    const clientName = `${lawyerRequest.user.firstName} ${lawyerRequest.user.lastName}`;
+    const clientName = `${lawyerRequest.user.name}`;
     await createNewRequestNotificationForLawyer(
       lawyer.id,
       clientName,
@@ -226,8 +222,8 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
-    
+    const currentUserId = await currentUser();
+
     if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -246,7 +242,7 @@ export async function PATCH(request: Request) {
 
     const lawyer = await prisma.lawyer.findUnique({
       where: { 
-        userId: currentUserId,
+        userId: currentUserId?.id,
         user: {
           isActive: true
         }
@@ -297,8 +293,7 @@ export async function PATCH(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
+            name: true,
             email: true
           }
         },
@@ -306,8 +301,7 @@ export async function PATCH(request: Request) {
           include: {
             user: {
               select: {
-                firstName: true,
-                lastName: true
+                name: true
               }
             }
           }
@@ -317,7 +311,7 @@ export async function PATCH(request: Request) {
     });
 
     if (newStatus === 'ACCEPTED' || newStatus === 'REJECTED') {
-      const lawyerName = `${updatedRequest.lawyer.user.firstName} ${updatedRequest.lawyer.user.lastName}`;
+      const lawyerName = `${updatedRequest.lawyer.user.name}`;
       const notificationType = newStatus === 'ACCEPTED' ? 'lawyer_request_accepted' : 'lawyer_request_rejected';
       
       await createLawyerRequestNotification(
