@@ -219,7 +219,7 @@ export async function POST(req: NextRequest) {
     if (pqr.creator?.email) {
       await sendPQRCreationEmail(
         pqr.creator?.email,
-        pqr.creator?.firstName || "John Doe",
+        pqr.creator?.name || "John Doe",
         "Registro exitoso de PQR @quejate.com.co",
         pqr.consecutiveCode,
         new Date(pqr.createdAt).toLocaleString("es-CO", {
