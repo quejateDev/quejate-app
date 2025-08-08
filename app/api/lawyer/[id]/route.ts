@@ -14,9 +14,8 @@ export async function GET(
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
+              name: true,
+              image: true,
               email: true,
               isVerified: true
             }
