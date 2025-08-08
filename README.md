@@ -1,8 +1,8 @@
-# Sistema de Gestión de PQRS (PQR Management System)
+# Sistema de Gestión de PQRSD (PQRSD Management System)
 
 ## 📋 Descripción
 
-Sistema web moderno y escalable para la gestión de Peticiones, Quejas, Reclamos y Sugerencias (PQRS). Permite a los usuarios enviar y dar seguimiento a sus solicitudes, mientras proporciona a las organizaciones herramientas poderosas para su gestión.
+Sistema web moderno y escalable para la gestión de Peticiones, Quejas, Reclamos, Sugerencias y Denuncias (PQRSD). Permite a los usuarios enviar y dar seguimiento a sus solicitudes, mientras proporciona a las organizaciones herramientas poderosas para su gestión.
 
 ## ✨ Características Principales
 
@@ -25,28 +25,10 @@ Sistema web moderno y escalable para la gestión de Peticiones, Quejas, Reclamos
   - Comentarios y respuestas
   - Compartir PQRS (si no es privado)
 
-### 👨‍💼 Para Administradores
-
-- **Gestión Organizacional**
-  - Creación y administración de entidades
-  - Configuración de departamentos y áreas
-  - Asignación de roles y permisos
-
-- **Configuración de PQRS**
-  - Campos personalizados por departamento
-  - Tiempos de respuesta configurables
-  - Plantillas de respuesta
-  - Reglas de asignación automática
-
-- **Análisis y Reportes**
-  - Dashboard con métricas clave
-  - Reportes exportables
-  - Estadísticas de rendimiento
-
 ## 🛠️ Stack Tecnológico
 
 ### Frontend
-- **Next.js 14** - Framework React con App Router
+- **Next.js 15** - Framework React con App Router
 - **TypeScript** - Tipado estático
 - **Shadcn UI** - Componentes reutilizables
 - **Tailwind CSS** - Estilos utilitarios
@@ -58,6 +40,7 @@ Sistema web moderno y escalable para la gestión de Peticiones, Quejas, Reclamos
 - **Prisma ORM** - ORM para base de datos
 - **PostgreSQL** - Base de datos principal
 - **AWS S3** - Almacenamiento de archivos
+- **Lambda Function** - Generación de documentos legales usando API de GPT
 - **NextAuth.js** - Autenticación y autorización
 
 ## 📁 Estructura del Proyecto
@@ -100,6 +83,12 @@ DATABASE_URL="postgresql://user:password@localhost:5432/pqrs"
 # Autenticación
 NEXTAUTH_SECRET="tu-secreto-seguro"
 NEXTAUTH_URL="http://localhost:3000"
+AUTH_SECRET="authkey"
+
+# OAuth
+AUTH_GOOGLE_ID="key"
+AUTH_GOOGLE_SECRET="key"
+
 
 # AWS S3
 AWS_ACCESS_KEY_ID="tu-access-key"
@@ -110,6 +99,23 @@ AWS_BUCKET="nombre-del-bucket"
 # Configuración de la aplicación
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NEXT_PUBLIC_APP_NAME="Sistema PQRS"
+
+# Lambda Function
+NEXT_PUBLIC_API_GATEWAY_URL="https://clave.execute-api.region.amazonaws.com/default/name"
+
+# Resend
+AUTH_RESEND_KEY="key"
+RESEND_API_KEY="key"
+EMAIL_FROM="email"
+
+# API GPT
+OPENAI_API_KEY="key"
+
+# RECAPTCHA
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY="key"
+RECAPTCHA_SECRET_KEY="key"
+
+
 ```
 
 ### Instalación y Ejecución
