@@ -2,6 +2,7 @@ import { Sora, Be_Vietnam_Pro } from "next/font/google";
 import { Providers } from "./providers";
 import { Metadata } from "next";
 import "@/app/globals.css"; 
+import { SessionProvider } from "next-auth/react"
 
 const sora = Sora({
   subsets: ["latin"],
@@ -35,9 +36,11 @@ export default function RootLayout({
         <link rel="icon" href="/IsotipoVector.svg" type="image/svg+xml" />
       </head>
       <body className="font-sans antialiased"> 
-        <Providers>
-          {children}
-        </Providers>
+        <SessionProvider>
+          <Providers>
+            {children}
+          </Providers>
+        </SessionProvider>
       </body>
     </html>
   );

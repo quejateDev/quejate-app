@@ -2,15 +2,13 @@
 
 import { PQRCard } from "./PQRCard";
 import { PQR } from "@/types/pqrsd";
-import { User } from "@/types/user";
 
 
 interface PQRListProps {
   pqrs: PQR[];
-  currentUser: User | null;
 }
 
-export default function PQRList({ pqrs, currentUser }: PQRListProps) {
+export default function PQRList({ pqrs }: PQRListProps) {
 
   return (
     <div className="space-y-6">
@@ -19,7 +17,6 @@ export default function PQRList({ pqrs, currentUser }: PQRListProps) {
           key={pqr.id}
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
-          user={currentUser || null}
           isUserProfile={false}
         />
       ))}

@@ -9,19 +9,25 @@ import { useLike } from "../../hooks/useLike";
 import { useVideoPlayback } from "../../hooks/useVideoPlayback";
 import { useComments } from "../../hooks/useComments";
 import { PQR } from "@/types/pqrsd";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export type PQRCardProps = {
   pqr: PQR;
   initialLiked?: boolean;
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-  } | null;
   isUserProfile?: boolean;
 };
 
-export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false }: PQRCardProps) {
+export function PQRCard({ pqr, initialLiked = false, isUserProfile = false }: PQRCardProps) {
+  const user = useCurrentUser();
+
+  const commentUser = user ? {
+    id: user.id,
+    name: user.name ?? 'Usuario', 
+    image: user.image ?? null,
+    email: user.email ?? null
+  } : undefined;
+
+  console.log("Current user:", user);
   const shouldShowCard = !pqr.private || isUserProfile || (user?.id && pqr.creator?.id === user.id);
   const { liked, likeCount } = useLike(
     pqr.id,
@@ -74,7 +80,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
             {showComments && (
               <CommentSection
                 pqrId={pqr.id}
-                user={user}
+                user={commentUser}
                 initialComments={localComments}
                 onCommentSubmit={handleCommentSubmit}
                 onCommentCreated={addLocalComment}
@@ -107,7 +113,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
             {showComments && (
             <CommentSection
               pqrId={pqr.id}
-              user={user}
+              user={commentUser}
               initialComments={localComments}
               onCommentSubmit={handleCommentSubmit}
               onCommentCreated={addLocalComment}
