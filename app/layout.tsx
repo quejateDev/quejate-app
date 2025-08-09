@@ -3,6 +3,7 @@ import { Providers } from "./providers";
 import { Metadata } from "next";
 import "@/app/globals.css"; 
 import { SessionProvider } from "next-auth/react"
+import { LoginModalProvider } from "@/providers/LoginModalProvider";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body className="font-sans antialiased"> 
         <SessionProvider>
           <Providers>
-            {children}
+            <LoginModalProvider>
+              {children}
+            </LoginModalProvider>
           </Providers>
         </SessionProvider>
       </body>

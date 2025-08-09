@@ -2,12 +2,11 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 
 import "../globals.css";
 import NavbarDashboard from "@/components/Navbar/NavbarDashboard";
-import LoginModalProvider from "@/providers/LoginModalProivder";
-import LoginModal from "@/components/modals/LoginModal";
 import Footer from "@/components/footer";
 import { currentUser } from "@/lib/auth";
 import { getFullUserWithFollowingStatus } from "@/data/user";
 import { UserProvider } from "@/components/UserProvider";
+import { LoginModalProvider } from "@/providers/LoginModalProvider";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const sessionUser = await currentUser();
@@ -24,7 +23,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <NavbarDashboard />
             </div>
             <div className="flex-1 w-full mx-auto">
-              <LoginModal />
               {children}
             </div>
           </LoginModalProvider>

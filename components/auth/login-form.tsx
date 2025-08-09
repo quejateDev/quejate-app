@@ -14,10 +14,12 @@ import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";  
 import Link from "next/link";
+import { useLoginModal } from "@/providers/LoginModalProvider";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Correo usado en otra cuenta" : "";
+  const { setIsOpen } = useLoginModal();
 
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -40,6 +42,10 @@ export const LoginForm = () => {
         .then((data) => {
           setError(data?.error);
           setSuccess(data?.success);
+
+          if (data?.success) {
+            setIsOpen(false);
+          }
         })
     });
   }

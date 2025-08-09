@@ -9,14 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { LogIn, LogOut, User, Scale, MailPlus } from "lucide-react";
-import { useLoginModal } from "@/providers/LoginModalProivder";
-import { Button } from "./ui/button";
 import { useFullUser } from "./UserProvider";
 import { signOut } from "next-auth/react"
 
 export default function AvatarMenu() {
   const userProfile = useFullUser();
-  const { setIsOpen } = useLoginModal();
 
   const handleLogout = () => {
     signOut({ callbackUrl: "/dashboard" });
@@ -85,17 +82,13 @@ export default function AvatarMenu() {
         ) : (
           <>
             <DropdownMenuItem asChild>
-              <Button
-                onClick={() => setIsOpen(true)}
-                variant="ghost"
-                className="flex items-center gap-2"
-              >
+              <Link href="/auth/login" className="flex items-center gap-2 w-full">
                 <LogIn className="h-4 w-4" />
                 <span>Iniciar Sesión</span>
-              </Button>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/signup" className="flex items-center gap-2 w-full">
+              <Link href="/auth/register" className="flex items-center gap-2 w-full">
                 <User className="h-4 w-4" />
                 <span>Registrarme</span>
               </Link>

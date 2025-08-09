@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { toggleLike } from "@/services/api/pqr.service";
-import useAuthStore from "@/store/useAuthStore";
+import { useCurrentUser } from "./use-current-user";
 
 export function useLike(pqrId: string, initialLiked: boolean, initialLikeCount: number) {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuthStore();
+  const user = useCurrentUser();
 
   const handleLike = async () => {
     if (!user || !user.id) {

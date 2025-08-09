@@ -12,23 +12,19 @@ import useNotificationStore from "@/store/useNotificationStore";
 import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import useAuthStore from "@/store/useAuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Notification } from "@/types/notification";
 import Link from "next/link";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function NotificationDropdown() {
   const { notifications, unreadCount, setNotifications, markAsRead } = useNotificationStore();
-  const { token } = useAuthStore();
+  const session = useCurrentUser();
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch("/api/notifications", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch("/api/notifications");
         if (!response.ok) throw new Error("Failed to fetch notifications");
         const data = await response.json();
         setNotifications(data);
@@ -37,10 +33,10 @@ export function NotificationDropdown() {
       }
     };
 
-    if (token) {
+    if (session) {
       fetchNotifications();
     }
-  }, [token, setNotifications]);
+  }, [session, setNotifications]);
 
   const handleMarkAsRead = async (id: string) => {
     try {
@@ -48,7 +44,6 @@ export function NotificationDropdown() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ notificationId: id }),
       });
