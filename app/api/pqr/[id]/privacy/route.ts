@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 
 export async function PATCH(
     request: Request,
@@ -8,7 +8,7 @@ export async function PATCH(
   ) {
     try {
       const { id } = await params;
-      const currentUserId = await getUserIdFromToken();
+      const currentUserId = await currentUser();
       
       if (!currentUserId) {
         return NextResponse.json(
@@ -29,7 +29,7 @@ export async function PATCH(
     const existingPqrs = await prisma.pQRS.findUnique({
       where: {
         id,
-        creatorId: currentUserId
+        creatorId: currentUserId.id
       }
     });
 
@@ -43,7 +43,7 @@ export async function PATCH(
     const updatedPqrs = await prisma.pQRS.update({
       where: {
         id,
-        creatorId: currentUserId
+        creatorId: currentUserId.id
       },
       data: {
         private: isPrivate,

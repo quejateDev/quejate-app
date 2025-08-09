@@ -1,28 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import  prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/utils";
+import { currentUser } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "No token provided" },
-        { status: 401 }
-      );
-    }
-
-    const decoded = await verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 }
-      );
-    }
+    const currentUserId = await currentUser();
 
     const notifications = await prisma.notification.findMany({
       where: {
-        userId: decoded.id,
+        userId: currentUserId?.id,
       },
       orderBy: {
         createdAt: "desc",

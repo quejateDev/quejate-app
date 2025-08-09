@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getUserIdFromToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { currentUser } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const { lawyerId, score, comment } = await request.json();
 
-    if (currentUserId === lawyerId) {
+    if (currentUserId.id === lawyerId) {
       return NextResponse.json(
         { error: "No puedes calificarte a ti mismo" },
         { status: 400 }
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const existingRating = await prisma.rating.findFirst({
       where: {
         lawyerId: lawyer.id,
-        clientId: currentUserId
+        clientId: currentUserId.id
       }
     });
 
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const newRating = await prisma.rating.create({
       data: {
         lawyerId: lawyer.id,
-        clientId: currentUserId,
+        clientId: currentUserId.id,
         score,
         comment
       },

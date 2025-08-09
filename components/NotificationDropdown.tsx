@@ -94,18 +94,16 @@ export function NotificationDropdown() {
           </div>
         ) : (
           notifications.map((notification) => (
-            <Link
+            <DropdownMenuItem
               key={notification.id}
-              href={getNotificationLink(notification)}
-              legacyBehavior
-              passHref
+              asChild
+              className={`flex items-start gap-3 p-4 ${
+                !notification.read ? "bg-muted/50" : ""
+              }`}
+              onClick={() => handleMarkAsRead(notification.id)}
+            
             >
-              <DropdownMenuItem
-                className={`flex items-start gap-3 p-4 ${
-                  !notification.read ? "bg-muted/50" : ""
-                }`}
-                onClick={() => handleMarkAsRead(notification.id)}
-              >
+              <Link href={getNotificationLink(notification)}>
                 {(notification.type === "follow" || 
                 notification.type === "like" || 
                 notification.type === "comment") && (
@@ -134,8 +132,8 @@ export function NotificationDropdown() {
                     })}
                   </p>
                 </div>
-              </DropdownMenuItem>
-            </Link>
+              </Link>
+            </DropdownMenuItem>
           ))
         )}
       </DropdownMenuContent>

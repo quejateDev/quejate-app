@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import bcrypt from 'bcryptjs';
+import { currentUser } from "@/lib/auth";
 
 export async function GET(
   request: Request,
@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -56,7 +56,7 @@ export async function GET(
     if (currentUserId) {
       const followCheck = await prisma.user.findFirst({
         where: {
-          id: currentUserId,
+          id: currentUserId.id,
           following: {
             some: {
               id: user.id,
@@ -93,8 +93,8 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const currentUserId = await getUserIdFromToken();
-    
+    const currentUserId = await currentUser();
+
     if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -102,7 +102,7 @@ export async function PATCH(
       );
     }
 
-    if (currentUserId !== id) {
+    if (currentUserId.id !== id) {
       return NextResponse.json(
         { error: "No tienes permiso para actualizar este perfil" },
         { status: 403 }
@@ -179,6 +179,13 @@ export async function PATCH(
         return NextResponse.json(
           { error: "Usuario no encontrado" },
           { status: 404 }
+        );
+      }
+
+      if (!user.password || typeof user.password !== 'string') {
+        return NextResponse.json(
+          { error: "Contraseña actual incorrecta" },
+          { status: 400 }
         );
       }
 

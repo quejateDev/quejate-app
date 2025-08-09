@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 import { LawyerRequestStatus } from "@prisma/client";
 
 export async function GET(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: {
-        id: currentUserId,
+        id: currentUserId.id,
         isActive: true
       }
     });
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     }
 
     const whereConditions = {
-      userId: currentUserId,
+      userId: currentUserId.id,
       ...(status && { status })
     };
 

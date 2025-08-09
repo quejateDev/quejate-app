@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 
 export async function GET(request: Request, params: any) {
   try {
@@ -13,8 +13,8 @@ export async function GET(request: Request, params: any) {
       );
     }
 
-    const currentUserId = await getUserIdFromToken();
-    const isOwnProfile = currentUserId === requestedUserId;
+    const currentUserId = await currentUser();
+    const isOwnProfile = currentUserId?.id === requestedUserId;
 
     const userPQRs = await prisma.pQRS.findMany({
       where: {

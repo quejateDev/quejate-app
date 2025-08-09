@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import { LawyerRequestStatus } from "@prisma/client";
 import { createLawyerRequestNotification, createNewRequestNotificationForLawyer } from "@/lib/helpers/notificationHelpers";
+import { currentUser } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
     const lawyer = await prisma.lawyer.findUnique({
       where: {
-        userId: currentUserId,
+        userId: currentUserId.id,
         user: {
           isActive: true
         }
@@ -94,7 +94,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
 
     const client = await prisma.user.findUnique({
       where: {
-        id: currentUserId,
+        id: currentUserId.id,
         isActive: true
       }
     });
@@ -154,7 +154,7 @@ export async function POST(request: Request) {
       const pqr = await prisma.pQRS.findUnique({
         where: {
           id: pqrId,
-          creatorId: currentUserId
+          creatorId: currentUserId.id
         }
       });
 
@@ -168,7 +168,7 @@ export async function POST(request: Request) {
 
     const lawyerRequest = await prisma.lawyerRequest.create({
       data: {
-        userId: currentUserId,
+        userId: currentUserId.id,
         lawyerId: lawyer.id,
         pqrId: pqrId || null,
         message,
@@ -226,8 +226,8 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
-    
+    const currentUserId = await currentUser();
+
     if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -246,7 +246,7 @@ export async function PATCH(request: Request) {
 
     const lawyer = await prisma.lawyer.findUnique({
       where: { 
-        userId: currentUserId,
+        userId: currentUserId.id,
         user: {
           isActive: true
         }

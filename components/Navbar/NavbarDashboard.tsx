@@ -24,11 +24,9 @@ export default function NavbarDashboard() {
   const NavItems = () => (
     <>
       <NavigationMenuItem className="mx-2">
-        <Link href="/dashboard" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            Inicio
-          </NavigationMenuLink>
-        </Link>
+        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+          <Link href="/dashboard">Inicio</Link>
+        </NavigationMenuLink>
       </NavigationMenuItem>
     </>
   );
