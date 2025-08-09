@@ -9,40 +9,27 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { LogIn, LogOut, User, Scale, MailPlus } from "lucide-react";
-import useAuthStore from "@/store/useAuthStore";
-import { useEffect } from "react";
-import useUser from "@/hooks/useUser";
 import { useLoginModal } from "@/providers/LoginModalProivder";
 import { Button } from "./ui/button";
+import { useFullUser } from "./UserProvider";
+import { signOut } from "next-auth/react"
 
 export default function AvatarMenu() {
-  const { user } = useAuthStore();
-  const { user: userProfile, fetchUser } = useUser();
+  const userProfile = useFullUser();
   const { setIsOpen } = useLoginModal();
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchUser(user.id);
-    }
-  }, [user]);
-
-  function handleLogout() {
-    useAuthStore.getState().logout();
-    window.location.href = "/";
-  }
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/dashboard" });
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-10 w-10 border border-ring cursor-pointer">
           <AvatarImage
-            src={
-              user && userProfile?.profilePicture
-                ? userProfile.profilePicture
-                : undefined
-            }
+            src={userProfile?.profilePicture || ""}
             alt={
-              user && userProfile?.firstName ? userProfile.firstName : "User"
+              userProfile?.firstName?.[0]
             }
           />
           <AvatarFallback className="bg-muted-foreground/10">
@@ -51,10 +38,10 @@ export default function AvatarMenu() {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="px-4 py-3">
-        {user ? (
+        {userProfile ? (
           <>
             <DropdownMenuItem className="flex items-center gap-2">
-              <span>{user.email}</span>
+              <span>{userProfile.email}</span>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
@@ -65,7 +52,7 @@ export default function AvatarMenu() {
                 <span>Ver Perfil</span>
               </Link>
             </DropdownMenuItem>
-            {user.role === "CLIENT" || user.role === "LAWYER" ? (
+            {userProfile.role === "CLIENT" || userProfile.role === "LAWYER" ? (
               <DropdownMenuItem asChild>
                 <Link
                   href="/dashboard/lawyer/lawyer-requests"
@@ -76,7 +63,7 @@ export default function AvatarMenu() {
                 </Link>
               </DropdownMenuItem>
             ) : null}
-            {user.role === "LAWYER" ? (
+            {userProfile.role === "LAWYER" ? (
               <DropdownMenuItem asChild>
                 <Link
                   href="/dashboard/lawyer"

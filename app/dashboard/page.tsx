@@ -6,8 +6,8 @@ import PQRList from "@/components/pqr/pqrsd-list";
 import { Header } from "@/components/Header";
 import EntitiesSidebar from "@/components/sidebars/EntitiesSidebar";
 import UserSidebar from "@/components/sidebars/UserSidebar";
-import { currentUser } from "@/lib/auth";
-import { getFullUserWithFollowingStatus, getUsersForSidebar } from "@/data/user";
+import { getUsersForSidebar } from "@/data/user";
+import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface PageProps {
   searchParams: Promise<{
@@ -18,12 +18,7 @@ interface PageProps {
   }>;
 }
 
-export default async function DashboardPage({ searchParams }: PageProps) {
-  const sessionUser = await currentUser();
-  const fullUser = sessionUser
-    ? await getFullUserWithFollowingStatus(sessionUser.id)
-    : null;
-
+export default async function DashboardPage({ searchParams, fullUser }: PageProps & { fullUser: UserWithFollowingStatus | null }) {
   const { topUsers, discoverUsers } = await getUsersForSidebar(fullUser?.id);
 
   // Fetch entities and departments for filters
