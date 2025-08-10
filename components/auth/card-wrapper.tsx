@@ -21,24 +21,26 @@ export const CardWrapper = ({
     showSocial = false
 }: CardWrapperProps) => {
     return (
-        <Card className="w-[400px] shadow-md ">
-            <CardHeader>
-               <Header label={headerLabel} />     
-            </CardHeader>
-            <CardContent>
-                {children}
-            </CardContent>
-           {showSocial && (
-            <CardFooter>
-                <Social />
-            </CardFooter>
-           )}
-           <CardFooter className="text-center">
-            <BackButton 
-            label={backButtonLabel}
-            href={backButtonHref}
-            />
-              </CardFooter>
-        </Card>
+        <div className="flex items-center justify-center min-h-screen p-4">
+            <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white">
+                <CardHeader className="space-y-4 pb-4">
+                   <Header label={headerLabel} />     
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {children}
+                </CardContent>
+               {showSocial && (
+                <CardFooter className="pt-4">
+                    <Social />
+                </CardFooter>
+               )}
+               <CardFooter className="text-center pt-2 pb-6">
+                <BackButton 
+                label={backButtonLabel}
+                href={backButtonHref}
+                />
+                  </CardFooter>
+            </Card>
+        </div>
     );
 }

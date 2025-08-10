@@ -13,13 +13,20 @@ export const Social = () => {
     })
   }
   return (
-    <div className="flex items-center w-full gap-x-2">
+    <div className="w-full space-y-4">
+      <div className="flex items-center space-x-2">
+        <div className="flex-1 h-px bg-gray-300"></div>
+        <span className="text-sm text-gray-500 bg-white px-2">o</span>
+        <div className="flex-1 h-px bg-gray-300"></div>
+      </div>
       <Button 
         size="lg" 
-        className="w-full bg-white"
+        variant="outline"
+        className="w-full bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 flex items-center justify-center gap-2"
         onClick={() => onClick("google")}
       >
         <FcGoogle className="w-5 h-5" />
+        <span>Continuar con Google</span>
       </Button>
     </div>
   );
