@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import LoginForm from "@/components/auth/login-form";
+import LoginFormModal from "@/components/auth/login-form-modal";
 
 interface LoginModalContextType {
   isOpen: boolean;
@@ -21,8 +21,8 @@ export const LoginModalProvider = ({ children }: { children: React.ReactNode }) 
     <LoginModalContext.Provider value={{ isOpen, setIsOpen }}>
       {children}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md p-6">
-          <LoginForm />
+        <DialogContent className="sm:max-w-[300px] p-6 bg-white">
+          <LoginFormModal/>
         </DialogContent>
       </Dialog>
     </LoginModalContext.Provider>

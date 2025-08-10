@@ -5,8 +5,10 @@ import LoginForm from "@/components/auth/login-form";
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Cargando formulario...</div>}>
-      <LoginForm />
-    </Suspense>
+    <div className="w-full min-h-screen">
+      <Suspense fallback={<div>Cargando formulario...</div>}>
+        <LoginForm />
+      </Suspense>
+    </div>
   );
 }

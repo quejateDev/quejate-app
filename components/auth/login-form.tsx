@@ -18,7 +18,7 @@ import { useLoginModal } from "@/providers/LoginModalProvider";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
-  const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Correo usado en otra cuenta" : "";
+  const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Este correo ya está asociado con otra cuenta" : "";
   const { setIsOpen } = useLoginModal();
 
   const [error, setError] = useState<string | undefined>("");
@@ -52,8 +52,8 @@ export const LoginForm = () => {
 
   return (
     <CardWrapper 
-      headerLabel="Login" 
-      backButtonLabel="No tienes cuenta?" 
+      headerLabel="" 
+      backButtonLabel="¿No tienes cuenta?" 
       backButtonHref="/auth/register" 
       showSocial
     
@@ -65,19 +65,20 @@ export const LoginForm = () => {
           className="space-y-4" 
         >
 
-          <div>
+          <div className="space-y-4">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-gray-700">Correo electrónico</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="email"
                       disabled={isPending}
-                      placeholder="quejate@ejemplo.com"
+                      placeholder="tucorreo@ejemplo.com"
+                      className="h-11 border border-gray-300"
                     />
                   </FormControl>
                   <FormMessage />
@@ -89,25 +90,28 @@ export const LoginForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contraseña</FormLabel>
+                  <FormLabel className="text-gray-700">Contraseña</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
                       type="password"
-                      placeholder="*******"
+                      placeholder="••••••••"
+                      className="h-11 border border-gray-300"
                     />
                   </FormControl>
-                  <Button
-                    size="sm"
-                    variant="link"
-                    asChild
-                    className="px-0 font-normal"
-                  >
-                    <Link href="/auth/reset">
-                      Olvidaste tu contraseña?
-                    </Link>
-                  </Button>
+                  <div className="text-right">
+                    <Button
+                      size="sm"
+                      variant="link"
+                      asChild
+                      className="px-0 font-normal text-blue-600 hover:text-blue-800"
+                    >
+                      <Link href="/auth/reset">
+                        ¿Olvidaste tu contraseña?
+                      </Link>
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -118,8 +122,8 @@ export const LoginForm = () => {
           <Button
             disabled={isPending}
             type="submit"
-            className="w-full bg-blue-500 text-white hover:bg-blue-600">
-            Ingresar
+            className="w-full h-11 bg-blue-600 text-white hover:bg-blue-700 font-medium">
+            {isPending ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </form>
       </Form>

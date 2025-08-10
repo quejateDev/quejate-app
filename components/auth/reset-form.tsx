@@ -41,6 +41,7 @@ export const ResetForm = () => {
   return (
     <CardWrapper 
       headerLabel="Olvidaste tu contraseña?" 
+      headerDescription="Ingresa dirección de correo electrónico y te enviaremos un enlace de verificación para restablecer tu contraseña."
       backButtonLabel="Volver al login" 
       backButtonHref="/auth/login" 
     
@@ -65,6 +66,7 @@ export const ResetForm = () => {
                       type="email"
                       disabled={isPending}
                       placeholder="quejate@ejemplo.com"
+                      className="h-11 border border-gray-300"
                     />
                   </FormControl>
                   <FormMessage />
@@ -77,7 +79,7 @@ export const ResetForm = () => {
           <Button
             disabled={isPending}
             type="submit"
-            className="w-full bg-blue-500 text-white hover:bg-blue-600">
+            className="w-full bg-quaternary hover:bg-quaternary-dark text-white">
             Enviar enlace de restablecimiento
           </Button>
         </form>

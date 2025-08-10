@@ -7,7 +7,8 @@ import { BackButton } from "./back-button";
 
 interface CardWrapperProps {
   children: React.ReactNode;
-  headerLabel: string;
+  headerLabel?: string;
+  headerDescription?: string;
   backButtonLabel: string;
   backButtonHref: string;
   showSocial?: boolean;
@@ -16,6 +17,7 @@ interface CardWrapperProps {
 export const CardWrapper = ({
     children,
     headerLabel,
+    headerDescription,
     backButtonLabel,
     backButtonHref,
     showSocial = false
@@ -23,24 +25,24 @@ export const CardWrapper = ({
     return (
         <div className="flex items-center justify-center min-h-screen p-4">
             <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white">
-                <CardHeader className="space-y-4 pb-4">
-                   <Header label={headerLabel} />     
+                <CardHeader className="px-8 py-6">
+                   <Header label={headerLabel} description={headerDescription} />     
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {children}
-                </CardContent>
-               {showSocial && (
-                <CardFooter className="pt-4">
-                    <Social />
-                </CardFooter>
-               )}
-               <CardFooter className="text-center pt-2 pb-6">
-                <BackButton 
-                label={backButtonLabel}
-                href={backButtonHref}
-                />
-                  </CardFooter>
-            </Card>
+            <CardContent className="px-8 pb-6">
+                {children}
+            </CardContent>
+           {showSocial && (
+            <CardFooter className="px-8 pb-4">
+                <Social />
+            </CardFooter>
+           )}
+           <CardFooter className="text-center px-8 pb-6">
+            <BackButton 
+            label={backButtonLabel}
+            href={backButtonHref}
+            />
+              </CardFooter>
+        </Card>
         </div>
     );
 }
