@@ -18,8 +18,8 @@ type CommentSectionProps = {
   pqrId: string;
   user: {
     id: string;
-    name: string;
-    image?: string;
+    name: string | null;
+    image?: string | null;
   } | null;
   initialComments: Comment[];
   onCommentSubmit: (text: string) => void;
@@ -56,7 +56,7 @@ export function CommentSection({
         ...newComment,
         user: {
           id: user.id,
-          name: user.name, 
+          name: user.name || "", 
           image: user.image || "",    
         },
       };
