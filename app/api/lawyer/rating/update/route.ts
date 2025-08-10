@@ -58,9 +58,8 @@ export async function PUT(request: Request) {
         client: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true
+            name: true,
+            image: true
           }
         }
       }

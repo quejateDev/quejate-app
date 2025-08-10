@@ -42,8 +42,7 @@ export async function POST(req: NextRequest) {
       where: { id: currentUserId.id },
       select: {
         email: true,
-        firstName: true,
-        lastName: true
+        name: true
       }
     });
 
@@ -54,7 +53,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const userName = `${user.firstName} ${user.lastName}`.trim();
+    const userName = `${user.name}`.trim();
 
     await sendOversightDocumentEmail(
       oversightEntity.email,

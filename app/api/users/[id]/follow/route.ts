@@ -79,11 +79,11 @@ export async function POST(
       data: {
         userId: id,
         type: "follow",
-        message: `${updatedUser?.firstName} ha comenzado a seguirte`,
+        message: `${updatedUser?.name} ha comenzado a seguirte`,
         data: {
           followerId: updatedUser?.id,
-          followerName: updatedUser?.firstName + " " + updatedUser?.lastName,
-          followerImage: updatedUser?.profilePicture || null,
+          followerName: updatedUser?.name,
+          followerImage: updatedUser?.image || null,
         },
       },
     });

@@ -47,10 +47,9 @@ export async function GET(request: Request) {
               user: {
                 select: {
                   id: true,
-                  firstName: true,
-                  lastName: true,
+                  name: true,
                   email: true,
-                  profilePicture: true,
+                  image: true,
                   phone: true
                 }
               },

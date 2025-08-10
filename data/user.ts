@@ -32,8 +32,8 @@ export async function getUsersForSidebar(
   const allUsers = await prisma.user.findMany({
     include: {
       _count: { select: { PQRS: true, followers: true, following: true } },
-      followers: { select: { id: true, firstName: true, lastName: true } },
-      following: { select: { id: true, firstName: true, lastName: true } }
+      followers: { select: { id: true, name: true } },
+      following: { select: { id: true, name: true } }
     }
   });
 
@@ -75,8 +75,8 @@ export async function getFullUserWithFollowingStatus(
     where: { id: userId },
     include: {
       _count: { select: { PQRS: true, followers: true, following: true } },
-      followers: { select: { id: true, firstName: true, lastName: true } },
-      following: { select: { id: true, firstName: true, lastName: true } },
+      followers: { select: { id: true, name: true } },
+      following: { select: { id: true, name: true } },
     },
   });
 

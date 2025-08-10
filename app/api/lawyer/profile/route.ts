@@ -19,9 +19,8 @@ export async function GET() {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
             email: true,
             phone: true,
             isVerified: true
@@ -93,9 +92,8 @@ export async function PATCH(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
             email: true
           }
         },

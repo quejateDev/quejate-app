@@ -17,8 +17,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 interface User {
   id: string;
   username: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   role: string;
 }
 
@@ -89,7 +88,7 @@ export function UserSearchCommand() {
             {users.map((user) => (
               <CommandItem
                 key={user.id}
-                value={`${user.firstName} ${user.lastName}`}
+                value={`${user.name}`}
                 onSelect={() => handleSelect(user.id)}
                 className="flex items-center gap-2"
               >
@@ -100,7 +99,7 @@ export function UserSearchCommand() {
                 </Avatar>
                 <div className="flex flex-col">
                   <span>
-                    {user.firstName} {user.lastName}
+                    {user.name}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     @{user.username}

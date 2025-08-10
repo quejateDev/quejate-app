@@ -11,7 +11,7 @@ import Link from "next/link";
 
 interface User {
   id: string;
-  name: string;
+  name: string | null;
 }
 
 interface FollowStatsProps {

@@ -79,9 +79,8 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       creator: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
-          profilePicture: true,
+          name: true,
+          image: true,
         },
       },
       comments: {
@@ -91,9 +90,8 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           createdAt: true,
           user: {
             select: {
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
+              name: true,
+              image: true,
             },
           },
         },

@@ -15,24 +15,21 @@ export async function GET(
       where: { id },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         email: true,
-        profilePicture: true,
+        image: true,
         role: true,
         phone: true,
         followers: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
           }
         },
         following: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
           }
         },
         _count: {
@@ -110,9 +107,9 @@ export async function PATCH(
     }
 
     const bodyKeys = Object.keys(body);
-    if (bodyKeys.length === 1 && bodyKeys[0] === 'profilePicture') {
+    if (bodyKeys.length === 1 && bodyKeys[0] === 'image') {
 
-      if (!body.profilePicture || !isValidUrl(body.profilePicture)) {
+      if (!body.image || !isValidUrl(body.image)) {
         return NextResponse.json(
           { error: "URL de imagen no válida" },
           { status: 400 }
@@ -121,29 +118,28 @@ export async function PATCH(
 
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: { profilePicture: body.profilePicture },
+        data: { image: body.image },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          name: true,
           email: true,
-          profilePicture: true
+          image: true
         }
       });
 
       return NextResponse.json(updatedUser);
     }
 
-    const { firstName, lastName, phone, profilePicture, currentPassword, newPassword } = body;
+    const { name, phone, image, currentPassword, newPassword } = body;
 
-    if (!firstName || !lastName || !phone || firstName.trim() === '' || lastName.trim() === '' || phone.trim() === '') {
+    if (!name || !phone || name.trim() === '' || phone.trim() === '') {
       return NextResponse.json(
         { error: "Nombre, apellido y teléfono son requeridos" },
         { status: 400 }
       );
     }
 
-    if (profilePicture && profilePicture.trim() !== '' && !isValidUrl(profilePicture)) {
+    if (image && image.trim() !== '' && !isValidUrl(image)) {
       return NextResponse.json(
         { error: "URL de imagen no válida" },
         { status: 400 }
@@ -151,15 +147,14 @@ export async function PATCH(
     }
 
     const updateData: any = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      name: name.trim(),
       phone: phone.trim(),
     };
 
-    if (profilePicture === null || profilePicture === '') {
-      updateData.profilePicture = null;
-    } else if (profilePicture && profilePicture.trim() !== '') {
-      updateData.profilePicture = profilePicture;
+    if (image === null || image === '') {
+      updateData.image = null;
+    } else if (image && image.trim() !== '') {
+      updateData.image = image;
     }
 
     if (newPassword) {
@@ -207,11 +202,10 @@ export async function PATCH(
       data: updateData,
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         email: true,
         phone: true,
-        profilePicture: true
+        image: true
       }
     });
 

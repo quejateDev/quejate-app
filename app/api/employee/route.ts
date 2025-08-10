@@ -16,8 +16,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const {
     password,
-    firstName,
-    lastName,
+    name,
     email,
     phone,
     role,
@@ -26,8 +25,7 @@ export async function POST(request: Request) {
   const employee = await prisma.user.create({
     data: {
       password,
-      firstName,
-      lastName,
+      name,
       email,
       phone,
       role,

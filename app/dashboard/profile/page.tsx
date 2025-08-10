@@ -85,7 +85,7 @@ export default function ProfilePage() {
 
   const getFullName = () => {
     if (!userProfile) return '';
-    return `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
+    return `${userProfile.name || ''}`.trim();
   };
 
   if (!currentUser && !userLoading) {

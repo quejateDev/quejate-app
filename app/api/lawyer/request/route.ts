@@ -47,11 +47,10 @@ export async function GET(request: Request) {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
+              name: true,
               email: true,
               phone: true,
-              profilePicture: true
+              image: true
             }
           },
           pqr: {
@@ -179,8 +178,7 @@ export async function POST(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
+            name: true,
             email: true
           }
         },
@@ -188,8 +186,7 @@ export async function POST(request: Request) {
           include: {
             user: {
               select: {
-                firstName: true,
-                lastName: true,
+                name: true,
                 email: true
               }
             }
@@ -205,7 +202,7 @@ export async function POST(request: Request) {
       }
     });
 
-    const clientName = `${lawyerRequest.user.firstName} ${lawyerRequest.user.lastName}`;
+    const clientName = `${lawyerRequest.user.name}`;
     await createNewRequestNotificationForLawyer(
       lawyer.id,
       clientName,
@@ -297,8 +294,7 @@ export async function PATCH(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
+            name: true,
             email: true
           }
         },
@@ -306,8 +302,7 @@ export async function PATCH(request: Request) {
           include: {
             user: {
               select: {
-                firstName: true,
-                lastName: true
+                name: true
               }
             }
           }
@@ -317,7 +312,7 @@ export async function PATCH(request: Request) {
     });
 
     if (newStatus === 'ACCEPTED' || newStatus === 'REJECTED') {
-      const lawyerName = `${updatedRequest.lawyer.user.firstName} ${updatedRequest.lawyer.user.lastName}`;
+      const lawyerName = `${updatedRequest.lawyer.user.name}`;
       const notificationType = newStatus === 'ACCEPTED' ? 'lawyer_request_accepted' : 'lawyer_request_rejected';
       
       await createLawyerRequestNotification(
