@@ -1,9 +1,9 @@
-import PqrCreationEmail from "@/emails/pqr-creation";
-import VerificationEmail from "@/emails/VerificationEmail";
-import ResetPasswordEmail from "@/emails/ResetPasswordEmail";
-import OversightCreationEmail from "@/emails/oversight-control-creation";
+import PqrCreationEmail from "@/emails/templates/pqr-creation";
+import VerificationEmail from "@/emails/templates/VerificationEmail";
+import ResetPasswordEmail from "@/emails/templates/ResetPasswordEmail";
+import OversightCreationEmail from "@/emails/templates/oversight-control-creation";
 import { Resend } from "resend";
-import OversightNotificationEmail from "@/emails/oversight-notification";
+import OversightNotificationEmail from "@/emails/templates/oversight-notification";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
