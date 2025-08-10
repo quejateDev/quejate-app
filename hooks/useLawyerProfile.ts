@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
-import useAuthStore from "@/store/useAuthStore";
 import { LawyerData } from "@/types/lawyer-profile";
+import { useCurrentUser } from "./use-current-user";
 
 
 
@@ -14,7 +14,7 @@ export interface LawyerProfileUpdateData {
 }
 
 export const useLawyerProfile = () => {
-  const { user } = useAuthStore();
+  const user = useCurrentUser();
   const [lawyerData, setLawyerData] = useState<LawyerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

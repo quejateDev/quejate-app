@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import { DocumentType, DocumentTypeMapping } from "@/types/document-types";
-import useAuthStore from "@/store/useAuthStore";
+import { useCurrentUser } from "./use-current-user";
 
 export interface LawyerFormData {
   documentType: string;
@@ -24,7 +24,7 @@ export interface VerificationStatus {
 
 export const useLawyerRegistration = () => {
   const router = useRouter();
-  const { user: currentUser } = useAuthStore();
+  const currentUser = useCurrentUser();
   
   const [formData, setFormData] = useState<LawyerFormData>({
     documentType: "",

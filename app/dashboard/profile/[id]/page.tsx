@@ -6,15 +6,15 @@ import { PQRSkeleton } from "@/components/pqr/pqr-skeleton";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "lucide-react";
-import useAuthStore from "@/store/useAuthStore";
 import { FollowButton } from "@/components/Buttons/FollowButton";
 import { FollowStats } from "@/components/FollowStats";
 import { useParams } from "next/navigation";
 import useUser from "@/hooks/useUser";
 import usePQR from "@/hooks/usePQR";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export default function ProfilePage() {
-  const { user: currentUser } = useAuthStore();
+  const currentUser = useCurrentUser();
   const params = useParams();
   const { id } = params;
   const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = useUser();

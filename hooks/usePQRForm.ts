@@ -4,17 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Department, PQRSType, CustomField, UserRole, Entity } from "@prisma/client";
+import { Department, PQRSType, CustomField } from "@prisma/client";
 import { createPQRS } from '@/services/api/pqr.service';
 import { getDepartmentsService } from '@/services/api/Department.service';
-
-interface User {
-  id?: string;
-  email: string;
-  name?: string;
-  role?: UserRole;
-  entity?: Entity;
-}
 
 export const formSchema = z.object({
   type: z.enum(["PETITION", "COMPLAINT", "CLAIM", "SUGGESTION", "REPORT"]),
@@ -32,14 +24,14 @@ export const formSchema = z.object({
   ),
 });
 
-export const usePQRForm = (entityId: string, user: User | null) => {
+export const usePQRForm = (entityId: string, userId: string | undefined) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [pqr, setPqr] = useState({
     type: "PETITION" as PQRSType,
     departmentId: "",
-    creatorId: user?.id || "",
+    creatorId: userId || "",
     dueDate: new Date(),
     customFields: [],
     isAnonymous: false,
@@ -66,10 +58,10 @@ export const usePQRForm = (entityId: string, user: User | null) => {
   });
 
   useEffect(() => {
-    if (user) {
-      setPqr(prev => ({ ...prev, creatorId: user?.id || "" }));
+    if (userId) {
+      setPqr(prev => ({ ...prev, creatorId: userId }));
     }
-  }, [user]);
+  }, [userId]);
 
   const fetchDepartments = useCallback(async () => {
     try {
@@ -179,7 +171,7 @@ export const usePQRForm = (entityId: string, user: User | null) => {
         JSON.stringify({
           type: values.type,
           departmentId: values.departmentId || null,
-          creatorId: user?.id,
+          creatorId: userId,
           dueDate: new Date(),
           customFields: customFieldsData,
           entityId: selectedEntityId,

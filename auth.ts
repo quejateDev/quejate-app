@@ -5,7 +5,7 @@ import authConfig from "@/auth.config"
 import { getUserById } from "@/data/user"
 import { getAccountByUserId } from "./data/account"
 import prisma from "./lib/prisma"
- 
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/auth/login",
@@ -33,6 +33,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.isOAuth = token.isOAuth as boolean;
       }
 
+      if (token.image && session.user) {
+        session.user.image = token.image as string | null;
+      }
+
       return session;
     },
     async signIn({ user, account }) {
@@ -53,9 +57,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       const existingAccount = await getAccountByUserId(existingUser.id);
       
       token.isOAuth = !!existingAccount;
-      token.name = existingUser.firstName + " " + existingUser.lastName;
+      token.name = existingUser.name;
       token.email = existingUser.email;
       token.role = existingUser.role;
+      token.image = existingUser.image || null;
       return token
     }
   },

@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useAuthStore from "@/store/useAuthStore";
 import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -37,8 +36,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useLoginModal } from "@/providers/LoginModalProivder";
+import { useLoginModal } from "@/providers/LoginModalProvider";
 import { usePQRForm } from "@/hooks/usePQRForm";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 // Dynamically import ReCAPTCHA to avoid SSR issues
 // @ts-ignore
@@ -52,7 +52,7 @@ type NewPQRFormProps = {
 };
 
 export function NewPQRForm({ entityId }: NewPQRFormProps) {
-  const { user } = useAuthStore();
+  const userId = useCurrentUser()?.id;
   const { setIsOpen } = useLoginModal();
   
   const {
@@ -64,9 +64,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     openDepartment,
     setOpenDepartment,
     onSubmit,
-    recaptchaToken,
     setRecaptchaToken,
-  } = usePQRForm(entityId, user);
+  } = usePQRForm(entityId, userId);
 
   if (isLoadingInitial) {
     return (
@@ -317,21 +316,21 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 <FormField
                   control={form.control}
                   name="isPrivate"
-                  disabled={!user}
+                  disabled={!userId}
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
                         <Checkbox
                           id="isPrivate"
                           checked={!field.value}
-                          disabled={!user}
+                          disabled={!userId}
                           onCheckedChange={checked => field.onChange(!checked)}
                         />
                       </FormControl>
-                      <FormLabel className={`${!user ? "line-through" : ""} flex flex-col gap-2`}>
+                      <FormLabel className={`${!userId ? "line-through" : ""} flex flex-col gap-2`}>
                         <span>¿Desea publicar esta PQRSD en el muro?</span>
                       </FormLabel>
-                      {!user && (
+                      {!userId && (
                         <Tooltip>
                           <TooltipTrigger>
                             <Info className="w-4 h-4 text-red-500" />
@@ -344,7 +343,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     </FormItem>
                   )}
                 />
-                {!user && (
+                {!userId && (
                   <span
                     className="text-blue-500 underline font-semibold cursor-pointer"
                     onClick={() => setIsOpen(true)}

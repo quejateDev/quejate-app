@@ -6,7 +6,6 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { User, Scale, ArrowRight, Edit2 } from 'lucide-react';
-import useAuthStore from '@/store/useAuthStore';
 import Link from 'next/link';
 import usePQR from '@/hooks/usePQR';
 import useUser from '@/hooks/useUser';
@@ -14,11 +13,12 @@ import { useToast } from '@/hooks/use-toast';
 import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
 import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { UserProfileEditModal, UserProfileUpdateData } from '@/components/forms/UserProfileEdit';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
-  const { user: currentUser } = useAuthStore();
+  const currentUser = useCurrentUser();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
   const { user: userProfile, fetchUser, isLoading: userLoading } = useUser();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -29,12 +29,6 @@ export default function ProfilePage() {
       fetchUserPQRS(currentUser.id);
     }
   }, [currentUser?.id]);
-
-  useEffect(() => {
-    if (currentUser?.id) {
-      fetchUser(currentUser.id);
-    }
-  }, [currentUser]);
 
   const isOwnProfile = userProfile ? userProfile.id === currentUser?.id : false;
 
@@ -150,7 +144,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="mx-auto mb-6 w-32 h-32">
                   <Avatar className="h-32 w-32 border-2 border-primary">
-                    <AvatarImage src={userProfile?.profilePicture || ""} alt={getFullName()} />
+                    <AvatarImage src={currentUser?.image || ""} alt={getFullName()} />
                     <AvatarFallback className="bg-muted-foreground/10">
                       <User className="h-16 w-16 stroke-1" />
                     </AvatarFallback>
