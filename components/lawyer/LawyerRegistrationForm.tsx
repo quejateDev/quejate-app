@@ -63,7 +63,7 @@ export function LawyerRegistrationForm({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <ProfilePictureUploader
-        profilePicture={formData.profilePicture}
+        image={formData.image}
         onFileChange={onFileChange}
         disabled={loading}
         isUploading={isUploadingImage}

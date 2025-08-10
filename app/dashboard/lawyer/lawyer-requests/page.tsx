@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -155,13 +155,13 @@ export default function LawyerRequestsPage() {
                         <div className="w-full">
                           <div className="flex flex-wrap items-center gap-2 mb-2">
                             <Avatar className="h-8 w-8 border border-primary">
-                              <AvatarImage src={request.lawyer.user.profilePicture} />
+                              <AvatarImage src={request.lawyer.user.image} />
                               <AvatarFallback className="bg-muted-foreground/10">
                                 <User className="h-5 w-5 stroke-1" />
                               </AvatarFallback>
                             </Avatar>
                             <h3 className="font-semibold text-lg break-words">
-                              {request.lawyer.user.firstName} {request.lawyer.user.lastName}
+                              {request.lawyer.user.name}
                             </h3>
                             <Badge className={statusConfig[request.status].color}>
                               <StatusIcon className="w-3 h-3 mr-1" />
@@ -176,7 +176,7 @@ export default function LawyerRequestsPage() {
                             <div className="flex items-center">
                           <div 
                             className="flex items-center space-x-1 mt-1 cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => handleRatingsClick(request.lawyer.user.id, `${request.lawyer.user.firstName} ${request.lawyer.user.lastName}`)}
+                            onClick={() => handleRatingsClick(request.lawyer.user.id, `${request.lawyer.user.name}`)}
                           >
                             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm text-gray-600">
@@ -193,7 +193,7 @@ export default function LawyerRequestsPage() {
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleCreateRatingClick(request.lawyer.user.id, `${request.lawyer.user.firstName} ${request.lawyer.user.lastName}`);
+                                  handleCreateRatingClick(request.lawyer.user.id, `${request.lawyer.user.name}`);
                                 }}
                                 className="w-8 h-8 rounded-full bg-secondary text-quaternary hover:bg-secondary-dark flex items-center justify-center ml-2"
                               >

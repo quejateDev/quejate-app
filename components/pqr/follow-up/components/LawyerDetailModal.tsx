@@ -32,9 +32,6 @@ export function LawyerDetailModal({
 }: LawyerDetailModalProps) {
   const [showRatingsModal, setShowRatingsModal] = useState(false);
   
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
 
   const formatCurrency = (amount: number | null) => {
     if (!amount) return "No especificado";
@@ -55,17 +52,17 @@ export function LawyerDetailModal({
             <div className="flex items-center gap-4">
               <Avatar className="h-24 w-24 border-2 border-quaternary">
                 <AvatarImage 
-                  src={lawyer.user.profilePicture || undefined} 
-                  alt={`${lawyer.user.firstName} ${lawyer.user.lastName}`}
+                  src={lawyer.user.image || undefined} 
+                  alt={`${lawyer.user.name}`}
                 />
                 <AvatarFallback className="text-lg">
-                  {lawyer.user.firstName?.[0]}{lawyer.user.lastName?.[0]}
+                  {lawyer.user.name?.[0]}
                 </AvatarFallback>
               </Avatar>
               
               <div className="space-y-1">
                 <h3 className="text-xl font-semibold">
-                  {lawyer.user.firstName} {lawyer.user.lastName}
+                  {lawyer.user.name}
                 </h3>
                 {lawyer.isVerified ? (
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -150,7 +147,7 @@ export function LawyerDetailModal({
         isOpen={showRatingsModal}
         onClose={() => setShowRatingsModal(false)}
         lawyerUserId={lawyer.user.id}
-        lawyerName={`${lawyer.user.firstName} ${lawyer.user.lastName}`}
+        lawyerName={`${lawyer.user.name}`}
       />
     </Dialog>
   );

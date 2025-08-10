@@ -24,8 +24,7 @@ export const RegisterForm = () => {
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: ""
+      name: ""
     }
   });
 
@@ -60,7 +59,7 @@ export const RegisterForm = () => {
           <div className="space-y-4">
             <FormField
               control={form.control}
-              name="firstName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
@@ -68,25 +67,7 @@ export const RegisterForm = () => {
                     <Input
                       {...field}
                       disabled={isPending}
-                      placeholder="Juan"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="Perez"
+                      placeholder="Juan Pérez"
                     />
                   </FormControl>
                   <FormMessage />
