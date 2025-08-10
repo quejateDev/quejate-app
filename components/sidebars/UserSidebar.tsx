@@ -44,7 +44,7 @@ export default function UserSidebar({
 
 
   const UserAvatar = ({ user }: { user: UserType }) => (
-    <Avatar className="h-12 w-12 border border-quaternary">
+    <Avatar className="h-10 w-10 border border-quaternary">
       {user?.image && (
         <AvatarImage src={user.image} alt={user.name || ""} />
       )}

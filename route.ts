@@ -1,6 +1,7 @@
 export const publicRoutes = [
     "/dashboard",
     "/auth/new-verification",
+    "/api/entities",
 ];
 
 export const authRoutes = [

@@ -80,7 +80,7 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center justify-center text-center">
               <Avatar className="h-28 w-28 border-2 border-muted">
                 {userProfile?.image ? (
-                  <AvatarImage src={userProfile.image} alt={userProfile.name} />
+                  <AvatarImage src={userProfile.image} alt={userProfile.name || ""} />
                 ) : null}
                 <AvatarFallback className="bg-muted-foreground/10">
                 {<User className="h-16 w-16 stroke-1" />}
