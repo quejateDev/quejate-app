@@ -130,11 +130,11 @@ export async function PATCH(
       return NextResponse.json(updatedUser);
     }
 
-    const { name, phone, image, currentPassword, newPassword } = body;
+    const { name, image, currentPassword, newPassword } = body;
 
-    if (!name || !phone || name.trim() === '' || phone.trim() === '') {
+    if (!name || name.trim() === '') {
       return NextResponse.json(
-        { error: "Nombre, apellido y teléfono son requeridos" },
+        { error: "Nombre es requerido" },
         { status: 400 }
       );
     }
@@ -148,7 +148,6 @@ export async function PATCH(
 
     const updateData: any = {
       name: name.trim(),
-      phone: phone.trim(),
     };
 
     if (image === null || image === '') {
