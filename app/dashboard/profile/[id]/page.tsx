@@ -79,15 +79,15 @@ export default function ProfilePage() {
             <CardHeader className="text-center">
             <div className="flex flex-col items-center justify-center text-center">
               <Avatar className="h-28 w-28 border-2 border-muted">
-                {userProfile?.profilePicture ? (
-                  <AvatarImage src={userProfile.profilePicture} alt={userProfile.firstName} />
+                {userProfile?.image ? (
+                  <AvatarImage src={userProfile.image} alt={userProfile.name} />
                 ) : null}
                 <AvatarFallback className="bg-muted-foreground/10">
                 {<User className="h-16 w-16 stroke-1" />}
                 </AvatarFallback>
               </Avatar>
               <h2 className="text-2xl font-semibold mt-4">
-                {userProfile.firstName} {userProfile.lastName}
+                {userProfile.name}
               </h2>
               <p className="text-sm text-muted-foreground">
                 {userProfile.email}
@@ -102,7 +102,7 @@ export default function ProfilePage() {
                       setUserProfile(prev => {
                         if (!prev) return prev;
                         const updatedFollowers = isFollowing
-                          ? [...prev.followers, { id: currentUser?.id || '', username: currentUser?.name || '', firstName: '', lastName: '' }]
+                          ? [...prev.followers, { id: currentUser?.id || '', username: currentUser?.name || '', name: '' }]
                           : prev.followers.filter(f => f.id !== currentUser?.id);
                         return {
                           ...prev,

@@ -9,9 +9,8 @@ type Comment = {
   createdAt: string | Date;
   user: {
     id: string;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
+    name: string;
+    image?: string;
   };
 };
 
@@ -19,9 +18,8 @@ type CommentSectionProps = {
   pqrId: string;
   user: {
     id: string;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
+    name: string;
+    image?: string;
   } | null;
   initialComments: Comment[];
   onCommentSubmit: (text: string) => void;
@@ -58,9 +56,8 @@ export function CommentSection({
         ...newComment,
         user: {
           id: user.id,
-          firstName: user.firstName, 
-          lastName: user.lastName,    
-          profilePicture: user.profilePicture || "",    
+          name: user.name, 
+          image: user.image || "",    
         },
       };
       
@@ -79,15 +76,15 @@ export function CommentSection({
     <div className="sm:px-4">
       <div className="flex items-center gap-2 mt-3">
       <Avatar className="w-8 h-8 shrink-0">
-          {user?.profilePicture ? (
+          {user?.image ? (
             <AvatarImage 
-              src={user.profilePicture} 
-              alt={`${user.firstName} ${user.lastName}`} 
+              src={user.image} 
+              alt={`${user.name}`} 
             />
           ) : null}
           <AvatarFallback className="bg-gray-200 text-gray-700">
-            {user?.firstName ? (
-              user.firstName.charAt(0).toUpperCase()
+            {user?.name ? (
+              user.name.charAt(0).toUpperCase()
             ) : (
               <User className="h-4 w-4 stroke-1" />
             )}
@@ -144,14 +141,14 @@ function CommentItem({ comment }: { comment: Comment }) {
   return (
     <div className="flex gap-2">
       <Avatar className="w-8 h-8 sm:w-8 sm:h-8 shrink-0 mt-1">
-        {comment.user?.profilePicture ? (
+        {comment.user?.image ? (
           <AvatarImage 
-            src={comment.user.profilePicture} 
-            alt={`${comment.user.firstName} ${comment.user.lastName}`}
+            src={comment.user.image} 
+            alt={`${comment.user.name}`}
           />
         ) : null}
         <AvatarFallback className="bg-gray-200 text-gray-700">
-          {comment.user?.firstName?.charAt(0).toUpperCase() || (
+          {comment.user?.name?.charAt(0).toUpperCase() || (
             <User className="h-4 w-4 stroke-1" />
           )}
         </AvatarFallback>
@@ -159,7 +156,7 @@ function CommentItem({ comment }: { comment: Comment }) {
       <div className="flex-1 min-w-0">
         <div className="bg-gray-100 p-2 sm:p-3 rounded-lg break-words">
           <p className="font-semibold text-xs sm:text-sm">
-            {comment.user?.firstName} {comment.user?.lastName}
+            {comment.user?.name}
           </p>
           <p className="text-xs sm:text-sm mt-1">{comment.text}</p>
         </div>

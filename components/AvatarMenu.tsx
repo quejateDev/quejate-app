@@ -24,9 +24,9 @@ export default function AvatarMenu() {
       <DropdownMenuTrigger asChild>
         <Avatar className="h-10 w-10 border border-ring cursor-pointer">
           <AvatarImage
-            src={userProfile?.profilePicture || ""}
+            src={userProfile?.image || ""}
             alt={
-              userProfile?.firstName?.[0]
+              userProfile?.name?.[0]
             }
           />
           <AvatarFallback className="bg-muted-foreground/10">

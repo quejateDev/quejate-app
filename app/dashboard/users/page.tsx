@@ -12,8 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface User {
   id: string;
   username: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   role: string;
   _count?: {
     followers: number;
@@ -61,7 +60,7 @@ export default function UsersPage() {
           </Avatar>
           <div className="flex flex-col">
             <h3 className="text-lg font-semibold">
-              {user.firstName} {user.lastName}
+              {user.name}
             </h3>
             <p className="text-sm text-muted-foreground">@{user.username}</p>
             {user._count && (

@@ -111,8 +111,7 @@ Los tipos están centralizados en el hook `useLawyerRegistration.ts`:
 model User {
   id                String              @id @default(uuid())
   password          String
-  firstName         String
-  lastName          String
+  name         String
   email             String              @unique
   phone             String
   role              UserRole

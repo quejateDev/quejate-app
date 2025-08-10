@@ -6,14 +6,14 @@ import { Upload, User } from "lucide-react";
 import Image from "next/image";
 
 interface ProfilePictureUploaderProps {
-  profilePicture: File | null;
+  image: File | null;
   onFileChange: (file: File | null) => void;
   disabled?: boolean;
   isUploading?: boolean;
 }
 
 export function ProfilePictureUploader({
-  profilePicture,
+  image,
   onFileChange,
   disabled = false,
   isUploading = false,
@@ -41,9 +41,9 @@ export function ProfilePictureUploader({
     <div className="flex flex-col items-center mb-6">
       <div className="relative w-32 h-32 group mb-4">
         <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 hover:border-primary/40 transition-colors">
-          {profilePicture ? (
+          {image ? (
             <Image
-              src={URL.createObjectURL(profilePicture)}
+              src={URL.createObjectURL(image)}
               alt="Vista previa de foto de perfil"
               width={128}
               height={128}
@@ -63,7 +63,7 @@ export function ProfilePictureUploader({
             <div className="text-white flex flex-col items-center space-y-1">
               <Upload className="h-6 w-6" />
               <span className="text-xs font-medium">
-                {profilePicture ? "Cambiar foto" : "Subir foto"}
+                {image ? "Cambiar foto" : "Subir foto"}
               </span>
             </div>
           </div>
@@ -93,7 +93,7 @@ export function ProfilePictureUploader({
         <p className="text-sm text-muted-foreground">
           Foto profesional (recomendado)
         </p>
-        {profilePicture && (
+        {image && (
           <Button
             type="button"
             variant="ghost"
