@@ -2,13 +2,11 @@ import { UserBasic } from "./user-basic";
 export interface User extends UserBasic {
   followers: Array<{
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
   }>;
   following: Array<{
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
   }>;
   _count: {
     followers: number;

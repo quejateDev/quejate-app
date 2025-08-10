@@ -45,8 +45,8 @@ export default function UserSidebar({
 
   const UserAvatar = ({ user }: { user: UserType }) => (
     <Avatar className="h-12 w-12 border border-quaternary">
-      {user?.profilePicture && (
-        <AvatarImage src={user.profilePicture} alt={user.firstName} />
+      {user?.image && (
+        <AvatarImage src={user.image} alt={user.name} />
       )}
       <AvatarFallback className="bg-muted-foreground/10">
         <User className="h-6 w-6 stroke-1 text-quaternary" />
@@ -57,8 +57,8 @@ export default function UserSidebar({
   const TopUserAvatar = ({ user, rank }: { user: UserType; rank: number }) => (
     <div className="relative">
       <Avatar className="h-10 w-10 border border-quaternary">
-        {user?.profilePicture && (
-          <AvatarImage src={user.profilePicture} alt={user.firstName} />
+        {user?.image && (
+          <AvatarImage src={user.image} alt={user.name} />
         )}
         <AvatarFallback className="bg-muted-foreground/10">
           <User className="h-5 w-5 stroke-1 text-quaternary" />
@@ -93,7 +93,7 @@ export default function UserSidebar({
               <div className="flex-1 min-w-0">
                 <Link href={`/dashboard/profile/${user.id}`}>
                   <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
-                    {user.firstName} {user.lastName}
+                    {user.name}
                   </p>
                 </Link>
                 <p className="text-xs text-muted-foreground truncate">
@@ -138,7 +138,7 @@ export default function UserSidebar({
                     <div className="flex-1 min-w-0">
                       <Link href={`/dashboard/profile/${user.id}`}>
                         <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
-                          {user.firstName} {user.lastName}
+                          {user.name}
                         </p>
                       </Link>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">

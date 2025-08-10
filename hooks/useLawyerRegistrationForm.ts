@@ -9,7 +9,7 @@ export interface LawyerFormData {
   specialties: string;
   description: string;
   feePerHour: string;
-  profilePicture: File | null;
+  image: File | null;
 }
 
 const initialFormData: LawyerFormData = {
@@ -20,7 +20,7 @@ const initialFormData: LawyerFormData = {
   specialties: "",
   description: "",
   feePerHour: "",
-  profilePicture: null,
+  image: null,
 };
 
 export const useLawyerRegistrationForm = () => {
@@ -71,7 +71,7 @@ export const useLawyerRegistrationForm = () => {
   };
 
   const handleProfilePictureChange = (file: File | null) => {
-    setFormData((prev) => ({ ...prev, profilePicture: file }));
+    setFormData((prev) => ({ ...prev, image: file }));
   };
 
   const handleIdentityDocumentImageChange = (file: File) => {

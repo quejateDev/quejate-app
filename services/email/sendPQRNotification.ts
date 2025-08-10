@@ -32,7 +32,7 @@ export async function sendPQRNotificationEmail(
           consecutiveCode: consecutiveCode,
         },
         creatorInfo: {
-          name: creatorData ? `${creatorData?.firstName} ${creatorData?.lastName}` : 'Anónimo',
+          name: creatorData ? `${creatorData?.name}` : 'Anónimo',
           email: creatorData ? creatorData?.email : 'Anónimo',
           phone: creatorData ? creatorData?.phone : 'Anónimo',
         },

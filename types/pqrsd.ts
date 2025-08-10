@@ -13,9 +13,8 @@ export interface PQR {
   description?: string | null;
   creator: {
     id: string;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string | null;
+    name: string;
+    image?: string | null;
   } | null;
   department: {
     name: string;
@@ -37,8 +36,7 @@ export interface PQR {
     text: string;
     createdAt: Date;
     user: {
-      firstName: string;
-      lastName: string;
+      name: string;
     };
   }[];
   _count: {

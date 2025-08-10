@@ -57,7 +57,7 @@ export function OversightDocumentExport({
           pqrData,
           documentUrl,
           creatorInfo: {
-            name: `${pqrData.creator?.firstName || ""} ${pqrData.creator?.lastName || ""}`.trim() || "Usuario",
+            name: `${pqrData.creator?.name || ""}`.trim() || "Usuario",
             email: "usuario@quejate.com.co", // Email por defecto ya que no está en la estructura actual
             phone: ""
           }

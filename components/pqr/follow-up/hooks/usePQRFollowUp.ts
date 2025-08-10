@@ -203,7 +203,7 @@ export function usePQRFollowUp(
       const daysExceeded = calculateBusinessDaysExceeded(pqrData.createdAt);
       const documentData = {
         fullName: pqrData.creator
-          ? `${pqrData.creator.firstName} ${pqrData.creator.lastName}`
+          ? `${pqrData.creator.name}`
           : "Anónimo",
         oversightEntity: entityToUse.name,
         entity: pqrData.entity?.name,

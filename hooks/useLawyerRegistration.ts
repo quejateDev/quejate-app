@@ -14,7 +14,7 @@ export interface LawyerFormData {
   specialties: string;
   description: string;
   feePerHour: string;
-  profilePicture: File | null;
+  image: File | null;
 }
 
 export interface VerificationStatus {
@@ -34,7 +34,7 @@ export const useLawyerRegistration = () => {
     specialties: "",
     description: "",
     feePerHour: "",
-    profilePicture: null,
+    image: null,
   });
   
   const [loading, setLoading] = useState(false);
@@ -62,7 +62,7 @@ export const useLawyerRegistration = () => {
   };
 
   const handleFileChange = (file: File | null) => {
-    setFormData((prev) => ({ ...prev, profilePicture: file }));
+    setFormData((prev) => ({ ...prev, image: file }));
   };
 
   const handleIdentityDocumentImageChange = (file: File) => {
@@ -110,7 +110,7 @@ export const useLawyerRegistration = () => {
   };
 
   const canVerify = () => {
-    return formData.profilePicture !== null && 
+    return formData.image !== null && 
            formData.identityDocumentImage !== null && 
            formData.professionalCardImage !== null;
   };
@@ -164,16 +164,16 @@ export const useLawyerRegistration = () => {
 
   const submitRegistration = async (): Promise<boolean> => {
     try {
-      let profilePictureUrl: string | undefined;
+      let imageUrl: string | undefined;
       let identityDocumentImageUrl: string | undefined;
       let professionalCardImageUrl: string | undefined;
 
       setIsUploadingImage(true);
       
-      if (formData.profilePicture) {
+      if (formData.image) {
         try {
           const uploadFormData = new FormData();
-          uploadFormData.append('file', formData.profilePicture);
+          uploadFormData.append('file', formData.image);
 
           const uploadResponse = await fetch('/api/upload', {
             method: 'POST',
@@ -185,9 +185,9 @@ export const useLawyerRegistration = () => {
           }
 
           const uploadData = await uploadResponse.json();
-          profilePictureUrl = uploadData.path || uploadData.url;
+          imageUrl = uploadData.path || uploadData.url;
 
-          if (!profilePictureUrl) {
+          if (!imageUrl) {
             throw new Error('No se recibió URL de la imagen de perfil');
           }
 
@@ -288,14 +288,14 @@ export const useLawyerRegistration = () => {
 
       const response = await axios.post("/api/lawyer/register", submissionData);
 
-      if (response.data && profilePictureUrl && currentUser?.id) {
+      if (response.data && imageUrl && currentUser?.id) {
         try {
           await fetch(`/api/users/${currentUser.id}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ profilePicture: profilePictureUrl }),
+            body: JSON.stringify({ image: imageUrl }),
           });
         } catch (error) {
           console.error("Error updating profile picture:", error);
