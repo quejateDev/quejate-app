@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
 import bcrypt from 'bcryptjs';
+import { currentUser } from "@/lib/auth";
 
 export async function GET(
   request: Request,
@@ -9,30 +9,27 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         email: true,
-        profilePicture: true,
+        image: true,
         role: true,
         phone: true,
         followers: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
           }
         },
         following: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
           }
         },
         _count: {
@@ -56,7 +53,7 @@ export async function GET(
     if (currentUserId) {
       const followCheck = await prisma.user.findFirst({
         where: {
-          id: currentUserId,
+          id: currentUserId.id,
           following: {
             some: {
               id: user.id,
@@ -93,8 +90,8 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const currentUserId = await getUserIdFromToken();
-    
+    const currentUserId = await currentUser();
+
     if (!currentUserId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -102,7 +99,7 @@ export async function PATCH(
       );
     }
 
-    if (currentUserId !== id) {
+    if (currentUserId.id !== id) {
       return NextResponse.json(
         { error: "No tienes permiso para actualizar este perfil" },
         { status: 403 }
@@ -110,9 +107,9 @@ export async function PATCH(
     }
 
     const bodyKeys = Object.keys(body);
-    if (bodyKeys.length === 1 && bodyKeys[0] === 'profilePicture') {
+    if (bodyKeys.length === 1 && bodyKeys[0] === 'image') {
 
-      if (!body.profilePicture || !isValidUrl(body.profilePicture)) {
+      if (!body.image || !isValidUrl(body.image)) {
         return NextResponse.json(
           { error: "URL de imagen no válida" },
           { status: 400 }
@@ -121,29 +118,28 @@ export async function PATCH(
 
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: { profilePicture: body.profilePicture },
+        data: { image: body.image },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          name: true,
           email: true,
-          profilePicture: true
+          image: true
         }
       });
 
       return NextResponse.json(updatedUser);
     }
 
-    const { firstName, lastName, phone, profilePicture, currentPassword, newPassword } = body;
+    const { name, image, currentPassword, newPassword } = body;
 
-    if (!firstName || !lastName || !phone || firstName.trim() === '' || lastName.trim() === '' || phone.trim() === '') {
+    if (!name || name.trim() === '') {
       return NextResponse.json(
-        { error: "Nombre, apellido y teléfono son requeridos" },
+        { error: "Nombre es requerido" },
         { status: 400 }
       );
     }
 
-    if (profilePicture && profilePicture.trim() !== '' && !isValidUrl(profilePicture)) {
+    if (image && image.trim() !== '' && !isValidUrl(image)) {
       return NextResponse.json(
         { error: "URL de imagen no válida" },
         { status: 400 }
@@ -151,15 +147,13 @@ export async function PATCH(
     }
 
     const updateData: any = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      phone: phone.trim(),
+      name: name.trim(),
     };
 
-    if (profilePicture === null || profilePicture === '') {
-      updateData.profilePicture = null;
-    } else if (profilePicture && profilePicture.trim() !== '') {
-      updateData.profilePicture = profilePicture;
+    if (image === null || image === '') {
+      updateData.image = null;
+    } else if (image && image.trim() !== '') {
+      updateData.image = image;
     }
 
     if (newPassword) {
@@ -182,6 +176,13 @@ export async function PATCH(
         );
       }
 
+      if (!user.password || typeof user.password !== 'string') {
+        return NextResponse.json(
+          { error: "Contraseña actual incorrecta" },
+          { status: 400 }
+        );
+      }
+
       const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
       if (!isCurrentPasswordValid) {
@@ -200,11 +201,10 @@ export async function PATCH(
       data: updateData,
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         email: true,
         phone: true,
-        profilePicture: true
+        image: true
       }
     });
 

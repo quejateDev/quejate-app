@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { followUserService } from "@/services/api/User.service";
-import useAuthStore from "@/store/useAuthStore";
-import { useLoginModal } from "@/providers/LoginModalProivder";
+import { useLoginModal } from "@/providers/LoginModalProvider";
+import { useFullUser } from "../UserProvider";
 
 interface FollowButtonProps {
   userId: string;
@@ -22,7 +22,8 @@ export function FollowButton({
 }: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, token } = useAuthStore();
+  const user = useFullUser();
+
   const { setIsOpen } = useLoginModal();
 
   const handleFollow = async () => {
@@ -33,7 +34,7 @@ export function FollowButton({
 
     setIsLoading(true);
     try {
-      const { followed, counts } = await followUserService(userId, token as string);
+      const { followed, counts } = await followUserService(userId);
       setIsFollowing(followed);
       onFollowChange?.(followed, counts);
     } catch (error) {

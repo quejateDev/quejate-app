@@ -12,11 +12,7 @@ export async function getUserService(id: string) {
     return response.data;
 }
 
-export async function followUserService(id: string, token: string) {
-    const response = await Client.post(`/users/${id}/follow`, null, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+export async function followUserService(id: string ) {
+    const response = await Client.post(`/users/${id}/follow`, null );
     return response.data;
 }

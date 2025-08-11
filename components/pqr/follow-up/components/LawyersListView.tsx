@@ -36,10 +36,6 @@ export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersLi
     fetchLawyers();
   }, [fetchLawyers]);
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
   const lawyerCount = lawyers.filter(
     (lawyer) => lawyer.user.id !== pqrData.creator?.id && lawyer.isVerified
   ).length;
@@ -186,12 +182,9 @@ export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersLi
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4">
                     <Avatar className="w-12 h-12 flex-shrink-0">
-                      <AvatarImage src={lawyer.user.profilePicture || ""} />
+                      <AvatarImage src={lawyer.user.image || ""} />
                       <AvatarFallback className="text-sm font-semibold">
-                        {getInitials(
-                          lawyer.user.firstName,
-                          lawyer.user.lastName
-                        )}
+                        {lawyer.user.name?.[0]}
                       </AvatarFallback>
                     </Avatar>
 
@@ -200,7 +193,7 @@ export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersLi
                         <div className="space-y-1">
                           <div className=" flex items-center space-x-2">
                             <h3 className="font-medium text-gray-900">
-                              {lawyer.user.firstName} {lawyer.user.lastName} -
+                              {lawyer.user.name} -
                             </h3>
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="ml-1 text-sm font-medium">

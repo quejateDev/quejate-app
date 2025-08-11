@@ -15,20 +15,18 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, User, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { User as UserType } from "@/types/user";
+import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface UserProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedData: UserProfileUpdateData) => Promise<boolean>;
-  initialData?: UserType;
+  initialData?: UserWithFollowingStatus;
 }
 
 export interface UserProfileUpdateData {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  profilePicture?: string | null;
+  name: string;
+  image?: string | null;
   currentPassword?: string;
   newPassword?: string;
 }
@@ -40,15 +38,13 @@ export function UserProfileEditModal({
   initialData,
 }: UserProfileEditModalProps) {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
+    name: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [profilePicturePreview, setProfilePicturePreview] = useState<string>("");
+  const [image, setProfilePicture] = useState<File | null>(null);
+  const [imagePreview, setProfilePicturePreview] = useState<string>("");
   const [shouldRemoveProfilePicture, setShouldRemoveProfilePicture] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
@@ -63,14 +59,12 @@ export function UserProfileEditModal({
   useEffect(() => {
     if (initialData && isOpen) {
       setFormData({
-        firstName: initialData.firstName || "",
-        lastName: initialData.lastName || "",
-        phone: initialData.phone || "",
+        name: initialData.name || "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-      setProfilePicturePreview(initialData.profilePicture || "");
+      setProfilePicturePreview(initialData.image || "");
       setProfilePicture(null);
       setShouldRemoveProfilePicture(false);
     }
@@ -106,12 +100,12 @@ export function UserProfileEditModal({
   };
 
   const uploadProfilePicture = async (): Promise<string | null> => {
-    if (!profilePicture) return null;
+    if (!image) return null;
 
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', profilePicture);
+      formData.append('file', image);
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -133,28 +127,10 @@ export function UserProfileEditModal({
   };
 
   const validateForm = (): boolean => {
-    if (!formData.firstName.trim()) {
+    if (!formData.name.trim()) {
       toast({
         title: "Error",
         description: "El nombre es requerido",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    if (!formData.lastName.trim()) {
-      toast({
-        title: "Error",
-        description: "El apellido es requerido",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    if (!formData.phone.trim()) {
-      toast({
-        title: "Error",
-        description: "El teléfono es requerido",
         variant: "destructive",
       });
       return false;
@@ -198,19 +174,17 @@ export function UserProfileEditModal({
     setLoading(true);
 
     try {
-      let profilePictureUrl = initialData?.profilePicture;
+      let imageUrl = initialData?.image;
 
       if (shouldRemoveProfilePicture) {
-        profilePictureUrl = null;
-      } else if (profilePicture) {
-        profilePictureUrl = await uploadProfilePicture();
+        imageUrl = null;
+      } else if (image) {
+        imageUrl = await uploadProfilePicture();
       }
 
       const updateData: UserProfileUpdateData = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        phone: formData.phone.trim(),
-        profilePicture: shouldRemoveProfilePicture ? null : (profilePictureUrl || undefined),
+        name: formData.name.trim(),
+        image: shouldRemoveProfilePicture ? null : (imageUrl || undefined),
         currentPassword: formData.currentPassword.trim() || undefined,
         newPassword: formData.newPassword.trim() || undefined,
       };
@@ -235,9 +209,7 @@ export function UserProfileEditModal({
   const handleClose = () => {
     if (!loading) {
       setFormData({
-        firstName: "",
-        lastName: "",
-        phone: "",
+        name: "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -271,7 +243,7 @@ export function UserProfileEditModal({
             <div className="relative w-24 h-24 group">
               <Avatar className="w-24 h-24 border-2 border-primary/20">
                 <AvatarImage 
-                  src={shouldRemoveProfilePicture ? "" : (profilePicturePreview || initialData?.profilePicture || "")} 
+                  src={shouldRemoveProfilePicture ? "" : (imagePreview || initialData?.image || "")} 
                   alt="Profile" 
                 />
                 <AvatarFallback className="bg-muted-foreground/10">
@@ -311,9 +283,9 @@ export function UserProfileEditModal({
                 className="flex items-center gap-2"
               >
                 <Upload className="h-4 w-4" />
-                {profilePicturePreview && !shouldRemoveProfilePicture ? "Cambiar foto" : "Subir foto"}
+                {imagePreview && !shouldRemoveProfilePicture ? "Cambiar foto" : "Subir foto"}
               </Button>
-              {(profilePicturePreview || initialData?.profilePicture) && !shouldRemoveProfilePicture && (
+              {(imagePreview || initialData?.image) && !shouldRemoveProfilePicture && (
                 <Button
                   type="button"
                   size="sm"
@@ -329,11 +301,11 @@ export function UserProfileEditModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">Nombre *</Label>
+              <Label htmlFor="name">Nombre completo *</Label>
               <Input
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Ingresa tu nombre"
                 className="border-muted"
@@ -341,36 +313,10 @@ export function UserProfileEditModal({
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Apellido *</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                placeholder="Ingresa tu apellido"
-                className="border-muted"
-                disabled={loading}
-                required
-              />
-            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono *</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              placeholder="Ingresa tu número de teléfono"
-              className="border-muted"
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div className="space-y-4 border-t pt-4">
+          {!initialData?.isOAuth &&(
+            <div className="space-y-4 border-t pt-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
               Cambiar Contraseña
             </h4>
@@ -447,6 +393,7 @@ export function UserProfileEditModal({
               </div>
             </div>
           </div>
+          )}
 
           <DialogFooter>
             <Button

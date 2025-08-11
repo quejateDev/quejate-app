@@ -1,9 +1,8 @@
 export interface UserBasic {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profilePicture: string | null;
+  name: string | null;
+  email: string | null;
+  image: string | null;
   phone: string | null;
-  role: string;
+  role: string | null;
 }

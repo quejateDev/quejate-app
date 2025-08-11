@@ -13,9 +13,8 @@ import { Separator } from '@/components/ui/separator';
 interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  profilePicture?: string | null;
+  name: string;
+  image?: string | null;
   role: string;
   _count: {
     followers: number;
@@ -60,8 +59,7 @@ export default function SocialPage() {
     const searchLower = debouncedSearch.toLowerCase();
     return (
       user.email.toLowerCase().includes(searchLower) ||
-      user.firstName.toLowerCase().includes(searchLower) ||
-      user.lastName.toLowerCase().includes(searchLower)
+      user.name.toLowerCase().includes(searchLower)
     );
   });
 
@@ -71,8 +69,8 @@ export default function SocialPage() {
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
             <Avatar className="h-32 w-32 border border-quaternary">
-              {user?.profilePicture ? (
-                <AvatarImage src={user.profilePicture} alt={user.firstName}/>
+              {user?.image ? (
+                <AvatarImage src={user.image} alt={user.name}/>
               ) : null}
               <AvatarFallback className="bg-muted-foreground/10">
                 {<User className="h-16 w-16 stroke-1 text-quaternary" />}
@@ -80,7 +78,7 @@ export default function SocialPage() {
             </Avatar>
             <div className="flex flex-col flex-1">
               <h3 className="text-lg font-semibold">
-                {user.firstName} {user.lastName}
+                {user.name}
               </h3>
               <p className="text-sm text-muted-foreground">@{user.email}</p>
               <div className="flex gap-4 mt-2 text-sm">
@@ -149,8 +147,8 @@ export default function SocialPage() {
                         className="flex items-center gap-3 hover:bg-accent rounded-lg p-2 transition-colors"
                       >
                         <Avatar className="h-16 w-16 border border-quaternary">
-                          {user?.profilePicture ? (
-                            <AvatarImage src={user.profilePicture} alt={user.firstName}/>
+                          {user?.image ? (
+                            <AvatarImage src={user.image} alt={user.name}/>
                           ) : null}
                           <AvatarFallback className="bg-muted-foreground/10">
                             {<User className="h-8 w-8 stroke-1 text-quaternary" />}
@@ -158,7 +156,7 @@ export default function SocialPage() {
                         </Avatar>
                         <div className="flex flex-col flex-1">
                           <span className="font-medium">
-                            {user.firstName} {user.lastName}
+                            {user.name}
                           </span>
                           <span className="text-sm text-muted-foreground">
                             {user._count.followers} seguidores

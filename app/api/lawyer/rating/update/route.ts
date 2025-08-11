@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export async function PUT(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    if (existingRating.clientId !== currentUserId) {
+    if (existingRating.clientId !== currentUserId.id) {
       return NextResponse.json(
         { error: "No autorizado para modificar esta calificación" },
         { status: 403 }
@@ -58,9 +58,8 @@ export async function PUT(request: Request) {
         client: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true
+            name: true,
+            image: true
           }
         }
       }

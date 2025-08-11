@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
   try {
-    const currentUserId = await getUserIdFromToken();
+    const currentUserId = await currentUser();
 
     if (!currentUserId) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     const existingRating = await prisma.rating.findFirst({
       where: {
         lawyerId: lawyer.id,
-        clientId: currentUserId
+        clientId: currentUserId.id
       }
     });
 

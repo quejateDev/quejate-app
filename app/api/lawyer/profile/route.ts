@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getUserIdFromToken } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const userId = await getUserIdFromToken();
+    const user = await currentUser();
+    const userId = user?.id;
+
     if (!userId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -17,9 +19,8 @@ export async function GET() {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
             email: true,
             phone: true,
             isVerified: true
@@ -57,7 +58,9 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    const userId = await getUserIdFromToken();
+    const user = await currentUser();
+    const userId = user?.id;
+
     if (!userId) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -89,9 +92,8 @@ export async function PATCH(request: Request) {
       include: {
         user: {
           select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
             email: true
           }
         },

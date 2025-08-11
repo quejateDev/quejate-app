@@ -2,12 +2,12 @@
 
 import { PQRCard } from "./PQRCard";
 import { PQR } from "@/types/pqrsd";
-import { User } from "@/types/user";
+import { UserBasic } from "@/types/user-basic";
 
 
 interface PQRListProps {
   pqrs: PQR[];
-  currentUser: User | null;
+  currentUser: UserBasic | null;
 }
 
 export default function PQRList({ pqrs, currentUser }: PQRListProps) {

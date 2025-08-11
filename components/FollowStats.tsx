@@ -11,8 +11,7 @@ import Link from "next/link";
 
 interface User {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string | null;
 }
 
 interface FollowStatsProps {
@@ -42,7 +41,7 @@ export function FollowStats({ followers, following }: FollowStatsProps) {
                   href={`/dashboard/profile/${follower.id}`}
                   className="text-sm hover:underline"
                 >
-                  {follower.firstName} {follower.lastName}
+                  {follower.name}
                 </Link>
               </div>
             ))}
@@ -72,7 +71,7 @@ export function FollowStats({ followers, following }: FollowStatsProps) {
                   href={`/dashboard/profile/${user.id}`}
                   className="text-sm hover:underline"
                 >
-                  {user.firstName} {user.lastName}
+                  {user.name}
                 </Link>
               </div>
             ))}

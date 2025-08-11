@@ -1,77 +1,53 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { User, Trophy, UserPlus } from 'lucide-react';
-import Link from 'next/link';
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { User, UserPlus, Trophy } from "lucide-react";
 import { FollowButton } from '../Buttons/FollowButton';
 import { User as UserType } from '@/types/user';
+import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface DashboardSidebarProps {
   className?: string;
-  currentUser: UserType | null;
+  currentUser: UserWithFollowingStatus | null;
+  initialTopUsers: UserWithFollowingStatus[];
+  initialDiscoverUsers: UserWithFollowingStatus[];
 }
 
-export default function UserSidebar({ className = "", currentUser }: DashboardSidebarProps) {
-  const [discoverUsers, setDiscoverUsers] = useState<UserType[]>([]);
-  const [topUsers, setTopUsers] = useState<UserType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/users');
-      if (response.ok) {
-        const data: UserType[] = await response.json();
-
-        const sortedByPQRS = [...data].sort(
-          (a, b) => (b._count?.PQRS || 0) - (a._count?.PQRS || 0)
-        );
-        setTopUsers(sortedByPQRS.slice(0, 5));
-        
-        const followingIds = currentUser?.following?.map(user => user.id) || [];
-        const filteredData = data.filter(user => 
-          user.id !== currentUser?.id && 
-          !followingIds.includes(user.id)
-        );
-        const shuffledUsers = [...filteredData].sort(() => Math.random() - 0.5);
-        setDiscoverUsers(shuffledUsers.slice(0, 4));
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  fetchUsers();
-}, [currentUser?.id, currentUser?.following]);
+export default function UserSidebar({
+  className = "",
+  currentUser,
+  initialTopUsers,
+  initialDiscoverUsers
+}: DashboardSidebarProps) {
+  const [discoverUsers, setDiscoverUsers] = useState(initialDiscoverUsers);
+  const [topUsers, setTopUsers] = useState(initialTopUsers);
 
   const handleFollowChange = (
-    userId: string,
-    isFollowing: boolean,
-    counts?: { followers: number; following: number; PQRS: number }
-  ) => {
-    setDiscoverUsers(prev => 
-      prev.map(user => 
-        user.id === userId 
-          ? { ...user, isFollowing, _count: counts || user._count }
-          : user
-      )
-    );
-    
-  };
+  userId: string,
+  isFollowing: boolean,
+  counts?: { followers: number; following: number; PQRS: number }
+) => {
+  setDiscoverUsers(prev =>
+    prev.map(user =>
+      user.id === userId
+        ? { ...user, isFollowing, _count: counts || user._count }
+        : user
+    )
+  );
+};
+
 
   const UserAvatar = ({ user }: { user: UserType }) => (
-    <Avatar className="h-12 w-12 border border-quaternary">
-      {user?.profilePicture ? (
-        <AvatarImage src={user.profilePicture} alt={user.firstName} />
-      ) : null}
+    <Avatar className="h-10 w-10 border border-quaternary">
+      {user?.image && (
+        <AvatarImage src={user.image} alt={user.name || ""} />
+      )}
       <AvatarFallback className="bg-muted-foreground/10">
         <User className="h-6 w-6 stroke-1 text-quaternary" />
       </AvatarFallback>
@@ -81,9 +57,9 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
   const TopUserAvatar = ({ user, rank }: { user: UserType; rank: number }) => (
     <div className="relative">
       <Avatar className="h-10 w-10 border border-quaternary">
-        {user?.profilePicture ? (
-          <AvatarImage src={user.profilePicture} alt={user.firstName} />
-        ) : null}
+        {user?.image && (
+          <AvatarImage src={user.image} alt={user.name || ""} />
+        )}
         <AvatarFallback className="bg-muted-foreground/10">
           <User className="h-5 w-5 stroke-1 text-quaternary" />
         </AvatarFallback>
@@ -96,38 +72,16 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
     </div>
   );
 
-  if (isLoading) {
-    return (
-      <div className={`w-80 space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="animate-pulse space-y-4">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center space-x-3">
-                    <div className="h-12 w-12 bg-gray-200 rounded-full"></div>
-                    <div className="space-y-2 flex-1">
-                      <div className="h-3 bg-gray-200 rounded"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className={`w-80 space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}>
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <UserPlus className="h-5 w-5 text-quaternary" />
-            Descubrir usuarios
+    <div
+      className={`w-80 space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto ${className}`}
+    >
+      {discoverUsers.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <UserPlus className="h-5 w-5 text-quaternary" />
+              Descubrir usuarios
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -139,7 +93,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
               <div className="flex-1 min-w-0">
                 <Link href={`/dashboard/profile/${user.id}`}>
                   <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
-                    {user.firstName} {user.lastName}
+                    {user.name}
                   </p>
                 </Link>
                 <p className="text-xs text-muted-foreground truncate">
@@ -148,8 +102,8 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
               </div>
               <FollowButton
                 userId={user.id}
-                isFollowing={user.isFollowing || false}
-                onFollowChange={(isFollowing, counts) => 
+                isFollowing={user.isFollowing ?? false}
+                onFollowChange={(isFollowing, counts) =>
                   handleFollowChange(user.id, isFollowing, counts)
                 }
               />
@@ -163,7 +117,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
           </Link>
         </CardContent>
       </Card>
-
+    )}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -175,7 +129,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
           </p>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[300px]">
+          <ScrollArea className="max-h-[300px] h-auto">
             <div className="space-y-4 pr-2">
               {topUsers.map((user, index) => (
                 <div key={user.id}>
@@ -184,7 +138,7 @@ export default function UserSidebar({ className = "", currentUser }: DashboardSi
                     <div className="flex-1 min-w-0">
                       <Link href={`/dashboard/profile/${user.id}`}>
                         <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
-                          {user.firstName} {user.lastName}
+                          {user.name}
                         </p>
                       </Link>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">

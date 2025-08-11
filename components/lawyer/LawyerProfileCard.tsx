@@ -101,17 +101,17 @@ export function LawyerProfileCard() {
             <div className="flex items-center gap-4">
               <Avatar className="h-24 w-24">
                 <AvatarImage 
-                  src={user.profilePicture || undefined} 
-                  alt={`${user.firstName} ${user.lastName}`}
+                  src={user.image || undefined} 
+                  alt={`${user.name}`}
                 />
                 <AvatarFallback className="text-lg">
-                  {user.firstName?.[0]}{user.lastName?.[0]}
+                  {user.name?.[0]}
                 </AvatarFallback>
               </Avatar>
               
               <div className="space-y-1">
                 <h3 className="text-xl font-semibold">
-                  {user.firstName} {user.lastName}
+                  {user.name}
                 </h3>
 
                 {isVerified ? (
@@ -229,7 +229,7 @@ export function LawyerProfileCard() {
         isOpen={showRatingsModal}
         onClose={() => setShowRatingsModal(false)}
         lawyerUserId={lawyerData.userId}
-        lawyerName={`${lawyerData.user.firstName} ${lawyerData.user.lastName}`}
+        lawyerName={`${lawyerData.user.name}`}
       />
             
       <LawyerProfileEditModal

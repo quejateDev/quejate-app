@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/utils";
+import { currentUser } from "@/lib/auth";
 
 export async function POST(
   req: NextRequest,
@@ -16,24 +16,16 @@ export async function POST(
       );
     }
 
-    const token = req.cookies.get('token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "No token provided" },
-        { status: 401 }
-      );
-    }
+    const user = await currentUser();
 
-    const currentUser = await verifyToken(token);
-
-    if (!currentUser) {
+    if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     // Check if already following
     const existingFollow = await prisma.user.findFirst({
       where: {
-        id: currentUser.id,
+        id: user.id,
         // @ts-ignore
         following: {
           some: {
@@ -47,7 +39,7 @@ export async function POST(
     if (existingFollow) {
       // Unfollow
       updatedUser = await prisma.user.update({
-        where: { id: currentUser.id },
+        where: { id: user.id },
         data: {
           // @ts-ignore
           following: {
@@ -58,7 +50,7 @@ export async function POST(
     } else {
       // Follow
       updatedUser = await prisma.user.update({
-        where: { id: currentUser.id },
+        where: { id: user.id },
         data: {
           // @ts-ignore
           following: {
@@ -87,11 +79,11 @@ export async function POST(
       data: {
         userId: id,
         type: "follow",
-        message: `${updatedUser?.firstName} ha comenzado a seguirte`,
+        message: `${updatedUser?.name} ha comenzado a seguirte`,
         data: {
           followerId: updatedUser?.id,
-          followerName: updatedUser?.firstName + " " + updatedUser?.lastName,
-          followerImage: updatedUser?.profilePicture || null,
+          followerName: updatedUser?.name,
+          followerImage: updatedUser?.image || null,
         },
       },
     });

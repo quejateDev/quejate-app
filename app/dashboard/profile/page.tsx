@@ -6,21 +6,19 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { User, Scale, ArrowRight, Edit2 } from 'lucide-react';
-import useAuthStore from '@/store/useAuthStore';
 import Link from 'next/link';
 import usePQR from '@/hooks/usePQR';
-import useUser from '@/hooks/useUser';
 import { useToast } from '@/hooks/use-toast';
 import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
 import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { UserProfileEditModal, UserProfileUpdateData } from '@/components/forms/UserProfileEdit';
+import { useFullUser } from '@/components/UserProvider';
 
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
-  const { user: currentUser } = useAuthStore();
+  const currentUser = useFullUser();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
-  const { user: userProfile, fetchUser, isLoading: userLoading } = useUser();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
@@ -30,13 +28,7 @@ export default function ProfilePage() {
     }
   }, [currentUser?.id]);
 
-  useEffect(() => {
-    if (currentUser?.id) {
-      fetchUser(currentUser.id);
-    }
-  }, [currentUser]);
-
-  const isOwnProfile = userProfile ? userProfile.id === currentUser?.id : false;
+  const isOwnProfile = true;
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -90,11 +82,11 @@ export default function ProfilePage() {
   };
 
   const getFullName = () => {
-    if (!userProfile) return '';
-    return `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
+    if (!currentUser) return '';
+    return `${currentUser.name || ''}`.trim();
   };
 
-  if (!currentUser && !userLoading) {
+  if (!currentUser) {
     return (
       <div className="container mx-auto p-4">
         <p className="text-muted-foreground">Por favor inicia sesión para ver tu perfil</p>
@@ -118,7 +110,7 @@ export default function ProfilePage() {
         <div className="space-y-4">
           {pqrs.map((pqr) => (
             //@ts-ignore
-            <PQRCard key={pqr.id} pqr={pqr} user={userProfile || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
+            <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
           ))}
         </div>
       );
@@ -150,7 +142,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="mx-auto mb-6 w-32 h-32">
                   <Avatar className="h-32 w-32 border-2 border-primary">
-                    <AvatarImage src={userProfile?.profilePicture || ""} alt={getFullName()} />
+                    <AvatarImage src={currentUser?.image || ""} alt={getFullName()} />
                     <AvatarFallback className="bg-muted-foreground/10">
                       <User className="h-16 w-16 stroke-1" />
                     </AvatarFallback>
@@ -168,7 +160,7 @@ export default function ProfilePage() {
               className="w-full"
             />
 
-            {userProfile?.role !== 'LAWYER' && !userLoading && (
+            {currentUser?.role !== 'LAWYER' && (
               <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
                 <CardHeader className="text-center">
                   <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
@@ -201,7 +193,7 @@ export default function ProfilePage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleSaveProfile}
-        initialData={userProfile || undefined}
+        initialData={currentUser || undefined}
       />
     </div>
   );

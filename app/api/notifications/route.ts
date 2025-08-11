@@ -1,28 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import  prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/utils";
+import { currentUser } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "No token provided" },
-        { status: 401 }
-      );
-    }
-
-    const decoded = await verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 }
-      );
-    }
+    const currentUserId = await currentUser();
 
     const notifications = await prisma.notification.findMany({
       where: {
-        userId: decoded.id,
+        userId: currentUserId?.id,
       },
       orderBy: {
         createdAt: "desc",
@@ -42,17 +28,12 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
-    if (!token) {
+
+    const currentUserId = await currentUser();
+
+    if (!currentUserId) {
       return NextResponse.json(
-        { error: "No token provided" },
-        { status: 401 }
-      );
-    }
-    const decoded = await verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { error: "Invalid token" },
+        { error: "User not authenticated" },
         { status: 401 }
       );
     }
@@ -62,7 +43,7 @@ export async function PATCH(req: NextRequest) {
     await prisma.notification.update({
       where: {
         id: notificationId,
-        userId: decoded.id,
+        userId: currentUserId.id,
       },
       data: {
         read: true,

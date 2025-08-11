@@ -5,8 +5,7 @@ export interface Rating {
   createdAt: string;
   client: {
     id: string;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
+    name: string;
+    image?: string;
   };
 }

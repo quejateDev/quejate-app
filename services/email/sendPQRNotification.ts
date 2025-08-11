@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import PQRNotificationEmail from '@/emails/pqr-notification';
+import PQRNotificationEmail from '@/emails/templates/pqr-notification';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -32,7 +32,7 @@ export async function sendPQRNotificationEmail(
           consecutiveCode: consecutiveCode,
         },
         creatorInfo: {
-          name: creatorData ? `${creatorData?.firstName} ${creatorData?.lastName}` : 'Anónimo',
+          name: creatorData ? `${creatorData?.name}` : 'Anónimo',
           email: creatorData ? creatorData?.email : 'Anónimo',
           phone: creatorData ? creatorData?.phone : 'Anónimo',
         },

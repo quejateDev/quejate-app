@@ -3,11 +3,11 @@
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { toggleLike } from "@/services/api/pqr.service";
-import useAuthStore from "@/store/useAuthStore";
 import { Heart } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useLoginModal } from "@/providers/LoginModalProivder";
+import { useLoginModal } from "@/providers/LoginModalProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { useFullUser } from "../UserProvider";
 
 // Componente para las partículas de like
 const LikeParticle = ({ delay = 0 }) => {
@@ -54,7 +54,7 @@ export default function LikeButton({
   pqrId: string;
   likes: number;
 }) {
-  const { user } = useAuthStore();
+  const user = useFullUser();
   const [liked, setLiked] = useState(initialLiked);
   const [isLoading, setIsLoading] = useState(false);
   const [likeCount, setLikeCount] = useState(likes || 0);

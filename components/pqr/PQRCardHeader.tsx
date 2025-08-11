@@ -103,7 +103,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
   };
 
   const creatorName = !pqr.anonymous && pqr.creator
-    ? `${pqr.creator.firstName} ${pqr.creator.lastName}`
+    ? `${pqr.creator.name}`
     : "Anónimo";
 
   const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
@@ -121,12 +121,12 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 border border-quaternary">
-              {pqr.anonymous || !pqr.creator?.profilePicture ? (
+              {pqr.anonymous || !pqr.creator?.image ? (
                   <AvatarFallback className="bg-muted-foreground/10">
                     <User className="h-5 w-5 stroke-1 text-quaternary" />
                   </AvatarFallback>
               ) : (
-                <AvatarImage src={pqr.creator.profilePicture} alt={creatorName} />
+                <AvatarImage src={pqr.creator.image} alt={creatorName} />
                 )
               }
             </Avatar>
@@ -187,9 +187,9 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
             <div className="flex items-center justify-center h-8 w-8 rounded-full border-tertiary border bg-gray-100">
               {pqr.anonymous ? (
                 <User className="h-6 w-6 stroke-1" />
-              ) : pqr.creator?.profilePicture ? (
+              ) : pqr.creator?.image ? (
                 <Image
-                  src={pqr.creator.profilePicture}
+                  src={pqr.creator.image}
                   alt={creatorName}
                   width={48}
                   height={48}

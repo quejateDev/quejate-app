@@ -15,10 +15,9 @@ export interface LawyerRequest {
     feePerHour?: number;
     user: {
       id: string;
-      firstName: string;
-      lastName: string;
+      name: string;
       email: string;
-      profilePicture?: string;
+      image?: string;
       phone?: string;
     };
     receivedRatings: Array<{ score: number }>;

@@ -2,10 +2,9 @@ export interface Lawyer {
   id: string;
   user: {
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     email: string;
-    profilePicture: string | null;
+    image: string | null;
     phone: string | null;
   };
 }

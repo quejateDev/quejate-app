@@ -2,21 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendOversightDocumentEmail, sendOversightCreationConfirmationEmail } from "@/services/email/Resend.service";
 import { verifyToken } from "@/lib/utils";
 import prisma from "@/lib/prisma";
+import { currentUser } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "No token provided" },
-        { status: 401 }
-      );
-    }
+    const currentUserId = await currentUser();
 
-    const decoded = await verifyToken(token);
-    if (!decoded) {
+    if (!currentUserId) {
       return NextResponse.json(
-        { error: "Invalid token" },
+        { error: "No autorizado, inicie sesión nuevamente" },
         { status: 401 }
       );
     }
@@ -45,22 +39,21 @@ export async function POST(req: NextRequest) {
     const pqrUrl = `https://quejate.com.co/dashboard/pqr/${pqrData.id}`;
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id: currentUserId.id },
       select: {
         email: true,
-        firstName: true,
-        lastName: true
+        name: true
       }
     });
 
-    if (!user) {
+    if (!user || !user.email) {
       return NextResponse.json(
         { error: "Usuario no encontrado" },
         { status: 404 }
       );
     }
 
-    const userName = `${user.firstName} ${user.lastName}`.trim();
+    const userName = `${user.name}`.trim();
 
     await sendOversightDocumentEmail(
       oversightEntity.email,

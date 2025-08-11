@@ -193,15 +193,15 @@ export function LawyerRequestsList() {
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Avatar className="h-8 w-8 border border-primary">
                             <AvatarImage 
-                              src={request.user.profilePicture || undefined} 
-                              alt={`${request.user.firstName} ${request.user.lastName}`}
+                              src={request.user.image || undefined} 
+                              alt={`${request.user.name}`}
                             />
                             <AvatarFallback className="bg-muted-foreground/10">
                               <User className="h-5 w-5 stroke-1" />
                             </AvatarFallback>
                           </Avatar>
                           <h3 className="font-semibold text-lg break-words">
-                            {request.user.firstName} {request.user.lastName}
+                            {request.user.name}
                           </h3>
                           <Badge className={statusConfig[request.status].color}>
                             <StatusIcon className="w-3 h-3 mr-1" />

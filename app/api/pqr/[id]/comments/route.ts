@@ -34,9 +34,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         user: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
           },
         },
       },
@@ -45,7 +44,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (userId !== pqr.creatorId) {
       const commentingUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { firstName: true, lastName: true, profilePicture: true },
+        select: { name: true, image: true },
       });
 
       if (commentingUser) {
@@ -53,12 +52,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           data: {
             type: "comment",
             userId: pqr.creatorId,
-            message: `${commentingUser.firstName} ${commentingUser.lastName} ha comentado tu PQRSD`,
+            message: `${commentingUser.name} ha comentado tu PQRSD`,
             data: {
               pqrId: pqrId,
               followerId: userId,
-              followerName: `${commentingUser.firstName} ${commentingUser.lastName}`,
-              followerImage: commentingUser.profilePicture || null,
+              followerName: `${commentingUser.name}`,
+              followerImage: commentingUser.image || null,
             },
           },
         });
@@ -81,9 +80,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         user: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
+            name: true,
+            image: true,
           },
         },
       },

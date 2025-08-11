@@ -183,7 +183,7 @@ export async function GeneratePQRCertificate(data: PQR) {
       await addTextWithPageControl("Solicitud realizada de forma anónima", margins.left);
     } else if (data.creator) {
       await addTextWithPageControl(
-        `Nombre: ${data.creator.firstName} ${data.creator.lastName}`,
+        `Nombre: ${data.creator.name}`,
         margins.left
       );
     } else {

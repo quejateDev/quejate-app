@@ -59,7 +59,7 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             <div>
               {pqr.anonymous || !pqr.creator
                 ? "Anónimo"
-                : `${pqr.creator?.firstName} ${pqr.creator?.lastName}`}
+                : `${pqr.creator?.name}`}
             </div>
 
             <div className="font-semibold">Tipo de requerimiento:</div>

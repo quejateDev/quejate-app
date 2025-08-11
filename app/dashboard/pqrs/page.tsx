@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import useAuthStore from '@/store/useAuthStore';
 import { PQRCard } from '@/components/pqr/PQRCard';
 import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { getGetPQRDTO } from '@/dto/pqr.dto';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
 export default function UserPQRs() {
   const [pqrs, setPqrs] = useState<getGetPQRDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuthStore();
+  const user = useCurrentUser();
 
   useEffect(() => {
     fetchUserPQRs();

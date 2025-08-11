@@ -6,7 +6,8 @@ import PQRList from "@/components/pqr/pqrsd-list";
 import { Header } from "@/components/Header";
 import EntitiesSidebar from "@/components/sidebars/EntitiesSidebar";
 import UserSidebar from "@/components/sidebars/UserSidebar";
-import { getCurrentUser } from "@/lib/auth";
+import { getFullUserWithFollowingStatus, getUsersForSidebar } from "@/data/user";
+import { currentUser } from "@/lib/auth";
 
 interface PageProps {
   searchParams: Promise<{
@@ -18,8 +19,13 @@ interface PageProps {
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
+  const sessionUser = await currentUser();
+  const fullUser = sessionUser
+    ? await getFullUserWithFollowingStatus(sessionUser.id!)
+    : null;
 
-  const currentUser = await getCurrentUser(); 
+  const { topUsers, discoverUsers } = await getUsersForSidebar(fullUser?.id);
+
   // Fetch entities and departments for filters
   const entities = await prisma.entity.findMany({
     select: {
@@ -73,9 +79,8 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       creator: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
-          profilePicture: true,
+          name: true,
+          image: true,
         },
       },
       comments: {
@@ -85,9 +90,8 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           createdAt: true,
           user: {
             select: {
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
+              name: true,
+              image: true,
             },
           },
         },
@@ -157,10 +161,14 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               </h1>
             </div>
             <PQRFilters entities={entities} departments={departments} />
-            <PQRList pqrs={pqrs} currentUser = {currentUser || null} />
+            <PQRList pqrs={pqrs} currentUser={fullUser || null} />
           </div>
           <div className="hidden lg:block mt-8">
-            <UserSidebar currentUser = {currentUser || null} />
+            <UserSidebar
+              currentUser={fullUser}
+              initialTopUsers={topUsers}
+              initialDiscoverUsers={discoverUsers}
+            />
           </div>
         </div>
       </div>

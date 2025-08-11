@@ -120,7 +120,7 @@ export function RatingsModal({ isOpen, onClose, lawyerUserId, lawyerName }: Rati
                 <div key={rating.id} className="border rounded-lg p-4 space-y-3">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={rating.client.profilePicture} />
+                      <AvatarImage src={rating.client.image} />
                       <AvatarFallback className="bg-muted-foreground/10">
                         <User className="h-5 w-5 stroke-1" />
                       </AvatarFallback>
@@ -128,7 +128,7 @@ export function RatingsModal({ isOpen, onClose, lawyerUserId, lawyerName }: Rati
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium">
-                          {rating.client.firstName} {rating.client.lastName}
+                          {rating.client.name}
                         </h4>
                         <span className="text-sm text-muted-foreground">
                           {formatDate(rating.createdAt)}
