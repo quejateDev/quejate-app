@@ -25,7 +25,7 @@ export const VerificationEmail = ({
   return (
     <EmailLayout preview="Verifica tu correo electrónico en Quejate">
       <Heading style={baseStyles.heading}>
-        ¡Bienvenidos!
+        ¡Bienvenido!
       </Heading>
       
       <Text style={baseStyles.paragraph}>

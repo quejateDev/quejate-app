@@ -30,6 +30,7 @@ export async function getUsersForSidebar(
   discoverUsers: UserWithFollowingStatus[];
 }> {
   const allUsers = await prisma.user.findMany({
+    where: { emailVerified: { not: null } },
     include: {
       _count: { select: { PQRS: true, followers: true, following: true } },
       followers: { select: { id: true, name: true } },
