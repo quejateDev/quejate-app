@@ -21,7 +21,7 @@ interface PageProps {
 export default async function DashboardPage({ searchParams }: PageProps) {
   const sessionUser = await currentUser();
   const fullUser = sessionUser
-    ? await getFullUserWithFollowingStatus(sessionUser.id)
+    ? await getFullUserWithFollowingStatus(sessionUser.id!)
     : null;
 
   const { topUsers, discoverUsers } = await getUsersForSidebar(fullUser?.id);

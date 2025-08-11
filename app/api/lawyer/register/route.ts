@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     const lawyer = await prisma.lawyer.create({
       data: {
-        userId: userId.id,
+        userId: userId.id!,
         documentType: requestBody.documentType as DocumentType,
         identityDocument: requestBody.identityDocument,
         identityDocumentImage: requestBody.identityDocumentImage,

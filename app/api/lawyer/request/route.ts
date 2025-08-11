@@ -167,7 +167,7 @@ export async function POST(request: Request) {
 
     const lawyerRequest = await prisma.lawyerRequest.create({
       data: {
-        userId: currentUserId.id,
+        userId: currentUserId.id!,
         lawyerId: lawyer.id,
         pqrId: pqrId || null,
         message,

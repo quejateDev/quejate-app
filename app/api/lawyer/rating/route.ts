@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const newRating = await prisma.rating.create({
       data: {
         lawyerId: lawyer.id,
-        clientId: currentUserId.id,
+        clientId: currentUserId.id!,
         score,
         comment
       },

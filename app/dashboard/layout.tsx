@@ -11,9 +11,9 @@ import { LoginModalProvider } from "@/providers/LoginModalProvider";
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const sessionUser = await currentUser();
   const fullUser = sessionUser
-    ? await getFullUserWithFollowingStatus(sessionUser.id)
+    ? await getFullUserWithFollowingStatus(sessionUser.id!)
     : null;
-
+  
   return (
     <UserProvider value={fullUser}>
       <SidebarProvider>

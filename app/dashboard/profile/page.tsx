@@ -8,19 +8,17 @@ import { Button } from '@/components/ui/button';
 import { User, Scale, ArrowRight, Edit2 } from 'lucide-react';
 import Link from 'next/link';
 import usePQR from '@/hooks/usePQR';
-import useUser from '@/hooks/useUser';
 import { useToast } from '@/hooks/use-toast';
 import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
 import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { UserProfileEditModal, UserProfileUpdateData } from '@/components/forms/UserProfileEdit';
-import { useCurrentUser } from '@/hooks/use-current-user';
+import { useFullUser } from '@/components/UserProvider';
 
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
-  const currentUser = useCurrentUser();
+  const currentUser = useFullUser();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
-  const { user: userProfile, fetchUser, isLoading: userLoading } = useUser();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
@@ -30,7 +28,7 @@ export default function ProfilePage() {
     }
   }, [currentUser?.id]);
 
-  const isOwnProfile = userProfile ? userProfile.id === currentUser?.id : false;
+  const isOwnProfile = true;
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -84,11 +82,11 @@ export default function ProfilePage() {
   };
 
   const getFullName = () => {
-    if (!userProfile) return '';
-    return `${userProfile.name || ''}`.trim();
+    if (!currentUser) return '';
+    return `${currentUser.name || ''}`.trim();
   };
 
-  if (!currentUser && !userLoading) {
+  if (!currentUser) {
     return (
       <div className="container mx-auto p-4">
         <p className="text-muted-foreground">Por favor inicia sesión para ver tu perfil</p>
@@ -112,7 +110,7 @@ export default function ProfilePage() {
         <div className="space-y-4">
           {pqrs.map((pqr) => (
             //@ts-ignore
-            <PQRCard key={pqr.id} pqr={pqr} user={userProfile || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
+            <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
           ))}
         </div>
       );
@@ -162,7 +160,7 @@ export default function ProfilePage() {
               className="w-full"
             />
 
-            {userProfile?.role !== 'LAWYER' && !userLoading && (
+            {currentUser?.role !== 'LAWYER' && (
               <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
                 <CardHeader className="text-center">
                   <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
@@ -195,7 +193,7 @@ export default function ProfilePage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleSaveProfile}
-        initialData={userProfile || undefined}
+        initialData={currentUser || undefined}
       />
     </div>
   );

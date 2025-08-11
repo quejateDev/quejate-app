@@ -15,13 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, User, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ExtendedUser } from "@/next-auth";
+import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface UserProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedData: UserProfileUpdateData) => Promise<boolean>;
-  initialData?: ExtendedUser;
+  initialData?: UserWithFollowingStatus;
 }
 
 export interface UserProfileUpdateData {

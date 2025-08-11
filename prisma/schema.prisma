@@ -22,6 +22,7 @@ model User {
   entityId          String?
   isActive          Boolean              @default(true)
   isVerified        Boolean              @default(false)
+  isOAuth           Boolean?              
   comments          Comment[]
   EmailVerification EmailVerification[]
   EntityHasUser     EntityHasUser[]

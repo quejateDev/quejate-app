@@ -127,7 +127,6 @@ export function LawyerProfileEditModal({
               name="feePerHour"
               type="number"
               min="0"
-              step="1000"
               placeholder="Ej: 150000"
               value={formData.feePerHour}
               onChange={handleInputChange}
