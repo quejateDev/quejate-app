@@ -15,18 +15,17 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, User, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { User as UserType } from "@/types/user";
+import { ExtendedUser } from "@/next-auth";
 
 interface UserProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedData: UserProfileUpdateData) => Promise<boolean>;
-  initialData?: UserType;
+  initialData?: ExtendedUser;
 }
 
 export interface UserProfileUpdateData {
   name: string;
-  phone: string;
   image?: string | null;
   currentPassword?: string;
   newPassword?: string;
@@ -40,7 +39,6 @@ export function UserProfileEditModal({
 }: UserProfileEditModalProps) {
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -62,7 +60,6 @@ export function UserProfileEditModal({
     if (initialData && isOpen) {
       setFormData({
         name: initialData.name || "",
-        phone: initialData.phone || "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -139,15 +136,6 @@ export function UserProfileEditModal({
       return false;
     }
 
-    if (!formData.phone.trim()) {
-      toast({
-        title: "Error",
-        description: "El teléfono es requerido",
-        variant: "destructive",
-      });
-      return false;
-    }
-
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
       toast({
         title: "Error",
@@ -196,7 +184,6 @@ export function UserProfileEditModal({
 
       const updateData: UserProfileUpdateData = {
         name: formData.name.trim(),
-        phone: formData.phone.trim(),
         image: shouldRemoveProfilePicture ? null : (imageUrl || undefined),
         currentPassword: formData.currentPassword.trim() || undefined,
         newPassword: formData.newPassword.trim() || undefined,
@@ -223,7 +210,6 @@ export function UserProfileEditModal({
     if (!loading) {
       setFormData({
         name: "",
-        phone: "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -315,7 +301,7 @@ export function UserProfileEditModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre *</Label>
+              <Label htmlFor="name">Nombre completo *</Label>
               <Input
                 id="name"
                 name="name"
@@ -329,21 +315,8 @@ export function UserProfileEditModal({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono *</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              placeholder="Ingresa tu número de teléfono"
-              className="border-muted"
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div className="space-y-4 border-t pt-4">
+          {!initialData?.isOAuth &&(
+            <div className="space-y-4 border-t pt-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
               Cambiar Contraseña
             </h4>
@@ -420,6 +393,7 @@ export function UserProfileEditModal({
               </div>
             </div>
           </div>
+          )}
 
           <DialogFooter>
             <Button
