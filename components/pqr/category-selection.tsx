@@ -7,7 +7,7 @@ import { Input } from "../ui/input";
 import { Category, RegionalDepartment, Municipality } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { Heart, Loader2, ChevronLeft, Search } from "lucide-react";
+import { Heart, Loader2, ChevronLeft, Search, ImageIcon } from "lucide-react";
 import {
   getMunicipalitiesByDepartment,
   getRegionalDepartments,
@@ -390,7 +390,7 @@ export function CategorySelection({
               )}
               onClick={() => setSelectedCategory(category)}
             >
-              {/* <div className="relative w-32 h-32 flex items-center">
+              <div className="relative w-32 h-32 flex items-center">
                 {category.imageUrl ? (
                   category.imageUrl.endsWith('.json') ? (
                     <div className="w-32 h-32 flex">
@@ -416,7 +416,7 @@ export function CategorySelection({
                     <ImageIcon className="w-5 h-5 text-gray-400" />
                   </div>
                 )}
-              </div> */}
+              </div>
               <h3 className="font-semibold text-center">{category.name}</h3>
               {category.description && (
                 <p className="text-xs text-gray-500 text-justify px-2">
