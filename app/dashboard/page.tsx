@@ -165,7 +165,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           </div>
           <div className="hidden lg:block mt-8">
             <UserSidebar
-              currentUser={fullUser}
               initialTopUsers={topUsers}
               initialDiscoverUsers={discoverUsers}
             />
