@@ -11,10 +11,10 @@ import { FollowStats } from "@/components/FollowStats";
 import { useParams } from "next/navigation";
 import useUser from "@/hooks/useUser";
 import usePQR from "@/hooks/usePQR";
-import { useCurrentUser } from "@/hooks/use-current-user";
+import { useFullUser } from "@/components/UserProvider";
 
 export default function ProfilePage() {
-  const currentUser = useCurrentUser();
+  const currentUser = useFullUser();
   const params = useParams();
   const { id } = params;
   const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = useUser();
@@ -136,7 +136,7 @@ export default function ProfilePage() {
               [...Array(3)].map((_, i) => <PQRSkeleton key={i} />)
             ) : pqrs?.length && pqrs.length > 0 ? (
               // @ts-ignore
-              pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />)
+              pqrs?.filter(pqr => !pqr.anonymous).map((pqr) => <PQRCard user={currentUser || null} key={pqr.id} pqr={pqr} isUserProfile={isOwnProfile} />)
             ) : (
               <p className="text-muted-foreground">No hay PQRSD publicadas</p>
             )}
