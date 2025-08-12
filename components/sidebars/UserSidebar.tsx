@@ -13,7 +13,6 @@ import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface DashboardSidebarProps {
   className?: string;
-  currentUser: UserWithFollowingStatus | null;
   initialTopUsers: UserWithFollowingStatus[];
   initialDiscoverUsers: UserWithFollowingStatus[];
 }
@@ -21,7 +20,6 @@ interface DashboardSidebarProps {
 
 export default function UserSidebar({
   className = "",
-  currentUser,
   initialTopUsers,
   initialDiscoverUsers
 }: DashboardSidebarProps) {
@@ -129,7 +127,7 @@ export default function UserSidebar({
           </p>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="max-h-[300px] h-auto">
+          <ScrollArea className="h-[300px] h-auto">
             <div className="space-y-4 pr-2">
               {topUsers.map((user, index) => (
                 <div key={user.id}>

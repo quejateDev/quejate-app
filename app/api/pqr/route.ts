@@ -207,10 +207,6 @@ export async function POST(req: NextRequest) {
         entity.email,
         entity.name,
         pqr,
-        pqr.creator,
-        pqr.customFieldValues,
-        pqr.attachments,
-        pqr.consecutiveCode
       );
     } else {
       throw new Error("No email found for this entity");

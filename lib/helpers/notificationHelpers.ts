@@ -37,7 +37,7 @@ export async function createNewRequestNotificationForLawyer(
 ) {
   try {
     const notificationMessage = pqrSubject 
-      ? `${clientName} ha enviado una solicitud de asesoría para la PQR: "${pqrSubject}"`
+      ? `${clientName} ha enviado una solicitud de asesoría para una PQRSD: "${pqrSubject}"`
       : `${clientName} ha enviado una nueva solicitud de asesoría legal`;
 
     const lawyer = await prisma.lawyer.findUnique({
