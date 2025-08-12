@@ -1,6 +1,4 @@
 import PqrCreationEmail from "@/emails/templates/pqr-creation";
-import VerificationEmail from "@/emails/templates/VerificationEmail";
-import ResetPasswordEmail from "@/emails/templates/ResetPasswordEmail";
 import OversightCreationEmail from "@/emails/templates/oversight-control-creation";
 import { Resend } from "resend";
 import OversightNotificationEmail from "@/emails/templates/oversight-notification";
@@ -25,36 +23,6 @@ export async function sendPQRCreationEmail(
       creationDate: creationDate,
       pqrLink: pqrLink,
     }),
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
-}
-
-export async function sendVerificationEmail(email: string, token: string) {
-  const { data, error } = await resend.emails.send({
-    from: "noresponder@quejate.com.co",
-    to: [email],
-    subject: "Verifique su correo electr&oacute;nico",
-    react: VerificationEmail({ userName: email, token: token }),
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
-}
-
-export async function sendPasswordResetEmail(email: string, token: string) {
-  const { data, error } = await resend.emails.send({
-    from: "noresponder@quejate.com.co",
-    to: [email],
-    subject: "Restablece tu contraseña - Quejate",
-    react: ResetPasswordEmail({ userName: email, token: token }),
   });
 
   if (error) {

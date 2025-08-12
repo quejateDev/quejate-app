@@ -7,10 +7,6 @@ export async function sendPQRNotificationEmail(
   entityEmail: string,
   entityName: string,
   pqrData: any,
-  creatorData: any,
-  customFields: any[],
-  attachments: any[],
-  consecutiveCode: string
 ) {
   try {
     const { data, error } = await resend.emails.send({
@@ -22,22 +18,22 @@ export async function sendPQRNotificationEmail(
         pqrInfo: {
           id: pqrData.id,
           type: pqrData.type,
-          title: pqrData.title,
+          subject: pqrData.subject,
           description: pqrData.description,
           createdAt: new Date(pqrData.createdAt).toLocaleString('es-CO', {
             timeZone: 'America/Bogota',
           }),
           status: pqrData.status,
           isAnonymous: pqrData.anonymous,
-          consecutiveCode: consecutiveCode,
+          consecutiveCode: pqrData.consecutiveCode,
         },
         creatorInfo: {
-          name: creatorData ? `${creatorData?.name}` : 'Anónimo',
-          email: creatorData ? creatorData?.email : 'Anónimo',
-          phone: creatorData ? creatorData?.phone : 'Anónimo',
+          name: pqrData.creator ? `${pqrData.creator.name}` : 'Anónimo',
+          email: pqrData.creator ? pqrData.creator.email : 'Anónimo',
+          phone: pqrData.creator ? pqrData.creator.phone : 'Anónimo',
         },
-        customFields,
-        attachments,
+        customFields: pqrData.customFieldValues,
+        attachments: pqrData.attachments,
         pqrUrl: `https://quejate.com.co/dashboard/pqr/${pqrData.id}`,
       }),
     });

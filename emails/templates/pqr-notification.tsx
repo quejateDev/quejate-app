@@ -14,7 +14,7 @@ interface PQRNotificationEmailProps {
   pqrInfo: {
     id: string;
     type: string;
-    title: string;
+    subject: string;
     description: string;
     createdAt: string;
     status: string;
@@ -53,7 +53,7 @@ export default function PQRNotificationEmail({
   return (
     <EmailLayout preview={`Nueva PQRSD recibida - ${entityName}`}>
       <Heading style={baseStyles.heading}>
-        🔔 Nueva PQRSD Recibida
+        Nueva PQRSD Recibida
       </Heading>
 
       <Text style={baseStyles.paragraph}>
@@ -97,7 +97,7 @@ export default function PQRNotificationEmail({
           <strong>Tipo:</strong> {pqrTypeLabel}
         </Text>
         <Text style={{...baseStyles.paragraph, margin: '0 0 12px 0'}}>
-          <strong>Asunto:</strong> {pqrInfo.title}
+          <strong>Asunto:</strong> {pqrInfo.subject}
         </Text>
         <Text style={{...baseStyles.paragraph, margin: '0 0 12px 0'}}>
           <strong>Estado actual:</strong> {statusLabel}
@@ -109,7 +109,7 @@ export default function PQRNotificationEmail({
       </div>
 
       <Heading style={baseStyles.subheading}>
-        👤 Información del Ciudadano
+        Información del Ciudadano
       </Heading>
 
       <div style={{
