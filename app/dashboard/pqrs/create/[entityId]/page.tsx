@@ -1,6 +1,5 @@
 import { NewPQRForm } from "@/components/forms/new-pqr";
 
-
 export default async function NewPQR({ params }: any) {
   const { entityId} = await params;
 
