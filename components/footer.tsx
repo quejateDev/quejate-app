@@ -36,7 +36,7 @@ export default function Footer() {
                 href="/legal"
                 className="hover:text-quaternary text-sm transition-colors duration-300"
               >
-                Términos y Condiciones
+                Términos y condiciones
               </a>
           </div>
         </div>
