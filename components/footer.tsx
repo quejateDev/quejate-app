@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-flow-col md:auto-cols-auto gap-8">
           <div className="min-w-[200px] max-w-[300px]">
-            <h3 className="text-md font-semibold mb-4">Quejate</h3>
+            <h3 className="text-md font-semibold mb-4">Quéjate</h3>
             <p className="text-white text-sm">
               Solución integral para la gestión de PQRSD en tu organización.
             </p>
