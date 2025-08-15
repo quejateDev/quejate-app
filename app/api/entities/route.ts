@@ -26,6 +26,7 @@ export async function GET(req: Request) {
         description: true,
         imageUrl: true,
         email: true,
+        createdAt: true,
         municipalityId: true,
         regionalDepartmentId: true,
         category: { select: { id: true, name: true } },
