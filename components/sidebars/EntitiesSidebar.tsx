@@ -174,7 +174,8 @@ export default function EntitiesSidebar({ className = "" }: EntitiesSidebarProps
               <EntityRankAvatar entity={entity} rank={index + 1} />
               <div className="flex-1 min-w-0">
                 <Link href={`/dashboard/pqrs/create/${entity.id}`}>
-                  <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
+                  <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate"
+                     title={entity.name}>
                     {entity.name}
                   </p>
                 </Link>
