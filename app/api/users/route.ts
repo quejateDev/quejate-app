@@ -4,6 +4,11 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
+      where: {
+        role: {
+          notIn: ["ADMIN", "SUPER_ADMIN"]
+        }
+      },
       select: {
         id: true,
         name: true,
