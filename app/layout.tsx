@@ -37,7 +37,7 @@ export default function RootLayout({
         <link rel="icon" href="/IsotipoVector.svg" type="image/svg+xml" />
       </head>
       <body className="font-sans antialiased"> 
-        <SessionProvider>
+        <SessionProvider refetchOnWindowFocus={false}>
           <Providers>
             <LoginModalProvider>
               {children}

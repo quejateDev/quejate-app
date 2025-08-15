@@ -5,6 +5,13 @@ export const publicRoutes = [
     "/api/entities",
 ];
 
+export const privateRoutes = [
+  "/dashboard/profile",
+  "/dashboard/lawyer/lawyer-requests",
+  "/dashboard/lawyer"
+];
+
+
 export const authRoutes = [
     "/auth/login",
     "/auth/register",
