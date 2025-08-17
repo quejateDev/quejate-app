@@ -13,6 +13,8 @@ import FavoritesSidebar from '@/components/sidebars/FavoriteEntitiesSidebar';
 import { PQRSkeleton } from '@/components/pqr/pqr-skeleton';
 import { UserProfileEditModal, UserProfileUpdateData } from '@/components/forms/UserProfileEdit';
 import { useFullUser } from '@/components/UserProvider';
+import { StatusFilter } from '@/components/filters/status-filter';
+import { filterStatusOptions } from "@/constants/pqrMaps";
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +22,7 @@ export default function ProfilePage() {
   const currentUser = useFullUser();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,6 +32,10 @@ export default function ProfilePage() {
   }, [currentUser?.id]);
 
   const isOwnProfile = true;
+
+  const filteredPqrs = statusFilter === "all" 
+    ? pqrs 
+    : pqrs.filter(pqr => pqr.status === statusFilter);
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -105,10 +112,10 @@ export default function ProfilePage() {
       );
     }
 
-    if (pqrs.length > 0) {
+    if (filteredPqrs.length > 0) {
       return (
         <div className="space-y-4">
-          {pqrs.map((pqr) => (
+          {filteredPqrs.map((pqr) => (
             //@ts-ignore
             <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
           ))}
@@ -117,7 +124,12 @@ export default function ProfilePage() {
     }
 
     return (
-      <p className="text-muted-foreground">Aún no has creado ninguna PQRSD</p>
+      <p className="text-muted-foreground">
+        {statusFilter === "all" 
+          ? "Aún no has creado ninguna PQRSD" 
+          : `No tienes PQRSD con estado "${filterStatusOptions.find(opt => opt.value === statusFilter)?.label}"`
+        }
+      </p>
     );
   };
 
@@ -184,7 +196,13 @@ export default function ProfilePage() {
           </div>
         </div>
         <div className="lg:col-span-8">
-          <h3 className="text-lg font-semibold mb-4">Mis PQRSD Recientes</h3>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <h3 className="text-lg font-semibold">Mis PQRSD</h3>
+            <StatusFilter 
+              value={statusFilter} 
+              onValueChange={setStatusFilter}
+            />
+          </div>
           {renderPQRSContent()}
         </div>
       </div>
