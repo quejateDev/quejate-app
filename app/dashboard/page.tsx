@@ -160,7 +160,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
                 La comunidad opina
               </h1>
             </div>
-            <PQRFilters entities={entities} departments={departments} />
             <PQRList pqrs={pqrs} currentUser={fullUser || null} />
           </div>
           <div className="hidden lg:block mt-8">

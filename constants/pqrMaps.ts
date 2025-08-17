@@ -24,3 +24,11 @@ export const statusMap = {
     variant: "rejected",
   },
 } as const;
+
+export const filterStatusOptions = [
+  { label: "Todos los estados", value: "all" },
+  { label: "Pendiente", value: "PENDING" },
+  { label: "En Proceso", value: "IN_PROGRESS" },
+  { label: "Resuelto", value: "RESOLVED" },
+  { label: "Cerrado", value: "CLOSED" }
+] as const;

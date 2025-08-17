@@ -9,6 +9,7 @@ import { useLike } from "../../hooks/useLike";
 import { useVideoPlayback } from "../../hooks/useVideoPlayback";
 import { useComments } from "../../hooks/useComments";
 import { PQR } from "@/types/pqrsd";
+import { cn } from "@/lib/utils";
 
 export type PQRCardProps = {
   pqr: PQR;
@@ -27,7 +28,19 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
     initialLiked,
     pqr._count?.likes || 0
   );
+
+  const isOverdue = new Date(pqr.dueDate) < new Date() && 
+                   pqr.status !== "RESOLVED" && 
+                   pqr.status !== "CLOSED" && isUserProfile;
   
+  const cardClasses = cn(
+    "border-secondary",
+    {
+      "border-red-600": isOverdue,
+      "hover:shadow-md transition-shadow": !isOverdue
+    }
+  );
+
   const {
     commentCount,
     isVisible: showComments,
@@ -48,7 +61,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
   return (
     <div className="md:block">
       <div className="hidden md:block">
-        <Card className="border-secondary">
+        <Card  className={cardClasses}>
           <div className="p-6">
             <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
           </div>

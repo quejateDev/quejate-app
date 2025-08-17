@@ -16,34 +16,29 @@ function isBusinessDay(date: Date, holidays: Holiday[]): boolean {
     return isWeekday && !isHoliday(date, holidays);
 }
 
-export function calculateBusinessDaysExceeded(createdAt: Date, daysThreshold = 15): number {
-    const createdDate = new Date(createdAt);
-    const currentDate = new Date();
-    let businessDaysCount = 0;
-    let exceededDays = 0;
-
-    createdDate.setHours(0, 0, 0, 0);
-    currentDate.setHours(0, 0, 0, 0);
-    
-    const tempDate = new Date(createdDate);
-
-    while (businessDaysCount < daysThreshold && tempDate <= currentDate) {
-        if (isBusinessDay(tempDate, COLOMBIAN_HOLIDAYS)) {
-            businessDaysCount++;
-        }
-        tempDate.setDate(tempDate.getDate() + 1);
+export function calculateBusinessDaysExceeded(
+  dueDate: Date | string, 
+  businessDaysThreshold: number = 15
+): number {
+  const due = new Date(dueDate);
+  const currentDate = new Date();
+  
+  due.setHours(0, 0, 0, 0);
+  currentDate.setHours(0, 0, 0, 0);
+  
+  let exceededDays = 0;
+  const tempDate = new Date(due);
+  
+  tempDate.setDate(tempDate.getDate() + 1);
+  
+  while (tempDate <= currentDate) {
+    if (isBusinessDay(tempDate, COLOMBIAN_HOLIDAYS)) {
+      exceededDays++;
     }
-
-    if (businessDaysCount < daysThreshold) return 0;
-
-    while (tempDate <= currentDate) {
-        if (isBusinessDay(tempDate, COLOMBIAN_HOLIDAYS)) {
-            exceededDays++;
-        }
-        tempDate.setDate(tempDate.getDate() + 1);
-    }
-
-    return exceededDays;
+    tempDate.setDate(tempDate.getDate() + 1);
+  }
+  
+  return exceededDays;
 }
 
 export function calculateDueDate(createdAt: Date, businessDaysToAdd = 15): Date {

@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 import { sendPQRNotificationEmail } from "@/services/email/sendPQRNotification";
+import { calculateDueDate } from "@/utils/dateHelpers";
 
 interface FormFile extends File {
   arrayBuffer(): Promise<ArrayBuffer>;
@@ -33,9 +34,26 @@ export async function GET() {
         createdAt: "desc",
       },
       include: {
-        department: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            email: true,
+            entityId: true,
+          },
+        },
         customFieldValues: true,
-        attachments: true,
+        attachments: {
+          select: {
+            id: true,
+            name: true,
+            url: true,
+            pqrId: true,
+            size: true,
+            type: true,
+          },
+        },
       },
     });
 
@@ -117,9 +135,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Calcular fecha límite
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + maxResponseTime);
+    // Calcular fecha límite considerando días hábiles colombianos
+    const dueDate = calculateDueDate(new Date(), maxResponseTime);
 
     const consecutiveCode = await prisma.entityConsecutive.findFirst({
       where: {
