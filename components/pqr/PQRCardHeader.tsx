@@ -9,6 +9,7 @@ import { PQRAlertModal } from "./PQRAlertModal";
 import { toast } from "@/hooks/use-toast";
 import { PQR } from "@/types/pqrsd";
 import { AvatarFallback, Avatar, AvatarImage } from "../ui/avatar";
+import { formatDateWithoutTime } from "@/lib/dateUtils";
 
 type PQRCardHeaderProps = {
   pqr: PQR;
@@ -21,12 +22,12 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
   const [isPrivate, setIsPrivate] = useState(pqr.private);
 
   const showAlert = isUserProfile &&
-                pqr.type !== "SUGGESTION" &&
-                calculateBusinessDaysExceeded(pqr.createdAt) > 0 &&
-                pqr.status !== "RESOLVED" &&
-                pqr.status !== "CLOSED";
+              pqr.type !== "SUGGESTION" &&
+              new Date(pqr.dueDate).getTime() < new Date().getTime() &&
+              pqr.status !== "RESOLVED" &&
+              pqr.status !== "CLOSED";
 
-  const daysExceeded = calculateBusinessDaysExceeded(pqr.createdAt);
+  const daysExceeded = calculateBusinessDaysExceeded(pqr.dueDate);
 
   const handleResolved = async () => {
     setIsUpdating(true);
@@ -106,11 +107,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
     ? `${pqr.creator.name}`
     : "Anónimo";
 
-  const formattedDate = new Date(pqr.createdAt).toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = formatDateWithoutTime(pqr.createdAt);
 
   const statusInfo = statusMap[pqr.status];
   const typeInfo = typeMap[pqr.type];
@@ -172,7 +169,7 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                 </span>
                 <div className="hidden group-hover:block absolute right-0 top-full mt-1 bg-gray-800 text-white text-xs rounded p-2 whitespace-nowrap z-10 shadow-lg">
-                  Tiempo excedido de respuesta: {daysExceeded}
+                  Días excedidos de respuesta: {daysExceeded}
                 </div>
               </div>
             )}
