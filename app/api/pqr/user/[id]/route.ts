@@ -41,13 +41,32 @@ export async function GET(request: Request, params: any) {
           },
         },
         department: {
-          include: {
-            entity: true,
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            email: true,
+            entityId: true,
           },
         },
-        entity: true,
+        entity: {
+          select: {
+            id: true,
+            name: true,
+            categoryId: true,
+            imageUrl: true
+          },
+        },
         customFieldValues: true,
-        creator: true
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            email: true,
+            
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc',

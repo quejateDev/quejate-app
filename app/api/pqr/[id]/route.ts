@@ -30,11 +30,24 @@ export async function GET(
           },
         },
         department: {
-          include: {
-            entity: true,
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            email: true,
+            entityId: true,
           },
         },
-        entity: true,
+        entity: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            email: true,
+            categoryId: true,
+            imageUrl: true
+          },
+        },
         customFieldValues: true,
         creator: true
       },
