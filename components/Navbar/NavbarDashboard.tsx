@@ -74,7 +74,7 @@ export default function NavbarDashboard() {
                       className="text-lg font-semibold flex items-center"
                     >
                       <Users className="h-4 w-4 mr-2" />
-                      Explorar
+                      Descubrir usuarios
                     </Link>
                   </div>
                 </SheetContent>
