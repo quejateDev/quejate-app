@@ -31,7 +31,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
 
   const isOverdue = new Date(pqr.dueDate) < new Date() && 
                    pqr.status !== "RESOLVED" && 
-                   pqr.status !== "CLOSED";
+                   pqr.status !== "CLOSED" && isUserProfile;
   
   const cardClasses = cn(
     "border-secondary",

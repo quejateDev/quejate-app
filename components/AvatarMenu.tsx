@@ -29,8 +29,12 @@ export default function AvatarMenu() {
               userProfile?.name?.[0]
             }
           />
-          <AvatarFallback className="bg-muted-foreground/10">
-            <User className="h-6 w-6 stroke-1 text-quaternary" />
+          <AvatarFallback className="bg-muted-foreground/10 text-quaternary">
+            {userProfile?.name ? (
+              userProfile.name.charAt(0).toUpperCase()
+            ) : (
+              <User className="h-6 w-6 stroke-1 text-quaternary" />
+            )}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
