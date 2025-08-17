@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { User, UserPlus, Trophy } from "lucide-react";
-import { FollowButton } from '../Buttons/FollowButton';
-import { User as UserType } from '@/types/user';
+import { FollowButton } from "../Buttons/FollowButton";
+import { User as UserType } from "@/types/user";
 import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface DashboardSidebarProps {
@@ -17,35 +17,31 @@ interface DashboardSidebarProps {
   initialDiscoverUsers: UserWithFollowingStatus[];
 }
 
-
 export default function UserSidebar({
   className = "",
   initialTopUsers,
-  initialDiscoverUsers
+  initialDiscoverUsers,
 }: DashboardSidebarProps) {
   const [discoverUsers, setDiscoverUsers] = useState(initialDiscoverUsers);
   const [topUsers, setTopUsers] = useState(initialTopUsers);
 
   const handleFollowChange = (
-  userId: string,
-  isFollowing: boolean,
-  counts?: { followers: number; following: number; PQRS: number }
-) => {
-  setDiscoverUsers(prev =>
-    prev.map(user =>
-      user.id === userId
-        ? { ...user, isFollowing, _count: counts || user._count }
-        : user
-    )
-  );
-};
-
+    userId: string,
+    isFollowing: boolean,
+    counts?: { followers: number; following: number; PQRS: number }
+  ) => {
+    setDiscoverUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId
+          ? { ...user, isFollowing, _count: counts || user._count }
+          : user
+      )
+    );
+  };
 
   const UserAvatar = ({ user }: { user: UserType }) => (
     <Avatar className="h-10 w-10 border border-quaternary">
-      {user?.image && (
-        <AvatarImage src={user.image} alt={user.name || ""} />
-      )}
+      {user?.image && <AvatarImage src={user.image} alt={user.name || ""} />}
       <AvatarFallback className="bg-muted-foreground/10">
         <User className="h-6 w-6 stroke-1 text-quaternary" />
       </AvatarFallback>
@@ -55,11 +51,13 @@ export default function UserSidebar({
   const TopUserAvatar = ({ user, rank }: { user: UserType; rank: number }) => (
     <div className="relative">
       <Avatar className="h-10 w-10 border border-quaternary">
-        {user?.image && (
-          <AvatarImage src={user.image} alt={user.name || ""} />
-        )}
-        <AvatarFallback className="bg-muted-foreground/10">
-          <User className="h-5 w-5 stroke-1 text-quaternary" />
+        {user?.image && <AvatarImage src={user.image} alt={user.name || ""} />}
+        <AvatarFallback className="bg-muted-foreground/10 text-quaternary">
+          {user?.name ? (
+            user.name.charAt(0).toUpperCase()
+          ) : (
+            <User className="h-6 w-6 stroke-1 text-quaternary" />
+          )}
         </AvatarFallback>
       </Avatar>
       {rank <= 3 && (
@@ -80,42 +78,42 @@ export default function UserSidebar({
             <CardTitle className="flex items-center gap-2 text-lg">
               <UserPlus className="h-5 w-5 text-quaternary" />
               Descubrir usuarios
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {discoverUsers.map((user) => (
-            <div key={user.id} className="flex items-center gap-3">
-              <Link href={`/dashboard/profile/${user.id}`}>
-                <UserAvatar user={user} />
-              </Link>
-              <div className="flex-1 min-w-0">
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {discoverUsers.map((user) => (
+              <div key={user.id} className="flex items-center gap-3">
                 <Link href={`/dashboard/profile/${user.id}`}>
-                  <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
-                    {user.name}
-                  </p>
+                  <UserAvatar user={user} />
                 </Link>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user._count.followers} seguidores
-                </p>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/dashboard/profile/${user.id}`}>
+                    <p className="font-medium text-sm hover:text-quaternary transition-colors cursor-pointer truncate">
+                      {user.name}
+                    </p>
+                  </Link>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user._count.followers} seguidores
+                  </p>
+                </div>
+                <FollowButton
+                  userId={user.id}
+                  isFollowing={user.isFollowing ?? false}
+                  onFollowChange={(isFollowing, counts) =>
+                    handleFollowChange(user.id, isFollowing, counts)
+                  }
+                />
               </div>
-              <FollowButton
-                userId={user.id}
-                isFollowing={user.isFollowing ?? false}
-                onFollowChange={(isFollowing, counts) =>
-                  handleFollowChange(user.id, isFollowing, counts)
-                }
-              />
-            </div>
-          ))}
-          <Separator className="my-4 bg-white" />
-          <Link href="/dashboard/social">
-            <Button variant="outline" className="w-full" size="sm">
-              Ver más usuarios
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-    )}
+            ))}
+            <Separator className="my-4 bg-white" />
+            <Link href="/dashboard/social">
+              <Button variant="outline" className="w-full" size="sm">
+                Ver más usuarios
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
