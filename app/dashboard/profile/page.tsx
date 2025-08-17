@@ -140,7 +140,7 @@ export default function ProfilePage() {
           <div className="sticky top-4 space-y-6">
             <Card>
               <CardHeader className="text-center">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-2">
                   <div></div>
                   <Button
                     variant="outline"
@@ -152,11 +152,15 @@ export default function ProfilePage() {
                     Editar
                   </Button>
                 </div>
-                <div className="mx-auto mb-6 w-32 h-32">
-                  <Avatar className="h-32 w-32 border-2 border-primary">
+                <div className="mx-auto w-24 h-24">
+                  <Avatar className="h-24 w-24 border-2 border-primary">
                     <AvatarImage src={currentUser?.image || ""} alt={getFullName()} />
-                    <AvatarFallback className="bg-muted-foreground/10">
-                      <User className="h-16 w-16 stroke-1" />
+                    <AvatarFallback className="bg-muted-foreground/10 text-xl">
+                      {currentUser?.name ? (
+                        currentUser.name.charAt(0).toUpperCase()
+                      ) : (
+                        <User className="h-16 w-16 stroke-1" />
+                      )}
                     </AvatarFallback>
                   </Avatar>
                 </div>
