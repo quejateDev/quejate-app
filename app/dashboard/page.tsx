@@ -29,7 +29,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   const { topUsers, discoverUsers } = await getUsersForSidebar(fullUser?.id);
 
-  // Obtener datos iniciales directamente desde Prisma
   const initialPqrs = await prisma.pQRS.findMany({
     where: {
       private: false,

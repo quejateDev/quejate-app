@@ -5,6 +5,12 @@ import { currentUser } from "@/lib/auth";
 export async function GET(request: Request, params: any) {
   try {
     const { id: requestedUserId } = await params.params;
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    
+    const skip = (page - 1) * limit;
+    const take = Math.min(limit, 50);
 
     if (!requestedUserId) {
       return NextResponse.json(
@@ -52,16 +58,32 @@ export async function GET(request: Request, params: any) {
             name: true,
             image: true,
             email: true,
-            
           }
         }
       },
       orderBy: {
         createdAt: 'desc',
       },
+      skip,
+      take,
     });
 
-    return NextResponse.json(userPQRs);
+    const totalCount = await prisma.pQRS.count({
+      where: {
+        creatorId: requestedUserId,
+        private: isOwnProfile ? undefined : false
+      }
+    });
+
+    const hasMore = skip + take < totalCount;
+
+    return NextResponse.json({
+      pqrs: userPQRs,
+      hasMore,
+      nextPage: hasMore ? page + 1 : null,
+      totalCount
+    });
+
   } catch (error) {
     console.error("Error fetching user PQRs:", error);
     return NextResponse.json(

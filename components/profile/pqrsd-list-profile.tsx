@@ -1,44 +1,27 @@
 "use client";
 
-import { PQRCard } from "./PQRCard";
+
 import { PQR } from "@/types/pqrsd";
 import { UserBasic } from "@/types/user-basic";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { PQRCard } from "../pqr/PQRCard";
 
-interface PQRListProps {
-  initialPqrs: PQR[];
+interface PQRListProfileProps {
+  pqrs: PQR[];
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
   currentUser: UserBasic | null;
 }
 
-export default function PQRList({ initialPqrs, currentUser }: PQRListProps) {
-  const [pqrs, setPqrs] = useState<PQR[]>(initialPqrs);
-  const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(2);
-  const [hasMore, setHasMore] = useState(true);
-
-  const loadMorePqrs = async () => {
-    if (isLoading || !hasMore) return;
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/pqr?page=${page}&limit=10`);
-      const data = await response.json();
-      
-      if (data.pqrs && data.pqrs.length > 0) {
-        setPqrs(prev => [...prev, ...data.pqrs]);
-        setPage(prev => prev + 1);
-        setHasMore(data.hasMore);
-      } else {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error('Error loading more PQRS:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+export default function PQRListProfile({ 
+  pqrs, 
+  isLoading, 
+  hasMore, 
+  onLoadMore, 
+  currentUser 
+}: PQRListProfileProps) {
 
   return (
     <div className="space-y-6">
@@ -48,7 +31,7 @@ export default function PQRList({ initialPqrs, currentUser }: PQRListProps) {
           pqr={pqr}
           initialLiked={pqr.likes?.length > 0}
           user={currentUser || null}
-          isUserProfile={false}
+          isUserProfile={true}
         />
       ))}
       
@@ -61,7 +44,7 @@ export default function PQRList({ initialPqrs, currentUser }: PQRListProps) {
       {hasMore && (
         <div className="flex justify-center mt-8">
           <Button
-            onClick={loadMorePqrs}
+            onClick={onLoadMore}
             disabled={isLoading}
             variant="outline"
             size="lg"
@@ -84,6 +67,7 @@ export default function PQRList({ initialPqrs, currentUser }: PQRListProps) {
           <p className="text-muted-foreground">No hay más PQRSD para mostrar</p>
         </div>
       )}
+
     </div>
   );
 }

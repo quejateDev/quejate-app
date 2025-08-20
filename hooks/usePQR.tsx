@@ -2,13 +2,16 @@
 
 import { getPQRSById, getPQRSByUser } from "@/services/api/pqr.service";
 import { useState } from "react";
-import { getGetPQRDTO } from "@/dto/pqr.dto";
+import { PQR } from "@/types/pqrsd";
 
 export default function usePQR() {
-  const [pqr, setPqr] = useState<getGetPQRDTO>();
-  const [pqrs, setPqrs] = useState<getGetPQRDTO[]>([]);
+  const [pqr, setPqr] = useState<PQR>();
+  const [pqrs, setPqrs] = useState<PQR[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSingleLoading, setIsSingleLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   async function fetchPQR(id: string) {
     setIsSingleLoading(true);
@@ -22,15 +25,23 @@ export default function usePQR() {
     }
   }
 
-  async function fetchUserPQRS(id: string) {
-    setIsLoading(true);
+  async function fetchUserPQRS(id: string, pageNum: number = 1, limit: number = 10) {
+    const loadingState = pageNum === 1 ? setIsLoading : setIsLoadingMore;
+    
+    loadingState(true);
     try {
-      const response = await getPQRSByUser(id);
-      setPqrs(response);
+      const response = await getPQRSByUser(id, pageNum, limit);
+      if (pageNum === 1) {
+        setPqrs(response.pqrs);
+      } else {
+        setPqrs(prev => [...prev, ...response.pqrs]);
+      }
+      setHasMore(response.hasMore);
+      setPage(pageNum + 1);
     } catch (error) {
       console.error("Error fetching user PQRs:", error);
     } finally {
-      setIsLoading(false);
+      loadingState(false);
     }
   }
 
@@ -40,6 +51,9 @@ export default function usePQR() {
     pqr,
     pqrs,
     isLoading, 
-    isSingleLoading 
+    isLoadingMore,
+    isSingleLoading,
+    hasMore,
+    page
   };
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PQRCard } from '@/components/pqr/PQRCard';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,23 +14,27 @@ import { UserProfileEditModal, UserProfileUpdateData } from '@/components/forms/
 import { useFullUser } from '@/components/UserProvider';
 import { StatusFilter } from '@/components/filters/status-filter';
 import { filterStatusOptions } from "@/constants/pqrMaps";
+import PQRListProfile from '@/components/profile/pqrsd-list-profile';
 
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
   const currentUser = useFullUser();
-  const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
+  const { pqrs, fetchUserPQRS, isLoading: pqrsLoading, isLoadingMore: pqrsLoadingMore, hasMore, page } = usePQR();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
 
   useEffect(() => {
     if (currentUser?.id) {
-      fetchUserPQRS(currentUser.id);
+      fetchUserPQRS(currentUser.id, 1, 10);
     }
   }, [currentUser?.id]);
 
-  const isOwnProfile = true;
+  const loadMorePqrs = async () => {
+    if (pqrsLoading || !hasMore || !currentUser?.id) return;
+    await fetchUserPQRS(currentUser.id, page, 10);
+  };
 
   const filteredPqrs = statusFilter === "all" 
     ? pqrs 
@@ -102,7 +105,7 @@ export default function ProfilePage() {
   }
 
   const renderPQRSContent = () => {
-    if (pqrsLoading) {
+    if (pqrsLoading && pqrs.length === 0) {
       return (
         <div className="space-y-4">
           {[...Array(3)].map((_, index) => (
@@ -112,14 +115,15 @@ export default function ProfilePage() {
       );
     }
 
-    if (filteredPqrs.length > 0) {
+     if (filteredPqrs.length > 0) {
       return (
-        <div className="space-y-4">
-          {filteredPqrs.map((pqr) => (
-            //@ts-ignore
-            <PQRCard key={pqr.id} pqr={pqr} user={currentUser || null} initialLiked={pqr.likes?.some((like) => like.userId === currentUser?.id)} isUserProfile={isOwnProfile} />
-          ))}
-        </div>
+        <PQRListProfile
+          pqrs={filteredPqrs}
+          isLoading={pqrsLoadingMore}
+          hasMore={hasMore}
+          onLoadMore={loadMorePqrs}
+          currentUser={currentUser || null}
+        />
       );
     }
 
