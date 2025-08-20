@@ -31,14 +31,6 @@ export interface PQR {
     type: string;
     size: number;
   }[];
-  comments: {
-    id: string;
-    text: string;
-    createdAt: Date;
-    user: {
-      name: string | null;
-    };
-  }[];
   _count: {
     likes: number;
     comments: number;

@@ -22,6 +22,7 @@ type CommentSectionProps = {
     image?: string | null;
   } | null;
   initialComments: Comment[];
+  isLoading?: boolean;
   onCommentSubmit: (text: string) => void;
   onCommentCreated: (comment: Comment) => void;
 };
@@ -30,6 +31,7 @@ export function CommentSection({
   pqrId, 
   user, 
   initialComments, 
+  isLoading = false,
   onCommentSubmit,
   onCommentCreated 
 }: CommentSectionProps) {
