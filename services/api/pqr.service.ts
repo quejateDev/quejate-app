@@ -1,6 +1,6 @@
 import { Department, PQRS, User, Comment, Entity } from "@prisma/client";
-import { getGetPQRDTO } from "@/dto/pqr.dto";
 import axios from "axios";
+import { PQR } from "@/types/pqrsd";
 
 const Client = axios.create({
   baseURL: "/api",
@@ -46,13 +46,13 @@ export async function getPQRS() {
   return response.data;
 }
 
-export async function getPQRSById(id: PQRS["id"]): Promise<getGetPQRDTO> {
+export async function getPQRSById(id: PQRS["id"]): Promise<PQR> {
   const response = await Client.get(`/pqr/${id}`);
   return response.data;
 }
 
-export async function getPQRSByUser(userId: User["id"]) {
-  const response = await Client.get(`/pqr/user/${userId}`);
+export async function getPQRSByUser(userId: User["id"], page: number = 1, limit: number = 10) {
+  const response = await Client.get(`/pqr/user/${userId}?page=${page}&limit=${limit}`);
   return response.data;
 }
 
