@@ -44,12 +44,17 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
   const {
     commentCount,
     isVisible: showComments,
+    isLoadingComments,
     toggleComments,
     localComments,
     addLocalComment
-  } = useComments(pqr.comments);
+  } = useComments(pqr._count?.comments || 0);
 
   const { videoRefsDesktop, videoRefsMobile } = useVideoPlayback();
+  
+  const handleToggleComments = () => {
+    toggleComments(pqr.id);
+  };
 
   const handleCommentSubmit = async (text: string) => {
     console.log("Comentario enviado:", text);
@@ -79,7 +84,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
                 liked={liked}
                 likeCount={likeCount}
                 commentCount={commentCount}
-                onCommentClick={toggleComments}
+                onCommentClick={handleToggleComments}
                 pqrId={pqr.id}
               />
             </div>
@@ -88,6 +93,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
                 pqrId={pqr.id}
                 user={user}
                 initialComments={localComments}
+                isLoading={isLoadingComments}
                 onCommentSubmit={handleCommentSubmit}
                 onCommentCreated={addLocalComment}
               />
@@ -110,7 +116,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
             liked={liked}
             likeCount={likeCount}
             commentCount={commentCount}
-            onCommentClick={toggleComments}
+            onCommentClick={handleToggleComments}
             pqrId={pqr.id}
           />
         </div>
@@ -121,6 +127,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
               pqrId={pqr.id}
               user={user}
               initialComments={localComments}
+              isLoading={isLoadingComments}
               onCommentSubmit={handleCommentSubmit}
               onCommentCreated={addLocalComment}
             />

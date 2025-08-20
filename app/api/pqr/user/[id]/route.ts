@@ -24,28 +24,16 @@ export async function GET(request: Request, params: any) {
       include: {
         likes: true,
         attachments: true,
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true
-              }
-            }
-          }
-        },
         _count: {
           select: {
             likes: true,
+            comments: true
           },
         },
         department: {
           select: {
             id: true,
             name: true,
-            description: true,
-            email: true,
             entityId: true,
           },
         },

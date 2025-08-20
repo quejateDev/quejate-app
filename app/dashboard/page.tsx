@@ -43,19 +43,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           image: true,
         },
       },
-      comments: {
-        select: {
-          id: true,
-          text: true,
-          createdAt: true,
-          user: {
-            select: {
-              name: true,
-              image: true,
-            },
-          },
-        },
-      },
       department: {
         select: {
           name: true,
