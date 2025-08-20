@@ -129,8 +129,8 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error("Error fetching PQRs:", error);
-    return NextResponse.json({ error: "Error fetching PQRs" }, { status: 500 });
+    console.error("Error fetching PQRSD:", error);
+    return NextResponse.json({ error: "Error fetching PQRSD" }, { status: 500 });
   }
 }
 
