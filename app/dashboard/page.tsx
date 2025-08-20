@@ -1,6 +1,3 @@
-import { PQRSType } from "@prisma/client";
-import prisma from "@/lib/prisma";
-import { PQRFilters } from "@/components/filters/pqr-filters";
 import { Play } from "lucide-react";
 import PQRList from "@/components/pqr/pqrsd-list";
 import { Header } from "@/components/Header";
@@ -8,13 +5,19 @@ import EntitiesSidebar from "@/components/sidebars/EntitiesSidebar";
 import UserSidebar from "@/components/sidebars/UserSidebar";
 import { getFullUserWithFollowingStatus, getUsersForSidebar } from "@/data/user";
 import { currentUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 interface PageProps {
   searchParams: Promise<{
-    type?: string;
-    status?: string;
-    entity?: string;
-    department?: string;
+    page?: string;
+    limit?: string;
+  }>;
+}
+
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+    limit?: string;
   }>;
 }
 
@@ -26,54 +29,11 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   const { topUsers, discoverUsers } = await getUsersForSidebar(fullUser?.id);
 
-  // Fetch entities and departments for filters
-  const entities = await prisma.entity.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-
-  const departments = await prisma.department.findMany({
-    select: {
-      id: true,
-      name: true,
-      entityId: true,
-    },
-  });
-
-  const { department, entity, type, status } = await searchParams;
-
-  // Build where clause based on search params
-  const where: any = {
-    private: false,
-  };
-
-  if (type && type !== "all") {
-    where.type = type as PQRSType;
-  }
-
-  if (status && status !== "all") {
-    where.status = status;
-  }
-
-  if (entity && entity !== "all") {
-    where.department = {
-      entityId: entity,
-    };
-  }
-
-  if (department && department !== "all") {
-    where.departmentId = department;
-  }
-
-  // Fetch PQRs
-  const pqrs = await prisma.pQRS.findMany({
+  // Obtener datos iniciales directamente desde Prisma
+  const initialPqrs = await prisma.pQRS.findMany({
     where: {
-      creatorId: {
-        not: null,
-      },
-      ...where,
+      private: false,
+      creatorId: { not: null }
     },
     include: {
       creator: {
@@ -143,6 +103,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     orderBy: {
       createdAt: "desc",
     },
+    take: 10,
   });
 
   return (
@@ -160,7 +121,10 @@ export default async function DashboardPage({ searchParams }: PageProps) {
                 La comunidad opina
               </h1>
             </div>
-            <PQRList pqrs={pqrs} currentUser={fullUser || null} />
+            <PQRList 
+              initialPqrs={initialPqrs} 
+              currentUser={fullUser || null}
+            />
           </div>
           <div className="hidden lg:block mt-8">
             <UserSidebar

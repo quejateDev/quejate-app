@@ -27,37 +27,107 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    
+    const skip = (page - 1) * limit;
+    const take = Math.min(limit, 50);
+
     const pqrs = await prisma.pQRS.findMany({
+      where: {
+        private: false,
+        creatorId: { not: null }
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        comments: {
+          select: {
+            id: true,
+            text: true,
+            createdAt: true,
+            user: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+        department: {
+          select: {
+            name: true,
+            entity: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        entity: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        likes: {
+          select: {
+            id: true,
+            userId: true
+          },
+        },
+        customFieldValues: {
+          select: {
+            name: true,
+            value: true,
+          },
+        },
+        attachments: {
+          select: {
+            name: true,
+            url: true,
+            type: true,
+            size: true,
+          },
+        }, 
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },
-      include: {
-        department: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            email: true,
-            entityId: true,
-          },
-        },
-        customFieldValues: true,
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            url: true,
-            pqrId: true,
-            size: true,
-            type: true,
-          },
-        },
-      },
+      skip,
+      take,
     });
 
-    return NextResponse.json(pqrs);
+    const totalCount = await prisma.pQRS.count({
+      where: {
+        private: false,
+        creatorId: { not: null }
+      }
+    });
+
+    const hasMore = skip + take < totalCount;
+
+    return NextResponse.json({
+      pqrs,
+      hasMore,
+      nextPage: hasMore ? page + 1 : null
+    });
+
   } catch (error) {
     console.error("Error fetching PQRs:", error);
     return NextResponse.json({ error: "Error fetching PQRs" }, { status: 500 });
