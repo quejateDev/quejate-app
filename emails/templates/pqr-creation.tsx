@@ -36,7 +36,7 @@ export const PqrCreationEmail = ({
       </Text>
       
       <Text style={baseStyles.paragraph}>
-        Te confirmamos que tu Petición, Queja, Reclamo, Sugerencia o Denuncia (PQRSD) ha sido registrada correctamente en nuestra plataforma.
+        Te confirmamos que tu PQRSD ha sido registrada correctamente en nuestra plataforma.
       </Text>
 
       <div style={{
