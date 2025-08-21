@@ -208,15 +208,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let fechaConsecutivo = new Date().toLocaleDateString("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
+    const today = new Date();
+    const fechaConsecutivo = today.toISOString().split('T')[0].replace(/-/g, '');
+
+    const pqrCountToday = await prisma.pQRS.count({
+      where: {
+        entityId: body.entityId,
+        createdAt: {
+          gte: new Date(today.setHours(0, 0, 0, 0)),
+          lt: new Date(today.setHours(23, 59, 59, 999)),
+        },
+      },
     });
 
-    fechaConsecutivo = fechaConsecutivo.split("/").reverse().join("");
-    fechaConsecutivo = fechaConsecutivo.replace(/\//g, "");
-
+    const dailyCounter = pqrCountToday + 1;
+    const newConsecutiveCode = `${consecutiveCode.code}-${fechaConsecutivo}-${dailyCounter}`;
+    
     // Create PQR with attachments
     const [pqr] = await prisma.$transaction([
       prisma.pQRS.create({
@@ -249,7 +256,7 @@ export async function POST(req: NextRequest) {
               })),
             },
           },
-          consecutiveCode: `${consecutiveCode.code}-${fechaConsecutivo}`,
+          consecutiveCode: newConsecutiveCode,
         },
         include: {
           department: true, 
