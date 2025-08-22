@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendOversightDocumentEmail, sendOversightCreationConfirmationEmail } from "@/services/email/Resend.service";
-import { verifyToken } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@/lib/auth";
 
