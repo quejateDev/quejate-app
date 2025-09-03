@@ -130,7 +130,7 @@ export async function PATCH(
       return NextResponse.json(updatedUser);
     }
 
-    const { name, image, currentPassword, newPassword } = body;
+    const { name, phone, image, currentPassword, newPassword } = body;
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -149,6 +149,10 @@ export async function PATCH(
     const updateData: any = {
       name: name.trim(),
     };
+
+    if (phone !== undefined) {
+      updateData.phone = phone && phone.trim() !== '' ? phone.trim() : null;
+    }
 
     if (image === null || image === '') {
       updateData.image = null;
