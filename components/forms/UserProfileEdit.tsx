@@ -26,6 +26,7 @@ interface UserProfileEditModalProps {
 
 export interface UserProfileUpdateData {
   name: string;
+  phone?: string | null;
   image?: string | null;
   currentPassword?: string;
   newPassword?: string;
@@ -39,6 +40,7 @@ export function UserProfileEditModal({
 }: UserProfileEditModalProps) {
   const [formData, setFormData] = useState({
     name: "",
+    phone: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -60,6 +62,7 @@ export function UserProfileEditModal({
     if (initialData && isOpen) {
       setFormData({
         name: initialData.name || "",
+        phone: initialData.phone || "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -184,6 +187,7 @@ export function UserProfileEditModal({
 
       const updateData: UserProfileUpdateData = {
         name: formData.name.trim(),
+        phone: formData.phone.trim() || null,
         image: shouldRemoveProfilePicture ? null : (imageUrl || undefined),
         currentPassword: formData.currentPassword.trim() || undefined,
         newPassword: formData.newPassword.trim() || undefined,
@@ -210,6 +214,7 @@ export function UserProfileEditModal({
     if (!loading) {
       setFormData({
         name: "",
+        phone: "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -311,6 +316,21 @@ export function UserProfileEditModal({
                 className="border-muted"
                 disabled={loading}
                 required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Número de celular</Label>
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="+57"
+                className="border-muted"
+                disabled={loading}
               />
             </div>
           </div>
