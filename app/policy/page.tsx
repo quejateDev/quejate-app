@@ -3,14 +3,11 @@ import React from "react";
 export default function Policy() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Política de Privacidad
-          </h1>
-          <p className="text-gray-600 mb-2">
+          <h1 className="text-3xl font-bold text-primary mb-4">
             POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES - QUEJATE.COM.CO
-          </p>
+          </h1>
           <p className="text-gray-600">
             En vigor a partir del 4/8/2025 11:30:57
           </p>
