@@ -130,7 +130,7 @@ export const LoginForm = () => {
             </Link>
             {' '}y{' '}
             <Link 
-              href="/privacy" 
+              href="/policy" 
               className="text-blue-600 hover:text-blue-800 underline"
             >
               Política de Privacidad
