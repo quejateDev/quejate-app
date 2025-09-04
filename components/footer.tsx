@@ -39,7 +39,7 @@ export default function Footer() {
               Términos y condiciones
               </a>
             <a
-              href="/privacy"
+              href="/policy"
               className="hover:text-quaternary text-sm transition-colors duration-300"
             >
               Política de privacidad
