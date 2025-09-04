@@ -39,6 +39,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useLoginModal } from "@/providers/LoginModalProvider";
 import { usePQRForm } from "@/hooks/usePQRForm";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import Link from "next/link";
 
 // Dynamically import ReCAPTCHA to avoid SSR issues
 // @ts-ignore
@@ -366,7 +367,23 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   onExpired={() => setRecaptchaToken(null)}
                 />
               </div>
-
+              <div className="text-xs text-gray-600 mt-2">
+                Al enviar esta PQRSD, aceptas automáticamente nuestros{' '}
+                <Link 
+                  href="/terms" 
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Términos y Condiciones
+                </Link>
+                {' '}y{' '}
+                <Link 
+                  href="/policy" 
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Política de Privacidad
+                </Link>
+                .
+              </div>
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
