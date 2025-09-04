@@ -12,6 +12,7 @@ import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { useState, useTransition } from "react";
 import { register } from "@/actions/register";
+import Link from "next/link";
 
 export const RegisterForm = () => {
 
@@ -117,6 +118,25 @@ export const RegisterForm = () => {
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
+
+          <div className="text-xs text-gray-600">
+            Al registrarte o iniciar sesión, aceptas automáticamente nuestros{' '}
+            <Link 
+              href="/terms" 
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Términos y Condiciones
+            </Link>
+            {' '}y{' '}
+            <Link 
+              href="/policy" 
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Política de Privacidad
+            </Link>
+            .
+          </div>
+          
           <Button
             disabled={isPending}
             type="submit"
