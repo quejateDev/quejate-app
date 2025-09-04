@@ -3,16 +3,16 @@ import React from "react";
 export default function TermsAndConditions() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            TÉRMINOS Y CONDICIONES DE USO
+          <h1 className="text-3xl font-bold text-primary mb-4">
+            TÉRMINOS Y CONDICIONES DE USO - QUEJATE.COM.CO
           </h1>
           <p className="text-gray-600">En vigor a partir del 4/8/2025 11:30:57</p>
         </div>
 
         <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
-          <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Introducción</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mt-10 mb-4">1. Introducción</h2>
           <p className="mb-6">
             Estos Términos y Condiciones (en adelante &quot;T&C&quot;) regulan el acceso y uso de la plataforma tecnológica QUEJATE.COM.CO
             y de la aplicación móvil asociada (en adelante, la &quot;Plataforma&quot;), operada por PLATAFORMA DE QUEJAS CIUDADANA SAS.
