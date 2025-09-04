@@ -30,14 +30,20 @@ export default function Footer() {
               
             </div>
           </div>
-          <div>
+          <div className="flex flex-col">
             <h3 className="text-md font-semibold mb-4">Legal</h3>
             <a
-                href="/legal"
+                href="/terms"
                 className="hover:text-quaternary text-sm transition-colors duration-300"
               >
-                Términos y condiciones
+              Términos y condiciones
               </a>
+            <a
+              href="/privacy"
+              className="hover:text-quaternary text-sm transition-colors duration-300"
+            >
+              Política de privacidad
+            </a>
           </div>
         </div>
       </div>
