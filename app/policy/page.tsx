@@ -13,7 +13,7 @@ export default function Policy() {
           </p>
         </div>
 
-        <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
+        <div className="prose prose-lg text-justify max-w-none text-gray-800 leading-relaxed">
           <p className="mb-6">
             Esta política desarrolla el marco de recolección, uso,
             almacenamiento, transferencia y supresión de datos personales
