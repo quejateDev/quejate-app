@@ -60,12 +60,16 @@ export const useLawyerRegistration = () => {
     try {
       const res = await axios.post("/api/lawyer/validate", {
         identityDocument: formData.identityDocument,
+        licenseNumber: formData.licenseNumber,
       });
-      if (res.data?.exists) {
+      if (res.data?.existsIdentity) {
         errors.push("El número de documento ya está registrado");
       }
+      if (res.data?.existsLicense) {
+        errors.push("El número de licencia ya está registrado");
+      }
     } catch (err) {
-      errors.push("Error validando el número de documento");
+      errors.push("Error validando el número de documento o licencia");
     }
 
     return errors;
@@ -350,7 +354,7 @@ export const useLawyerRegistration = () => {
     const errors = await validateForm();
     if (errors.length > 0) {
       toast({
-        title: "Errores en el formulario",
+        title: "Error en el formulario",
         description: errors.join(". "),
         variant: "destructive",
       });
