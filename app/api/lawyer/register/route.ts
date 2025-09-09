@@ -8,6 +8,7 @@ interface LawyerRegistrationRequest {
   identityDocument: string;
   identityDocumentImage: string;
   professionalCardImage: string;
+  licenseNumber: string;
   specialties: string[];
   description?: string;
   feePerHour?: number;
@@ -26,6 +27,13 @@ export async function POST(request: Request) {
 
     const requestBody: LawyerRegistrationRequest = await request.json();
     
+    if (!requestBody.licenseNumber) {
+      return NextResponse.json(
+        { error: "El número de licencia es requerido" },
+        { status: 400 }
+      );
+    }
+    
     const existingLawyer = await prisma.lawyer.findUnique({
       where: { userId: userId.id }
     });
@@ -37,6 +45,26 @@ export async function POST(request: Request) {
       );
     }
 
+    const existingLawyerByDocument = await prisma.lawyer.findUnique({
+      where: { identityDocument: requestBody.identityDocument }
+    });
+    if (existingLawyerByDocument) {
+      return NextResponse.json(
+        { error: "Ya existe un abogado registrado con este número de documento." },
+        { status: 400 }
+      );
+    }
+
+    const existingLawyerByLicense = await prisma.lawyer.findUnique({
+      where: { licenseNumber: requestBody.licenseNumber }
+    });
+    if (existingLawyerByLicense) {
+      return NextResponse.json(
+        { error: "Ya existe un abogado registrado con este número de licencia." },
+        { status: 400 }
+      );
+    }
+
     const lawyer = await prisma.lawyer.create({
       data: {
         userId: userId.id!,
@@ -44,6 +72,7 @@ export async function POST(request: Request) {
         identityDocument: requestBody.identityDocument,
         identityDocumentImage: requestBody.identityDocumentImage,
         professionalCardImage: requestBody.professionalCardImage,
+        licenseNumber: requestBody.licenseNumber,
         specialties: requestBody.specialties,
         description: requestBody.description,
         feePerHour: requestBody.feePerHour,

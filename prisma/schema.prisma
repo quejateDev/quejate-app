@@ -50,7 +50,7 @@ model Lawyer {
   id                    String          @id @default(uuid())
   userId                String          @unique
   documentType          DocumentType
-  identityDocument      String
+  identityDocument      String          @unique
   specialties           String[]
   description           String?
   feePerHour            Float?
@@ -59,7 +59,8 @@ model Lawyer {
   updatedAt             DateTime        @updatedAt
   isVerified            Boolean         @default(false)
   identityDocumentImage String
-  professionalCardImage String
+  professionalCardImage String          
+  licenseNumber         String          @unique
   user                  User            @relation(fields: [userId], references: [id])
   lawyerRequests        LawyerRequest[]
   receivedRatings       Rating[]        @relation("LawyerReceivedRatings")
@@ -478,4 +479,4 @@ model PasswordResetToken {
 
   @@unique([email, token])
   @@map("password_reset_tokens")
-} 
+}

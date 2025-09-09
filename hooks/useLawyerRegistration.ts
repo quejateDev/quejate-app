@@ -11,6 +11,7 @@ export interface LawyerFormData {
   identityDocument: string;
   identityDocumentImage: File | null;
   professionalCardImage: File | null;
+  licenseNumber: string;
   specialties: string;
   description: string;
   feePerHour: string;
@@ -31,6 +32,7 @@ export const useLawyerRegistration = () => {
     identityDocument: "",
     identityDocumentImage: null,
     professionalCardImage: null,
+    licenseNumber: "",
     specialties: "",
     description: "",
     feePerHour: "",
@@ -281,6 +283,7 @@ export const useLawyerRegistration = () => {
         identityDocument: formData.identityDocument,
         identityDocumentImage: identityDocumentImageUrl,
         professionalCardImage: professionalCardImageUrl,
+        licenseNumber: formData.licenseNumber,
         specialties: formData.specialties.split(",").map((s) => s.trim()),
         description: formData.description,
         feePerHour: parseFloat(formData.feePerHour) || undefined,

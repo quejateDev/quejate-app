@@ -100,6 +100,18 @@ export function LawyerRegistrationForm({
             className="border border-muted"
           />
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="licenseNumber">Número de Licencia</Label>
+          <Input
+            id="licenseNumber"
+            name="licenseNumber"
+            value={formData.licenseNumber}
+            onChange={onChange}
+            required
+            className="border border-muted"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
