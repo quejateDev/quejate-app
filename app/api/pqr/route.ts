@@ -284,11 +284,25 @@ export async function POST(req: NextRequest) {
     }
 
     if (entity?.email) {
-      await sendPQRNotificationEmail(
-        entity.email,
-        entity.name,
-        pqr,
-      );
+      try {
+        await sendPQRNotificationEmail(
+          entity.email,
+          entity.name,
+          pqr,
+        );
+      } catch (emailError: any) {
+        if (emailError && emailError.message && emailError.message.includes('550')) {
+          return NextResponse.json(
+            {
+              error: 'No se pudo enviar la notificación: la cuenta de correo de la entidad no existe. Por favor escriba a soporte@gmail.com para asistencia.',
+              code: 550
+            },
+            { status: 400 }
+          );
+        } else {
+          throw emailError;
+        }
+      }
     } else {
       throw new Error("No email found for this entity");
     }
