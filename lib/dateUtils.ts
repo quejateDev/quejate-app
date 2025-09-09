@@ -18,9 +18,12 @@ export function formatDate(date: Date | string): string {
 }
 
 export function formatDateWithoutTime(date: Date | string): string {
-  return new Date(date).toLocaleString("es-CO", {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
+  const validDate = new Date(date);
+  const colombiaTime = new Date(validDate.getTime() - (5 * 60 * 60 * 1000));
+  
+  const year = colombiaTime.getUTCFullYear();
+  const month = String(colombiaTime.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(colombiaTime.getUTCDate()).padStart(2, '0');
+  
+  return `${day}/${month}/${year}`;
 }
