@@ -8,6 +8,9 @@ const nextConfig = {
       },
     ],
   },
+  env: {
+    TZ: 'America/Bogota',
+  },
 }
 
 module.exports = nextConfig 

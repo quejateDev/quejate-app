@@ -54,22 +54,3 @@ export function calculateDueDate(createdAt: Date, businessDaysToAdd = 15): Date 
     
     return dueDate;
 }
-
-export function getColombiaTime(): Date {
-  const colombiaTimeString = new Date().toLocaleString('es-CO', {
-    timeZone: 'America/Bogota'
-  });
-  return new Date(colombiaTimeString);
-}
-
-export function formatToColombiaTime(date: Date | string): string {
-  return new Date(date).toLocaleString('es-CO', {
-    timeZone: 'America/Bogota',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-}

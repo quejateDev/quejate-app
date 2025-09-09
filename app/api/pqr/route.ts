@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 import { sendPQRNotificationEmail } from "@/services/email/sendPQRNotification";
-import { calculateDueDate, getColombiaTime } from "@/utils/dateHelpers";
+import { calculateDueDate } from "@/utils/dateHelpers";
 
 interface FormFile extends File {
   arrayBuffer(): Promise<ArrayBuffer>;
@@ -130,7 +130,6 @@ export async function POST(req: NextRequest) {
   }
 
   let pqr: any;
-  const nowColombia = getColombiaTime();
 
   try {
     const formData = await req.formData();
@@ -237,8 +236,6 @@ export async function POST(req: NextRequest) {
           creatorId: body.creatorId,
           subject: body.subject,
           description: body.description,
-          createdAt: nowColombia,
-          updatedAt: nowColombia,
           customFieldValues: {
             create: body.customFields.map((field: any) => ({
               name: field.name,
