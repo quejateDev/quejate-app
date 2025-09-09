@@ -64,12 +64,25 @@ export function OversightDocumentExport({
         }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error al enviar el correo');
+        if (result?.error && result?.error.includes('correo') && result?.error.includes('no existe')) {
+          toast({
+            title: "Error de correo del ente de control",
+            description: result.error + ' Por favor escriba a soporte@gmail.com para asistencia.',
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: result?.error || "Error al enviar el correo con el documento",
+            variant: "destructive",
+          });
+        }
+        return;
       }
 
-      const result = await response.json();
-      
       toast({
         title: "Correos enviados exitosamente",
         description: `El documento ha sido enviado a ${oversightEntity?.name} y se ha enviado una confirmación a tu correo`,

@@ -186,6 +186,15 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
       const response = await createPQRS(formData);
 
+      if (response && response.code === 550) {
+        toast({
+          title: "Error de correo de entidad",
+          description: response.error || "No se pudo enviar la notificación: la cuenta de correo de la entidad no existe. Por favor escriba a soporte@gmail.com para asistencia.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (response) {
         toast({
           title: "PQRSD creado",
@@ -195,8 +204,13 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       }
     } catch (error: any) {
       console.error(error);
-      
-      if (error.response?.data?.error === 'reCAPTCHA verification failed') {
+      if (error.response?.data?.code === 550) {
+        toast({
+          title: "Error de correo de entidad",
+          description: error.response?.data?.error || "No se pudo enviar la notificación: la cuenta de correo de la entidad no existe. Por favor escriba a soporte@gmail.com para asistencia.",
+          variant: "destructive",
+        });
+      } else if (error.response?.data?.error === 'reCAPTCHA verification failed') {
         toast({
           title: "Error",
           description: "Verificación reCAPTCHA fallida. Por favor, inténtalo de nuevo.",
