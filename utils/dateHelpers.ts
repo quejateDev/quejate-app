@@ -42,7 +42,20 @@ export function calculateBusinessDaysExceeded(
 }
 
 export function calculateDueDate(createdAt: Date, businessDaysToAdd = 15): Date {
+    const colombiaCreatedAt = new Date(createdAt.getTime() - (5 * 60 * 60 * 1000));
+ 
+    const colombiaHours = colombiaCreatedAt.getUTCHours();
+    const startFromNextDay = colombiaHours >= 18;
+    
     const dueDate = new Date(createdAt);
+    
+    if (startFromNextDay) {
+        dueDate.setDate(dueDate.getDate() + 1);
+        while (!isBusinessDay(dueDate, COLOMBIAN_HOLIDAYS)) {
+            dueDate.setDate(dueDate.getDate() + 1);
+        }
+    }
+    
     let businessDaysCount = 0;
     
     while (businessDaysCount < businessDaysToAdd) {
