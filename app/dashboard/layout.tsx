@@ -7,6 +7,7 @@ import { currentUser } from "@/lib/auth";
 import { getFullUserWithFollowingStatus } from "@/data/user";
 import { UserProvider } from "@/components/UserProvider";
 import { LoginModalProvider } from "@/providers/LoginModalProvider";
+import { SessionProvider } from "next-auth/react";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const sessionUser = await currentUser();
@@ -15,7 +16,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     : null;
   
   return (
-    <UserProvider value={fullUser}>
+    <SessionProvider refetchOnWindowFocus={false}>
+      <UserProvider value={fullUser}>
       <SidebarProvider>
         <main className="flex-1 flex-col bg-white">
           <LoginModalProvider>
@@ -30,5 +32,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </SidebarProvider>
       <Footer />
     </UserProvider>
+    </SessionProvider>
   );
 }
