@@ -1,22 +1,13 @@
 import { useState } from "react";
 import { DocumentType, DocumentTypeMapping } from "@/types/document-types";
-
-export interface LawyerFormData {
-  documentType: string;
-  identityDocument: string;
-  identityDocumentImage: File | null;
-  professionalCardImage: File | null;
-  specialties: string;
-  description: string;
-  feePerHour: string;
-  image: File | null;
-}
+import { LawyerFormData } from "@/types/lawyer";
 
 const initialFormData: LawyerFormData = {
   documentType: "",
   identityDocument: "",
   identityDocumentImage: null,
   professionalCardImage: null,
+  licenseNumber: "",
   specialties: "",
   description: "",
   feePerHour: "",
@@ -108,6 +99,10 @@ export const useLawyerRegistrationForm = () => {
 
     if (!formData.description.trim()) {
       errors.push("Descripción profesional es requerida");
+    }
+
+    if (!formData.licenseNumber.trim()) {
+      errors.push("Número de licencia es requerido");
     }
 
     return {

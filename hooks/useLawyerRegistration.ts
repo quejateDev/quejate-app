@@ -1,22 +1,12 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import { DocumentType, DocumentTypeMapping } from "@/types/document-types";
 import { useCurrentUser } from "./use-current-user";
-
-export interface LawyerFormData {
-  documentType: string;
-  identityDocument: string;
-  identityDocumentImage: File | null;
-  professionalCardImage: File | null;
-  licenseNumber: string;
-  specialties: string;
-  description: string;
-  feePerHour: string;
-  image: File | null;
-}
+import { LawyerFormData } from "@/types/lawyer";
 
 export interface VerificationStatus {
   isValid: boolean;
@@ -26,7 +16,7 @@ export interface VerificationStatus {
 export const useLawyerRegistration = () => {
   const router = useRouter();
   const currentUser = useCurrentUser();
-  
+
   const [formData, setFormData] = useState<LawyerFormData>({
     documentType: "",
     identityDocument: "",
@@ -38,7 +28,7 @@ export const useLawyerRegistration = () => {
     feePerHour: "",
     image: null,
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [verificationModal, setVerificationModal] = useState(false);
@@ -51,6 +41,35 @@ export const useLawyerRegistration = () => {
       label: DocumentTypeMapping[value].label,
     })
   );
+
+  const validateForm = async () => {
+    const errors: string[] = [];
+
+    if (!formData.documentType) {
+      errors.push("Tipo de documento es requerido");
+    }
+    if (!formData.identityDocument.trim()) {
+      errors.push("Número de documento es requerido");
+    }
+    if (!formData.licenseNumber.trim()) {
+      errors.push("Número de licencia es requerido");
+    }
+    if (!formData.description.trim()) {
+      errors.push("Descripción profesional es requerida");
+    }
+    try {
+      const res = await axios.post("/api/lawyer/validate", {
+        identityDocument: formData.identityDocument,
+      });
+      if (res.data?.exists) {
+        errors.push("El número de documento ya está registrado");
+      }
+    } catch (err) {
+      errors.push("Error validando el número de documento");
+    }
+
+    return errors;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -323,18 +342,30 @@ export const useLawyerRegistration = () => {
     }
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      const isVerificationSuccessful = await verifyLawyer();
-      if (isVerificationSuccessful) {
-        await submitRegistration();
-      }
-    } finally {
+    const errors = await validateForm();
+    if (errors.length > 0) {
+      toast({
+        title: "Errores en el formulario",
+        description: errors.join(". "),
+        variant: "destructive",
+      });
       setLoading(false);
+      return;
     }
+
+    const isVerificationSuccessful = await verifyLawyer();
+    if (!isVerificationSuccessful) {
+      setLoading(false);
+      return;
+    }
+
+    await submitRegistration();
+    setLoading(false);
   };
 
   return {

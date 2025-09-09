@@ -13,8 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ProfilePictureUploader } from "./ProfilePictureUploader";
 import { DocumentUploader } from "./DocumentUploader";
 import { SpecialtiesManager } from "./SpecialtiesManager";
-import { LawyerFormData } from "@/hooks/useLawyerRegistration";
 import { Info } from "lucide-react";
+import { LawyerFormData } from "@/types/lawyer";
 
 interface DocumentTypeOption {
   value: string;

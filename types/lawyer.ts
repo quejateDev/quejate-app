@@ -8,3 +8,15 @@ export interface Lawyer {
     phone: string | null;
   };
 }
+
+export interface LawyerFormData {
+  documentType: string;
+  identityDocument: string;
+  identityDocumentImage: File | null;
+  professionalCardImage: File | null;
+  licenseNumber: string;
+  specialties: string;
+  description: string;
+  feePerHour: string;
+  image: File | null;
+}
