@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogIn, LogOut, User, Scale, MailPlus } from "lucide-react";
+import { LogIn, LogOut, User, Scale, MailPlus, Settings } from "lucide-react";
 import { useFullUser } from "./UserProvider";
 import { signOut } from "next-auth/react"
 
@@ -41,9 +41,6 @@ export default function AvatarMenu() {
       <DropdownMenuContent align="end" className="px-4 py-3">
         {userProfile ? (
           <>
-            <DropdownMenuItem className="flex items-center gap-2">
-              <span>{userProfile.email}</span>
-            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
                 href="/dashboard/profile"
@@ -53,6 +50,17 @@ export default function AvatarMenu() {
                 <span>Ver Perfil</span>
               </Link>
             </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link
+                href="/dashboard/profile/settings"
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Configuración</span>
+              </Link>
+            </DropdownMenuItem>
+
             {userProfile.role === "CLIENT" || userProfile.role === "LAWYER" ? (
               <DropdownMenuItem asChild>
                 <Link
