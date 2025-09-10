@@ -13,6 +13,7 @@ interface PQRListProfileProps {
   hasMore: boolean;
   onLoadMore: () => void;
   currentUser: UserBasic | null;
+  onUpdatePQRStatus: (pqrId: string, newStatus: keyof typeof import("@/constants/pqrMaps").statusMap) => void;
 }
 
 export default function PQRListProfile({ 
@@ -20,7 +21,8 @@ export default function PQRListProfile({
   isLoading, 
   hasMore, 
   onLoadMore, 
-  currentUser 
+  currentUser,
+  onUpdatePQRStatus
 }: PQRListProfileProps) {
 
   return (
@@ -32,6 +34,7 @@ export default function PQRListProfile({
           initialLiked={pqr.likes?.length > 0}
           user={currentUser || null}
           isUserProfile={true}
+          onUpdatePQRStatus={onUpdatePQRStatus}
         />
       ))}
       

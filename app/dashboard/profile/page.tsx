@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
   const currentUser = useFullUser();
-  const { pqrs, fetchUserPQRS, isLoading: pqrsLoading, isLoadingMore: pqrsLoadingMore, hasMore, page } = usePQR();
+  const { pqrs, fetchUserPQRS, updatePQRStatus, isLoading: pqrsLoading, isLoadingMore: pqrsLoadingMore, hasMore, page } = usePQR();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
@@ -29,7 +29,7 @@ export default function ProfilePage() {
     if (currentUser?.id) {
       fetchUserPQRS(currentUser.id, 1, 10);
     }
-  }, [currentUser?.id]);
+  }, [currentUser?.id, fetchUserPQRS]);
 
   const loadMorePqrs = async () => {
     if (pqrsLoading || !hasMore || !currentUser?.id) return;
@@ -123,6 +123,7 @@ export default function ProfilePage() {
           hasMore={hasMore}
           onLoadMore={loadMorePqrs}
           currentUser={currentUser || null}
+          onUpdatePQRStatus={updatePQRStatus}
         />
       );
     }

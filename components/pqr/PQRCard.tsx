@@ -19,9 +19,10 @@ export type PQRCardProps = {
     name: string | null;
   } | null;
   isUserProfile?: boolean;
+  onUpdatePQRStatus?: (pqrId: string, newStatus: keyof typeof import("@/constants/pqrMaps").statusMap) => void;
 };
 
-export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false }: PQRCardProps) {
+export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false, onUpdatePQRStatus }: PQRCardProps) {
   const shouldShowCard = !pqr.private || isUserProfile || (user?.id && pqr.creator?.id === user.id);
   const { liked, likeCount } = useLike(
     pqr.id,
@@ -68,7 +69,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
       <div className="hidden md:block">
         <Card  className={cardClasses}>
           <div className="p-6">
-            <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
+            <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} onUpdatePQRStatus={onUpdatePQRStatus} />
           </div>
           <CardContent>
             <PQRCardContent pqr={pqr} />
@@ -102,7 +103,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
         </Card>
       </div>
       <div className="md:hidden border-b-2 border-muted">
-        <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} />
+        <PQRCardHeader pqr={pqr} isUserProfile={isUserProfile} onUpdatePQRStatus={onUpdatePQRStatus} />
         <PQRCardContent pqr={pqr} />
         <div className="mt-4 mb-2">
           <PQRCardAttachments

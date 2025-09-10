@@ -1,7 +1,7 @@
 "use client";
 
 import { getPQRSById, getPQRSByUser } from "@/services/api/pqr.service";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { PQR } from "@/types/pqrsd";
 
 export default function usePQR() {
@@ -13,7 +13,7 @@ export default function usePQR() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  async function fetchPQR(id: string) {
+  const fetchPQR = useCallback(async function(id: string) {
     setIsSingleLoading(true);
     try {
       const data = await getPQRSById(id);
@@ -23,9 +23,9 @@ export default function usePQR() {
     } finally {
       setIsSingleLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchUserPQRS(id: string, pageNum: number = 1, limit: number = 10) {
+  const fetchUserPQRS = useCallback(async function(id: string, pageNum: number = 1, limit: number = 10) {
     const loadingState = pageNum === 1 ? setIsLoading : setIsLoadingMore;
     
     loadingState(true);
@@ -43,11 +43,22 @@ export default function usePQR() {
     } finally {
       loadingState(false);
     }
-  }
+  }, []);
+
+  const updatePQRStatus = useCallback(function(pqrId: string, newStatus: keyof typeof import("@/constants/pqrMaps").statusMap) {
+    setPqrs(prev => 
+      prev.map(pqr => 
+        pqr.id === pqrId 
+          ? { ...pqr, status: newStatus }
+          : pqr
+      )
+    );
+  }, []);
 
   return {
     fetchPQR,
     fetchUserPQRS,
+    updatePQRStatus,
     pqr,
     pqrs,
     isLoading, 

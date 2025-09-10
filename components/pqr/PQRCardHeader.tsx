@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, User, Eye, EyeOff } from "lucide-react";
 import { typeMap, statusMap } from "../../constants/pqrMaps";
-import Image from "next/image";
 import { useState } from "react";
 import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { PQRAlertModal } from "./PQRAlertModal";
@@ -14,9 +13,10 @@ import { formatDateWithoutTime } from "@/lib/dateUtils";
 type PQRCardHeaderProps = {
   pqr: PQR;
   isUserProfile: boolean;
+  onUpdatePQRStatus?: (pqrId: string, newStatus: keyof typeof import("@/constants/pqrMaps").statusMap) => void;
 };
 
-export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
+export function PQRCardHeader({ pqr, isUserProfile, onUpdatePQRStatus }: PQRCardHeaderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPrivate, setIsPrivate] = useState(pqr.private);
@@ -46,6 +46,10 @@ export function PQRCardHeader({ pqr, isUserProfile }: PQRCardHeaderProps) {
 
       if (!response.ok) {
         throw new Error(data.error || "Error al actualizar el estado");
+      }
+
+      if (onUpdatePQRStatus) {
+        onUpdatePQRStatus(pqr.id, "RESOLVED");
       }
 
       toast({
