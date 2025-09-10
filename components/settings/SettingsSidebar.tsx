@@ -29,19 +29,19 @@ export function SettingsSidebar({
               key={section.id}
               variant={isActive ? "default" : "ghost"}
               className={cn(
-                "w-full justify-start gap-3 h-auto py-3 px-3",
+                "w-full justify-start gap-3 h-auto min-h-[4rem] py-3 px-3 whitespace-normal",
                 isActive 
                   ? "bg-primary text-primary-foreground shadow-sm" 
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
               onClick={() => onSectionChange(section.id as SettingsSectionId)}
             >
-              <Icon className="h-4 w-4 flex-shrink-0" />
-              <div className="flex flex-col items-start">
-                <span className="font-medium text-sm">{section.title}</span>
+              <Icon className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              <div className="flex flex-col items-start min-w-0 flex-1 overflow-hidden text-left">
+                <span className="font-medium text-sm leading-tight w-full text-left">{section.title}</span>
                 {section.description && (
                   <span className={cn(
-                    "text-xs mt-0.5 text-left",
+                    "text-xs mt-1 text-left leading-normal break-words w-full overflow-hidden",
                     isActive ? "text-primary-foreground/80" : "text-muted-foreground"
                   )}>
                     {section.description}
