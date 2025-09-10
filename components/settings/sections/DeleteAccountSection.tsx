@@ -110,7 +110,7 @@ export function DeleteAccountSection({
               ¿Qué pasará cuando elimines tu cuenta?
             </h4>
             <ul className="text-sm text-red-700 space-y-1">
-              <li>• Todos tus PQRSD serán eliminados permanentemente de la plataforma, pero las entidades los tendrán en sus correos.</li>
+              <li>• Todos tus PQRSD se eliminarán permanentemente de la plataforma, pero las entidades conservarán copias en sus correos.</li>
               <li>• Tu perfil y datos personales serán borrados</li>
               <li>• Perderás acceso a todas las funcionalidades</li>
               <li>• Esta acción no se puede deshacer</li>
