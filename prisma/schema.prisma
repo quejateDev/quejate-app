@@ -34,8 +34,8 @@ model User {
   PQRS              PQRS[]
   statusHistory     PQRStatusHistory[]
   givenRatings      Rating[]             @relation("ClientGivenRatings")
-  department        Department?          @relation(fields: [departmentId], references: [id])
-  Entity            Entity?              @relation(fields: [entityId], references: [id])
+  department        Department?          @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  Entity            Entity?              @relation(fields: [entityId], references: [id], onDelete: SetNull)
   favorites         UserFavoriteEntity[]
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
@@ -96,7 +96,7 @@ model Rating {
   score     Int
   createdAt DateTime @default(now())
   comment   String?
-  client    User     @relation("ClientGivenRatings", fields: [clientId], references: [id])
+  client    User     @relation("ClientGivenRatings", fields: [clientId], references: [id], onDelete: Cascade)
   lawyer    Lawyer   @relation("LawyerReceivedRatings", fields: [lawyerId], references: [id])
 
   @@unique([lawyerId, clientId])
@@ -152,7 +152,7 @@ model UserFavoriteEntity {
   entityId  String
   createdAt DateTime @default(now())
   entity    Entity   @relation(fields: [entityId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, entityId])
 }
@@ -227,8 +227,8 @@ model PQRS {
   lawyerRequests    LawyerRequest[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
-  assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id])
-  creator           User?              @relation(fields: [creatorId], references: [id])
+  assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id], onDelete: SetNull)
+  creator           User?              @relation(fields: [creatorId], references: [id], onDelete: SetNull)
   department        Department?        @relation(fields: [departmentId], references: [id])
   entity            Entity             @relation(fields: [entityId], references: [id])
   statusHistory     PQRStatusHistory[]
@@ -387,7 +387,7 @@ model PQRStatusHistory {
   pqrId     String
   userId    String
   pqr       PQRS       @relation(fields: [pqrId], references: [id], onDelete: Cascade)
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([pqrId])
   @@index([userId])

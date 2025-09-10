@@ -223,6 +223,77 @@ export async function PATCH(
   }
 }
 
+export async function DELETE(
+  request: Request,
+  { params }: any
+) {
+  try {
+    const { id } = await params;
+    const currentUserId = await currentUser();
+
+    if (!currentUserId) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      );
+    }
+
+    if (currentUserId.id !== id && currentUserId.role !== "ADMIN" && currentUserId.role !== "SUPER_ADMIN") {
+      return NextResponse.json(
+        { error: "No tienes permisos para eliminar este usuario" },
+        { status: 403 }
+      );
+    }
+
+    const userToDelete = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    });
+
+    if (!userToDelete) {
+      return NextResponse.json(
+        { error: "Usuario no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    if (userToDelete.role === "SUPER_ADMIN" && currentUserId.role !== "SUPER_ADMIN") {
+      return NextResponse.json(
+        { error: "No se puede eliminar un super administrador" },
+        { status: 403 }
+      );
+    }
+
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    return NextResponse.json(
+      { 
+        message: "Usuario eliminado exitosamente",
+        deletedUser: {
+          id: userToDelete.id,
+          name: userToDelete.name,
+          email: userToDelete.email
+        }
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json(
+      { error: "Error al eliminar el usuario" },
+      { status: 500 }
+    );
+  }
+}
+
 function isValidUrl(url: string) {
   try {
     new URL(url);
