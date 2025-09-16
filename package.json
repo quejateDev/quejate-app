@@ -51,7 +51,7 @@
     "formidable": "^3.5.2",
     "framer-motion": "^11.15.0",
     "jsonwebtoken": "^9.0.2",
-    "jspdf": "^3.0.1",
+    "jspdf": "^3.0.2",
     "lucide-react": "^0.487.0",
     "next": "^15.1.2",
     "next-auth": "^5.0.0-beta.29",
