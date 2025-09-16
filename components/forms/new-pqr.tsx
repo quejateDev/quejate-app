@@ -59,6 +59,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     form,
     departments,
     customFields,
+    currentUser,
     isLoading,
     isLoadingInitial,
     openDepartment,
@@ -313,6 +314,32 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   visibles para la entidad ni para otros usuarios.
                 </p>
               </div>
+
+              {userId && currentUser?.phone && !form.watch("isAnonymous") && (
+                <div className="flex flex-col space-y-1">
+                  <FormField
+                    control={form.control}
+                    name="includePhone"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            id="includePhone"
+                            checked={field.value}
+                            onCheckedChange={checked => field.onChange(checked)}
+                          />
+                        </FormControl>
+                        <FormLabel>
+                          ¿Desea incluir su número de teléfono de contacto?
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Se incluirá su número: {currentUser.phone}. Para cambiar este número, vaya a su perfil.
+                  </p>
+                </div>
+              )}
 
               <div className="flex flex-col space-y-1 mb-6">
                 <FormField
