@@ -224,6 +224,15 @@ export async function POST(req: NextRequest) {
     const dailyCounter = pqrCountToday + 1;
     const newConsecutiveCode = `${consecutiveCode.code}-${fechaConsecutivo}-${dailyCounter}`;
     
+    let creatorPhone = null;
+    if (body.includePhone && !body.isAnonymous && body.creatorId) {
+      const creator = await prisma.user.findUnique({
+        where: { id: body.creatorId },
+        select: { phone: true },
+      });
+      creatorPhone = creator?.phone || null;
+    }
+    
     // Create PQR with attachments
     const [pqr] = await prisma.$transaction([
       prisma.pQRS.create({
@@ -288,6 +297,7 @@ export async function POST(req: NextRequest) {
         entity.email,
         entity.name,
         pqr,
+        creatorPhone
       );
     } else {
       throw new Error("No email found for this entity");

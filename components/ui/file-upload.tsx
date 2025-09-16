@@ -112,7 +112,7 @@ export function FileUpload({
                 accept={accept}
                 onChange={handleFileUpload}
                 disabled={isUploading}
-                className="cursor-pointer"
+                className="cursor-pointer border border-gray-300"
                 multiple={multiple}
               />
               {isUploading && (

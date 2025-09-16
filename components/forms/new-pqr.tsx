@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -60,6 +59,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     form,
     departments,
     customFields,
+    currentUser,
     isLoading,
     isLoadingInitial,
     openDepartment,
@@ -83,9 +83,10 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
   }
 
   return (
-    <Card className="max-w-lg mx-auto">
-      <CardContent>
-        <Form {...form}>
+    <div className="w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto">
+      <div className="md:bg-white md:rounded-lg md:shadow-sm md:border md:border-gray-300">
+        <div className="p-0 md:p-6">
+          <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4"
@@ -105,7 +106,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="border border-gray-300">
                             <SelectValue placeholder="Seleccione el tipo de solicitud" />
                           </SelectTrigger>
                         </FormControl>
@@ -135,7 +136,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                             variant="outline"
                             role="combobox"
                             aria-expanded={openDepartment}
-                            className="w-full justify-between"
+                            className="w-full justify-between bg-white border border-gray-300"
                           >
                             {field.value
                               ? departments.find(department => department.id === field.value)?.name
@@ -204,7 +205,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   <FormItem>
                     <FormLabel>Tema</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Tema de la PQRSD" />
+                      <Input {...field} placeholder="Tema de la PQRSD" className="border border-gray-300" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,6 +223,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         {...field}
                         placeholder="Descripción de la PQRSD"
                         rows={5}
+                        className="border border-gray-300"
                       />
                     </FormControl>
                     <FormMessage />
@@ -313,6 +315,32 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 </p>
               </div>
 
+              {userId && currentUser?.phone && !form.watch("isAnonymous") && (
+                <div className="flex flex-col space-y-1">
+                  <FormField
+                    control={form.control}
+                    name="includePhone"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            id="includePhone"
+                            checked={field.value}
+                            onCheckedChange={checked => field.onChange(checked)}
+                          />
+                        </FormControl>
+                        <FormLabel>
+                          ¿Desea incluir su número de teléfono de contacto?
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Se incluirá su número: {currentUser.phone}. Para cambiar este número, vaya a su perfil.
+                  </p>
+                </div>
+              )}
+
               <div className="flex flex-col space-y-1 mb-6">
                 <FormField
                   control={form.control}
@@ -397,7 +425,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 }

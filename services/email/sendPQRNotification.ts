@@ -7,6 +7,7 @@ export async function sendPQRNotificationEmail(
   entityEmail: string,
   entityName: string,
   pqrData: any,
+  creatorPhone?: string | null,
 ) {
   try {
     const { data, error } = await resend.emails.send({
@@ -30,7 +31,7 @@ export async function sendPQRNotificationEmail(
         creatorInfo: {
           name: pqrData.creator ? `${pqrData.creator.name}` : 'Anónimo',
           email: pqrData.creator ? pqrData.creator.email : 'Anónimo',
-          phone: pqrData.creator ? pqrData.creator.phone : 'Anónimo',
+          phone: pqrData.anonymous ? 'Anónimo' : (creatorPhone || pqrData.creator?.phone || 'No proporcionado'),
         },
         customFields: pqrData.customFieldValues,
         attachments: pqrData.attachments,

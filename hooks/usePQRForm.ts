@@ -16,6 +16,7 @@ export const formSchema = z.object({
   customFields: z.record(z.string()),
   isAnonymous: z.boolean(),
   isPrivate: z.boolean(),
+  includePhone: z.boolean(),
   attachments: z.array(
     z.object({
       url: z.string(),
@@ -28,6 +29,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [pqr, setPqr] = useState({
     type: "PETITION" as PQRSType,
     departmentId: "",
@@ -36,6 +38,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     customFields: [],
     isAnonymous: false,
     isPrivate: true,
+    includePhone: false,
     attachments: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<string>(entityId);
@@ -53,13 +56,29 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       customFields: {},
       isAnonymous: false,
       isPrivate: true,
+      includePhone: false,
       attachments: [],
     },
   });
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      if (!userId) return;
+      
+      try {
+        const response = await fetch(`/api/users/${userId}`);
+        if (response.ok) {
+          const userData = await response.json();
+          setCurrentUser(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
     if (userId) {
       setPqr(prev => ({ ...prev, creatorId: userId }));
+      fetchCurrentUser();
     }
   }, [userId]);
 
@@ -177,6 +196,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           entityId: selectedEntityId,
           isAnonymous: values.isAnonymous,
           isPrivate: values.isPrivate,
+          includePhone: values.includePhone,
           attachments: attachmentsData,
           subject: values.subject,
           description: values.description,
@@ -224,6 +244,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     form,
     departments,
     customFields,
+    currentUser,
     isLoading,
     isLoadingInitial,
     openDepartment,

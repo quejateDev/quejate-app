@@ -331,6 +331,7 @@ export function UserProfileEditModal({
                 placeholder="+57"
                 className="border-muted"
                 disabled={loading}
+                type="tel"
               />
             </div>
           </div>
