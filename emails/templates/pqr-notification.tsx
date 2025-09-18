@@ -194,7 +194,7 @@ export default function PQRNotificationEmail({
 
       <div style={baseStyles.alert}>
         <Text style={baseStyles.alertText}>
-          <strong>⏰ Recordatorio:</strong> Según la normativa vigente, tiene 15 días hábiles para dar respuesta a esta PQRSD.
+          <strong>⏰ Recordatorio:</strong> Según la Ley 1755 de 2015 &ldquo;Por medio de la cual se regula el Derecho Fundamental de Petición y se sustituye un título del Código de Procedimiento Administrativo y de lo Contencioso Administrativo&rdquo;, tiene 15 días hábiles para dar respuesta a esta PQRSD.
         </Text>
       </div>
 
