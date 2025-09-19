@@ -124,7 +124,7 @@ export function LawyerRegistrationForm({
           disabled={loading}
           isUploading={isUploadingImage}
           required={true}
-          helpText="Sube una imagen clara de tu documento de identidad (cédula, pasaporte, etc.)"
+          helpText="Sube una imagen clara de tu documento de identidad por ambos lados"
         />
         
         <DocumentUploader

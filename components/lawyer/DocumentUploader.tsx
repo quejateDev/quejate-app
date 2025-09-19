@@ -3,8 +3,9 @@ import { useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Upload, FileText, X } from "lucide-react";
+import { FileText, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { DocumentSkeleton } from "./DocumentSkeleton";
 
 interface DocumentUploaderProps {
   id: string;
@@ -107,22 +108,12 @@ export function DocumentUploader({
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-dashed border-gray-300 hover:border-primary transition-colors">
-          <CardContent className="p-6">
-            <div 
-              className="flex flex-col items-center justify-center text-center cursor-pointer"
-              onClick={triggerFileInput}
-            >
-              <Upload className="h-8 w-8 text-gray-400 mb-2" />
-              <p className="text-sm font-medium text-gray-900 mb-1">
-                Haz clic para subir un archivo
-              </p>
-              <p className="text-xs text-gray-500">
-                PNG, JPG, PDF hasta 10MB
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div 
+          className="cursor-pointer"
+          onClick={triggerFileInput}
+        >
+          <DocumentSkeleton />
+        </div>
       )}
 
       {helpText && (
