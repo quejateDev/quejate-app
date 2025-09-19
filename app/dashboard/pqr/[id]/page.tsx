@@ -55,6 +55,13 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             <div className="font-semibold">Entidad a la cual se realizó la solicitud:</div>
             <div>{pqr.entity.name}</div>
 
+            {pqr.entity.email && (
+              <>
+                <div className="font-semibold">Correo de la entidad:</div>
+                <div>{pqr.entity.email}</div>
+              </>
+            )}
+
             <div className="font-semibold">Ciudadano:</div>
             <div>
               {pqr.anonymous || !pqr.creator

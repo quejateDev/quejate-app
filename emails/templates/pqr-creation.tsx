@@ -13,6 +13,8 @@ interface PqrCreationEmailProps {
   pqrNumber: string;
   creationDate: string;
   pqrLink?: string;
+  entityName: string;
+  entityEmail?: string;
 }
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -22,6 +24,8 @@ export const PqrCreationEmail = ({
   pqrNumber,
   creationDate,
   pqrLink,
+  entityName,
+  entityEmail,
 }: PqrCreationEmailProps) => {
   const trackingLink = pqrLink || `${baseUrl}/dashboard/pqr/${pqrNumber}`;
 
@@ -48,7 +52,14 @@ export const PqrCreationEmail = ({
       }}>
         <Text style={{...baseStyles.alertText, color: baseStyles.brandColors.text.primary}}>
           <strong>📋 Número de radicado:</strong> {pqrNumber}<br />
-          <strong>📅 Fecha de registro:</strong> {creationDate}
+          <strong>📅 Fecha de registro:</strong> {creationDate}<br />
+          <strong>🏢 Entidad destino:</strong> {entityName}
+          {entityEmail && (
+            <>
+              <br />
+              <strong>📧 Correo de la entidad:</strong> {entityEmail}
+            </>
+          )}
         </Text>
       </div>
 
