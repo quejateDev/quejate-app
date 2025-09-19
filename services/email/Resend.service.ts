@@ -11,7 +11,9 @@ export async function sendPQRCreationEmail(
   subject: string,
   pqrNumber: string,
   creationDate: string,
-  pqrLink: string
+  pqrLink: string,
+  entityName: string,
+  entityEmail?: string
 ) {
   const { data, error } = await resend.emails.send({
     from: "noresponder@quejate.com.co",
@@ -22,6 +24,8 @@ export async function sendPQRCreationEmail(
       pqrNumber: pqrNumber,
       creationDate: creationDate,
       pqrLink: pqrLink,
+      entityName: entityName,
+      entityEmail: entityEmail,
     }),
   });
 

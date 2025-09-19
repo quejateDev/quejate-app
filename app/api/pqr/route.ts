@@ -312,7 +312,9 @@ export async function POST(req: NextRequest) {
         new Date(pqr.createdAt).toLocaleString("es-CO", {
           timeZone: "America/Bogota",
         }),
-        `https://quejate.com.co/dashboard/pqr/${pqr.id}`
+        `https://quejate.com.co/dashboard/pqr/${pqr.id}`,
+        entity.name,
+        entity.email
       );
     }
 
