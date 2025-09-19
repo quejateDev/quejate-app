@@ -73,13 +73,7 @@ export default function PQRNotificationEmail({
       }}>
         <Text style={{...baseStyles.alertText, color: '#92400E'}}>
           <strong>📋 Código de seguimiento:</strong> {pqrInfo.consecutiveCode}<br />
-          <strong>📅 Fecha de recepción:</strong> {new Date(pqrInfo.createdAt).toLocaleDateString('es-CO', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
+          <strong>📅 Fecha de recepción:</strong> {pqrInfo.createdAt}
         </Text>
       </div>
 
@@ -202,10 +196,6 @@ export default function PQRNotificationEmail({
         Para gestionar esta PQRSD, acceda al sistema utilizando sus credenciales institucionales.
       </Text>
 
-      <Text style={baseStyles.paragraph}>
-        <strong>Sistema de Gestión Quejate</strong><br />
-        Fortaleciendo la participación ciudadana
-      </Text>
     </EmailLayout>
   );
 }

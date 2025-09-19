@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import PQRNotificationEmail from '@/emails/templates/pqr-notification';
+import { formatDate } from '@/lib/dateUtils';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -21,9 +22,7 @@ export async function sendPQRNotificationEmail(
           type: pqrData.type,
           subject: pqrData.subject,
           description: pqrData.description,
-          createdAt: new Date(pqrData.createdAt).toLocaleString('es-CO', {
-            timeZone: 'America/Bogota',
-          }),
+          createdAt: formatDate(pqrData.createdAt),
           status: pqrData.status,
           isAnonymous: pqrData.anonymous,
           consecutiveCode: pqrData.consecutiveCode,
