@@ -284,7 +284,12 @@ export async function POST(req: NextRequest) {
     ]);
 
     const entity = await prisma.entity.findUnique({
-      where: { id: body.entityId },
+      where: { 
+        id: body.entityId,
+        category: {
+          isActive: true,
+        },
+      },
       select: { name: true, email: true },
     });
 
