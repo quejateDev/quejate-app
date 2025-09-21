@@ -7,6 +7,9 @@ export const dynamic = "force-dynamic";
 export default async function CreatePQRPage() {
   // Fetch categories with their entities
   const categories = await prisma.category.findMany({
+    where: {
+      isActive: true,
+    },
     include: {
       entities: {
         select: {

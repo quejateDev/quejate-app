@@ -188,6 +188,7 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   imageUrl    String?
+  isActive    Boolean  @default(true)
   entities    Entity[]
 }
 
