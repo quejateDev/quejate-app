@@ -5,7 +5,12 @@ export async function GET(request: Request, { params }: any) {
   try {
     const { id } = await params;
     const entity = await prisma.entity.findUnique({
-      where: { id },
+      where: { 
+        id,
+        category: {
+          isActive: true,
+        },
+      },
       include: {
         category: true,
         pqrConfig: {

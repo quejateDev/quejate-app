@@ -29,7 +29,14 @@ export async function GET(request: NextRequest, { params }: any) {
     });
 
     const favorites = await prisma.userFavoriteEntity.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        entity: {
+          category: {
+            isActive: true,
+          },
+        },
+      },
       include: {
         entity: {
           select: {

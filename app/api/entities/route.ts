@@ -18,7 +18,12 @@ export async function GET(req: Request) {
     }
 
     const entities = await prisma.entity.findMany({
-      where: whereClause,
+      where: {
+        ...whereClause,
+        category: {
+          isActive: true,
+        },
+      },
       orderBy: { name: "asc" },
       select: {
         id: true,
