@@ -17,6 +17,9 @@ export const formSchema = z.object({
   isAnonymous: z.boolean(),
   isPrivate: z.boolean(),
   includePhone: z.boolean(),
+  guestName: z.string().optional(),
+  guestEmail: z.string().optional(),
+  guestPhone: z.string().optional(),
   attachments: z.array(
     z.object({
       url: z.string(),
@@ -57,6 +60,9 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       isAnonymous: false,
       isPrivate: true,
       includePhone: false,
+      guestName: "",
+      guestEmail: "",
+      guestPhone: "",
       attachments: [],
     },
   });
@@ -166,6 +172,17 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       return;
     }
 
+    if (!userId && !values.isAnonymous) {
+      if (!values.guestName || !values.guestEmail) {
+        toast({
+          title: "Error",
+          description: "El nombre y correo electrónico son obligatorios para usuarios no registrados",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsLoading(true);
 
     try {
@@ -197,6 +214,9 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           isAnonymous: values.isAnonymous,
           isPrivate: values.isPrivate,
           includePhone: values.includePhone,
+          guestName: values.guestName,
+          guestEmail: values.guestEmail,
+          guestPhone: values.guestPhone,
           attachments: attachmentsData,
           subject: values.subject,
           description: values.description,
