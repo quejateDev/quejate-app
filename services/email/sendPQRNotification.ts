@@ -8,7 +8,7 @@ export async function sendPQRNotificationEmail(
   entityEmail: string,
   entityName: string,
   pqrData: any,
-  creatorPhone?: string | null,
+  contactInfo?: { name: string; email: string; phone: string } | null,
 ) {
   try {
     const { data, error } = await resend.emails.send({
@@ -28,9 +28,9 @@ export async function sendPQRNotificationEmail(
           consecutiveCode: pqrData.consecutiveCode,
         },
         creatorInfo: {
-          name: pqrData.creator ? `${pqrData.creator.name}` : 'Anónimo',
-          email: pqrData.creator ? pqrData.creator.email : 'Anónimo',
-          phone: pqrData.anonymous ? 'Anónimo' : (creatorPhone || pqrData.creator?.phone || 'No proporcionado'),
+          name: pqrData.anonymous ? 'Anónimo' : (contactInfo?.name || pqrData.creator?.name || 'No proporcionado'),
+          email: pqrData.anonymous ? 'Anónimo' : (contactInfo?.email || pqrData.creator?.email || 'No proporcionado'),
+          phone: pqrData.anonymous ? 'Anónimo' : (contactInfo?.phone || pqrData.creator?.phone || 'No proporcionado'),
         },
         customFields: pqrData.customFieldValues,
         attachments: pqrData.attachments,

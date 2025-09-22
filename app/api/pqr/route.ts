@@ -298,11 +298,33 @@ export async function POST(req: NextRequest) {
     }
 
     if (entity?.email) {
+      let contactInfo = {
+        name: 'Anónimo',
+        email: 'Anónimo',
+        phone: 'Anónimo'
+      };
+
+      if (!body.isAnonymous) {
+        if (body.creatorId && pqr.creator) {
+          contactInfo = {
+            name: pqr.creator.name || 'Usuario registrado',
+            email: pqr.creator.email || 'No proporcionado',
+            phone: creatorPhone || pqr.creator.phone || 'No proporcionado'
+          };
+        } else {
+          contactInfo = {
+            name: body.guestName || 'No proporcionado',
+            email: body.guestEmail || 'No proporcionado',
+            phone: body.guestPhone || 'No proporcionado'
+          };
+        }
+      }
+
       await sendPQRNotificationEmail(
         entity.email,
         entity.name,
         pqr,
-        creatorPhone
+        contactInfo
       );
     } else {
       throw new Error("No email found for this entity");

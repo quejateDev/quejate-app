@@ -290,7 +290,74 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 />
               </div>
 
-              <div className="flex flex-col space-y-1">
+              {!userId && !form.watch("isAnonymous") && (
+                <div className="space-y-4 border-t pt-4">
+                  <h3 className="text-lg font-medium">Datos de Contacto</h3>
+                  <p className="text-sm text-gray-600">
+                    Como no estás registrado, necesitamos tus datos de contacto para que la entidad pueda responder a tu PQRSD.
+                  </p>
+                  
+                  <FormField
+                    control={form.control}
+                    name="guestName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre completo *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Ingresa tu nombre completo" 
+                            className="border border-gray-300"
+                            required={!form.watch("isAnonymous")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="guestEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Correo electrónico *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="email"
+                            placeholder="correo@ejemplo.com" 
+                            className="border border-gray-300"
+                            required={!form.watch("isAnonymous")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="guestPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Teléfono (opcional)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="tel"
+                            placeholder="Ej: 3001234567" 
+                            className="border border-gray-300"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              <div className="flex flex-col space-y-1 mt-6">
                 <FormField
                   control={form.control}
                   name="isAnonymous"
@@ -300,7 +367,14 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         <Checkbox
                           id="isAnonymous"
                           checked={field.value}
-                          onCheckedChange={checked => field.onChange(checked)}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            if (checked && !userId) {
+                              form.setValue("guestName", "");
+                              form.setValue("guestEmail", "");
+                              form.setValue("guestPhone", "");
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormLabel>
