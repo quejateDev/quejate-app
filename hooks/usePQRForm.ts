@@ -228,8 +228,8 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
       if (response) {
         toast({
-          title: "PQRSD creado",
-          description: "El PQRSD ha sido creado exitosamente",
+          title: "PQRSD creada",
+          description: "La PQRSD ha sido creada exitosamente, la entidad deberá responder pronto.",
         });
         router.push("/dashboard");
       }
