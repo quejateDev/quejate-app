@@ -224,6 +224,9 @@ model PQRS {
   entityId          String
   attachments       Attachment[]
   comments          Comment[]
+  guestName        String?
+  guestEmail       String?
+  guestPhone       String?
   customFieldValues CustomFieldValue[]
   lawyerRequests    LawyerRequest[]
   likes             Like[]

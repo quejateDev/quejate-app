@@ -245,6 +245,9 @@ export async function POST(req: NextRequest) {
           creatorId: body.creatorId,
           subject: body.subject,
           description: body.description,
+          guestName: body.guestName,
+          guestEmail: body.guestEmail,
+          guestPhone: body.guestPhone,
           customFieldValues: {
             create: body.customFields.map((field: any) => ({
               name: field.name,
@@ -305,13 +308,20 @@ export async function POST(req: NextRequest) {
       };
 
       if (!body.isAnonymous) {
-        if (body.creatorId && pqr.creator) {
+        if (body.creatorId) {
+          // Usuario registrado - obtener datos del creator
+          const creator = await prisma.user.findUnique({
+            where: { id: body.creatorId },
+            select: { name: true, email: true, phone: true },
+          });
+          
           contactInfo = {
-            name: pqr.creator.name || 'Usuario registrado',
-            email: pqr.creator.email || 'No proporcionado',
-            phone: creatorPhone || pqr.creator.phone || 'No proporcionado'
+            name: creator?.name || 'Usuario registrado',
+            email: creator?.email || 'No proporcionado',
+            phone: creatorPhone || creator?.phone || 'No proporcionado'
           };
         } else {
+          // Usuario no registrado
           contactInfo = {
             name: body.guestName || 'No proporcionado',
             email: body.guestEmail || 'No proporcionado',
@@ -330,19 +340,27 @@ export async function POST(req: NextRequest) {
       throw new Error("No email found for this entity");
     }
 
-    if (pqr.creator?.email) {
-      await sendPQRCreationEmail(
-        pqr.creator?.email,
-        pqr.creator?.name || "John Doe",
-        "Registro exitoso de PQR @quejate.com.co",
-        pqr.consecutiveCode,
-        new Date(pqr.createdAt).toLocaleString("es-CO", {
-          timeZone: "America/Bogota",
-        }),
-        `https://quejate.com.co/dashboard/pqr/${pqr.id}`,
-        entity.name,
-        entity.email
-      );
+    // Solo enviar correo de confirmación a usuarios registrados
+    if (body.creatorId) {
+      const creator = await prisma.user.findUnique({
+        where: { id: body.creatorId },
+        select: { name: true, email: true },
+      });
+      
+      if (creator?.email) {
+        await sendPQRCreationEmail(
+          creator.email,
+          creator.name || "Usuario registrado",
+          "Registro exitoso de PQR @quejate.com.co",
+          pqr.consecutiveCode,
+          new Date(pqr.createdAt).toLocaleString("es-CO", {
+            timeZone: "America/Bogota",
+          }),
+          `https://quejate.com.co/dashboard/pqr/${pqr.id}`,
+          entity.name,
+          entity.email
+        );
+      }
     }
 
     return NextResponse.json(pqr);
