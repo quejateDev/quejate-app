@@ -12,6 +12,7 @@ export default async function CreatePQRPage() {
     },
     include: {
       entities: {
+        where: { isActive: true },
         select: {
           id: true,
           name: true,

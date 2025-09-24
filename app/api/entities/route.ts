@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     const entities = await prisma.entity.findMany({
       where: {
         ...whereClause,
+        isActive: true,
         category: {
           isActive: true,
         },

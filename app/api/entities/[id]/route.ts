@@ -10,6 +10,7 @@ export async function GET(request: Request, { params }: any) {
         category: {
           isActive: true,
         },
+        isActive: true
       },
       include: {
         category: true,
