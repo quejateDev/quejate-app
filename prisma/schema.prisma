@@ -142,6 +142,7 @@ model Entity {
   pqrs                 PQRS[]
   users                User[]
   favoritedBy          UserFavoriteEntity[]
+  isActive            Boolean              @default(true)
 
   @@index([categoryId])
 }
