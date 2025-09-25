@@ -21,10 +21,10 @@ export default function Footer() {
           <div>
             <h3 className="text-md font-bold mb-4">Síguenos</h3>
             <div className="flex space-x-4">
-              <a href="https://www.instagram.com/qujateco/" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.instagram.com/quejate.com.co" target="_blank" rel="noopener noreferrer">
                 <InstagramIcon className="w-6 h-6" />
               </a>
-              <a href="https://www.facebook.com/qujateco/" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/profile.php?id=61581217178815&ref=pl_edit_ig_profile_ac" target="_blank" rel="noopener noreferrer">
                 <FacebookIcon className="w-6 h-6" />
               </a>
               
