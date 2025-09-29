@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Bell, Scale } from "lucide-react";
 import { Button } from "./ui/button";
@@ -13,12 +13,22 @@ import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Notification } from "@/types/notification";
+import {
+  isCommentNotification,
+  isFollowNotification,
+  isLawyerRequestAcceptedNotification,
+  isLawyerRequestRejectedNotification,
+  isLikeNotification,
+  isNewLawyerRequestNotification,
+  isPQRSDTimeExpiredNotification,
+  Notification,
+} from "@/types/notification";
 import Link from "next/link";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function NotificationDropdown() {
-  const { notifications, unreadCount, setNotifications, markAsRead } = useNotificationStore();
+  const { notifications, unreadCount, setNotifications, markAsRead } =
+    useNotificationStore();
   const session = useCurrentUser();
 
   useEffect(() => {
@@ -55,24 +65,34 @@ export function NotificationDropdown() {
   };
 
   const getNotificationLink = (notification: Notification) => {
-    switch (notification.type) {
-      case 'follow':
-        return notification.data?.followerId 
-          ? `/dashboard/profile/${notification.data.followerId}` 
-          : '#';
-      case 'like':
-      case 'comment':
-        return notification.data?.pqrId 
-          ? `/dashboard/profile/pqr/${notification.data.pqrId}`
-          : '#';
-      case 'lawyer_request_accepted':
-      case 'lawyer_request_rejected':
-        return '/dashboard/lawyer/lawyer-requests';
-      case 'new_lawyer_request':
-        return '/dashboard/lawyer';
-      default:
-        return '#';
+    if (isFollowNotification(notification.data)) {
+      return `/dashboard/profile/${notification.data.followerId}`;
     }
+
+    if (isLikeNotification(notification.data)) {
+      return `/dashboard/profile/pqr/${notification.data.pqrId}`;
+    }
+
+    if (isCommentNotification(notification.data)) {
+      return `/dashboard/profile/pqr/${notification.data.pqrId}`;
+    }
+
+    if (
+      isLawyerRequestAcceptedNotification(notification.data) ||
+      isLawyerRequestRejectedNotification(notification.data)
+    ) {
+      return "/dashboard/lawyer/lawyer-requests";
+    }
+
+    if (isNewLawyerRequestNotification(notification.data)) {
+      return "/dashboard/lawyer";
+    }
+
+    if (isPQRSDTimeExpiredNotification(notification.data)) {
+      return `/dashboard/profile/pqr/${notification.data.pqrId}`;
+    }
+
+    return "#";
   };
 
   return (
@@ -101,30 +121,43 @@ export function NotificationDropdown() {
                 !notification.read ? "bg-muted/50" : ""
               }`}
               onClick={() => handleMarkAsRead(notification.id)}
-            
             >
               <Link href={getNotificationLink(notification)}>
-                {(notification.type === "follow" || 
-                notification.type === "like" || 
-                notification.type === "comment") && (
+                {(isFollowNotification(notification.data) ||
+                  isLikeNotification(notification.data) ||
+                  isCommentNotification(notification.data)) && (
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={notification.data?.followerImage} />
+                    <AvatarImage
+                      src={
+                        isFollowNotification(notification.data)
+                          ? notification.data.followerImage
+                          : isLikeNotification(notification.data)
+                            ? notification.data.userImage
+                            : isCommentNotification(notification.data)
+                              ? notification.data.userImage
+                              : undefined
+                      }
+                    />
                     <AvatarFallback>
-                      {notification.data?.followerName?.[0]}
+                      {isFollowNotification(notification.data)
+                        ? notification.data.followerName?.[0]
+                        : isLikeNotification(notification.data)
+                          ? notification.data.userName?.[0]
+                          : isCommentNotification(notification.data)
+                            ? notification.data.userName?.[0]
+                            : ""}
                     </AvatarFallback>
                   </Avatar>
                 )}
-                {(notification.type === "lawyer_request_accepted" || 
-                  notification.type === "lawyer_request_rejected" || 
+                {(notification.type === "lawyer_request_accepted" ||
+                  notification.type === "lawyer_request_rejected" ||
                   notification.type === "new_lawyer_request") && (
                   <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                     <Scale className="h-4 w-4 text-blue-600" />
                   </div>
                 )}
                 <div className="flex-1 space-y-1">
-                  <p className="text-sm leading-none">
-                    {notification.message}
-                  </p>
+                  <p className="text-sm leading-none">{notification.message}</p>
                   <p className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(notification.createdAt), {
                       addSuffix: true,

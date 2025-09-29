@@ -1,6 +1,5 @@
 export type NotificationType =
   | "follow"
-  | "mention"
   | "like"
   | "comment"
   | "lawyer_request_accepted"
@@ -17,7 +16,14 @@ export type NotificationData =
     followerImage?: string;
   }
   | {
-    type: "like" | "comment";
+    type: "like";
+    pqrId: string;
+    userId: string;
+    userName: string;
+    userImage?: string;
+  }
+  | {
+    type: "comment";
     pqrId: string;
     userId: string;
     userName: string;
@@ -51,3 +57,26 @@ export type Notification = {
   createdAt: Date;
   data: NotificationData;
 };
+
+export type CreateNotificationInput = Omit<Notification, 'id' | 'createdAt'>;
+
+export const isFollowNotification = (data: NotificationData): data is Extract<NotificationData, { type: "follow" }> =>
+  data.type === "follow";
+
+export const isLikeNotification = (data: NotificationData): data is Extract<NotificationData, { type: "like" }> =>
+  data.type === "like";
+
+export const isCommentNotification = (data: NotificationData): data is Extract<NotificationData, { type: "comment" }> =>
+  data.type === "comment";
+
+export const isLawyerRequestAcceptedNotification = (data: NotificationData): data is Extract<NotificationData, { type: "lawyer_request_accepted" }> =>
+  data.type === "lawyer_request_accepted";
+
+export const isLawyerRequestRejectedNotification = (data: NotificationData): data is Extract<NotificationData, { type: "lawyer_request_rejected" }> =>
+  data.type === "lawyer_request_rejected";
+
+export const isNewLawyerRequestNotification = (data: NotificationData): data is Extract<NotificationData, { type: "new_lawyer_request" }> =>
+  data.type === "new_lawyer_request";
+
+export const isPQRSDTimeExpiredNotification = (data: NotificationData): data is Extract<NotificationData, { type: "pqrsd_time_expired" }> =>
+  data.type === "pqrsd_time_expired";
