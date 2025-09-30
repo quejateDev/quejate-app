@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { LawyerRequestStatus } from "@prisma/client";
-import { createLawyerRequestNotification, createNewRequestNotificationForLawyer } from "@/lib/helpers/notificationHelpers";
 import { currentUser } from "@/lib/auth";
+import { NotificationFactory, notificationService } from "@/services/api/notification.service";
 
 export async function GET(request: Request) {
   try {
@@ -203,12 +203,14 @@ export async function POST(request: Request) {
     });
 
     const clientName = `${lawyerRequest.user.name}`;
-    await createNewRequestNotificationForLawyer(
-      lawyer.id,
-      clientName,
+    const notificationInput = NotificationFactory.createNewLawyerRequest(
+      lawyer.user.id,    
+      clientName || 'Cliente',
       lawyerRequest.id,
-      lawyerRequest.pqr?.subject || undefined
+      lawyerRequest.pqr?.subject
     );
+
+    await notificationService.create(notificationInput);
 
     return NextResponse.json(lawyerRequest, { status: 201 });
 
@@ -312,15 +314,23 @@ export async function PATCH(request: Request) {
     });
 
     if (newStatus === 'ACCEPTED' || newStatus === 'REJECTED') {
-      const lawyerName = `${updatedRequest.lawyer.user.name}`;
-      const notificationType = newStatus === 'ACCEPTED' ? 'lawyer_request_accepted' : 'lawyer_request_rejected';
-      
-      await createLawyerRequestNotification(
-        updatedRequest.userId,
-        notificationType,
-        lawyerName,
-        requestId
-      );
+      const lawyerName = updatedRequest.lawyer.user.name;
+
+      if (newStatus === 'ACCEPTED') {
+        const notificationInput = NotificationFactory.createLawyerRequestAccepted(
+          updatedRequest.userId,
+          lawyerName,
+          requestId
+        );
+        await notificationService.create(notificationInput);
+      } else {
+        const notificationInput = NotificationFactory.createLawyerRequestRejected(
+          updatedRequest.userId,
+          lawyerName,
+          requestId
+        );
+        await notificationService.create(notificationInput);
+      }
     }
 
     return NextResponse.json(updatedRequest, { status: 200 });

@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 export const NotificationFactory = {
   createFollow: (
     userId: string, 
-    follower: { id: string; name: string; image?: string }
+    follower: { id: string; name: string | null; image?: string | null },
   ): CreateNotificationInput => ({
     userId,
     type: "follow",
@@ -14,15 +14,15 @@ export const NotificationFactory = {
     data: {
       type: "follow",
       followerId: follower.id,
-      followerName: follower.name,
-      followerImage: follower.image,
+      followerName: follower.name || 'Usuario',
+      followerImage: follower.image || undefined,
     },
   }),
 
   createLike: (
     userId: string,
     pqrId: string, 
-    user: { id: string; name: string; image?: string }
+    user: { id: string; name: string | null; image?: string | null } 
   ): CreateNotificationInput => ({
     userId,
     type: "like",
@@ -32,8 +32,8 @@ export const NotificationFactory = {
       type: "like",
       pqrId,
       userId: user.id,
-      userName: user.name,
-      userImage: user.image,
+      userName: user.name || 'Usuario',
+      userImage: user.image || undefined,
     },
   }),
 
@@ -59,7 +59,7 @@ export const NotificationFactory = {
 
   createLawyerRequestAccepted: (
     userId: string,
-    lawyerName: string,
+    lawyerName: string | null,
     requestId: string
   ): CreateNotificationInput => ({
     userId,
@@ -69,13 +69,13 @@ export const NotificationFactory = {
     data: {
       type: "lawyer_request_accepted",
       requestId,
-      lawyerName,
+      lawyerName: lawyerName || 'Abogado',
     },
   }),
 
   createLawyerRequestRejected: (
     userId: string,
-    lawyerName: string,
+    lawyerName: string | null,
     requestId: string,
     rejectionMessage?: string
   ): CreateNotificationInput => ({
@@ -86,16 +86,16 @@ export const NotificationFactory = {
     data: {
       type: "lawyer_request_rejected",
       requestId,
-      lawyerName,
+      lawyerName: lawyerName || 'Abogado',
       ...(rejectionMessage && { rejectionMessage }),
     },
   }),
 
   createNewLawyerRequest: (
     lawyerUserId: string,
-    clientName: string,
+    clientName: string | null,
     requestId: string,
-    pqrSubject?: string
+    pqrSubject?: string | null
   ): CreateNotificationInput => ({
     userId: lawyerUserId,
     type: "new_lawyer_request",
@@ -106,7 +106,7 @@ export const NotificationFactory = {
     data: {
       type: "new_lawyer_request",
       requestId,
-      clientName,
+      clientName: clientName || 'Cliente',
       ...(pqrSubject && { pqrSubject }),
     },
   }),
