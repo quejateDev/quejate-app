@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@/lib/auth";
+import { NotificationFactory, notificationService } from "@/services/api/notification.service";
 
 export async function POST(
   req: NextRequest,
@@ -75,18 +76,18 @@ export async function POST(
       },
     });
 
-    await prisma.notification.create({
-      data: {
-        userId: id,
-        type: "follow",
-        message: `${updatedUser?.name} ha comenzado a seguirte`,
-        data: {
-          followerId: updatedUser?.id,
-          followerName: updatedUser?.name,
-          followerImage: updatedUser?.image || null,
-        },
-      },
-    });
+    if (!existingFollow && updatedUser) {
+      const notificationInput = NotificationFactory.createFollow(
+        id,                   
+        {               
+          id: updatedUser.id,
+          name: updatedUser.name,
+          image: updatedUser.image || undefined,
+        }
+      );
+
+      await notificationService.create(notificationInput);
+    }
 
     return NextResponse.json({
       followed: !existingFollow,
