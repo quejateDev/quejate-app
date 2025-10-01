@@ -322,7 +322,7 @@ export function CategorySelection({
                   setSelectedMunicipalityId(null);
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className="border border-muted">
                   <SelectValue placeholder="Buscar por departamento" />
                 </SelectTrigger>
                 <SelectContent>
