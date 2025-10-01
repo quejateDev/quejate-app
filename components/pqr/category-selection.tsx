@@ -30,6 +30,7 @@ import { useFavoriteEntities } from "@/hooks/useFavoriteEntities";
 import dynamic from "next/dynamic";
 import { formatText } from "@/utils/formatText";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { EntitySuggestionModal } from "@/components/modals/entity-suggestion-modal";
 
 interface SimpleEntity {
   id: string;
@@ -376,9 +377,12 @@ export function CategorySelection({
               />
             ))
           ) : (
-            <p className="text-left text-sm text-gray-500 col-span-full">
-              No se encontraron entidades con este criterio de búsqueda.
-            </p>
+            <div className="col-span-full space-y-4">
+              <p className="text-left text-sm text-gray-500">
+                No se encontraron entidades con este criterio de búsqueda.
+              </p>
+              <EntitySuggestionModal />
+            </div>
           )
         ) : filteredCategories.length > 0 ? (
           filteredCategories.map((category) => (

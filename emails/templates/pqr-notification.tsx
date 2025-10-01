@@ -166,13 +166,17 @@ export default function PQRNotificationEmail({
             padding: '20px',
             margin: '16px 0',
           }}>
-            {attachments.map((attachment, index) => (
-              <Text key={index} style={{...baseStyles.paragraph, margin: '0 0 8px 0'}}>
-                • <Link href={attachment.url} style={baseStyles.link}>
-                  {attachment.name}
-                </Link> ({attachment.type})
-              </Text>
-            ))}
+            {attachments.map((attachment, index) => {
+              const cleanName = attachment.name.substring(37);
+              // Remove leading UUID and underscore if present
+              return (
+                <Text key={index} style={{...baseStyles.paragraph, margin: '0 0 8px 0'}}>
+                  • <Link href={attachment.url} style={baseStyles.link}>
+                    {cleanName}
+                  </Link> ({attachment.type})
+                </Text>
+              );
+            })}
           </div>
         </>
       )}
