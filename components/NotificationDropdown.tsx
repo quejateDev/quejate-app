@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Scale } from "lucide-react";
+import { Bell, Scale, Clock } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -154,6 +154,11 @@ export function NotificationDropdown() {
                   notification.type === "new_lawyer_request") && (
                   <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                     <Scale className="h-4 w-4 text-blue-600" />
+                  </div>
+                )}
+                {notification.type === "pqrsd_time_expired" && (
+                  <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                    <Clock className="h-4 w-4 text-red-600" />
                   </div>
                 )}
                 <div className="flex-1 space-y-1">
