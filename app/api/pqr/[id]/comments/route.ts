@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { NotificationFactory, notificationService } from "@/services/api/notification.service";
 
 const prisma = new PrismaClient();
 
@@ -41,27 +42,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       },
     });
 
-    if (userId !== pqr.creatorId) {
-      const commentingUser = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { name: true, image: true },
-      });
+    if (userId !== pqr.creatorId && comment.user) {
+      const notificationInput = NotificationFactory.createComment(
+        pqr.creatorId,
+        pqrId,
+        comment.user,
+        comment.id
+      );
 
-      if (commentingUser) {
-        await prisma.notification.create({
-          data: {
-            type: "comment",
-            userId: pqr.creatorId,
-            message: `${commentingUser.name} ha comentado tu PQRSD`,
-            data: {
-              pqrId: pqrId,
-              followerId: userId,
-              followerName: `${commentingUser.name}`,
-              followerImage: commentingUser.image || null,
-            },
-          },
-        });
-      }
+      await notificationService.create(notificationInput);
     }
 
     return NextResponse.json(comment, { status: 201 });

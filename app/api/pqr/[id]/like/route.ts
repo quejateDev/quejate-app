@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { NotificationFactory, notificationService } from "@/services/api/notification.service";
 
 export async function POST(request: NextRequest, { params }: any) {
   try {
@@ -65,23 +66,21 @@ export async function POST(request: NextRequest, { params }: any) {
       if (userId !== updatedPQR.creator.id) {
         const likingUser = await prisma.user.findUnique({
           where: { id: userId },
-          select: { name: true, image: true },
+          select: { 
+            id: true,
+            name: true, 
+            image: true 
+          },
         });
     
         if (likingUser) {
-          await prisma.notification.create({
-            data: {
-              type: "like",
-              userId: updatedPQR.creator.id,
-              message: `A ${likingUser.name} le gusta tu PQRSD`,
-              data: {
-                pqrId: pqrId,
-                followerId: userId,
-                followerName: `${likingUser.name}`,
-                followerImage: likingUser.image || null,
-              },
-            },
-          });
+          const notificationInput = NotificationFactory.createLike(
+            updatedPQR.creator.id, 
+            pqrId,                  
+            likingUser             
+          );
+
+          await notificationService.create(notificationInput);
         }
       }
     }
