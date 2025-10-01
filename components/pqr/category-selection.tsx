@@ -224,7 +224,7 @@ export function CategorySelection({
             .includes(entitySearchQuery.toLowerCase());
           const matchesDescription = entity.description
             ? entity.description.toLowerCase().includes(entitySearchQuery.toLowerCase())
-            : true;
+            : false;
           
           const matchesDepartment = selectedDepartmentId
             ? loadingMunicipalities 
@@ -236,8 +236,7 @@ export function CategorySelection({
             ? entity.municipalityId === selectedMunicipalityId
             : true;
           return (
-            matchesName &&
-            matchesDescription &&
+            (matchesName || matchesDescription) &&
             matchesDepartment &&
             matchesMunicipality
           );
