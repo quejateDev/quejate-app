@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Plus } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from '@/hooks/use-toast';
 import geoData from "@/data/colombia-geo.json";
 import { formatText } from "@/utils/formatText";
 
@@ -50,7 +50,11 @@ export function EntitySuggestionModal({
     e.preventDefault();
     
     if (!entityName.trim() || !selectedDepartmentId) {
-      toast.error("Por favor completa los campos requeridos");
+      toast({
+        title: "Error",
+        description: "Por favor completa los campos requeridos",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -70,18 +74,29 @@ export function EntitySuggestionModal({
       });
 
       if (response.ok) {
-        toast.success("Sugerencia enviada exitosamente. Gracias por tu aporte!");
+        toast({
+          title: "¡Éxito!",
+          description: "Sugerencia enviada exitosamente. Gracias por tu aporte!",
+        });
         setEntityName("");
         setSelectedDepartmentId("");
         setSelectedMunicipalityId("");
         effectiveOnOpenChange(false);
       } else {
         const error = await response.json();
-        toast.error(error.error || "Error al enviar la sugerencia");
+        toast({
+          title: "Error",
+          description: error.error || "Error al enviar la sugerencia",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error submitting suggestion:", error);
-      toast.error("Error de conexión. Intenta nuevamente.");
+      toast({
+        title: "Error de conexión",
+        description: "Error de conexión. Intenta nuevamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
