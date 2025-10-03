@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import useNotificationStore from "@/store/useNotificationStore";
 import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
@@ -107,73 +108,77 @@ export function NotificationDropdown() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        {notifications.length === 0 ? (
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            No tienes notificaciones
-          </div>
-        ) : (
-          notifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              asChild
-              className={`flex items-start gap-3 p-4 ${
-                !notification.read ? "bg-muted/50" : ""
-              }`}
-              onClick={() => handleMarkAsRead(notification.id)}
-            >
-              <Link href={getNotificationLink(notification)}>
-                {(isFollowNotification(notification.data) ||
-                  isLikeNotification(notification.data) ||
-                  isCommentNotification(notification.data)) && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={
-                        isFollowNotification(notification.data)
-                          ? notification.data.followerImage
-                          : isLikeNotification(notification.data)
-                            ? notification.data.userImage
-                            : isCommentNotification(notification.data)
+      <DropdownMenuContent align="end" className="w-80 p-0">
+        <ScrollArea className="h-[480px]">
+          <div className="p-1">
+            {notifications.length === 0 ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                No tienes notificaciones
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  asChild
+                  className={`flex items-start gap-3 p-4 ${
+                    !notification.read ? "bg-muted/50" : ""
+                  }`}
+                  onClick={() => handleMarkAsRead(notification.id)}
+                >
+                  <Link href={getNotificationLink(notification)}>
+                    {(isFollowNotification(notification.data) ||
+                      isLikeNotification(notification.data) ||
+                      isCommentNotification(notification.data)) && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={
+                            isFollowNotification(notification.data)
+                              ? notification.data.followerImage
+                              : isLikeNotification(notification.data)
+                              ? notification.data.userImage
+                              : isCommentNotification(notification.data)
                               ? notification.data.userImage
                               : undefined
-                      }
-                    />
-                    <AvatarFallback>
-                      {isFollowNotification(notification.data)
-                        ? notification.data.followerName?.[0]
-                        : isLikeNotification(notification.data)
-                          ? notification.data.userName?.[0]
-                          : isCommentNotification(notification.data)
+                          }
+                        />
+                        <AvatarFallback>
+                          {isFollowNotification(notification.data)
+                            ? notification.data.followerName?.[0]
+                            : isLikeNotification(notification.data)
+                            ? notification.data.userName?.[0]
+                            : isCommentNotification(notification.data)
                             ? notification.data.userName?.[0]
                             : ""}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                {(notification.type === "lawyer_request_accepted" ||
-                  notification.type === "lawyer_request_rejected" ||
-                  notification.type === "new_lawyer_request") && (
-                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Scale className="h-4 w-4 text-blue-600" />
-                  </div>
-                )}
-                {notification.type === "pqrsd_time_expired" && (
-                  <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
-                    <Clock className="h-4 w-4 text-red-600" />
-                  </div>
-                )}
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm leading-none">{notification.message}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.createdAt), {
-                      addSuffix: true,
-                      locale: es,
-                    })}
-                  </p>
-                </div>
-              </Link>
-            </DropdownMenuItem>
-          ))
-        )}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                    {(notification.type === "lawyer_request_accepted" ||
+                      notification.type === "lawyer_request_rejected" ||
+                      notification.type === "new_lawyer_request") && (
+                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Scale className="h-4 w-4 text-blue-600" />
+                      </div>
+                    )}
+                    {notification.type === "pqrsd_time_expired" && (
+                      <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                        <Clock className="h-4 w-4 text-red-600" />
+                      </div>
+                    )}
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm leading-none">{notification.message}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(notification.createdAt), {
+                          addSuffix: true,
+                          locale: es,
+                        })}
+                      </p>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   );
