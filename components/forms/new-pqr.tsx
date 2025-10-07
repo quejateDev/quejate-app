@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FileUpload } from "../ui/file-upload";
 import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
 
 import {
   Form,
@@ -46,7 +47,6 @@ const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
   ssr: false,
 });
 
-
 type NewPQRFormProps = {
   entityId: string;
 };
@@ -67,6 +67,26 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     onSubmit,
     setRecaptchaToken,
   } = usePQRForm(entityId, userId);
+
+  const [entityName, setEntityName] = useState<string>("");
+
+  useEffect(() => {
+    const fetchEntityName = async () => {
+      try {
+        const response = await fetch(`/api/entities/${entityId}`);
+        if (response.ok) {
+          const entityData = await response.json();
+          setEntityName(entityData.name);
+        }
+      } catch (error) {
+        console.error('Error fetching entity name:', error);
+      }
+    };
+
+    if (entityId) {
+      fetchEntityName();
+    }
+  }, [entityId]);
 
   if (isLoadingInitial) {
     return (
@@ -93,6 +113,14 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
             encType="multipart/form-data"
           >
             <div className="grid gap-4 pt-6">
+              {entityName && (
+                <div className=" mb-2">
+                  <h2 className="text-xl font-semibold">
+                    {entityName}
+                  </h2>
+                </div>
+              )}
+              
               <div>
                 <FormField
                   control={form.control}
