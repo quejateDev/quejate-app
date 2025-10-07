@@ -296,56 +296,84 @@ export async function POST(req: NextRequest) {
     const entity = await prisma.entity.findUnique({
       where: { 
         id: body.entityId,
-        category: {
-          isActive: true,
-        },
       },
       select: { name: true, email: true },
     });
+
+    if (!entity) {
+      return NextResponse.json(
+        { error: "Entity not found" },
+        { status: 404 }
+      );
+    }
 
     if (!pqr.consecutiveCode) {
       throw new Error("No consecutive code found for this PQR");
     }
 
-    if (entity?.email) {
-      let contactInfo = {
-        name: 'Anónimo',
-        email: 'Anónimo',
-        phone: 'Anónimo'
-      };
+    let recipientEmail: string | null = null;
+    let recipientName: string = '';
 
-      if (!body.isAnonymous) {
-        if (body.creatorId) {
-          // Usuario registrado - obtener datos del creator
-          const creator = await prisma.user.findUnique({
-            where: { id: body.creatorId },
-            select: { name: true, email: true, phone: true },
-          });
-          
-          contactInfo = {
-            name: creator?.name || 'Usuario registrado',
-            email: creator?.email || 'No proporcionado',
-            phone: creatorPhone || creator?.phone || 'No proporcionado'
-          };
-        } else {
-          // Usuario no registrado
-          contactInfo = {
-            name: body.guestName || 'No proporcionado',
-            email: body.guestEmail || 'No proporcionado',
-            phone: body.guestPhone || 'No proporcionado'
-          };
-        }
+    if (body.departmentId) {
+      const department = await prisma.department.findUnique({
+        where: { id: body.departmentId },
+        select: { email: true, name: true },
+      });
+
+      if (department?.email) {
+        recipientEmail = department.email;
+        recipientName = department.name;
       }
-
-      await sendPQRNotificationEmail(
-        entity.email,
-        entity.name,
-        pqr,
-        contactInfo
-      );
-    } else {
-      throw new Error("No email found for this entity");
     }
+
+    if (!recipientEmail) {
+      if (entity.email) {
+        recipientEmail = entity.email;
+        recipientName = entity.name;
+      } else {
+        return NextResponse.json(
+          { error: "No email found for this entity or department" },
+          { status: 400 }
+        );
+      }
+    }
+
+    let contactInfo = {
+      name: 'Anónimo',
+      email: 'Anónimo',
+      phone: 'Anónimo'
+    };
+
+    if (!body.isAnonymous) {
+      if (body.creatorId) {
+        // Usuario registrado - obtener datos del creator
+        const creator = await prisma.user.findUnique({
+          where: { id: body.creatorId },
+          select: { name: true, email: true, phone: true },
+        });
+        
+        contactInfo = {
+          name: creator?.name || 'Usuario registrado',
+          email: creator?.email || 'No proporcionado',
+          phone: creatorPhone || creator?.phone || 'No proporcionado'
+        };
+      } else {
+        // Usuario no registrado
+        contactInfo = {
+          name: body.guestName || 'No proporcionado',
+          email: body.guestEmail || 'No proporcionado',
+          phone: body.guestPhone || 'No proporcionado'
+        };
+      }
+    }
+
+    // Enviar notificación al destinatario (departamento o entidad)
+    await sendPQRNotificationEmail(
+      recipientEmail,
+      recipientName,
+      pqr,
+      contactInfo
+    );
 
     // Solo enviar correo de confirmación a usuarios registrados
     if (body.creatorId) {
@@ -365,7 +393,7 @@ export async function POST(req: NextRequest) {
           }),
           `https://quejate.com.co/dashboard/pqr/${pqr.id}`,
           entity.name,
-          entity.email
+          recipientEmail
         );
       }
     }
