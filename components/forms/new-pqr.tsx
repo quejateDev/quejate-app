@@ -114,9 +114,9 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
           >
             <div className="grid gap-4 pt-6">
               {entityName && (
-                <div className=" mb-2">
+                <div className="text-center mb-2">
                   <h2 className="text-xl font-semibold">
-                    {entityName}
+                    Crear PQRSD - {entityName}
                   </h2>
                 </div>
               )}
