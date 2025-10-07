@@ -10,6 +10,10 @@ interface FormFile extends File {
 }
 
 async function verifyRecaptcha(token: string): Promise<boolean> {
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+
   try {
     const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
@@ -141,19 +145,22 @@ export async function POST(req: NextRequest) {
 
     const body = JSON.parse(jsonData as string);
 
-    if (!body.recaptchaToken) {
-      return NextResponse.json(
-        { error: 'reCAPTCHA token is required' },
-        { status: 400 }
-      );
-    }
+    // Solo validar reCAPTCHA en producción
+    if (process.env.NODE_ENV === 'production') {
+      if (!body.recaptchaToken) {
+        return NextResponse.json(
+          { error: 'reCAPTCHA token is required' },
+          { status: 400 }
+        );
+      }
 
-    const isRecaptchaValid = await verifyRecaptcha(body.recaptchaToken);
-    if (!isRecaptchaValid) {
-      return NextResponse.json(
-        { error: 'reCAPTCHA verification failed' },
-        { status: 400 }
-      );
+      const isRecaptchaValid = await verifyRecaptcha(body.recaptchaToken);
+      if (!isRecaptchaValid) {
+        return NextResponse.json(
+          { error: 'reCAPTCHA verification failed' },
+          { status: 400 }
+        );
+      }
     }
 
     if (!body.type) {

@@ -163,7 +163,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   }, [watchedDepartmentId]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!recaptchaToken) {
+    if (process.env.NODE_ENV === 'production' && !recaptchaToken) {
       toast({
         title: "Error",
         description: "Por favor completa la verificación reCAPTCHA",
@@ -220,7 +220,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           attachments: attachmentsData,
           subject: values.subject,
           description: values.description,
-          recaptchaToken: recaptchaToken,
+          recaptchaToken: recaptchaToken || null,
         })
       );
 

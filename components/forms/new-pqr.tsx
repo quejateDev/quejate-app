@@ -460,15 +460,16 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 </p>
               </div>
 
-              {/* reCAPTCHA */}
-              <div className="flex justify-center">
-                {/* @ts-ignore */}
-                <ReCAPTCHA
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                  onChange={(token: string | null) => setRecaptchaToken(token)}
-                  onExpired={() => setRecaptchaToken(null)}
-                />
-              </div>
+              {process.env.NODE_ENV === 'production' && (
+                <div className="flex justify-center">
+                  {/* @ts-ignore */}
+                  <ReCAPTCHA
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                    onChange={(token: string | null) => setRecaptchaToken(token)}
+                    onExpired={() => setRecaptchaToken(null)}
+                  />
+                </div>
+              )}
               <div className="text-xs text-gray-600 mt-2">
                 Al enviar esta PQRSD, aceptas automáticamente nuestros{' '}
                 <Link 
