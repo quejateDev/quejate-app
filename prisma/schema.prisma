@@ -42,6 +42,7 @@ model User {
   
   // NextAuth.js relations
   accounts          Account[]
+  entityResponses   EntityResponse[]
 
   @@index([departmentId])
 }
@@ -142,6 +143,7 @@ model Entity {
   pqrs                 PQRS[]
   users                User[]
   favoritedBy          UserFavoriteEntity[]
+  entityResponses      EntityResponse[]
   isActive            Boolean              @default(true)
 
   @@index([categoryId])
@@ -507,4 +509,31 @@ model PasswordResetToken {
 
   @@unique([email, token])
   @@map("password_reset_tokens")
+}
+
+model EntityResponse {
+  id          String               @id @default(uuid())
+  entityId    String
+  userId      String
+  text        String
+  createdAt   DateTime             @default(now())
+  attachments ResponseAttachment[]
+  entity      Entity               @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([entityId])
+  @@index([userId])
+}
+
+model ResponseAttachment {
+  id          String          @id @default(uuid())
+  responseId  String
+  url         String
+  name        String
+  size        Int?
+  type        String?
+  createdAt   DateTime        @default(now())
+  response    EntityResponse  @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  @@index([responseId])
 }
