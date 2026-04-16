@@ -68,7 +68,17 @@ export async function POST(req: NextRequest) {
       salt: COOKIE_NAME,
     });
 
-    return NextResponse.json({ sessionToken });
+    return NextResponse.json({
+      sessionToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        role: user.role,
+        isOAuth: false,
+      },
+    });
   } catch (error) {
     console.error("[MOBILE_CREDENTIALS_AUTH_ERROR]", error);
     return NextResponse.json(
