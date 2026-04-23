@@ -240,7 +240,8 @@ model PQRS {
   entity            Entity             @relation(fields: [entityId], references: [id])
   statusHistory     PQRStatusHistory[]
   customFields      CustomField[]      @relation("CustomFieldToPQRS")
-
+  latitude          Float?
+  longitude         Float?
   @@index([creatorId])
   @@index([departmentId])
   @@index([assignedToId])
