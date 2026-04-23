@@ -515,6 +515,42 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 </Link>
                 .
               </div>
+
+              {/* Botón de ubicación */}
+              <div className="flex flex-col space-y-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border border-gray-300"
+                  onClick={() => {
+                    if (!navigator.geolocation) {
+                      alert("Tu navegador no soporta geolocalización");
+                      return;
+                    }
+                    navigator.geolocation.getCurrentPosition(
+                      (position) => {
+                        form.setValue("latitude", position.coords.latitude);
+                        form.setValue("longitude", position.coords.longitude);
+                        alert(" Ubicación capturada correctamente");
+                      },
+                      () => {
+                        alert(" No se pudo obtener la ubicación. Verifica los permisos.");
+                      }
+                    );
+                  }}
+                >
+                   Agregar mi ubicación al reporte
+                </Button>
+                {form.watch("latitude") && (
+                  <p className="text-xs text-green-600">
+                     Ubicación capturada: {form.watch("latitude")?.toFixed(4)}, {form.watch("longitude")?.toFixed(4)}
+                  </p>
+                )}
+                <p className="text-xs text-gray-500">
+                  Opcional. Permite mostrar tu reporte en el mapa ciudadano.
+                </p>
+              </div>
+
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>

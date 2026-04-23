@@ -28,6 +28,11 @@ export default function NavbarDashboard() {
           <Link href="/dashboard">Inicio</Link>
         </NavigationMenuLink>
       </NavigationMenuItem>
+      <NavigationMenuItem className="mx-2">
+        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+          <Link href="/dashboard/mapa">Mapa Ciudadano</Link>
+        </NavigationMenuLink>
+      </NavigationMenuItem>
     </>
   );
 
@@ -67,6 +72,9 @@ export default function NavbarDashboard() {
                     <UserSearchCommand />
                     <Link href="/dashboard" className="text-lg font-semibold flex items-center">
                       Inicio
+                    </Link>
+                    <Link href="/dashboard/mapa" className="text-lg font-semibold flex items-center">
+                       Mapa Ciudadano
                     </Link>
                     {/* "Explorar" solo visible en móvil */}
                     <Link 
