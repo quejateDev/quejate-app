@@ -26,8 +26,6 @@ export const formSchema = z.object({
       size: z.number(),
     })
   ),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
 });
 
 export const usePQRForm = (entityId: string, userId: string | undefined) => {
@@ -66,8 +64,6 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       guestEmail: "",
       guestPhone: "",
       attachments: [],
-      latitude: undefined,
-      longitude: undefined,
     },
   });
 
@@ -225,8 +221,6 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           subject: values.subject,
           description: values.description,
           recaptchaToken: recaptchaToken || null,
-          latitude: values.latitude || null,
-          longitude: values.longitude || null,
         })
       );
 

@@ -276,8 +276,6 @@ export async function POST(req: NextRequest) {
             },
           },
           consecutiveCode: newConsecutiveCode,
-          latitude: body.latitude || null,
-          longitude: body.longitude || null,
         },
         include: {
           department: true, 
