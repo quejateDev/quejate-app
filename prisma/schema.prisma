@@ -40,6 +40,8 @@ model User {
   following         User[]              @relation("UserFollows")
   followers         User[]              @relation("UserFollows")
   
+  pushToken         String?
+
   // NextAuth.js relations
   accounts          Account[]
   entityResponses   EntityResponse[]
