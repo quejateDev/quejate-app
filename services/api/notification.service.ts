@@ -2,6 +2,33 @@
 import { CreateNotificationInput } from '@/types/notification';
 import prisma from "@/lib/prisma";
 
+const NOTIFICATION_TITLES: Record<string, string> = {
+  like: "Nuevo me gusta",
+  comment: "Nuevo comentario",
+  follow: "Nuevo seguidor",
+  pqrsd_time_expired: "PQRSD vencida",
+  lawyer_request_accepted: "Solicitud de asesoría aceptada",
+  lawyer_request_rejected: "Solicitud de asesoría rechazada",
+  new_lawyer_request: "Nueva solicitud de asesoría",
+};
+
+async function sendExpoPush(
+  token: string,
+  title: string,
+  body: string,
+  data: Record<string, string>
+) {
+  try {
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to: token, title, body, data }),
+    });
+  } catch (error) {
+    console.error("Error sending Expo push notification:", error);
+  }
+}
+
 export const NotificationFactory = {
   createFollow: (
     userId: string, 
@@ -130,9 +157,22 @@ export const NotificationFactory = {
 
 export const notificationService = {
   async create(notificationInput: CreateNotificationInput) {
-    return await prisma.notification.create({
+    const notification = await prisma.notification.create({
       data: notificationInput,
     });
+
+    const user = await prisma.user.findUnique({
+      where: { id: notificationInput.userId },
+      select: { pushToken: true },
+    });
+
+    if (user?.pushToken) {
+      const title = NOTIFICATION_TITLES[notificationInput.type] ?? "Nueva notificación";
+      const data = (notificationInput.data ?? {}) as Record<string, string>;
+      await sendExpoPush(user.pushToken, title, notificationInput.message, data);
+    }
+
+    return notification;
   },
 
   async markAsRead(notificationId: string) {
