@@ -47,6 +47,11 @@ const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
   ssr: false,
 });
 
+const MiniMapa = dynamic(
+  () => import("@/components/mapa-ciudadano/MiniMapa"),
+  { ssr: false, loading: () => <p>Cargando mapa...</p> }
+);
+
 type NewPQRFormProps = {
   entityId: string;
 };
@@ -516,39 +521,17 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 .
               </div>
 
-              {/* Botón de ubicación */}
+              {/* Minimapa de ubicación */}
               <div className="flex flex-col space-y-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full border border-gray-300"
-                  onClick={() => {
-                    if (!navigator.geolocation) {
-                      alert("Tu navegador no soporta geolocalización");
-                      return;
-                    }
-                    navigator.geolocation.getCurrentPosition(
-                      (position) => {
-                        form.setValue("latitude", position.coords.latitude);
-                        form.setValue("longitude", position.coords.longitude);
-                        alert(" Ubicación capturada correctamente");
-                      },
-                      () => {
-                        alert(" No se pudo obtener la ubicación. Verifica los permisos.");
-                      }
-                    );
+                <label className="text-sm font-medium">
+                  Ubicación del reporte (opcional)
+                </label>
+                <MiniMapa
+                  onLocationSelect={(lat, lng) => {
+                    form.setValue("latitude", lat);
+                    form.setValue("longitude", lng);
                   }}
-                >
-                   Agregar mi ubicación al reporte
-                </Button>
-                {form.watch("latitude") && (
-                  <p className="text-xs text-green-600">
-                     Ubicación capturada: {form.watch("latitude")?.toFixed(4)}, {form.watch("longitude")?.toFixed(4)}
-                  </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  Opcional. Permite mostrar tu reporte en el mapa ciudadano.
-                </p>
+                />
               </div>
 
               <Button type="submit" disabled={isLoading}>
