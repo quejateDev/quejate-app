@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         image: user.image,
         role: user.role,
+        entityId: user.entityId ?? null,
         isOAuth: false,
       },
       secret: process.env.AUTH_SECRET!,
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         image: user.image,
         role: user.role,
+        entityId: user.entityId ?? null,
         isOAuth: false,
       },
     });

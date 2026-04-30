@@ -77,7 +77,17 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { notificationId } = await req.json();
+    const body = await req.json();
+
+    if (body.markAll) {
+      await prisma.notification.updateMany({
+        where: { userId: currentUserId.id, read: false },
+        data: { read: true },
+      });
+      return NextResponse.json({ success: true });
+    }
+
+    const { notificationId } = body;
 
     await prisma.notification.update({
       where: {

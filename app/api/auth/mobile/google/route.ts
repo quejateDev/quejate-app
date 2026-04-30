@@ -107,6 +107,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         image: user.image,
         role: user.role,
+        entityId: user.entityId ?? null,
         isOAuth: true,
       },
       secret: process.env.AUTH_SECRET!,
@@ -114,7 +115,18 @@ export async function POST(req: NextRequest) {
       salt: COOKIE_NAME,
     });
 
-    return NextResponse.json({ sessionToken });
+    return NextResponse.json({
+      sessionToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        role: user.role,
+        entityId: user.entityId ?? null,
+        isOAuth: true,
+      },
+    });
   } catch (error) {
     console.error("[MOBILE_GOOGLE_AUTH_ERROR]", error);
     return NextResponse.json(
