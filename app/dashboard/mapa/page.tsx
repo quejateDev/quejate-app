@@ -7,6 +7,7 @@ export default async function MapaPage() {
     where: {
       latitude: { not: null },
       longitude: { not: null },
+      private: false,
     },
     select: {
       id: true,
