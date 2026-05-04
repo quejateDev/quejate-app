@@ -50,7 +50,17 @@ export async function GET(
           },
         },
         customFieldValues: true,
-        creator: true
+        creator: true,
+        statusHistory: {
+          select: {
+            id: true,
+            status: true,
+            comment: true,
+            createdAt: true,
+            user: { select: { name: true } },
+          },
+          orderBy: { createdAt: "asc" },
+        },
       },
   });
   if (!pqr) {

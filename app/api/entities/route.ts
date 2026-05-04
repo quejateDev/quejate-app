@@ -8,13 +8,18 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const departmentId = searchParams.get("departmentId");
     const municipalityId = searchParams.get("municipalityId");
+    const categoryId = searchParams.get("categoryId");
 
-    let whereClause = {};
+    let whereClause: Record<string, unknown> = {};
 
     if (municipalityId) {
       whereClause = { municipalityId };
     } else if (departmentId) {
       whereClause = { regionalDepartmentId: departmentId };
+    }
+
+    if (categoryId) {
+      whereClause = { ...whereClause, categoryId };
     }
 
     const entities = await prisma.entity.findMany({
