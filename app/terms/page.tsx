@@ -43,6 +43,7 @@ export default function TermsAndConditions() {
               <li>Trasladar sus inconformidades (PQRSD) a las entidades destino,</li>
               <li>Permitirles a los Usuarios hacer un seguimiento &quot;en vivo&quot; de sus PQRSD, monitorear si existe o no respuesta</li>
               <li>Llegado el término legal de vencimiento de la PQRSD, indicarle al usuario las acciones administrativas o judiciales que puede emprender con base en el marco normativo colombiano y en su caso particular. Tales acciones pueden ser, por ejemplo, generar una acción de tutela o escalar la inconformidad a la no atención oportuna en los entes de control correspondiente.</li>
+              <li>Opcionalmente, geolocalizar su PQRSD indicando la ubicación geográfica del hecho o situación que origina la solicitud. Esta información se visualizará en el mapa ciudadano de la Plataforma únicamente si la PQRSD ha sido configurada como pública por el usuario. Las PQRSD privadas no serán visibles en el mapa en ningún caso.</li>
             </ol>
           </div>
 
@@ -107,6 +108,7 @@ export default function TermsAndConditions() {
             <li>La plataforma no garantiza que las tutelas generadas por Inteligencia Artificial estén totalmente correctas, toda vez que dicha tecnología puede cometer errores. El usuario deberá revisar la totalidad de los documentos generados y verificar la información importante en aras a que estén acorde a las necesidades del usuario.</li>
             <li>La plataforma no se hace responsable de la información enviada a las entidades públicas o privadas.</li>
             <li>La plataforma no se hace responsable del contenido que el usuario publique en su muro privado o público.</li>
+            <li>La plataforma no se hace responsable de la inexactitud de las coordenadas de ubicación indicadas voluntariamente por el usuario al geolocalizar una PQRSD. La precisión de dicha ubicación es responsabilidad exclusiva del usuario.</li>
           </ul>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Aceptación de Términos</h2>

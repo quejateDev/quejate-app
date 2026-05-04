@@ -19,6 +19,7 @@ const LegalPage = () => {
             <li>Solo solicitamos los datos estrictamente necesarios para la prestación del servicio.</li>
             <li>Puedes solicitar la eliminación o modificación de tus datos en cualquier momento.</li>
             <li>Utilizamos medidas de seguridad para proteger tu información.</li>
+            <li>La geolocalización de una PQRSD es completamente opcional. Si decides indicar la ubicación de tu solicitud, esas coordenadas se mostrarán en el mapa ciudadano únicamente si tu PQRSD es pública. Las PQRSD privadas nunca aparecen en el mapa.</li>
           </ul>
         </section>
         <section className="mb-10">

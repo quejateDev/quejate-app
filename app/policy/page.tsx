@@ -87,6 +87,16 @@ export default function Policy() {
               </span>{" "}
               dirección IP, cookies, logs de acceso.
             </li>
+            <li>
+              <span className="font-semibold">
+                Datos de geolocalización:
+              </span>{" "}
+              coordenadas de latitud y longitud asociadas a una PQRSD, cuando el
+              usuario opte voluntariamente por indicar la ubicación geográfica de
+              su solicitud a través de la funcionalidad de mapa disponible en la
+              plataforma. La provisión de estos datos es completamente opcional;
+              su no suministro no afecta el acceso a los demás servicios.
+            </li>
           </ul>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
@@ -197,6 +207,13 @@ export default function Policy() {
             <li>
               Gestionar solicitudes, quejas y reclamos, direccionándolos a las
               áreas responsables.
+            </li>
+            <li>
+              Visualizar en un mapa ciudadano las PQRSD públicas que el usuario
+              haya geoubicado voluntariamente, con el fin de facilitar la
+              identificación geográfica de problemáticas ciudadanas. Las PQRSD
+              marcadas como privadas por el usuario nunca serán visibles en
+              dicho mapa.
             </li>
           </ul>
 
@@ -1068,6 +1085,51 @@ export default function Policy() {
             se exigirá la autorización expresa del titular o se aplicará alguna
             de las excepciones legales previstas en la ley.
           </p>
+
+          <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+            TRATAMIENTO DE DATOS DE GEOLOCALIZACIÓN
+          </h2>
+          <p className="mb-4">
+            La Plataforma ofrece una funcionalidad opcional que permite al
+            usuario indicar la ubicación geográfica (latitud y longitud) de la
+            PQRSD que desea radicar, mediante un selector de mapa interactivo.
+            El tratamiento de estos datos se rige por las siguientes reglas:
+          </p>
+          <ul className="list-disc list-inside ml-4 space-y-2 mb-6">
+            <li>
+              <span className="font-semibold">Voluntariedad:</span> La
+              geolocalización de una PQRSD es completamente opcional. El usuario
+              puede radicar su solicitud sin proporcionar ningún dato de
+              ubicación.
+            </li>
+            <li>
+              <span className="font-semibold">Finalidad:</span> Las coordenadas
+              se utilizan exclusivamente para mostrar la PQRSD en el mapa
+              ciudadano de la Plataforma, con el fin de visualizar
+              geográficamente las solicitudes ciudadanas y facilitar la gestión
+              por parte de las entidades.
+            </li>
+            <li>
+              <span className="font-semibold">Visibilidad pública:</span> Solo
+              las PQRSD configuradas como públicas por el usuario serán visibles
+              en el mapa ciudadano. Las PQRSD marcadas como privadas no
+              aparecerán en el mapa bajo ninguna circunstancia.
+            </li>
+            <li>
+              <span className="font-semibold">Datos almacenados:</span> Se
+              almacenan únicamente las coordenadas geográficas (latitud y
+              longitud) proporcionadas por el usuario en el momento de crear la
+              PQRSD. La Plataforma no accede ni registra la ubicación del
+              dispositivo del usuario en tiempo real sin su acción explícita.
+            </li>
+            <li>
+              <span className="font-semibold">Supresión:</span> El usuario
+              puede solicitar la eliminación de los datos de geolocalización
+              asociados a su PQRSD contactando a soporte@quejate.com.co, sin
+              perjuicio de los demás derechos del titular indicados en esta
+              política.
+            </li>
+          </ul>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
             DATOS SENSIBLES
