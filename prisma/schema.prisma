@@ -46,6 +46,8 @@ model User {
   accounts          Account[]
   entityResponses   EntityResponse[]
 
+  passwordResetCodes PasswordResetCode[]
+
   @@index([departmentId])
 }
 
@@ -512,6 +514,19 @@ model PasswordResetToken {
 
   @@unique([email, token])
   @@map("password_reset_tokens")
+}
+
+model PasswordResetCode {
+  id        String   @id @default(cuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, consumed, expiresAt])
 }
 
 model EntityResponse {

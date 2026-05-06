@@ -32,3 +32,21 @@ export const NewPasswordSchema = z.object({
     message: "La contraseña debe tener al menos 6 caracteres"
   }),
 });
+
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email({
+    message: "El correo electrónico es requerido"
+  }),
+});
+
+export const ResetPasswordCodeSchema = z.object({
+  email: z.string().email({
+    message: "El correo electrónico es requerido"
+  }),
+  code: z.string().regex(/^\d{6}$/, {
+    message: "El código debe tener 6 dígitos"
+  }),
+  newPassword: z.string().min(6, {
+    message: "La contraseña debe tener al menos 6 caracteres"
+  }),
+});
