@@ -9,14 +9,19 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 import { baseStyles } from '../styles/shared';
+import { LOGO_INLINE_DATA_URL } from '../assets/logo-inline';
 
 interface EmailLayoutProps {
   children: React.ReactNode;
   preview?: string;
+  inlineLogo?: boolean;
 }
 
+const LOGO_REMOTE_URL = 'https://quejate-files.s3.us-east-2.amazonaws.com/LogotipoEditableterpng.png';
 
-export const EmailLayout = ({ children, preview }: EmailLayoutProps) => {
+export const EmailLayout = ({ children, preview, inlineLogo = false }: EmailLayoutProps) => {
+  const logoSrc = inlineLogo ? LOGO_INLINE_DATA_URL : LOGO_REMOTE_URL;
+
   return (
     <Html>
       <Head>
@@ -29,7 +34,7 @@ export const EmailLayout = ({ children, preview }: EmailLayoutProps) => {
         <Container style={baseStyles.container}>
           <Section style={baseStyles.header}>
             <Img
-              src={`https://quejate-files.s3.us-east-2.amazonaws.com/LogotipoEditableterpng.png`}
+              src={logoSrc}
               alt="Quejate Logo"
               style={baseStyles.logo}
             />

@@ -17,7 +17,10 @@ export const ResetPasswordCodeEmail = ({
   code,
 }: ResetPasswordCodeEmailProps) => {
   return (
-    <EmailLayout preview="Tu código de restablecimiento de contraseña - Quejate">
+    <EmailLayout
+      preview="Tu código de restablecimiento de contraseña - Quejate"
+      inlineLogo
+    >
       <Heading style={baseStyles.heading}>
         Restablecimiento de contraseña
       </Heading>
