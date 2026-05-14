@@ -26,6 +26,11 @@ export async function sendPQRNotificationEmail(
           status: pqrData.status,
           isAnonymous: pqrData.anonymous,
           consecutiveCode: pqrData.consecutiveCode,
+          location: pqrData.latitude && pqrData.longitude ? {
+            latitude: pqrData.latitude,
+            longitude: pqrData.longitude,
+            address: pqrData.locationAddress,
+          } : null,
         },
         creatorInfo: {
           name: pqrData.anonymous ? 'Anónimo' : (contactInfo?.name || pqrData.creator?.name || 'No proporcionado'),

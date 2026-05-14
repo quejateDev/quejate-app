@@ -6,7 +6,7 @@ import {
   Hr,
 } from "@react-email/components";
 import { EmailLayout } from "../components/EmailLayout";
-import { baseStyles } from "../styles/shared";
+import { baseStyles, colors } from "../styles/shared";
 import * as React from "react";
 
 interface PQRNotificationEmailProps {
@@ -20,6 +20,11 @@ interface PQRNotificationEmailProps {
     status: string;
     isAnonymous: boolean;
     consecutiveCode: string;
+    location?: {
+      latitude: number;
+      longitude: number;
+      address?: string;
+    } | null;
   };
   creatorInfo: {
     name: string;
@@ -49,105 +54,154 @@ export default function PQRNotificationEmail({
 
   const pqrTypeLabel = typeMap[pqrInfo.type as keyof typeof typeMap]?.label || pqrInfo.type;
   const statusLabel = statusMap[pqrInfo.status as keyof typeof statusMap]?.label || pqrInfo.status;
-  
+
   return (
     <EmailLayout preview={`Nueva PQRSD recibida - ${entityName}`}>
-      <Heading style={baseStyles.heading}>
-        Nueva PQRSD Recibida
-      </Heading>
 
-      <Text style={baseStyles.paragraph}>
-        Estimado equipo de <strong>{entityName}</strong>,
+      {/* Header entidad */}
+      <Text style={{ fontSize: '13px', color: colors.text.muted, margin: '0 0 8px 0' }}>
+        {entityName.toUpperCase()} — BANDEJA PQRSD
       </Text>
 
-      <Text style={baseStyles.paragraph}>
-        Se ha recibido una nueva {pqrTypeLabel} que requiere su atención y respuesta.
-      </Text>
-
+      {/* Banner principal — Radicado */}
       <div style={{
-        ...baseStyles.alert,
-        backgroundColor: '#FEF3C7',
-        borderColor: '#F59E0B',
-        borderLeftWidth: '4px',
-        borderLeftStyle: 'solid',
+        backgroundColor: colors.tertiary,
+        borderRadius: pqrInfo.location ? '8px 8px 0 0' : '8px',
+        padding: '24px',
+        margin: '0 0 0 0',
       }}>
-        <Text style={{...baseStyles.alertText, color: '#92400E'}}>
-          <strong>📋 Código de seguimiento:</strong> {pqrInfo.consecutiveCode}<br />
-          <strong>📅 Fecha de recepción:</strong> {pqrInfo.createdAt}
+        <Text style={{ fontSize: '11px', color: colors.secondary, margin: '0 0 4px 0', letterSpacing: '1px' }}>
+          NÚMERO DE RADICADO
+        </Text>
+        <Text style={{ fontSize: '22px', fontWeight: '700', color: colors.white, margin: '0 0 8px 0' }}>
+          {pqrInfo.consecutiveCode}
+        </Text>
+        <Text style={{ fontSize: '12px', color: colors.secondary, margin: '0 0 12px 0' }}>
+          {pqrTypeLabel} · {pqrInfo.createdAt}
+        </Text>
+        <span style={{
+          backgroundColor: colors.quaternary,
+          color: colors.white,
+          borderRadius: '20px',
+          padding: '4px 12px',
+          fontSize: '12px',
+          fontWeight: '600',
+        }}>
+          Plazo: 15 días hábiles
+        </span>
+      </div>
+
+      {/* Banner geográfico */}
+      {pqrInfo.location && (
+        <div style={{
+          backgroundColor: '#1a3f6f',
+          padding: '16px 24px',
+          borderRadius: '0 0 8px 8px',
+          margin: '0 0 24px 0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <div>
+            <Text style={{ fontSize: '10px', color: colors.secondary, margin: '0 0 4px 0', letterSpacing: '1px' }}>
+              REFERENCIA GEOGRÁFICA DEL SOLICITANTE
+            </Text>
+            <Text style={{ fontSize: '16px', fontWeight: '700', color: colors.white, margin: '0 0 2px 0' }}>
+              {pqrInfo.location.address?.split(',').slice(0, 2).join(',') || 'Ubicación registrada'}
+            </Text>
+            {pqrInfo.location.address && (
+              <Text style={{ fontSize: '12px', color: colors.secondary, margin: '0 0 4px 0' }}>
+                {pqrInfo.location.address.split(',').slice(2, 4).join(',')}
+              </Text>
+            )}
+            <Text style={{ fontSize: '12px', color: colors.secondary, margin: '0', fontFamily: 'monospace' }}>
+              {pqrInfo.location.latitude.toFixed(4)}° N, {pqrInfo.location.longitude.toFixed(4)}° W
+            </Text>
+          </div>
+          <Link
+            href={`https://www.google.com/maps?q=${pqrInfo.location.latitude},${pqrInfo.location.longitude}`}
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              color: colors.white,
+              borderRadius: '6px',
+              padding: '8px 16px',
+              fontSize: '13px',
+              fontWeight: '600',
+              textDecoration: 'none',
+              border: '1px solid rgba(255,255,255,0.3)',
+            }}
+          >
+            Ver en mapa ↗
+          </Link>
+        </div>
+      )}
+
+      {!pqrInfo.location && <div style={{ margin: '0 0 24px 0' }} />}
+
+      {/* Descripción */}
+      <Text style={{ fontSize: '11px', color: colors.text.muted, letterSpacing: '1px', margin: '0 0 8px 0' }}>
+        DESCRIPCIÓN DEL CIUDADANO
+      </Text>
+      <div style={{
+        borderLeft: `4px solid ${colors.quaternary}`,
+        paddingLeft: '16px',
+        margin: '0 0 24px 0',
+      }}>
+        <Text style={{ ...baseStyles.paragraph, margin: '0', fontStyle: 'italic' }}>
+          "{pqrInfo.description}"
         </Text>
       </div>
 
-      <Heading style={baseStyles.subheading}>
-        📋 Detalles de la PQRSD
-      </Heading>
-
-      <div style={{
-        backgroundColor: baseStyles.brandColors.accent,
-        borderRadius: '8px',
-        padding: '20px',
-        margin: '16px 0',
-      }}>
-        <Text style={{...baseStyles.paragraph, margin: '0 0 12px 0'}}>
-          <strong>Tipo:</strong> {pqrTypeLabel}
-        </Text>
-        <Text style={{...baseStyles.paragraph, margin: '0 0 12px 0'}}>
-          <strong>Asunto:</strong> {pqrInfo.subject}
-        </Text>
-        <Text style={{...baseStyles.paragraph, margin: '0 0 12px 0'}}>
-          <strong>Estado actual:</strong> {statusLabel}
-        </Text>
-        <Text style={{...baseStyles.paragraph, margin: '0'}}>
-          <strong>Descripción:</strong><br />
-          {pqrInfo.description}
-        </Text>
+      {/* Asunto y estado */}
+      <div style={{ margin: '0 0 24px 0' }}>
+        <div style={{ backgroundColor: colors.accent, borderRadius: '8px', padding: '16px', marginBottom: '8px' }}>
+          <Text style={{ fontSize: '10px', color: colors.text.muted, margin: '0 0 4px 0', letterSpacing: '1px' }}>ASUNTO</Text>
+          <Text style={{ fontSize: '14px', fontWeight: '600', color: colors.text.primary, margin: '0' }}>{pqrInfo.subject}</Text>
+        </div>
+        <div style={{ backgroundColor: colors.accent, borderRadius: '8px', padding: '16px' }}>
+          <Text style={{ fontSize: '10px', color: colors.text.muted, margin: '0 0 4px 0', letterSpacing: '1px' }}>ESTADO</Text>
+          <Text style={{ fontSize: '14px', fontWeight: '600', color: colors.text.primary, margin: '0' }}>{statusLabel}</Text>
+        </div>
       </div>
 
-      <Heading style={baseStyles.subheading}>
-        Información del Ciudadano
-      </Heading>
-
+      {/* Información del ciudadano */}
+      <Heading style={baseStyles.subheading}>Información del Ciudadano</Heading>
       <div style={{
-        backgroundColor: baseStyles.brandColors.white,
-        border: `1px solid ${baseStyles.brandColors.border}`,
+        backgroundColor: colors.white,
+        border: `1px solid ${colors.border}`,
         borderRadius: '8px',
         padding: '20px',
-        margin: '16px 0',
+        margin: '0 0 16px 0',
       }}>
         {!pqrInfo.isAnonymous ? (
           <>
-            <Text style={{...baseStyles.paragraph, margin: '0 0 8px 0'}}>
+            <Text style={{ ...baseStyles.paragraph, margin: '0 0 8px 0' }}>
               <strong>Nombre:</strong> {creatorInfo.name}
             </Text>
-            <Text style={{...baseStyles.paragraph, margin: '0 0 8px 0'}}>
+            <Text style={{ ...baseStyles.paragraph, margin: '0 0 8px 0' }}>
               <strong>Email:</strong> {creatorInfo.email}
             </Text>
             {creatorInfo.phone && (
-              <Text style={{...baseStyles.paragraph, margin: '0'}}>
+              <Text style={{ ...baseStyles.paragraph, margin: '0' }}>
                 <strong>Teléfono:</strong> {creatorInfo.phone}
               </Text>
             )}
           </>
         ) : (
-          <Text style={{...baseStyles.paragraph, margin: '0', color: baseStyles.brandColors.text.muted}}>
+          <Text style={{ ...baseStyles.paragraph, margin: '0', color: colors.text.muted }}>
             <strong>PQRSD Anónima</strong><br />
             El ciudadano ha optado por mantener su identidad anónima.
           </Text>
         )}
       </div>
 
+      {/* Campos personalizados */}
       {customFields && customFields.length > 0 && (
         <>
-          <Heading style={baseStyles.subheading}>
-            📝 Información Adicional
-          </Heading>
-          <div style={{
-            backgroundColor: baseStyles.brandColors.muted,
-            borderRadius: '8px',
-            padding: '20px',
-            margin: '16px 0',
-          }}>
+          <Heading style={baseStyles.subheading}>📝 Información Adicional</Heading>
+          <div style={{ backgroundColor: colors.muted, borderRadius: '8px', padding: '20px', margin: '0 0 16px 0' }}>
             {customFields.map((field, index) => (
-              <Text key={index} style={{...baseStyles.paragraph, margin: '0 0 8px 0'}}>
+              <Text key={index} style={{ ...baseStyles.paragraph, margin: '0 0 8px 0' }}>
                 <strong>{field.name}:</strong> {field.value}
               </Text>
             ))}
@@ -155,25 +209,16 @@ export default function PQRNotificationEmail({
         </>
       )}
 
+      {/* Adjuntos */}
       {attachments && attachments.length > 0 && (
         <>
-          <Heading style={baseStyles.subheading}>
-            📎 Archivos Adjuntos
-          </Heading>
-          <div style={{
-            backgroundColor: '#F8FAFC',
-            borderRadius: '8px',
-            padding: '20px',
-            margin: '16px 0',
-          }}>
+          <Heading style={baseStyles.subheading}>📎 Archivos Adjuntos</Heading>
+          <div style={{ backgroundColor: '#F8FAFC', borderRadius: '8px', padding: '20px', margin: '0 0 16px 0' }}>
             {attachments.map((attachment, index) => {
               const cleanName = attachment.name.substring(37);
-              // Remove leading UUID and underscore if present
               return (
-                <Text key={index} style={{...baseStyles.paragraph, margin: '0 0 8px 0'}}>
-                  • <Link href={attachment.url} style={baseStyles.link}>
-                    {cleanName}
-                  </Link> ({attachment.type})
+                <Text key={index} style={{ ...baseStyles.paragraph, margin: '0 0 8px 0' }}>
+                  • <Link href={attachment.url} style={baseStyles.link}>{cleanName}</Link> ({attachment.type})
                 </Text>
               );
             })}
@@ -183,10 +228,7 @@ export default function PQRNotificationEmail({
 
       <Hr style={baseStyles.divider} />
 
-      <Link
-        href={pqrUrl}
-        style={baseStyles.button}
-      >
+      <Link href={pqrUrl} style={baseStyles.button}>
         Ver PQRSD en el Sistema
       </Link>
 

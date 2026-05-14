@@ -239,6 +239,23 @@ export async function POST(req: NextRequest) {
       });
       creatorPhone = creator?.phone || null;
     }
+
+    // Obtener dirección legible si hay coordenadas
+    let locationAddress: string | undefined = undefined;
+    if (body.latitude && body.longitude) {
+      try {
+        const geoResponse = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${body.latitude}&lon=${body.longitude}&format=json&accept-language=es`,
+          { headers: { "Accept-Language": "es" } }
+        );
+        const geoData = await geoResponse.json();
+        if (geoData.display_name) {
+          locationAddress = geoData.display_name;
+        }
+      } catch (error) {
+        console.error("Error obteniendo dirección:", error);
+      }
+    }
     
     // Create PQR with attachments
     const [pqr] = await prisma.$transaction([
@@ -373,7 +390,7 @@ export async function POST(req: NextRequest) {
     await sendPQRNotificationEmail(
       recipientEmail,
       recipientName,
-      pqr,
+      { ...pqr, locationAddress },
       contactInfo
     );
 
