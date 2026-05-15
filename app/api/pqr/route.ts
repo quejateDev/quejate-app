@@ -374,7 +374,7 @@ export async function POST(req: NextRequest) {
         contactInfo = {
           name: creator?.name || 'Usuario registrado',
           email: creator?.email || 'No proporcionado',
-          phone: creatorPhone || creator?.phone || 'No proporcionado'
+          phone: creatorPhone || 'No proporcionado'
         };
       } else {
         // Usuario no registrado
