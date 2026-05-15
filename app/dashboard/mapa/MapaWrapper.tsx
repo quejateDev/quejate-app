@@ -18,6 +18,8 @@ export type Reporte = {
   longitude: number | null;
   createdAt: Date;
   entity: { name: string } | null;
+  creator: { name: string | null; image: string | null } | null;
+  anonymous: boolean;
 };
 
 export default function MapaWrapper({ reportes }: { reportes: Reporte[] }) {

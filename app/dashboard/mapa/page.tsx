@@ -17,9 +17,16 @@ export default async function MapaPage() {
       latitude: true,
       longitude: true,
       createdAt: true,
+      anonymous: true,
       entity: {
         select: {
           name: true,
+        },
+      },
+      creator: {
+        select: {
+          name: true,
+          image: true,
         },
       },
     },

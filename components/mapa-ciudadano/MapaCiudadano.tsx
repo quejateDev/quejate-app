@@ -198,21 +198,57 @@ export default function MapaCiudadano({ reportes }: { reportes: Reporte[] }) {
               key={reporte.id}
               position={[reporte.latitude as number, reporte.longitude as number]}
             >
-              <Popup>
-                <div className="min-w-[180px]">
-                  <p className="font-semibold text-gray-900 mb-2">{reporte.subject}</p>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TIPO_COLORS[reporte.type]}`}>
-                      {TIPO_LABELS[reporte.type] || reporte.type}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_COLORS[reporte.status]}`}>
-                      {ESTADO_LABELS[reporte.status] || reporte.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">🏢 {reporte.entity?.name || "N/A"}</p>
-                  <p className="text-xs text-gray-500">📅 {new Date(reporte.createdAt).toLocaleDateString("es-CO")}</p>
+              <Popup minWidth={220}>
+            <div className="p-1">
+              {/* Header */}
+              <p className="font-semibold text-gray-900 text-sm mb-2 leading-tight">
+                {reporte.subject}
+              </p>
+
+              {/* Badges */}
+              <div className="flex flex-wrap gap-1 mb-3">
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TIPO_COLORS[reporte.type]}`}>
+                  {TIPO_LABELS[reporte.type] || reporte.type}
+                </span>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_COLORS[reporte.status]}`}>
+                  {ESTADO_LABELS[reporte.status] || reporte.status}
+                </span>
+              </div>
+
+              {/* Creador */}
+              {!reporte.anonymous && reporte.creator && (
+                <div className="flex items-center gap-2 mb-2">
+                  {reporte.creator.image ? (
+                    <img
+                      src={reporte.creator.image}
+                      alt={reporte.creator.name || ""}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-700">
+                      {reporte.creator.name?.charAt(0).toUpperCase() || "?"}
+                    </div>
+                  )}
+                  <span className="text-xs text-gray-600">{reporte.creator.name}</span>
                 </div>
-              </Popup>
+              )}
+
+              {reporte.anonymous && (
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs">
+                    👤
+                  </div>
+                  <span className="text-xs text-gray-500">Anónimo</span>
+                </div>
+              )}
+
+              {/* Entidad y fecha */}
+              <div className="border-t border-gray-100 pt-2 mt-1 space-y-1">
+                <p className="text-xs text-gray-500">🏢 {reporte.entity?.name || "N/A"}</p>
+                <p className="text-xs text-gray-500">📅 {new Date(reporte.createdAt).toLocaleDateString("es-CO")}</p>
+              </div>
+            </div>
+          </Popup>
             </Marker>
           ))}
         </MapContainer>
