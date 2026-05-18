@@ -26,8 +26,9 @@ export async function currentUser() {
           id: decoded.sub,
           name: decoded.name as string,
           email: decoded.email as string,
-          image: decoded.picture as string,
+          image: (decoded.image ?? null) as string | null,
           role: decoded.role as string,
+          entityId: (decoded.entityId ?? null) as string | null,
         };
       }
     } catch {
