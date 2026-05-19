@@ -108,3 +108,28 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const { count } = await prisma.notification.deleteMany({
+      where: { userId: user.id },
+    });
+
+    return NextResponse.json({ success: true, deleted: count });
+  } catch (error) {
+    console.error("Error deleting notifications:", error);
+    return NextResponse.json(
+      { error: "Error deleting notifications" },
+      { status: 500 }
+    );
+  }
+}
