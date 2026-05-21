@@ -84,12 +84,13 @@ export async function GET(request: NextRequest) {
         },
         attachments: {
           select: {
+            id: true,
             name: true,
             url: true,
             type: true,
             size: true,
           },
-        }, 
+        },
         _count: {
           select: {
             likes: true,
