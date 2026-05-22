@@ -160,5 +160,149 @@ export const COLOMBIAN_HOLIDAYS: Holiday[] = [
         "name": "Navidad",
         "type": "public",
         "rule": "12-25"
+    },
+    {
+        "date": "2026-01-01 00:00:00",
+        "start": "2026-01-01T05:00:00.000Z",
+        "end": "2026-01-02T05:00:00.000Z",
+        "name": "Año Nuevo",
+        "type": "public",
+        "rule": "01-01"
+    },
+    {
+        "date": "2026-01-12 00:00:00",
+        "start": "2026-01-12T05:00:00.000Z",
+        "end": "2026-01-13T05:00:00.000Z",
+        "name": "Día de los Reyes Magos",
+        "type": "public",
+        "rule": "monday after 01-06"
+    },
+    {
+        "date": "2026-03-23 00:00:00",
+        "start": "2026-03-23T05:00:00.000Z",
+        "end": "2026-03-24T05:00:00.000Z",
+        "name": "San José",
+        "type": "public",
+        "rule": "monday after 03-19"
+    },
+    {
+        "date": "2026-04-02 00:00:00",
+        "start": "2026-04-02T05:00:00.000Z",
+        "end": "2026-04-03T05:00:00.000Z",
+        "name": "Jueves Santo",
+        "type": "public",
+        "rule": "easter -3"
+    },
+    {
+        "date": "2026-04-03 00:00:00",
+        "start": "2026-04-03T05:00:00.000Z",
+        "end": "2026-04-04T05:00:00.000Z",
+        "name": "Viernes Santo",
+        "type": "public",
+        "rule": "easter -2"
+    },
+    {
+        "date": "2026-05-01 00:00:00",
+        "start": "2026-05-01T05:00:00.000Z",
+        "end": "2026-05-02T05:00:00.000Z",
+        "name": "Día del trabajador",
+        "type": "public",
+        "rule": "05-01"
+    },
+    {
+        "date": "2026-05-18 00:00:00",
+        "start": "2026-05-18T05:00:00.000Z",
+        "end": "2026-05-19T05:00:00.000Z",
+        "name": "Ascensión del Señor",
+        "type": "public",
+        "rule": "easter 43"
+    },
+    {
+        "date": "2026-06-08 00:00:00",
+        "start": "2026-06-08T05:00:00.000Z",
+        "end": "2026-06-09T05:00:00.000Z",
+        "name": "Corpus Christi",
+        "type": "public",
+        "rule": "easter 64"
+    },
+    {
+        "date": "2026-06-15 00:00:00",
+        "start": "2026-06-15T05:00:00.000Z",
+        "end": "2026-06-16T05:00:00.000Z",
+        "name": "Sagrado Corazón de Jesús",
+        "type": "public",
+        "rule": "easter 71"
+    },
+    {
+        "date": "2026-06-29 00:00:00",
+        "start": "2026-06-29T05:00:00.000Z",
+        "end": "2026-06-30T05:00:00.000Z",
+        "name": "San Pedro y San Pablo",
+        "type": "public",
+        "rule": "monday after 06-29"
+    },
+    {
+        "date": "2026-07-20 00:00:00",
+        "start": "2026-07-20T05:00:00.000Z",
+        "end": "2026-07-21T05:00:00.000Z",
+        "name": "Día de la Independencia",
+        "type": "public",
+        "rule": "07-20"
+    },
+    {
+        "date": "2026-08-07 00:00:00",
+        "start": "2026-08-07T05:00:00.000Z",
+        "end": "2026-08-08T05:00:00.000Z",
+        "name": "Batalla de Boyacá",
+        "type": "public",
+        "rule": "08-07"
+    },
+    {
+        "date": "2026-08-17 00:00:00",
+        "start": "2026-08-17T05:00:00.000Z",
+        "end": "2026-08-18T05:00:00.000Z",
+        "name": "Asunción de la Virgen",
+        "type": "public",
+        "rule": "monday after 08-15"
+    },
+    {
+        "date": "2026-10-12 00:00:00",
+        "start": "2026-10-12T05:00:00.000Z",
+        "end": "2026-10-13T05:00:00.000Z",
+        "name": "Día de la Raza",
+        "type": "public",
+        "rule": "monday after 10-12"
+    },
+    {
+        "date": "2026-11-02 00:00:00",
+        "start": "2026-11-02T05:00:00.000Z",
+        "end": "2026-11-03T05:00:00.000Z",
+        "name": "Todos los Santos",
+        "type": "public",
+        "rule": "monday after 11-01"
+    },
+    {
+        "date": "2026-11-16 00:00:00",
+        "start": "2026-11-16T05:00:00.000Z",
+        "end": "2026-11-17T05:00:00.000Z",
+        "name": "Independencia de Cartagena",
+        "type": "public",
+        "rule": "monday after 11-11"
+    },
+    {
+        "date": "2026-12-08 00:00:00",
+        "start": "2026-12-08T05:00:00.000Z",
+        "end": "2026-12-09T05:00:00.000Z",
+        "name": "La inmaculada concepción",
+        "type": "public",
+        "rule": "12-08"
+    },
+    {
+        "date": "2026-12-25 00:00:00",
+        "start": "2026-12-25T05:00:00.000Z",
+        "end": "2026-12-26T05:00:00.000Z",
+        "name": "Navidad",
+        "type": "public",
+        "rule": "12-25"
     }
 ];

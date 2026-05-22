@@ -2,19 +2,40 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
 import { Paperclip } from "lucide-react";
-import { mediaExtensions, videoExtensions } from "../../constants/mediaExtensions";
+import { imageExtensions, videoExtensions } from "../../constants/mediaExtensions";
+
+type AttachmentItem = {
+  id?: string;
+  name: string;
+  url: string;
+  type: string;
+  size: number;
+  thumbnailUrl?: string | null;
+};
 
 type PQRCardAttachmentsProps = {
-  attachments: {
-    name: string;
-    url: string;
-    type: string;
-    size: number;
-  }[];
+  attachments: AttachmentItem[];
   videoRefsDesktop?: React.RefObject<(HTMLVideoElement | null)[]>;
   videoRefsMobile?: React.RefObject<(HTMLVideoElement | null)[]>;
   isMobile?: boolean;
 };
+
+// `type` puede venir como MIME real ("image/jpeg", "video/mp4") o como
+// una extensión suelta ("jpg") en adjuntos antiguos. Detectamos por ambos,
+// y como último recurso por la extensión del nombre del archivo.
+const nameExt = (att: AttachmentItem) => att.name.toLowerCase().split(".").pop() ?? "";
+
+const isImageAttachment = (att: AttachmentItem) => {
+  const t = att.type.toLowerCase();
+  return t.startsWith("image/") || imageExtensions.includes(t) || imageExtensions.includes(nameExt(att));
+};
+
+const isVideoAttachment = (att: AttachmentItem) => {
+  const t = att.type.toLowerCase();
+  return t.startsWith("video/") || videoExtensions.includes(t) || videoExtensions.includes(nameExt(att));
+};
+
+const isMediaAttachment = (att: AttachmentItem) => isImageAttachment(att) || isVideoAttachment(att);
 
 export function PQRCardAttachments({
   attachments,
@@ -23,22 +44,18 @@ export function PQRCardAttachments({
   isMobile = false,
 }: PQRCardAttachmentsProps) {
 
-  const imageAttachments = attachments.filter((att) =>
-    mediaExtensions.includes(att.type.toLowerCase())
-  );
-  const otherAttachments = attachments.filter(
-    (att) => !mediaExtensions.includes(att.type.toLowerCase())
-  );
+  const mediaAttachments = attachments.filter(isMediaAttachment);
+  const otherAttachments = attachments.filter((att) => !isMediaAttachment(att));
 
   return (
     <>
-      {imageAttachments.length > 0 && (
+      {mediaAttachments.length > 0 && (
         <Carousel className="w-full max-w-md mx-auto relative">
           <CarouselContent>
-            {imageAttachments.map((attachment, index) => (
+            {mediaAttachments.map((attachment, index) => (
               <CarouselItem key={attachment.url}>
                 <div className="p-1">
-                  {videoExtensions.includes(attachment.type.toLowerCase()) ? (
+                  {isVideoAttachment(attachment) ? (
                     <div className="relative cursor-pointer group h-48 md:h-60">
                       <video
                         ref={(el) => {
@@ -49,6 +66,7 @@ export function PQRCardAttachments({
                           }
                         }}
                         src={attachment.url}
+                        poster={attachment.thumbnailUrl ?? undefined}
                         className="object-cover w-full h-full"
                         controls
                         autoPlay
@@ -84,7 +102,7 @@ export function PQRCardAttachments({
               </CarouselItem>
             ))}
           </CarouselContent>
-          {imageAttachments.length > 1 && (
+          {mediaAttachments.length > 1 && (
             <div className="hidden md:block">
               <CarouselPrevious />
               <CarouselNext />

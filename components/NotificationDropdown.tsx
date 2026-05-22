@@ -1,11 +1,10 @@
 "use client";
 
-import { Bell, Scale, Clock } from "lucide-react";
+import { Bell, Scale, Clock, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -28,8 +27,14 @@ import Link from "next/link";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function NotificationDropdown() {
-  const { notifications, unreadCount, setNotifications, markAsRead } =
-    useNotificationStore();
+  const {
+    notifications,
+    unreadCount,
+    setNotifications,
+    markAsRead,
+    removeNotification,
+    clearNotifications,
+  } = useNotificationStore();
   const session = useCurrentUser();
 
   useEffect(() => {
@@ -62,6 +67,32 @@ export function NotificationDropdown() {
       markAsRead(id);
     } catch (error) {
       console.error("Error marking notification as read:", error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const previous = notifications;
+    removeNotification(id); // optimista
+    try {
+      const response = await fetch(`/api/notifications/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete notification");
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      setNotifications(previous); // revertir
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    const previous = notifications;
+    clearNotifications(); // optimista
+    try {
+      const response = await fetch("/api/notifications", { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete notifications");
+    } catch (error) {
+      console.error("Error deleting notifications:", error);
+      setNotifications(previous); // revertir
     }
   };
 
@@ -109,6 +140,19 @@ export function NotificationDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0">
+        {notifications.length > 0 && (
+          <div className="flex items-center justify-between px-3 py-2 border-b">
+            <span className="text-sm font-medium">Notificaciones</span>
+            <button
+              type="button"
+              onClick={handleDeleteAll}
+              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Borrar todas
+            </button>
+          </div>
+        )}
         <ScrollArea className="h-[480px]">
           <div className="p-1">
             {notifications.length === 0 ? (
@@ -117,15 +161,17 @@ export function NotificationDropdown() {
               </div>
             ) : (
               notifications.map((notification) => (
-                <DropdownMenuItem
+                <div
                   key={notification.id}
-                  asChild
-                  className={`flex items-start gap-3 p-4 ${
+                  className={`relative rounded-sm ${
                     !notification.read ? "bg-muted/50" : ""
                   }`}
-                  onClick={() => handleMarkAsRead(notification.id)}
                 >
-                  <Link href={getNotificationLink(notification)}>
+                  <Link
+                    href={getNotificationLink(notification)}
+                    onClick={() => handleMarkAsRead(notification.id)}
+                    className="flex items-start gap-3 p-4 pr-9 hover:bg-muted/40"
+                  >
                     {(isFollowNotification(notification.data) ||
                       isLikeNotification(notification.data) ||
                       isCommentNotification(notification.data)) && (
@@ -174,7 +220,19 @@ export function NotificationDropdown() {
                       </p>
                     </div>
                   </Link>
-                </DropdownMenuItem>
+                  <button
+                    type="button"
+                    aria-label="Eliminar notificación"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete(notification.id);
+                    }}
+                    className="absolute top-2 right-2 p-1 rounded-md text-muted-foreground hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               ))
             )}
           </div>

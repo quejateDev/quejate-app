@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 import { sendPQRNotificationEmail } from "@/services/email/sendPQRNotification";
-import { calculateDueDate } from "@/utils/dateHelpers";
+import { calculateDueDate, getOverdueInfo } from "@/utils/dateHelpers";
 
 interface FormFile extends File {
   arrayBuffer(): Promise<ArrayBuffer>;
@@ -89,6 +89,7 @@ export async function GET(request: NextRequest) {
             url: true,
             type: true,
             size: true,
+            thumbnailUrl: true,
           },
         },
         _count: {
@@ -114,8 +115,10 @@ export async function GET(request: NextRequest) {
 
     const hasMore = skip + take < totalCount;
 
+    const pqrsWithOverdue = pqrs.map((p) => ({ ...p, ...getOverdueInfo(p) }));
+
     return NextResponse.json({
-      pqrs,
+      pqrs: pqrsWithOverdue,
       hasMore,
       nextPage: hasMore ? page + 1 : null
     });
@@ -290,6 +293,7 @@ export async function POST(req: NextRequest) {
                 url: attachment.url,
                 type: attachment.type,
                 size: attachment.size,
+                thumbnailUrl: attachment.thumbnailUrl ?? null,
               })),
             },
           },
