@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
+import { getOverdueInfo } from "@/utils/dateHelpers";
 
 export async function GET(
   request: Request,
@@ -77,5 +78,5 @@ export async function GET(
     }
   }
 
-  return NextResponse.json(pqr);
+  return NextResponse.json({ ...pqr, ...getOverdueInfo(pqr) });
 }

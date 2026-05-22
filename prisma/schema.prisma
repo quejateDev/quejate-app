@@ -293,15 +293,16 @@ model PQRCustomField {
 }
 
 model Attachment {
-  id        String   @id @default(uuid())
-  url       String
-  createdAt DateTime @default(now())
-  name      String
-  pqrId     String
-  size      Int
-  type      String
-  updatedAt DateTime @updatedAt
-  pqr       PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
+  id           String   @id @default(uuid())
+  url          String
+  createdAt    DateTime @default(now())
+  name         String
+  pqrId        String
+  size         Int
+  type         String
+  thumbnailUrl String?
+  updatedAt    DateTime @updatedAt
+  pqr          PQRS     @relation(fields: [pqrId], references: [id], onDelete: Cascade)
 
   @@index([pqrId])
 }

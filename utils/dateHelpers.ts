@@ -41,6 +41,30 @@ export function calculateBusinessDaysExceeded(
   return exceededDays;
 }
 
+// Estados en los que la PQRSD ya no se considera "vencida" (tiene cierre).
+const NON_OVERDUE_STATUSES = ["RESOLVED", "CLOSED"];
+
+/**
+ * Fuente de verdad del backend para el estado de vencimiento de una PQRSD.
+ * Regla canónica: vencida = dueDate ya pasó Y status no es RESOLVED/CLOSED Y type no es SUGGESTION.
+ * businessDaysOverdue cuenta días hábiles (lun-vie, sin festivos colombianos) desde dueDate hasta hoy.
+ */
+export function getOverdueInfo(pqr: {
+  dueDate: Date | string;
+  status: string;
+  type: string;
+}): { isOverdue: boolean; businessDaysOverdue: number } {
+  const isOverdue =
+    new Date(pqr.dueDate).getTime() < Date.now() &&
+    !NON_OVERDUE_STATUSES.includes(pqr.status) &&
+    pqr.type !== "SUGGESTION";
+
+  return {
+    isOverdue,
+    businessDaysOverdue: isOverdue ? calculateBusinessDaysExceeded(pqr.dueDate) : 0,
+  };
+}
+
 export function calculateDueDate(createdAt: Date, businessDaysToAdd = 15): Date {
     const colombiaCreatedAt = new Date(createdAt.getTime() - (5 * 60 * 60 * 1000));
  

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@/lib/auth";
+import { getOverdueInfo } from "@/utils/dateHelpers";
 
 export async function GET(request: Request, params: any) {
   try {
@@ -77,8 +78,10 @@ export async function GET(request: Request, params: any) {
 
     const hasMore = skip + take < totalCount;
 
+    const pqrsWithOverdue = userPQRs.map((p) => ({ ...p, ...getOverdueInfo(p) }));
+
     return NextResponse.json({
-      pqrs: userPQRs,
+      pqrs: pqrsWithOverdue,
       hasMore,
       nextPage: hasMore ? page + 1 : null,
       totalCount
