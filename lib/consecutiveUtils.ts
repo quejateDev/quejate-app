@@ -11,7 +11,12 @@ export async function checkCodeExists(code: string): Promise<boolean> {
 
 export function getInitials(name: string): string {
   const words = name.split(' ').filter(word => word.length > 0);
-  let initials = words.map(word => word[0]?.toUpperCase() ?? '').join('');
+  let initials = words
+    .map(word => {
+      const cleanWord = word.replace(/[^a-zA-Z0-9]/g, '');
+      return cleanWord[0]?.toUpperCase() ?? '';
+    })
+    .join('');
 
   if (initials.length < 2) {
     initials = (initials + initials.charAt(0).repeat(2)).slice(0, 2);
