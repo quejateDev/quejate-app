@@ -97,6 +97,26 @@ export default function Policy() {
               plataforma. La provisión de estos datos es completamente opcional;
               su no suministro no afecta el acceso a los demás servicios.
             </li>
+            <li>
+              <span className="font-semibold">
+                Datos multimedia y archivos adjuntos:
+              </span>{" "}
+              imágenes, videos y documentos que el usuario adjunta voluntariamente
+              a una PQRSD. Para ello, la App puede solicitar acceso a la cámara
+              y a la galería del dispositivo, siempre previa autorización del
+              usuario en el sistema operativo. Estos archivos se almacenan
+              asociados a la PQRSD correspondiente y se rigen por las mismas
+              reglas de visibilidad (pública/privada) descritas en esta política.
+            </li>
+            <li>
+              <span className="font-semibold">
+                Identificadores para notificaciones:
+              </span>{" "}
+              un identificador de dispositivo (token de notificaciones push)
+              necesario para enviar avisos relacionados con el estado de las
+              PQRSD y la actividad de la cuenta. Este identificador se utiliza
+              exclusivamente con fines de notificación del servicio.
+            </li>
           </ul>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
