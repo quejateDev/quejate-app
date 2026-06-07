@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Scale, Clock, Trash2 } from "lucide-react";
+import { Bell, Scale, Clock, Trash2, MessageSquareText } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -21,6 +21,7 @@ import {
   isLikeNotification,
   isNewLawyerRequestNotification,
   isPQRSDTimeExpiredNotification,
+  isEntityResponseNotification,
   Notification,
 } from "@/types/notification";
 import Link from "next/link";
@@ -124,6 +125,10 @@ export function NotificationDropdown() {
       return `/dashboard/profile/pqr/${notification.data.pqrId}`;
     }
 
+    if (isEntityResponseNotification(notification.data)) {
+      return `/dashboard/profile/pqr/${notification.data.pqrId}/response/${notification.data.responseId}`;
+    }
+
     return "#";
   };
 
@@ -208,6 +213,11 @@ export function NotificationDropdown() {
                     {notification.type === "pqrsd_time_expired" && (
                       <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
                         <Clock className="h-4 w-4 text-red-600" />
+                      </div>
+                    )}
+                    {notification.type === "entity_response" && (
+                      <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                        <MessageSquareText className="h-4 w-4 text-green-600" />
                       </div>
                     )}
                     <div className="flex-1 space-y-1">

@@ -147,7 +147,7 @@ model Entity {
   pqrs                 PQRS[]
   users                User[]
   favoritedBy          UserFavoriteEntity[]
-  entityResponses      EntityResponse[]
+  pqrResponses        EntityResponse[]
   isActive            Boolean              @default(true)
 
   @@index([categoryId])
@@ -238,6 +238,7 @@ model PQRS {
   lawyerRequests    LawyerRequest[]
   likes             Like[]
   PQRCustomField    PQRCustomField[]
+  responses         EntityResponse[]
   assignedTo        User?              @relation("AssignedPQRS", fields: [assignedToId], references: [id], onDelete: SetNull)
   creator           User?              @relation(fields: [creatorId], references: [id], onDelete: SetNull)
   department        Department?        @relation(fields: [departmentId], references: [id])
@@ -532,14 +533,18 @@ model PasswordResetCode {
 
 model EntityResponse {
   id          String               @id @default(uuid())
+  pqrId       String
   entityId    String
   userId      String
   text        String
   createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
   attachments ResponseAttachment[]
+  pqr         PQRS                 @relation(fields: [pqrId], references: [id], onDelete: Cascade)
   entity      Entity               @relation(fields: [entityId], references: [id], onDelete: Cascade)
   user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([pqrId])
   @@index([entityId])
   @@index([userId])
 }
