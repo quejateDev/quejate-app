@@ -9,6 +9,7 @@ import {
   navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
 import { Menu, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 import AvatarMenu from "../AvatarMenu";
 import { UserSearchCommand } from "../UserSearchCommand";
 import { Button } from "../ui/button";
@@ -24,12 +25,18 @@ export default function NavbarDashboard() {
   const NavItems = () => (
     <>
       <NavigationMenuItem className="mx-2">
-        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+        <NavigationMenuLink
+          asChild
+          className={cn(navigationMenuTriggerStyle(), "visited:text-quaternary")}
+        >
           <Link href="/dashboard">Inicio</Link>
         </NavigationMenuLink>
       </NavigationMenuItem>
       <NavigationMenuItem className="mx-2">
-        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+        <NavigationMenuLink
+          asChild
+          className={cn(navigationMenuTriggerStyle(), "visited:text-quaternary")}
+        >
           <Link href="/dashboard/mapa">Mapa Ciudadano</Link>
         </NavigationMenuLink>
       </NavigationMenuItem>
