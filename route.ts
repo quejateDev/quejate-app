@@ -8,7 +8,11 @@ export const publicRoutes = [
 export const privateRoutes = [
   "/dashboard/profile",
   "/dashboard/lawyer/lawyer-requests",
-  "/dashboard/lawyer"
+  "/dashboard/lawyer",
+  // Crear PQRSD requiere cuenta (#5). La página de selección de categoría
+  // (/dashboard/pqrs/create) queda pública; solo el formulario por entidad
+  // (/dashboard/pqrs/create/<entityId>) exige sesión.
+  "/dashboard/pqrs/create/*"
 ];
 
 
