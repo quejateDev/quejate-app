@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { sendPQRCreationEmail } from "@/services/email/Resend.service";
 import { sendPQRNotificationEmail } from "@/services/email/sendPQRNotification";
 import { calculateDueDate, getOverdueInfo } from "@/utils/dateHelpers";
+import { currentUser } from "@/lib/auth";
 
 interface FormFile extends File {
   arrayBuffer(): Promise<ArrayBuffer>;
@@ -137,7 +138,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let pqr: any;
+  // #5: crear una PQRSD exige sesión (cookie web o Bearer móvil). El creatorId
+  // se deriva de la sesión, no del body, para evitar suplantación.
+  const authUser = await currentUser();
+  if (!authUser?.id) {
+    return NextResponse.json(
+      { error: "Debes iniciar sesión para crear una PQRSD" },
+      { status: 401 }
+    );
+  }
+  const creatorId = authUser.id;
+
+  let createdPqrId: string | null = null;
+  let consecutiveRollback: { id: string; previous: number } | null = null;
 
   try {
     const formData = await req.formData();
@@ -236,9 +249,9 @@ export async function POST(req: NextRequest) {
     const newConsecutiveCode = `${consecutiveCode.code}-${fechaConsecutivo}-${dailyCounter}`;
     
     let creatorPhone = null;
-    if (body.includePhone && !body.isAnonymous && body.creatorId) {
+    if (body.includePhone && !body.isAnonymous) {
       const creator = await prisma.user.findUnique({
-        where: { id: body.creatorId },
+        where: { id: creatorId },
         select: { phone: true },
       });
       creatorPhone = creator?.phone || null;
@@ -270,7 +283,7 @@ export async function POST(req: NextRequest) {
           anonymous: body.isAnonymous || false,
           departmentId: body.departmentId,
           entityId: body.entityId,
-          creatorId: body.creatorId,
+          creatorId,
           subject: body.subject,
           description: body.description,
           guestName: body.guestName,
@@ -317,6 +330,9 @@ export async function POST(req: NextRequest) {
       }),
     ]);
 
+    createdPqrId = pqr.id;
+    consecutiveRollback = { id: consecutiveCode.id, previous: consecutiveCode.consecutive };
+
     const entity = await prisma.entity.findUnique({
       where: { 
         id: body.entityId,
@@ -325,10 +341,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!entity) {
-      return NextResponse.json(
-        { error: "Entity not found" },
-        { status: 404 }
-      );
+      throw new Error("Entity not found after PQR creation");
     }
 
     if (!pqr.consecutiveCode) {
@@ -355,9 +368,10 @@ export async function POST(req: NextRequest) {
         recipientEmail = entity.email;
         recipientName = entity.name;
       } else {
-        return NextResponse.json(
-          { error: "No email found for this entity or department" },
-          { status: 400 }
+        // Sin email de área ni de entidad: la PQR ya quedó registrada;
+        // se omite la notificación por correo en lugar de fallar y orfanar la PQR.
+        console.warn(
+          `PQR ${createdPqrId} creada sin destinatario de correo (entidad ${body.entityId} sin email).`
         );
       }
     }
@@ -369,81 +383,88 @@ export async function POST(req: NextRequest) {
     };
 
     if (!body.isAnonymous) {
-      if (body.creatorId) {
-        // Usuario registrado - obtener datos del creator
-        const creator = await prisma.user.findUnique({
-          where: { id: body.creatorId },
-          select: { name: true, email: true, phone: true },
-        });
-        
-        contactInfo = {
-          name: creator?.name || 'Usuario registrado',
-          email: creator?.email || 'No proporcionado',
-          phone: creatorPhone || 'No proporcionado'
-        };
-      } else {
-        // Usuario no registrado
-        contactInfo = {
-          name: body.guestName || 'No proporcionado',
-          email: body.guestEmail || 'No proporcionado',
-          phone: body.guestPhone || 'No proporcionado'
-        };
-      }
+      const creator = await prisma.user.findUnique({
+        where: { id: creatorId },
+        select: { name: true, email: true, phone: true },
+      });
+
+      contactInfo = {
+        name: creator?.name || 'Usuario registrado',
+        email: creator?.email || 'No proporcionado',
+        phone: creatorPhone || 'No proporcionado'
+      };
     }
 
-    // Enviar notificación al destinatario (departamento o entidad)
-    await sendPQRNotificationEmail(
-      recipientEmail,
-      recipientName,
-      { ...pqr, locationAddress },
-      contactInfo
-    );
-
-    // Solo enviar correo de confirmación a usuarios registrados
-    if (body.creatorId) {
-      const creator = await prisma.user.findUnique({
-        where: { id: body.creatorId },
-        select: { name: true, email: true },
-      });
-      
-      if (creator?.email) {
-        await sendPQRCreationEmail(
-          creator.email,
-          creator.name || "Usuario registrado",
-          "Registro exitoso de PQR @quejate.com.co",
-          pqr.consecutiveCode,
-          new Date(pqr.createdAt).toLocaleString("es-CO", {
-            timeZone: "America/Bogota",
-          }),
-          `https://quejate.com.co/dashboard/pqr/${pqr.id}`,
-          entity.name,
-          recipientEmail
+    // Notificaciones por correo (best-effort: no deben tumbar la creación de la PQR)
+    try {
+      // Notificación al destinatario (área o entidad)
+      if (recipientEmail) {
+        await sendPQRNotificationEmail(
+          recipientEmail,
+          recipientName,
+          { ...pqr, locationAddress },
+          contactInfo
         );
       }
+
+      // Confirmación al creador autenticado
+      if (creatorId) {
+        const creator = await prisma.user.findUnique({
+          where: { id: creatorId },
+          select: { name: true, email: true },
+        });
+
+        if (creator?.email) {
+          await sendPQRCreationEmail(
+            creator.email,
+            creator.name || "Usuario registrado",
+            "Registro exitoso de PQR @quejate.com.co",
+            pqr.consecutiveCode,
+            new Date(pqr.createdAt).toLocaleString("es-CO", {
+              timeZone: "America/Bogota",
+            }),
+            `https://quejate.com.co/dashboard/pqr/${pqr.id}`,
+            entity.name,
+            recipientEmail ?? ""
+          );
+        }
+      }
+    } catch (emailError) {
+      console.error(
+        "Error enviando notificaciones de la PQR (la PQR sí fue creada):",
+        emailError
+      );
     }
 
     return NextResponse.json(pqr);
   } catch (error: any) {
-    console.error("Error in POST /api/pqr:", error.stack);
+    console.error("Error in POST /api/pqr:", error?.stack || error);
 
-    if (pqr && pqr.id) {
-      await prisma.$transaction([
-        prisma.pQRS.delete({
-          where: {
-            id: pqr.id,
-          },
-        }),
-        prisma.entityConsecutive.update({
-          where: { id: pqr.entityConsecutiveId },
-          data: {
-            consecutive: pqr.entityConsecutive.consecutive - 1,
-          },
-        }),
-      ]);
+    // Rollback: si la PQR alcanzó a crearse pero algo falló después,
+    // se elimina y se restaura el consecutivo de la entidad.
+    if (createdPqrId) {
+      try {
+        const rollbackOps: any[] = [
+          prisma.pQRS.delete({ where: { id: createdPqrId } }),
+        ];
+
+        if (consecutiveRollback) {
+          rollbackOps.push(
+            prisma.entityConsecutive.update({
+              where: { id: consecutiveRollback.id },
+              data: { consecutive: consecutiveRollback.previous },
+            })
+          );
+        }
+
+        await prisma.$transaction(rollbackOps);
+      } catch (rollbackError) {
+        console.error("Error during PQR rollback:", rollbackError);
+      }
     }
 
     return NextResponse.json(
-      { error: "Internal server error", details: error.message },
+      { error: "Internal server error", details: error?.message },
       { status: 500 }
     );
   }

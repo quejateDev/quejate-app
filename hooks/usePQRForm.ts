@@ -17,9 +17,6 @@ export const formSchema = z.object({
   isAnonymous: z.boolean(),
   isPrivate: z.boolean(),
   includePhone: z.boolean(),
-  guestName: z.string().optional(),
-  guestEmail: z.string().optional(),
-  guestPhone: z.string().optional(),
   attachments: z.array(
     z.object({
       url: z.string(),
@@ -33,6 +30,9 @@ export const formSchema = z.object({
 export const usePQRForm = (entityId: string, userId: string | undefined) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [entityCustomFields, setEntityCustomFields] = useState<CustomField[]>([]);
+  const [areaCustomFields, setAreaCustomFields] = useState<CustomField[]>([]);
+  const [entityName, setEntityName] = useState<string>("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pqr, setPqr] = useState({
@@ -62,9 +62,6 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       isAnonymous: false,
       isPrivate: true,
       includePhone: false,
-      guestName: "",
-      guestEmail: "",
-      guestPhone: "",
       attachments: [],
       latitude: undefined,
       longitude: undefined,
@@ -124,47 +121,69 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     }
   }, [selectedEntityId, fetchDepartments]);
 
-  async function fetchCustomFields(departmentId: string) {
+  async function fetchAreaCustomFields(departmentId: string) {
     if (!departmentId) {
-      setCustomFields([]);
-      setPqr(prev => ({ ...prev, customFields: [] }));
+      setAreaCustomFields([]);
       return;
     }
 
     try {
       const response = await fetch(`/api/area/${departmentId}/pqr-config`);
       const data = await response.json();
-      setCustomFields(data?.customFields || []);
-
-      setPqr(prev => ({
-        ...prev,
-        customFields: (data?.customFields || []).map((field: CustomField) => ({
-          name: field.name,
-          value: "",
-          type: field.type,
-          placeholder: field.placeholder || "",
-          required: field.required || false,
-        })),
-      }));
+      setAreaCustomFields(data?.customFields || []);
     } catch (error) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Error al cargar los campos personalizados",
+        description: "Error al cargar los campos personalizados del área",
         variant: "destructive",
       });
     }
   }
 
+  // Campos personalizados y nombre a nivel de ENTIDAD
+  // (se cargan haya o no un área seleccionada)
+  useEffect(() => {
+    if (!selectedEntityId) {
+      setEntityCustomFields([]);
+      setEntityName("");
+      return;
+    }
+
+    const fetchEntity = async () => {
+      try {
+        const response = await fetch(`/api/entities/${selectedEntityId}`);
+        if (!response.ok) return;
+        const data = await response.json();
+        setEntityName(data?.name || "");
+        setEntityCustomFields(data?.pqrConfig?.customFields || []);
+      } catch (error) {
+        console.error("Error al cargar la entidad:", error);
+      }
+    };
+
+    fetchEntity();
+  }, [selectedEntityId]);
+
   const watchedDepartmentId = form.watch("departmentId");
 
+  // Campos personalizados a nivel de ÁREA (cuando se elige un área)
   useEffect(() => {
     if (watchedDepartmentId) {
-      fetchCustomFields(watchedDepartmentId);
+      fetchAreaCustomFields(watchedDepartmentId);
     } else {
-      setCustomFields([]);
+      setAreaCustomFields([]);
     }
   }, [watchedDepartmentId]);
+
+  // Unión de campos de entidad + área (dedupe por nombre; el área prevalece)
+  useEffect(() => {
+    const byName = new Map<string, CustomField>();
+    for (const field of [...entityCustomFields, ...areaCustomFields]) {
+      byName.set(field.name, field);
+    }
+    setCustomFields(Array.from(byName.values()));
+  }, [entityCustomFields, areaCustomFields]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (process.env.NODE_ENV === 'production' && !recaptchaToken) {
@@ -174,17 +193,6 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
         variant: "destructive",
       });
       return;
-    }
-
-    if (!userId && !values.isAnonymous) {
-      if (!values.guestName || !values.guestEmail) {
-        toast({
-          title: "Error",
-          description: "El nombre y correo electrónico son obligatorios para usuarios no registrados",
-          variant: "destructive",
-        });
-        return;
-      }
     }
 
     setIsLoading(true);
@@ -218,9 +226,6 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           isAnonymous: values.isAnonymous,
           isPrivate: values.isPrivate,
           includePhone: values.includePhone,
-          guestName: values.guestName,
-          guestEmail: values.guestEmail,
-          guestPhone: values.guestPhone,
           attachments: attachmentsData,
           subject: values.subject,
           description: values.description,
@@ -270,6 +275,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     form,
     departments,
     customFields,
+    entityName,
     currentUser,
     isLoading,
     isLoadingInitial,
