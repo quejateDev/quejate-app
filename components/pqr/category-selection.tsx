@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -7,7 +7,7 @@ import { Input } from "../ui/input";
 import { Category, RegionalDepartment, Municipality } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { Heart, Loader2, ChevronLeft, Search, ImageIcon } from "lucide-react";
+import { Heart, Loader2, ChevronLeft, Search, ImageIcon, MapPin } from "lucide-react";
 import {
   getMunicipalitiesByDepartment,
   getRegionalDepartments,
@@ -29,8 +29,33 @@ import { VerificationBadge } from "../ui/verification-badge";
 import { useFavoriteEntities } from "@/hooks/useFavoriteEntities";
 import dynamic from "next/dynamic";
 import { formatText } from "@/utils/formatText";
+import { toast } from "@/hooks/use-toast";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { EntitySuggestionModal } from "@/components/modals/entity-suggestion-modal";
+import { PqrRegisterGate } from "@/components/pqr/pqr-register-gate";
+
+const normalizeLocationName = (value: string): string =>
+  (value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/^distrito\s+.*?\sde\s+/, "")
+    .trim();
+
+function findByName<T extends { id: string; name: string }>(
+  list: T[],
+  name: string
+): T | undefined {
+  const target = normalizeLocationName(name);
+  if (!target) return undefined;
+  return (
+    list.find((item) => normalizeLocationName(item.name) === target) ||
+    list.find((item) => {
+      const candidate = normalizeLocationName(item.name);
+      return candidate.includes(target) || target.includes(candidate);
+    })
+  );
+}
 
 interface SimpleEntity {
   id: string;
@@ -165,10 +190,120 @@ export function CategorySelection({
   const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<string | null>(null);
   const [toggling, setToggling] = useState<{ [id: string]: boolean }>({});
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
+  const [registerGateOpen, setRegisterGateOpen] = useState(false);
+  const [pendingEntityId, setPendingEntityId] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+  const autoLocatedRef = useRef(false);
+  const userTouchedLocationRef = useRef(false);
 
 
   const handleEntitySelect = (entityId: string) => {
+    // Gate de registro (#5): solo usuarios autenticados pueden crear una PQRSD.
+    if (!userId) {
+      setPendingEntityId(entityId);
+      setRegisterGateOpen(true);
+      return;
+    }
     router.push(`/dashboard/pqrs/create/${entityId}`);
+  };
+
+  const detectLocation = useCallback((options: { silent?: boolean } = {}) => {
+    const { silent = false } = options;
+
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      if (!silent) {
+        toast({
+          title: "Ubicación no disponible",
+          description: "Tu navegador no permite geolocalización.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        // Si el usuario ya eligió manualmente una ubicación, la detección
+        // automática (silenciosa) no debe sobreescribir su selección.
+        if (silent && userTouchedLocationRef.current) {
+          setLocating(false);
+          return;
+        }
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=es`,
+            { headers: { "Accept-Language": "es" } }
+          );
+          const data = await response.json();
+          const address = data?.address || {};
+          const stateName: string = address.state || address.region || "";
+          const cityName: string =
+            address.city ||
+            address.town ||
+            address.municipality ||
+            address.village ||
+            address.county ||
+            "";
+
+          const matchedDepartment = findByName(departments, stateName);
+          if (!matchedDepartment) {
+            if (!silent) {
+              toast({
+                title: "No pudimos ubicarte",
+                description:
+                  "No identificamos tu departamento. Selecciónalo manualmente.",
+                variant: "destructive",
+              });
+            }
+            return;
+          }
+
+          setSelectedDepartmentId(matchedDepartment.id);
+          setSelectedMunicipalityId(null);
+
+          const deptMunicipalities = await getMunicipalitiesByDepartment(
+            matchedDepartment.id
+          );
+          setMunicipalities(deptMunicipalities);
+          const matchedMunicipality = findByName(deptMunicipalities, cityName);
+          if (matchedMunicipality) {
+            setSelectedMunicipalityId(matchedMunicipality.id);
+          }
+        } catch (error) {
+          console.error("Error en geolocalización inversa:", error);
+          if (!silent) {
+            toast({
+              title: "Error de ubicación",
+              description: "No pudimos determinar tu ciudad. Intenta de nuevo.",
+              variant: "destructive",
+            });
+          }
+        } finally {
+          setLocating(false);
+        }
+      },
+      (error) => {
+        console.error("Permiso de ubicación denegado:", error);
+        setLocating(false);
+        if (!silent) {
+          toast({
+            title: "Permiso denegado",
+            description: "Activa el permiso de ubicación o filtra manualmente.",
+            variant: "destructive",
+          });
+        }
+      }
+    );
+  }, [departments]);
+
+  const handleUseMyLocation = () => detectLocation();
+
+  const handleClearLocation = () => {
+    userTouchedLocationRef.current = true;
+    setSelectedDepartmentId(null);
+    setSelectedMunicipalityId(null);
   };
 
   useEffect(() => {
@@ -182,6 +317,15 @@ export function CategorySelection({
     };
     fetchDepartments();
   }, []);
+
+  // Autodetecta la ubicación al entrar para pre-filtrar las entidades por
+  // departamento, sin que el usuario tenga que seleccionarlo manualmente.
+  // Silencioso: si deniegan el permiso, simplemente quedan los filtros manuales.
+  useEffect(() => {
+    if (autoLocatedRef.current || departments.length === 0) return;
+    autoLocatedRef.current = true;
+    detectLocation({ silent: true });
+  }, [departments, detectLocation]);
 
   useEffect(() => {
     if (selectedDepartmentId) {
@@ -318,6 +462,7 @@ export function CategorySelection({
               <Select
                 value={selectedDepartmentId || ""}
                 onValueChange={(value) => {
+                  userTouchedLocationRef.current = true;
                   setSelectedDepartmentId(value || null);
                   setSelectedMunicipalityId(null);
                 }}
@@ -339,9 +484,10 @@ export function CategorySelection({
               <div className="w-full md:w-64">
                 <Select
                   value={selectedMunicipalityId || ""}
-                  onValueChange={(value) =>
-                    setSelectedMunicipalityId(value || null)
-                  }
+                  onValueChange={(value) => {
+                    userTouchedLocationRef.current = true;
+                    setSelectedMunicipalityId(value || null);
+                  }}
                   disabled={!selectedDepartmentId}
                 >
                   <SelectTrigger>
@@ -357,7 +503,43 @@ export function CategorySelection({
                 </Select>
               </div>
             )}
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleUseMyLocation}
+                disabled={locating}
+                className="gap-2"
+              >
+                {locating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MapPin className="h-4 w-4" />
+                )}
+                Usar mi ubicación
+              </Button>
+              {(selectedDepartmentId || selectedMunicipalityId) && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleClearLocation}
+                >
+                  Ver todas
+                </Button>
+              )}
+            </div>
           </div>
+
+          {(selectedDepartmentId || selectedMunicipalityId) && (
+            <div className="flex items-center gap-2 rounded-md bg-primary/5 px-3 py-2 text-sm text-gray-600">
+              <MapPin className="h-4 w-4 shrink-0 text-primary" />
+              <span>
+                Mostrando entidades de tu ubicación. Usa &quot;Ver todas&quot; para
+                quitar el filtro.
+              </span>
+            </div>
+          )}
         </>
       )}
 
@@ -435,6 +617,12 @@ export function CategorySelection({
         )}
       </div>
     </div>
+
+      <PqrRegisterGate
+        open={registerGateOpen}
+        onOpenChange={setRegisterGateOpen}
+        entityId={pendingEntityId}
+      />
     </TooltipProvider>
   );
 }
