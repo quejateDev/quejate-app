@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -23,7 +23,6 @@ import {
 import { cn } from "@/lib/utils";
 import { FileUpload } from "../ui/file-upload";
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
 
 import {
   Form,
@@ -35,8 +34,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useLoginModal } from "@/providers/LoginModalProvider";
 import { usePQRForm } from "@/hooks/usePQRForm";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import Link from "next/link";
@@ -58,12 +55,12 @@ type NewPQRFormProps = {
 
 export function NewPQRForm({ entityId }: NewPQRFormProps) {
   const userId = useCurrentUser()?.id;
-  const { setIsOpen } = useLoginModal();
-  
+
   const {
     form,
     departments,
     customFields,
+    entityName,
     currentUser,
     isLoading,
     isLoadingInitial,
@@ -72,26 +69,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     onSubmit,
     setRecaptchaToken,
   } = usePQRForm(entityId, userId);
-
-  const [entityName, setEntityName] = useState<string>("");
-
-  useEffect(() => {
-    const fetchEntityName = async () => {
-      try {
-        const response = await fetch(`/api/entities/${entityId}`);
-        if (response.ok) {
-          const entityData = await response.json();
-          setEntityName(entityData.name);
-        }
-      } catch (error) {
-        console.error('Error fetching entity name:', error);
-      }
-    };
-
-    if (entityId) {
-      fetchEntityName();
-    }
-  }, [entityId]);
 
   if (isLoadingInitial) {
     return (
@@ -323,73 +300,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 />
               </div>
 
-              {!userId && !form.watch("isAnonymous") && (
-                <div className="space-y-4 border-t pt-4">
-                  <h3 className="text-lg font-medium">Datos de Contacto</h3>
-                  <p className="text-sm text-gray-600">
-                    Como no estás registrado, necesitamos tus datos de contacto para que la entidad pueda responder a tu PQRSD.
-                  </p>
-                  
-                  <FormField
-                    control={form.control}
-                    name="guestName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nombre completo *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="Ingresa tu nombre completo" 
-                            className="border border-gray-300"
-                            required={!form.watch("isAnonymous")}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="guestEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Correo electrónico *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            type="email"
-                            placeholder="correo@ejemplo.com" 
-                            className="border border-gray-300"
-                            required={!form.watch("isAnonymous")}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="guestPhone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Teléfono (opcional)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            type="tel"
-                            placeholder="Ej: 3001234567" 
-                            className="border border-gray-300"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
-
               <div className="flex flex-col space-y-1 mt-6">
                 <FormField
                   control={form.control}
@@ -400,14 +310,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                         <Checkbox
                           id="isAnonymous"
                           checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            if (checked && !userId) {
-                              form.setValue("guestName", "");
-                              form.setValue("guestEmail", "");
-                              form.setValue("guestPhone", "");
-                            }
-                          }}
+                          onCheckedChange={(checked) => field.onChange(checked)}
                         />
                       </FormControl>
                       <FormLabel>
@@ -452,41 +355,21 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                 <FormField
                   control={form.control}
                   name="isPrivate"
-                  disabled={!userId}
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
                         <Checkbox
                           id="isPrivate"
                           checked={!field.value}
-                          disabled={!userId}
                           onCheckedChange={checked => field.onChange(!checked)}
                         />
                       </FormControl>
-                      <FormLabel className={`${!userId ? "line-through" : ""} flex flex-col gap-2`}>
+                      <FormLabel className="flex flex-col gap-2">
                         <span>¿Desea publicar esta PQRSD en el muro?</span>
                       </FormLabel>
-                      {!userId && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="w-4 h-4 text-red-500" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Esta opción solo está permitida para usuarios registrados
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
                     </FormItem>
                   )}
                 />
-                {!userId && (
-                  <span
-                    className="text-blue-500 underline font-semibold cursor-pointer"
-                    onClick={() => setIsOpen(true)}
-                  >
-                    Inicia sesión para publicar tu PQRSD en el muro.
-                  </span>
-                )}
                 <p className="text-xs text-gray-500">
                   Si marca esta opción, su queja será visible para otras
                   personas en la sección de denuncias públicas.
