@@ -6,6 +6,7 @@ export type NotificationType =
   | "lawyer_request_rejected"
   | "new_lawyer_request"
   | "pqrsd_time_expired"
+  | "entity_response"
   ;
 
 export type NotificationData =
@@ -45,6 +46,14 @@ export type NotificationData =
     type: "pqrsd_time_expired";
     pqrId: string;
     pqrSubject: string;
+  }
+  | {
+    type: "entity_response";
+    pqrId: string;
+    responseId: string;
+    entityName: string;
+    responderName?: string;
+    consecutiveCode?: string;
   };
 
 
@@ -80,3 +89,6 @@ export const isNewLawyerRequestNotification = (data: NotificationData): data is 
 
 export const isPQRSDTimeExpiredNotification = (data: NotificationData): data is Extract<NotificationData, { type: "pqrsd_time_expired" }> =>
   data.type === "pqrsd_time_expired";
+
+export const isEntityResponseNotification = (data: NotificationData): data is Extract<NotificationData, { type: "entity_response" }> =>
+  data.type === "entity_response";

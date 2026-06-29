@@ -7,6 +7,7 @@ const NOTIFICATION_TITLES: Record<string, string> = {
   comment: "Nuevo comentario",
   follow: "Nuevo seguidor",
   pqrsd_time_expired: "PQRSD vencida",
+  entity_response: "Respuesta de entidad",
   lawyer_request_accepted: "Solicitud de asesoría aceptada",
   lawyer_request_rejected: "Solicitud de asesoría rechazada",
   new_lawyer_request: "Nueva solicitud de asesoría",
@@ -151,6 +152,30 @@ export const NotificationFactory = {
       type: "pqrsd_time_expired",
       pqrId,
       pqrSubject,
+    },
+  }),
+
+  createEntityResponse: (
+    userId: string,
+    pqrId: string,
+    responseId: string,
+    entityName: string,
+    responderName?: string | null,
+    consecutiveCode?: string | null
+  ): CreateNotificationInput => ({
+    userId,
+    type: "entity_response",
+    message: consecutiveCode
+      ? `${entityName} ha respondido a tu PQRSD No. ${consecutiveCode}`
+      : `${entityName} ha respondido a tu PQRSD`,
+    read: false,
+    data: {
+      type: "entity_response",
+      pqrId,
+      responseId,
+      entityName,
+      ...(responderName && { responderName }),
+      ...(consecutiveCode && { consecutiveCode }),
     },
   }),
 };
