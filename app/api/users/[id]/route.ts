@@ -64,12 +64,21 @@ export async function GET(
       isFollowing = !!followCheck;
     }
 
-    return NextResponse.json({ 
-      ...user,
-      isFollowing 
+    // El correo y el teléfono son datos personales (Ley 1581): solo los recibe
+    // su dueño. El perfil público expone nombre, foto, rol, seguidores y conteos.
+    const isOwner = currentUserId?.id === id;
+    const { email, phone, ...publicProfile } = user;
+
+    return NextResponse.json({
+      ...publicProfile,
+      ...(isOwner ? { email, phone } : {}),
+      isFollowing
     }, {
       headers: {
-        'Cache-Control': 'public, max-age=60'
+        // `private` (antes `public`): la respuesta ahora depende de quién
+        // pregunta; con `public` un caché compartido podría entregarle a
+        // cualquiera la respuesta del dueño, con su correo dentro.
+        'Cache-Control': 'private, max-age=60'
       }
     });
 

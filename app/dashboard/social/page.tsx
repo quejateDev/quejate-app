@@ -10,7 +10,6 @@ import { useDebounce } from '@/hooks/use-debounce';
 
 interface User {
   id: string;
-  email: string;
   name: string;
   image?: string | null;
   role: string;
@@ -46,12 +45,10 @@ export default function SocialPage() {
     fetchUsers();
   }, []);
 
+  // Búsqueda solo por nombre: el correo ya no viaja al cliente (dato personal).
   const filteredUsers = users.filter(user => {
     const searchLower = debouncedSearch.toLowerCase();
-    return (
-      user.email.toLowerCase().includes(searchLower) ||
-      user.name.toLowerCase().includes(searchLower)
-    );
+    return user.name.toLowerCase().includes(searchLower);
   });
 
   const UserCard = ({ user }: { user: User }) => (
@@ -75,7 +72,6 @@ export default function SocialPage() {
               <h3 className="text-base md:text-lg font-semibold truncate">
                 {user.name}
               </h3>
-              <p className="text-sm text-muted-foreground truncate">{user.email}</p>
               <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-2 text-sm">
                 <span className="text-muted-foreground">
                   {user._count.followers} seguidores

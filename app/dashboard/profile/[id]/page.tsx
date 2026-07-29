@@ -89,9 +89,11 @@ export default function ProfilePage() {
               <h2 className="text-2xl font-semibold mt-4">
                 {userProfile.name}
               </h2>
-              <p className="text-sm text-muted-foreground">
-                {userProfile.email}
-              </p>
+              {isOwnProfile && (
+                <p className="text-sm text-muted-foreground">
+                  {userProfile.email}
+                </p>
+              )}
             </div>
               {!isOwnProfile && (
                 <div className="mt-4">
