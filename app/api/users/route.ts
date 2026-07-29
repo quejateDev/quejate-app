@@ -12,7 +12,9 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        email: true,
+        // Sin `email`: este listado es público (sin sesión) y exponerlo permitía
+        // cosechar correos de ciudadanos. Los datos personales solo los ve su
+        // dueño (Ley 1581) — ver `GET /api/users/[id]`.
         role: true,
         image: true,
         _count: {
