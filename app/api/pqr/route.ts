@@ -319,7 +319,11 @@ export async function POST(req: NextRequest) {
           entity: true,
           customFieldValues: true,
           attachments: true,
-          creator: true,
+          // Nunca la fila User completa: traía el hash bcrypt de la contraseña.
+          // Los correos de notificación usan sus propias consultas más abajo.
+          creator: {
+            select: { id: true, name: true, image: true },
+          },
         },
       }),
       prisma.entityConsecutive.update({

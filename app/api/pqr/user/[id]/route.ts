@@ -58,7 +58,8 @@ export async function GET(request: Request, params: any) {
             id: true,
             name: true,
             image: true,
-            email: true,
+            // Sin `email`: endpoint público, y el correo es dato personal
+            // (Ley 1581). Ningún cliente lo lee de aquí.
           }
         }
       },

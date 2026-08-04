@@ -51,7 +51,10 @@ export async function PATCH(
       },
       include: {
         department: true,
-        creator: true,
+        // Nunca la fila User completa: traía el hash bcrypt de la contraseña.
+        creator: {
+          select: { id: true, name: true, image: true },
+        },
         customFieldValues: true
       }
     });
