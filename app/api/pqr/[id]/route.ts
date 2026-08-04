@@ -51,7 +51,12 @@ export async function GET(
           },
         },
         customFieldValues: true,
-        creator: true,
+        // `creator: true` devolvía TODA la fila User —incluido el hash bcrypt de
+        // la contraseña, el correo y el teléfono— y este endpoint es PÚBLICO
+        // para las PQRSD no privadas. Solo los campos que los clientes leen.
+        creator: {
+          select: { id: true, name: true, image: true },
+        },
         statusHistory: {
           select: {
             id: true,

@@ -4,6 +4,12 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const topPQRs = await prisma.pQRS.findMany({
+      // Mismo filtro que el muro público: una PQRSD privada no puede aparecer
+      // en un ranking público con su asunto, descripción y autor.
+      where: {
+        private: false,
+        creatorId: { not: null },
+      },
       take: 3,
       orderBy: {
         likes: {
