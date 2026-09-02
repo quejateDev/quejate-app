@@ -35,50 +35,16 @@ export async function GET(request: Request, { params }: any) {
   }
 }
 
-export async function PUT(request: Request, { params }: any) {
-  try {
-    const { id } = await params;
-    const body = await request.json();
-    const {
-      name,
-      description,
-      categoryId,
-      imageUrl,
-      email,
-      municipalityId,
-      isVerified,
-    } = body;
-
-    const entity = await prisma.entity.update({
-      where: { id },
-      data: {
-        name,
-        description,
-        categoryId,
-        imageUrl: imageUrl || undefined,
-        email: email || undefined,
-        municipalityId: municipalityId || undefined,
-        isVerified,
-      },
-    });
-
-    return NextResponse.json(entity);
-  } catch (error) {
-    console.error("[ENTITY_PUT]", error);
-    return new NextResponse("Internal error", { status: 500 });
-  }
-}
-
-export async function DELETE(request: Request, { params }: any) {
-  try {
-    const { id } = await params;
-    await prisma.entity.delete({
-      where: { id },
-    });
-
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    console.error("[ENTITY_DELETE]", error);
-    return new NextResponse("Internal error", { status: 500 });
-  }
-}
+// ---------------------------------------------------------------------------
+// Las operaciones de ESCRITURA de esta ruta se retiraron el 02/09/2026.
+//
+// No tenian ninguna comprobacion de sesion: el middleware de la web solo
+// protege paginas (`privateRoutes`), y estos manejadores solo importaban
+// `prisma`. Cualquiera en internet podia invocarlas.
+//
+// La administracion de catalogos vive en el panel, y desde la Tarea 15 pasa
+// por el backend unificado, donde `EntityScopeGuard` decide quien puede que.
+// Esta ruta se queda como lectura publica, que es lo unico que la web usa.
+//
+// NO reponer estos metodos aqui. Si hiciera falta escribir, es en el backend.
+// ---------------------------------------------------------------------------
