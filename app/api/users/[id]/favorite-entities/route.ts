@@ -15,6 +15,17 @@ export async function GET(request: NextRequest, { params }: any) {
       );
     }
 
+    // El `userId` viene de la URL, no de la sesion. Sin esta comprobacion
+    // cualquier cuenta con sesion valida podia leer y modificar los favoritos
+    // de otra persona con solo cambiar el id (OWASP API1 / IDOR).
+    // Mismo patron que `/api/notifications/[id]`.
+    if (userId !== currentUserId.id) {
+      return NextResponse.json(
+        { error: "No autorizado para acceder a los favoritos de otro usuario" },
+        { status: 403 }
+      );
+    }
+
     const departmentMap = new Map<string, string>();
     const municipalityMap = new Map<string, { name: string, departmentId: string }>();
 
@@ -86,6 +97,17 @@ export async function POST( request: NextRequest, { params }: any) {
       return NextResponse.json(
         { error: "No autorizado, inicie sesión nuevamente" },
         { status: 401 }
+      );
+    }
+
+    // El `userId` viene de la URL, no de la sesion. Sin esta comprobacion
+    // cualquier cuenta con sesion valida podia leer y modificar los favoritos
+    // de otra persona con solo cambiar el id (OWASP API1 / IDOR).
+    // Mismo patron que `/api/notifications/[id]`.
+    if (userId !== currentUserId.id) {
+      return NextResponse.json(
+        { error: "No autorizado para acceder a los favoritos de otro usuario" },
+        { status: 403 }
       );
     }
 
