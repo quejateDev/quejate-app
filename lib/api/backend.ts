@@ -68,6 +68,84 @@ const HOP_BY_HOP = new Set([
 ]);
 
 /**
+ * Cabeceras de reenvío que **nunca** se dejan pasar tal cual, aunque vengan en
+ * la petición. Se sustituyen por el valor de confianza (ver
+ * {@link trustedClientIp}) o no se envían.
+ *
+ * 🔴 **Es la mitad del arreglo de R-36 que puede convertirlo en algo peor.**
+ * El backend acota por IP y, para saber cuál es, lee `X-Forwarded-For`. Si esta
+ * ruta reenviara la cabecera que mandó el cliente, cualquiera podría escribir
+ * en ella la IP que quisiera —una distinta en cada petición— y **saltarse el
+ * limitador entero**. Un cubo compartido es un problema de disponibilidad; un
+ * limitador que se puede evadir a voluntad es un problema de seguridad.
+ */
+const CLIENT_CONTROLLED_FORWARDING = new Set([
+  "forwarded",
+  "x-forwarded-for",
+  "x-forwarded-host",
+  "x-forwarded-proto",
+  "x-real-ip",
+  "x-client-ip",
+  "x-vercel-forwarded-for",
+  "cf-connecting-ip",
+  "true-client-ip",
+]);
+
+/**
+ * La **única** cabecera cuyo valor se acepta como IP del cliente: la que
+ * escribe Vercel en el borde, descartando la que traiga el cliente con ese
+ * mismo nombre.
+ *
+ * 🔴 **Una sola, y no una lista de respaldos.** `x-forwarded-for` y `x-real-ip`
+ * también las pone Vercel, pero son nombres genéricos que cualquier proxy usa
+ * y que un cliente intentaría falsificar; aceptarlas «por si acaso» significa
+ * confiar en ellas justo el día en que la primera falte, que es exactamente
+ * cuando algo raro está pasando. Con una sola fuente, equivocarse degrada a
+ * cubo compartido —un problema de disponibilidad, el mismo que había antes— y
+ * **nunca** a límite evadible, que es un problema de seguridad. De los dos
+ * modos de fallo, este es el que se elige.
+ *
+ * Si el despliegue dejara de estar en Vercel, esta constante es la línea que
+ * hay que cambiar, y el aviso de {@link trustedClientIp} avisa de que hace
+ * falta.
+ */
+const PLATFORM_CLIENT_IP_HEADER = "x-vercel-forwarded-for";
+
+/** Un solo aviso por instancia: sin esto sería una línea de log por petición. */
+let warnedAboutMissingClientIp = false;
+
+/**
+ * IP del cliente **según la plataforma**, o `null` si no la hay.
+ *
+ * `null` no es un fallo en local: no hay proxy delante y el backend usa la IP
+ * del socket, que es la correcta. Pero en producción significaría que el
+ * limitador del backend ha vuelto a ver a toda la plataforma como un solo
+ * cliente (**R-36**), así que se avisa una vez por instancia para que quede en
+ * los logs de Vercel en lugar de degradarse en silencio — que es el patrón que
+ * costó **A-21**.
+ */
+export function trustedClientIp(request: Request): string | null {
+  // Vercel manda una sola IP; si algún día llegara una lista, la primera
+  // entrada es la del cliente y las siguientes los saltos intermedios.
+  const value = request.headers
+    .get(PLATFORM_CLIENT_IP_HEADER)
+    ?.split(",")[0]
+    ?.trim();
+  if (value) {
+    return value;
+  }
+
+  if (process.env.NODE_ENV === "production" && !warnedAboutMissingClientIp) {
+    warnedAboutMissingClientIp = true;
+    console.warn(
+      "[proxy] sin cabecera de IP de cliente de la plataforma: el backend " +
+        "contará el rate limit por la IP de salida de este servidor (R-36).",
+    );
+  }
+  return null;
+}
+
+/**
  * Cabecera `Cookie` de la petición en curso.
  *
  * Sirve tanto en una ruta de `app/api/*` como en un componente de servidor: en
@@ -235,13 +313,34 @@ export class BackendError extends Error {
  * `authorization`**: por aquí pasan los dos clientes. {@link backendFetch} las
  * vuelve a fijar explícitamente, para que ninguna de las dos dependa de que
  * esta lista siga siendo la que es hoy.
+ *
+ * 🔴 **Las cabeceras de reenvío no se copian: se reescriben** (R-36). Se
+ * descarta lo que trajera el cliente en {@link CLIENT_CONTROLLED_FORWARDING} y
+ * se emite un único `X-Forwarded-For` con la IP que puso la plataforma. Así el
+ * backend puede volver a contar por ciudadano y no por «la web entera», y nadie
+ * puede elegir en qué cubo cae.
+ *
+ * ⚠️ Emitir esta cabecera **no basta por sí sola**: el backend solo la mira si
+ * `TRUST_PROXY_HOPS` cuadra con la cadena real (cliente → Vercel → Cloudflare →
+ * Render). Un salto de menos y el cubo sigue compartido; uno de más no reabre
+ * la falsificación —porque aquí ya se descartó lo del cliente— pero tampoco
+ * ayuda. Ese número **hay que medirlo contra el despliegue**, y está en el plan
+ * de despliegue del informe de cierre de la Tarea 13.
  */
 export function forwardableHeaders(request: Request): Record<string, string> {
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {
-    if (!HOP_BY_HOP.has(key.toLowerCase())) {
-      headers[key] = value;
+    const name = key.toLowerCase();
+    if (HOP_BY_HOP.has(name) || CLIENT_CONTROLLED_FORWARDING.has(name)) {
+      return;
     }
+    headers[key] = value;
   });
+
+  const clientIp = trustedClientIp(request);
+  if (clientIp) {
+    headers["x-forwarded-for"] = clientIp;
+  }
+
   return headers;
 }
