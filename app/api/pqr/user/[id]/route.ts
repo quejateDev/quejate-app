@@ -1,98 +1,22 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { currentUser } from "@/lib/auth";
-import { getOverdueInfo } from "@/utils/dateHelpers";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function GET(request: Request, params: any) {
-  try {
-    const { id: requestedUserId } = await params.params;
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    
-    const skip = (page - 1) * limit;
-    const take = Math.min(limit, 50);
-
-    if (!requestedUserId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const currentUserId = await currentUser();
-    const isOwnProfile = currentUserId?.id === requestedUserId;
-
-    const userPQRs = await prisma.pQRS.findMany({
-      where: {
-        creatorId: requestedUserId,
-        private: isOwnProfile ? undefined : false
-      },      
-      include: {
-        likes: true,
-        attachments: true,
-        _count: {
-          select: {
-            likes: true,
-            comments: true
-          },
-        },
-        department: {
-          select: {
-            id: true,
-            name: true,
-            entityId: true,
-          },
-        },
-        entity: {
-          select: {
-            id: true,
-            name: true,
-            categoryId: true,
-            imageUrl: true
-          },
-        },
-        customFieldValues: true,
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            // Sin `email`: endpoint público, y el correo es dato personal
-            // (Ley 1581). Ningún cliente lo lee de aquí.
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip,
-      take,
-    });
-
-    const totalCount = await prisma.pQRS.count({
-      where: {
-        creatorId: requestedUserId,
-        private: isOwnProfile ? undefined : false
-      }
-    });
-
-    const hasMore = skip + take < totalCount;
-
-    const pqrsWithOverdue = userPQRs.map((p) => ({ ...p, ...getOverdueInfo(p) }));
-
-    return NextResponse.json({
-      pqrs: pqrsWithOverdue,
-      hasMore,
-      nextPage: hasMore ? page + 1 : null,
-      totalCount
-    });
-
-  } catch (error) {
-    console.error("Error fetching user PQRs:", error);
-    return NextResponse.json(
-      { error: "Error fetching user PQRs" },
-      { status: 500 }
-    );
-  }
+/**
+ * PQRSD radicadas por un usuario → `GET /pqr/user/:id`.
+ *
+ * Bloque A (contrato congelado). Sobre `{ pqrs, hasMore, nextPage, totalCount }`
+ * —aquí **sí** va `totalCount`, a diferencia del muro— y sesión **opcional**:
+ * el dueño del perfil ve además las privadas.
+ *
+ * 🔴 **H-18 se aplica distinto aquí, y a propósito.** En un perfil ajeno las
+ * PQRSD anónimas no se sirven con el autor vacío: se **omiten**. Vaciar el
+ * `creator` no protegería nada, porque el vínculo lo establece la propia ruta
+ * —`/pqr/user/:id` ya está preguntando «qué radicó esta persona»—.
+ *
+ * ⚠️ Como consecuencia, `totalCount` **difiere** entre el dueño y un visitante:
+ * cuenta lo que quien pregunta puede ver. La móvil lo usa para pintar el
+ * contador del perfil, no para paginar (pagina con `nextPage`).
+ */
+export async function GET(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(request, `/pqr/user/${encodeURIComponent(id)}`);
 }

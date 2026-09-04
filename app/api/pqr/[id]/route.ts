@@ -1,87 +1,20 @@
-import prisma from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
-import { getOverdueInfo } from "@/utils/dateHelpers";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function GET(
-  request: Request,
-  { params }: any
-) {
-  const { id} = await params;
-  const pqr = await prisma.pQRS.findUnique({
-    where: {
-      id,
-    },
-    include: {
-        likes: true,
-        attachments: true,
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
-        department: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            email: true,
-            entityId: true,
-          },
-        },
-        entity: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            email: true,
-            categoryId: true,
-            imageUrl: true
-          },
-        },
-        customFieldValues: true,
-        // `creator: true` devolvía TODA la fila User —incluido el hash bcrypt de
-        // la contraseña, el correo y el teléfono— y este endpoint es PÚBLICO
-        // para las PQRSD no privadas. Solo los campos que los clientes leen.
-        creator: {
-          select: { id: true, name: true, image: true },
-        },
-        statusHistory: {
-          select: {
-            id: true,
-            status: true,
-            comment: true,
-            createdAt: true,
-            user: { select: { name: true } },
-          },
-          orderBy: { createdAt: "asc" },
-        },
-      },
-  });
-  if (!pqr) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
-  if (pqr.private) {
-    const caller = await currentUser();
-    const role = caller?.role;
-    const isPrivileged = role === 'EMPLOYEE' || role === 'ADMIN' || role === 'SUPER_ADMIN';
-    const isOwner = caller?.id && pqr.creatorId === caller.id;
-    if (!isPrivileged && !isOwner) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-  }
-
-  return NextResponse.json({ ...pqr, ...getOverdueInfo(pqr) });
+/**
+ * Detalle de una PQRSD → `GET /pqr/:id`.
+ *
+ * Bloque A (contrato congelado). Objeto pelado con los mismos escalares,
+ * `likes`, `attachments`, `comments` con su `user`, `_count`, `department`,
+ * `entity`, `customFieldValues`, `creator`, `statusHistory`, `isOverdue` y
+ * `businessDaysOverdue`; menos `guest*` y más `hasLegalDeadline`, como el muro.
+ *
+ * Conserva el **403** de las PQRSD privadas para quien no es su autor ni
+ * personal autorizado, y el **404** de la que no existe.
+ *
+ * 🔴 Cierra H-18 igual que el muro: `creator: null` en las anónimas salvo para
+ * su autor, que lo necesita para el `isOwner` de `DetailHeader.tsx:104`.
+ */
+export async function GET(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(request, `/pqr/${encodeURIComponent(id)}`);
 }

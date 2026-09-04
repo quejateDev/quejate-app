@@ -1,50 +1,18 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
+/**
+ * Una entidad → `GET /entities/:id`.
+ *
+ * Bloque A (contrato congelado). Misma forma, incluida la capitalización
+ * heredada de Prisma `RegionalDepartment` / `Municipality`, y `pqrConfig` con
+ * sus `customFields`. 404 si no existe o está inactiva.
+ *
+ * ⚠️ El cuerpo del 404 pasa de texto plano (`new NextResponse("Entity not
+ * found")`) al `{ error }` del backend. Ningún cliente lee ese cuerpo: la móvil
+ * solo mira el estado (`usePQRConfig.ts:10` sobre `apiClient`, que lanza en
+ * cualquier no-2xx).
+ */
 export async function GET(request: Request, { params }: any) {
-  try {
-    const { id } = await params;
-    const entity = await prisma.entity.findUnique({
-      where: { 
-        id,
-        category: {
-          isActive: true,
-        },
-        isActive: true
-      },
-      include: {
-        category: true,
-        pqrConfig: {
-          include: {
-            customFields: true,
-          },
-        },
-        RegionalDepartment: true,
-        Municipality: true,
-      },
-    });
-
-    if (!entity) {
-      return new NextResponse("Entity not found", { status: 404 });
-    }
-
-    return NextResponse.json(entity);
-  } catch (error) {
-    console.error("[ENTITY_GET]", error);
-    return new NextResponse("Internal error", { status: 500 });
-  }
+  const { id } = await params;
+  return proxyToBackend(request, `/entities/${encodeURIComponent(id)}`);
 }
-
-// ---------------------------------------------------------------------------
-// Las operaciones de ESCRITURA de esta ruta se retiraron el 02/09/2026.
-//
-// No tenian ninguna comprobacion de sesion: el middleware de la web solo
-// protege paginas (`privateRoutes`), y estos manejadores solo importaban
-// `prisma`. Cualquiera en internet podia invocarlas.
-//
-// La administracion de catalogos vive en el panel, y desde la Tarea 15 pasa
-// por el backend unificado, donde `EntityScopeGuard` decide quien puede que.
-// Esta ruta se queda como lectura publica, que es lo unico que la web usa.
-//
-// NO reponer estos metodos aqui. Si hiciera falta escribir, es en el backend.
-// ---------------------------------------------------------------------------

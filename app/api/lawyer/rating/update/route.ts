@@ -1,77 +1,13 @@
-import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
+/**
+ * Cambiar una valoración propia → `PUT /lawyer/rating/update`.
+ *
+ * Bloque A (contrato congelado). Devuelve la valoración actualizada con su
+ * `client { id, name, image }` y **200**. Conserva 400 (falta `ratingId`, o
+ * `score` fuera de 1..5), 403 si la valoración es de otra persona y 404 si no
+ * existe.
+ */
 export async function PUT(request: Request) {
-  try {
-    const currentUserId = await currentUser();
-
-    if (!currentUserId) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 }
-      );
-    }
-
-    const { ratingId, score, comment } = await request.json();
-
-    if (!ratingId) {
-      return NextResponse.json(
-        { error: "Se requiere el ID de la calificación" },
-        { status: 400 }
-      );
-    }
-
-    if (!score || score < 1 || score > 5) {
-      return NextResponse.json(
-        { error: "La calificación debe estar entre 1 y 5" },
-        { status: 400 }
-      );
-    }
-
-    const existingRating = await prisma.rating.findUnique({
-      where: { id: ratingId },
-      include: { lawyer: true }
-    });
-
-    if (!existingRating) {
-      return NextResponse.json(
-        { error: "Calificación no encontrada" },
-        { status: 404 }
-      );
-    }
-
-    if (existingRating.clientId !== currentUserId.id) {
-      return NextResponse.json(
-        { error: "No autorizado para modificar esta calificación" },
-        { status: 403 }
-      );
-    }
-
-    const updatedRating = await prisma.rating.update({
-      where: { id: ratingId },
-      data: {
-        score,
-        comment: comment || null
-      },
-      include: {
-        client: {
-          select: {
-            id: true,
-            name: true,
-            image: true
-          }
-        }
-      }
-    });
-
-    return NextResponse.json(updatedRating, { status: 200 });
-
-  } catch (error) {
-    console.error("Error al actualizar la calificación:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, "/lawyer/rating/update");
 }

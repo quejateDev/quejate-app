@@ -1,91 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
-import { encode } from "next-auth/jwt";
-import bcrypt from "bcryptjs";
-import { LoginSchema } from "@/schemas";
-import { getUserByEmail } from "@/data/user";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-const COOKIE_NAME =
-  process.env.NODE_ENV === "production"
-    ? "__Secure-authjs.session-token"
-    : "authjs.session-token";
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const validated = LoginSchema.safeParse(body);
-
-    if (!validated.success) {
-      return NextResponse.json(
-        { error: "Campos inválidos", details: validated.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
-
-    const { email, password } = validated.data;
-
-    const user = await getUserByEmail(email);
-
-    if (!user || !user.password) {
-      return NextResponse.json(
-        { error: "Credenciales incorrectas" },
-        { status: 401 }
-      );
-    }
-
-    if (!user.emailVerified) {
-      return NextResponse.json(
-        { error: "El correo no ha sido verificado" },
-        { status: 401 }
-      );
-    }
-
-    if (!user.isActive) {
-      return NextResponse.json(
-        { error: "Cuenta desactivada" },
-        { status: 403 }
-      );
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return NextResponse.json(
-        { error: "Credenciales incorrectas" },
-        { status: 401 }
-      );
-    }
-
-    const sessionToken = await encode({
-      token: {
-        sub: user.id,
-        name: user.name,
-        email: user.email,
-        image: user.image,
-        role: user.role,
-        entityId: user.entityId ?? null,
-        isOAuth: false,
-      },
-      secret: process.env.AUTH_SECRET!,
-      maxAge: 30 * 24 * 60 * 60,
-      salt: COOKIE_NAME,
-    });
-
-    return NextResponse.json({
-      sessionToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        image: user.image,
-        role: user.role,
-        entityId: user.entityId ?? null,
-        isOAuth: false,
-      },
-    });
-  } catch (error) {
-    console.error("[MOBILE_CREDENTIALS_AUTH_ERROR]", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
-  }
+/**
+ * Entrar con correo y contraseña desde la app móvil → `POST /auth/mobile/credentials`.
+ *
+ * Bloque A (contrato congelado). El backend responde la misma forma
+ * —`{ sessionToken, user: { id, name, email, image, role, entityId, isOAuth } }`—
+ * y con **200 explícito** (`@HttpCode(200)`), que es lo que daba Next.
+ * Conserva también los tres estados de rechazo que la móvil distingue: 400
+ * campos inválidos, 401 credenciales o correo sin verificar, 403 cuenta
+ * desactivada.
+ *
+ * 🔑 **El `sessionToken` sigue siendo el mismo JWE.** El backend lo emite con
+ * `encode` de `@auth/core/jwt`, mismo `AUTH_SECRET`, mismo salt
+ * (`__Secure-authjs.session-token`) y los mismos 30 días, con un *fixture*
+ * dorado en CI que rompe si deja de decodificar los del emisor viejo. Los
+ * tokens que hay hoy en los teléfonos **siguen valiendo**.
+ *
+ * ⚠️ Añade un 429 por IP y por correo que aquí no existía. Es un estado nuevo,
+ * no un cambio de forma: la móvil lo recoge en su `catch` genérico.
+ */
+export async function POST(request: Request) {
+  return proxyToBackend(request, "/auth/mobile/credentials");
 }

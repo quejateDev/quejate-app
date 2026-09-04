@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { LawyerRequestStatus } from "@prisma/client";
 import { currentUser } from "@/lib/auth";
 import { NotificationFactory, notificationService } from "@/services/api/notification.service";
+import { proxyToBackend } from "@/lib/api/proxy";
 
 export async function GET(request: Request) {
   try {
@@ -91,136 +92,21 @@ export async function GET(request: Request) {
   }
 }
 
+/**
+ * Pedir asesoría a un abogado → `POST /lawyer/request`.
+ *
+ * Bloque A (contrato congelado): lo llama `useLawyers.ts:73` de la móvil.
+ * Devuelve **201** con la solicitud creada, y conserva los rechazos del
+ * original: 400 sin `lawyerId`/`message` o sin ningún método de contacto, 403
+ * si el cliente no está activo y 404 si el abogado o la PQRSD referida no
+ * existen o no son suyos.
+ *
+ * ⚠️ El `GET` y el `PATCH` de este mismo fichero son del **bloque B** (solo los
+ * usa la web) y se repuntan en el commit siguiente: Next obliga a que todos los
+ * métodos de una ruta vivan en un único fichero.
+ */
 export async function POST(request: Request) {
-  try {
-    const currentUserId = await currentUser();
-
-    if (!currentUserId) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 }
-      );
-    }
-
-    const { lawyerId, message, pqrId, clientContactEmail, clientContactPhone } = await request.json();
-
-    if (!lawyerId || !message) {
-      return NextResponse.json(
-        { error: "Faltan campos obligatorios: lawyerId y message" },
-        { status: 400 }
-      );
-    }
-
-    if (!clientContactEmail && !clientContactPhone) {
-      return NextResponse.json(
-        { error: "Debes proporcionar al menos un método de contacto (email o teléfono)" },
-        { status: 400 }
-      );
-    }
-
-    const client = await prisma.user.findUnique({
-      where: {
-        id: currentUserId.id,
-        isActive: true
-      }
-    });
-
-    if (!client) {
-      return NextResponse.json(
-        { error: "Cliente no encontrado o no tiene permisos" },
-        { status: 403 }
-      );
-    }
-
-    const lawyer = await prisma.lawyer.findUnique({
-      where: {
-        id: lawyerId,
-        user: {
-          isActive: true
-        }
-      },
-      include: { user: true }
-    });
-
-    if (!lawyer) {
-      return NextResponse.json(
-        { error: "Abogado no encontrado o no disponible" },
-        { status: 404 }
-      );
-    }
-
-    if (pqrId) {
-      const pqr = await prisma.pQRS.findUnique({
-        where: {
-          id: pqrId,
-          creatorId: currentUserId.id
-        }
-      });
-
-      if (!pqr) {
-        return NextResponse.json(
-          { error: "PQR no encontrada o no tienes permisos" },
-          { status: 404 }
-        );
-      }
-    }
-
-    const lawyerRequest = await prisma.lawyerRequest.create({
-      data: {
-        userId: currentUserId.id!,
-        lawyerId: lawyer.id,
-        pqrId: pqrId || null,
-        message,
-        clientContactEmail: clientContactEmail || null,
-        clientContactPhone: clientContactPhone || null,
-        status: "PENDING"
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
-        lawyer: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                email: true
-              }
-            }
-          }
-        },
-        pqr: {
-          select: {
-            id: true,
-            subject: true,
-            description: true
-          }
-        }
-      }
-    });
-
-    const clientName = `${lawyerRequest.user.name}`;
-    const notificationInput = NotificationFactory.createNewLawyerRequest(
-      lawyer.user.id,    
-      clientName || 'Cliente',
-      lawyerRequest.id,
-      lawyerRequest.pqr?.subject
-    );
-
-    await notificationService.create(notificationInput);
-
-    return NextResponse.json(lawyerRequest, { status: 201 });
-
-  } catch (error) {
-    console.error("Error creating lawyer request:", error);
-    return NextResponse.json(
-      { error: "Error al crear la solicitud de abogado" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, "/lawyer/request");
 }
 
 export async function PATCH(request: Request) {

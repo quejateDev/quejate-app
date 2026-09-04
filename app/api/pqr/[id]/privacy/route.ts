@@ -1,77 +1,17 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { currentUser } from "@/lib/auth";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function PATCH(
-    request: Request,
-    { params }: any
-  ) {
-    try {
-      const { id } = await params;
-      const currentUserId = await currentUser();
-      
-      if (!currentUserId) {
-        return NextResponse.json(
-          { error: "No autorizado, inicie sesión nuevamente" },
-          { status: 401 }
-        );
-      }
-
-    const { private: isPrivate } = await request.json();
-
-    if (typeof isPrivate !== "boolean") {
-      return NextResponse.json(
-        { error: "Valor de privacidad no válido. Debe ser un booleano." },
-        { status: 400 }
-      );
-    }
-
-    const existingPqrs = await prisma.pQRS.findUnique({
-      where: {
-        id,
-        creatorId: currentUserId.id
-      }
-    });
-
-    if (!existingPqrs) {
-      return NextResponse.json(
-        { error: "PQRS no encontrada o no tienes permisos." },
-        { status: 404 }
-      );
-    }
-
-    const updatedPqrs = await prisma.pQRS.update({
-      where: {
-        id,
-        creatorId: currentUserId.id
-      },
-      data: {
-        private: isPrivate,
-        updatedAt: new Date()
-      },
-      include: {
-        // Nunca la fila User completa: traía el hash bcrypt de la contraseña.
-        creator: {
-          select: { id: true, name: true, image: true },
-        },
-        customFieldValues: true
-      }
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: updatedPqrs,
-      message: `PQRSD marcada como ${isPrivate ? 'privada' : 'pública'} exitosamente.`
-    });
-
-  } catch (error) {
-    console.error("[PQRS_PRIVACY_UPDATE_ERROR]", error);
-    return NextResponse.json(
-      { 
-        error: "Error interno del servidor",
-        details: error instanceof Error ? error.message : null
-      },
-      { status: 500 }
-    );
-  }
+/**
+ * El autor oculta o publica su PQRSD → `PATCH /pqr/:id/privacy`.
+ *
+ * Bloque A (contrato congelado). Mismo sobre `{ success, data, message }`, con
+ * 400 si `private` no es booleano, 401 sin sesión y 404 si la PQRSD no es suya.
+ *
+ * ⚠️ Es el interruptor que gobierna `PQRActionsSheet.tsx:126`, y el que obligó
+ * a que H-18 conserve el `creator` **para el autor** en `GET /pqr` y
+ * `GET /pqr/:id`: sin ese `creator`, la móvil calcula `isOwner: false` y deja
+ * de ofrecer esta acción sobre la PQRSD propia.
+ */
+export async function PATCH(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(request, `/pqr/${encodeURIComponent(id)}/privacy`);
 }

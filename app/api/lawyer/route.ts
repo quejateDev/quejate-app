@@ -1,60 +1,21 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
+/**
+ * Directorio de abogados → `GET /lawyer`.
+ *
+ * Bloque A (contrato congelado). Array pelado con
+ * `{ id, userId, specialties, description, feePerHour, feePerService,
+ * isVerified, averageRating, ratingCount, user, createdAt }`.
+ *
+ * 🔴 **Cierra H-10**: el `user` deja de traer `email` y `phone`. Esta ruta no
+ * exige sesión, así que servía el correo y el teléfono de **todos** los
+ * abogados a cualquiera.
+ *
+ * ✅ **No rompe a la móvil.** `LawyerCard.tsx:18-52` es la única pantalla que
+ * pinta esta lista y lee `user.image`, `user.name`, `isVerified`,
+ * `averageRating`, `ratingCount`, `specialties` y `feePerHour`. Comprobado
+ * abriendo el fichero, no con un `grep`.
+ */
 export async function GET(request: Request) {
-  try {
-    const lawyers = await prisma.lawyer.findMany({
-      where: {
-        user: {
-          isActive: true,
-          role: 'LAWYER'
-        }
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            email: true,
-            phone: true
-          }
-        },
-        receivedRatings: true
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-
-    const formattedLawyers = lawyers.map(lawyer => {
-      const ratingCount = lawyer.receivedRatings.length;
-      const averageRating = ratingCount > 0 
-        ? lawyer.receivedRatings.reduce((sum, rating) => sum + rating.score, 0) / ratingCount
-        : 0;
-
-      return {
-        id: lawyer.id,
-        userId: lawyer.userId,
-        specialties: lawyer.specialties,
-        description: lawyer.description,
-        feePerHour: lawyer.feePerHour,
-        feePerService: lawyer.feePerService,
-        isVerified: lawyer.isVerified,
-        averageRating: parseFloat(averageRating.toFixed(1)),
-        ratingCount,
-        user: lawyer.user,
-        createdAt: lawyer.createdAt
-      };
-    });
-
-    return NextResponse.json(formattedLawyers);
-
-  } catch (error) {
-    console.error("Error fetching lawyers list:", error);
-    return NextResponse.json(
-      { error: "Error al obtener el listado de abogados" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, "/lawyer");
 }
