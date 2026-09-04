@@ -42,3 +42,7 @@ next-env.d.ts
 
 #ai
 /ai
+
+# Guia local para agentes de IA. No forma parte del producto y se mantiene
+# en la maquina del responsable, igual que docs/.
+CLAUDE.md
