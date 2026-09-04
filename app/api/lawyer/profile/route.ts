@@ -1,121 +1,26 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { currentUser } from "@/lib/auth";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function GET() {
-  try {
-    const user = await currentUser();
-    const userId = user?.id;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 }
-      );
-    }
-
-    const lawyer = await prisma.lawyer.findUnique({
-      where: { userId },
-      include: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-            email: true,
-            phone: true,
-            isVerified: true
-          }
-        },
-        receivedRatings: true
-      }
-    });
-
-    if (!lawyer) {
-      return NextResponse.json(
-        { error: "Perfil de abogado no encontrado" },
-        { status: 404 }
-      );
-    }
-
-    const averageRating = lawyer.receivedRatings.length > 0 
-      ? lawyer.receivedRatings.reduce((sum, rating) => sum + rating.score, 0) / lawyer.receivedRatings.length
-      : 0;
-
-    return NextResponse.json({
-      ...lawyer,
-      averageRating,
-      ratingCount: lawyer.receivedRatings.length
-    });
-
-  } catch (error) {
-    console.error("Error fetching lawyer profile:", error);
-    return NextResponse.json(
-      { error: "Error al obtener el perfil del abogado" },
-      { status: 500 }
-    );
-  }
+/**
+ * Perfil propio del abogado → `GET|PATCH /lawyer/profile`.
+ *
+ * Bloque B (solo web): `hooks/useLawyerProfile.ts:39,77`.
+ *
+ * El abogado se resuelve por el `userId` de la **sesión**, nunca por un
+ * parámetro, igual que aquí. Devuelve la fila con `averageRating`,
+ * `ratingCount` y su `user`, que en esta ruta **sí conserva `email` y `phone`**
+ * porque quien la lee es el titular. 401 sin sesión, 404 sin perfil.
+ *
+ * El `PATCH` sigue aceptando solo descripción, tarifa por hora y
+ * especialidades; el documento, la licencia y las imágenes no son editables,
+ * porque cambiarlos invalidaría una revisión humana ya hecha.
+ *
+ * ⚠️ La respuesta trae un objeto `verification` que aquí no existía. Es
+ * aditivo: `useLawyerProfile.ts` vuelca el JSON entero en su estado.
+ */
+export async function GET(request: Request) {
+  return proxyToBackend(request, "/lawyer/profile");
 }
 
 export async function PATCH(request: Request) {
-  try {
-    const user = await currentUser();
-    const userId = user?.id;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
-    const { description, feePerHour, specialties } = body;
-
-    const existingLawyer = await prisma.lawyer.findUnique({
-      where: { userId }
-    });
-
-    if (!existingLawyer) {
-      return NextResponse.json(
-        { error: "Perfil de abogado no encontrado" },
-        { status: 404 }
-      );
-    }
-
-    const updatedLawyer = await prisma.lawyer.update({
-      where: { userId },
-      data: {
-        description: description || existingLawyer.description,
-        feePerHour: feePerHour !== undefined ? feePerHour : existingLawyer.feePerHour,
-        specialties: specialties || existingLawyer.specialties,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-            email: true
-          }
-        },
-        receivedRatings: true
-      }
-    });
-
-    const averageRating = updatedLawyer.receivedRatings.length > 0 
-      ? updatedLawyer.receivedRatings.reduce((sum, rating) => sum + rating.score, 0) / updatedLawyer.receivedRatings.length
-      : 0;
-
-    return NextResponse.json({
-      ...updatedLawyer,
-      averageRating,
-      ratingCount: updatedLawyer.receivedRatings.length
-    });
-
-  } catch (error) {
-    console.error("Error updating lawyer profile:", error);
-    return NextResponse.json(
-      { error: "Error al actualizar el perfil del abogado" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, "/lawyer/profile");
 }

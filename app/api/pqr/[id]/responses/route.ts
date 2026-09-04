@@ -1,95 +1,35 @@
 import prisma from "@/lib/prisma";
 import { currentUser } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { proxyToBackend } from "@/lib/api/proxy";
 import { sendPQRResponseEmail } from "@/services/email/sendPQRResponseEmail";
 import {
   NotificationFactory,
   notificationService,
 } from "@/services/api/notification.service";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const user = await currentUser();
-
-    if (!user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id } = await params;
-
-    const pqr = await prisma.pQRS.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        subject: true,
-        consecutiveCode: true,
-        creatorId: true,
-        entityId: true,
-        entity: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            imageUrl: true,
-          },
-        },
-      },
-    });
-
-    if (!pqr) {
-      return NextResponse.json({ error: "PQRS not found" }, { status: 404 });
-    }
-
-    const userWithEntity = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { entityId: true, role: true },
-    });
-
-    const role = userWithEntity?.role ?? user.role;
-    const isSuperAdmin = role === "SUPER_ADMIN";
-    const isCreator = pqr.creatorId === user.id;
-    const belongsToEntity = userWithEntity?.entityId === pqr.entityId;
-
-    if (!isSuperAdmin && !isCreator && !belongsToEntity) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const responses = await prisma.entityResponse.findMany({
-      where: { pqrId: id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-        attachments: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return NextResponse.json({
-      pqr: {
-        id: pqr.id,
-        subject: pqr.subject,
-        consecutiveCode: pqr.consecutiveCode,
-      },
-      entity: pqr.entity,
-      responses,
-    });
-  } catch (error) {
-    console.error("Error fetching responses:", error);
-    return NextResponse.json(
-      { error: "Error fetching responses" },
-      { status: 500 }
-    );
-  }
+/**
+ * Respuestas de la entidad, para el ciudadano → `GET /pqr/:id/responses`.
+ *
+ * Bloque B (solo web):
+ * `app/dashboard/profile/pqr/[id]/response/[responseId]/page.tsx:135`, que pide
+ * la **colección** y busca dentro el elemento que necesita.
+ *
+ * Mismo sobre `{ pqr, entity, responses }`, con los adjuntos de cada respuesta,
+ * y la misma autorización: autor de la PQRSD, personal de la entidad dueña o
+ * `SUPER_ADMIN`, con el rol y la entidad releídos **de la base de datos** y no
+ * del token. 401, 403 y 404 se conservan.
+ *
+ * ⚠️ No es `GET /admin/pqr/:id/responses`, que devuelve un array pelado y exige
+ * pertenecer a la entidad. Son dos audiencias con dos contratos.
+ */
+export async function GET(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(request, `/pqr/${encodeURIComponent(id)}/responses`);
 }
 
+// `POST /pqr/:id/responses` se retira en el bloque C de esta misma tarea: la
+// respuesta oficial de la entidad la escribe el panel, no esta web ni la móvil.
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
