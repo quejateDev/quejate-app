@@ -1,48 +1,23 @@
-import { NextResponse } from "next/server";
-import { uploadObject } from "@/services/storage/s3.service";
-import { AWS_BUCKET, AWS_REGION } from "@/lib/config";
-import { currentUser } from "@/lib/auth";
+import { proxyToBackend } from "@/lib/api/proxy";
 
+/**
+ * Subida directa de un fichero a través del servidor → `POST /upload`.
+ *
+ * Bloque B (solo web): la foto de perfil (`UserProfileEdit.tsx:113`,
+ * `useProfileForm.ts:114`) y los documentos del registro de abogado
+ * (`useLawyerRegistration.ts:203,236,269`). La móvil declara la ruta pero sube
+ * siempre por URL prefirmada.
+ *
+ * Mismo cuerpo (`multipart/form-data` con el fichero en `file`), misma
+ * respuesta `{ success, path }` y **200** (`@HttpCode(OK)` en el backend).
+ *
+ * ⚠️ **Techo nuevo de 20 MB**, que aquí no existía. Y un SVG se guarda con
+ * `Content-Disposition: attachment` para que el bucket público lo descargue en
+ * vez de renderizarlo — el formato se sigue aceptando (R-18).
+ *
+ * El cuerpo viaja como stream hasta el backend: un fichero de 20 MB no se
+ * materializa en la memoria del servidor de Next solo para reenviarlo.
+ */
 export async function POST(request: Request) {
-  try {
-    // #6: subir un fichero exige sesión (cookie web o Bearer móvil). Sin esto
-    // cualquiera en internet podía escribir directamente en el bucket, con
-    // lectura pública y sin límite de tamaño. Crear una PQRSD ya exige sesión
-    // (#5), así que no hay ningún flujo legítimo de subida anónima.
-    const authUser = await currentUser();
-    if (!authUser?.id) {
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
-
-    const data = await request.formData();
-    const file: File | null = data.get("file") as unknown as File;
-
-    if (!file) {
-      return NextResponse.json(
-        { error: "No file uploaded" },
-        { status: 400 }
-      );
-    }
-
-    const bytes = await file.arrayBuffer();
-    
-    // Create unique filename
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${uniqueSuffix}-${file.name}`;
-
-    // Upload to S3
-    await uploadObject(filename, bytes);
-
-    return NextResponse.json({ 
-      success: true,
-      path: `https://${AWS_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${filename}`
-
-    });
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    return NextResponse.json(
-      { error: "Error uploading file" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, "/upload");
 }

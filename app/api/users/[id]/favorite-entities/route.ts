@@ -1,149 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import geoData from "@/data/colombia-geo.json";
-import { currentUser } from "@/lib/auth";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function GET(request: NextRequest, { params }: any) {
-  try {
-    const { id: userId } = await params;
-    const currentUserId = await currentUser();
-
-    if (!currentUserId) {
-      return NextResponse.json(
-        { error: "No autorizado, inicie sesión nuevamente" },
-        { status: 401 }
-      );
-    }
-
-    // El `userId` viene de la URL, no de la sesion. Sin esta comprobacion
-    // cualquier cuenta con sesion valida podia leer y modificar los favoritos
-    // de otra persona con solo cambiar el id (OWASP API1 / IDOR).
-    // Mismo patron que `/api/notifications/[id]`.
-    if (userId !== currentUserId.id) {
-      return NextResponse.json(
-        { error: "No autorizado para acceder a los favoritos de otro usuario" },
-        { status: 403 }
-      );
-    }
-
-    const departmentMap = new Map<string, string>();
-    const municipalityMap = new Map<string, { name: string, departmentId: string }>();
-
-    geoData.departments.forEach(dept => {
-      departmentMap.set(dept.id, dept.name);
-      dept.municipalities.forEach(mun => {
-        municipalityMap.set(mun.id, {
-          name: mun.name,
-          departmentId: dept.id
-        });
-      });
-    });
-
-    const favorites = await prisma.userFavoriteEntity.findMany({
-      where: { 
-        userId,
-        entity: {
-          category: {
-            isActive: true,
-          },
-        },
-      },
-      include: {
-        entity: {
-          select: {
-            id: true,
-            name: true,
-            imageUrl: true,
-            municipalityId: true,
-            regionalDepartmentId: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    const result = favorites.map((fav) => {
-      const entity = fav.entity;
-      const municipalityInfo = entity.municipalityId ? municipalityMap.get(entity.municipalityId) : null;
-      
-      const departmentName = entity.regionalDepartmentId 
-        ? departmentMap.get(entity.regionalDepartmentId)
-        : (municipalityInfo ? departmentMap.get(municipalityInfo.departmentId) : null);
-
-      return {
-        ...entity,
-        municipality: municipalityInfo?.name || null,
-        department: departmentName || null
-      };
-    });
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error("Error fetching favorites:", error);
-    return NextResponse.json(
-      { error: "Error al obtener favoritos" },
-      { status: 500 }
-    );
-  }
+/**
+ * Entidades favoritas de un usuario → `GET|POST /users/:id/favorite-entities`.
+ *
+ * Bloque B (solo web): `hooks/useFavoriteEntities.ts:26,50`.
+ *
+ * - **`GET`**: array pelado con la entidad enriquecida con los nombres de
+ *   `municipality` y `department` resueltos desde el catálogo geográfico.
+ * - **`POST`**: alterna, y devuelve `{ message, isFavorite }` con **200**
+ *   (`@HttpCode(200)` en el backend).
+ *
+ * El backend conserva la comprobación de H-14 que aquí se añadió: el `:id` de
+ * la URL tiene que ser el de la sesión, o **403**. Sin ella, cualquier cuenta
+ * con sesión podía leer y modificar los favoritos de otra cambiando el id
+ * (OWASP API1 / IDOR).
+ */
+export async function GET(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(
+    request,
+    `/users/${encodeURIComponent(id)}/favorite-entities`,
+  );
 }
 
-export async function POST( request: NextRequest, { params }: any) {
-  try {
-    const { id: userId } = await params;
-    const currentUserId = await currentUser();
-    const { entityId } = await request.json();
-
-    if (!currentUserId) {
-      return NextResponse.json(
-        { error: "No autorizado, inicie sesión nuevamente" },
-        { status: 401 }
-      );
-    }
-
-    // El `userId` viene de la URL, no de la sesion. Sin esta comprobacion
-    // cualquier cuenta con sesion valida podia leer y modificar los favoritos
-    // de otra persona con solo cambiar el id (OWASP API1 / IDOR).
-    // Mismo patron que `/api/notifications/[id]`.
-    if (userId !== currentUserId.id) {
-      return NextResponse.json(
-        { error: "No autorizado para acceder a los favoritos de otro usuario" },
-        { status: 403 }
-      );
-    }
-
-    const existingFavorite = await prisma.userFavoriteEntity.findFirst({
-      where: {
-        userId,
-        entityId
-      }
-    });
-
-    if (existingFavorite) {
-      await prisma.userFavoriteEntity.delete({
-        where: { id: existingFavorite.id }
-      });
-      return NextResponse.json({ 
-        message: "Entidad eliminada de favoritos",
-        isFavorite: false 
-      });
-    } else {
-      await prisma.userFavoriteEntity.create({
-        data: {
-          userId,
-          entityId
-        }
-      });
-      return NextResponse.json({ 
-        message: "Entidad añadida a favoritos",
-        isFavorite: true 
-      });
-    }
-
-  } catch (error) {
-    console.error("Error updating favorites:", error);
-    return NextResponse.json(
-      { error: "Error al actualizar favoritos" },
-      { status: 500 }
-    );
-  }
+export async function POST(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(
+    request,
+    `/users/${encodeURIComponent(id)}/favorite-entities`,
+  );
 }

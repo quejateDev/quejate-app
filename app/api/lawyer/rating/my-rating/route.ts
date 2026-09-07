@@ -1,55 +1,17 @@
-import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
+/**
+ * La valoración que el ciudadano ya dejó a un abogado →
+ * `GET /lawyer/rating/my-rating?lawyerId=`.
+ *
+ * Bloque A (contrato congelado). Sobre `{ rating }`, con `rating: null` si
+ * todavía no ha valorado. Exige sesión; 400 sin `lawyerId` y 404 si el abogado
+ * no existe.
+ *
+ * ⚠️ En el backend vive en su propio controlador (`@Controller('lawyer/rating')`)
+ * para que `my-rating` no lo atrape el `@Get(':id')` del directorio de
+ * abogados. La ruta pública es idéntica.
+ */
 export async function GET(request: Request) {
-  try {
-    const currentUserId = await currentUser();
-
-    if (!currentUserId) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 }
-      );
-    }
-
-    const { searchParams } = new URL(request.url);
-    const lawyerUserId = searchParams.get('lawyerId');
-
-    if (!lawyerUserId) {
-      return NextResponse.json(
-        { error: "Se requiere el ID del abogado" },
-        { status: 400 }
-      );
-    }
-
-    const lawyer = await prisma.lawyer.findUnique({
-      where: { userId: lawyerUserId }
-    });
-
-    if (!lawyer) {
-      return NextResponse.json(
-        { error: "Abogado no encontrado" },
-        { status: 404 }
-      );
-    }
-
-    const existingRating = await prisma.rating.findFirst({
-      where: {
-        lawyerId: lawyer.id,
-        clientId: currentUserId.id
-      }
-    });
-
-    return NextResponse.json({
-      rating: existingRating
-    }, { status: 200 });
-
-  } catch (error) {
-    console.error("Error al obtener la calificación:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, "/lawyer/rating/my-rating");
 }

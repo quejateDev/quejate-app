@@ -1,34 +1,17 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function POST(req: Request) {
-  try {
-    const { identityDocument, licenseNumber } = await req.json();
-    if (!identityDocument && !licenseNumber) {
-      return NextResponse.json({ error: "Falta el número de documento o licencia" }, { status: 400 });
-    }
-
-    let existsIdentity = false;
-    let existsLicense = false;
-
-    if (identityDocument) {
-      const existingLawyer = await prisma.lawyer.findUnique({
-        where: { identityDocument },
-        select: { id: true },
-      });
-      existsIdentity = !!existingLawyer;
-    }
-
-    if (licenseNumber) {
-      const existingLicense = await prisma.lawyer.findUnique({
-        where: { licenseNumber },
-        select: { id: true },
-      });
-      existsLicense = !!existingLicense;
-    }
-
-    return NextResponse.json({ existsIdentity, existsLicense });
-  } catch (error) {
-    return NextResponse.json({ error: "Error validando el documento o licencia" }, { status: 500 });
-  }
+/**
+ * Documento o licencia ya registrados → `POST /lawyer/validate`.
+ *
+ * Bloque B (solo web): `hooks/useLawyerRegistration.ts:61`. Misma respuesta
+ * `{ existsIdentity, existsLicense }` con **200** y el mismo 400 cuando no
+ * llega ninguno de los dos.
+ *
+ * 🔴 **El backend exige sesión, y aquí no la había.** Sin ella era un oráculo:
+ * alimentándolo con una lista de cédulas se averiguaba cuáles pertenecen a
+ * abogados de la plataforma, sin autenticarse. No rompe el flujo — para
+ * registrarse como abogado hay que haber entrado — y añade un límite de 20/min.
+ */
+export async function POST(request: Request) {
+  return proxyToBackend(request, "/lawyer/validate");
 }

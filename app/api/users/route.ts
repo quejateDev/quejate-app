@@ -1,42 +1,22 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function GET() {
-  try {
-    const users = await prisma.user.findMany({
-      where: {
-        role: {
-          notIn: ["ADMIN", "SUPER_ADMIN"]
-        }
-      },
-      select: {
-        id: true,
-        name: true,
-        // Sin `email`: este listado es público (sin sesión) y exponerlo permitía
-        // cosechar correos de ciudadanos. Los datos personales solo los ve su
-        // dueño (Ley 1581) — ver `GET /api/users/[id]`.
-        role: true,
-        image: true,
-        _count: {
-          select: {
-            followers: true,
-            following: true,
-            PQRS: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 50,
-    });
-
-    return NextResponse.json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return NextResponse.json(
-      { error: "Error al obtener usuarios" },
-      { status: 500 }
-    );
-  }
+/**
+ * Directorio público de usuarios → `GET /users`.
+ *
+ * Bloque B (solo web): `app/dashboard/social/page.tsx:33` y
+ * `app/dashboard/users/page.tsx:35`.
+ *
+ * 🔴 **Era uno de los cinco huecos del backend.** Se implementó allí en vez de
+ * mover las dos pantallas a `GET /users/search`, y la razón está medida, no
+ * supuesta: la búsqueda devuelve tres campos (`id`, `name`, `role`) y estas
+ * pantallas pintan el avatar y los contadores, y además cargan la lista **sin
+ * término**, donde la búsqueda responde `[]`.
+ *
+ * Misma forma que aquí: hasta 50 usuarios por `createdAt desc`, sin `ADMIN` ni
+ * `SUPER_ADMIN`, con `_count { followers, following, PQRS }` y **sin `email`**
+ * (H-05: el listado es público y el correo permitía cosecharlos todos de una
+ * petición).
+ */
+export async function GET(request: Request) {
+  return proxyToBackend(request, "/users");
 }

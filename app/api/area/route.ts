@@ -1,35 +1,28 @@
-// app/api/departments/route.ts
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function GET() {
-  try {
-    // Este listado es PUBLICO: el middleware de la web solo gatea las paginas
-    // de `privateRoutes`, ninguna ruta `/api` figura ahi. Con `include` de
-    // `employees` y `pqrs` Prisma devolvia todas las columnas escalares de las
-    // filas relacionadas: de cada empleado el hash bcrypt de la contrasena, el
-    // correo, el telefono y el token de push; de cada PQRSD la fila entera,
-    // SIN filtrar por `private`, con su asunto, descripcion, datos de contacto
-    // de invitado y coordenadas. Y sin `where`, las de todas las entidades.
-    // Misma clase que H-06, H-09 y H-11: `include` en vez de `select`.
-    //
-    // Los tres campos de abajo son los unicos que lee algun cliente.
-    const departments = await prisma.department.findMany({
-      select: {
-        id: true,
-        name: true,
-        entityId: true,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
-    return NextResponse.json(departments);
-  } catch (error) {
-    console.error("Error fetching departments:", error);
-    return NextResponse.json(
-      { error: "Error fetching departments" },
-      { status: 500 }
-    );
-  }
+/**
+ * Catálogo público de áreas → `GET /area`.
+ *
+ * Bloque B (solo web), pero es **el hueco que mandaba** de los cinco: lo
+ * consume `hooks/usePQRForm.ts:94`, o sea el formulario ciudadano de radicar
+ * PQRSD. El backend solo tenía `GET /admin/areas`, con sesión y alcance por
+ * entidad; sin un listado público, el formulario central del producto dejaba de
+ * funcionar. Se añadió `GET /area` allí.
+ *
+ * 🔴 **Y se añadió con el `select` de H-15, que hay que respetar.** El
+ * manejador original respondía, **sin sesión de ningún tipo**, con el `include`
+ * de `entity`, `employees` y `pqrs`: de cada empleado el hash bcrypt de su
+ * contraseña, su correo, su teléfono y su `pushToken`; de cada PQRSD la fila
+ * entera **sin filtrar por `private`**. Y sin `where`, las de todas las
+ * entidades. Se cerró aquí el 02/09/2026 dejando `id`, `name` y `entityId`, y
+ * el backend sirve exactamente esos tres campos. Servir la forma antigua
+ * reabre el agujero.
+ *
+ * ⚠️ Deuda conocida que el repunte no toca:
+ * `services/api/Department.service.ts:13-20` sigue tipando la respuesta como
+ * `DepartmentWithRelations`. El tipo es una promesa falsa desde el arreglo de
+ * H-15; nadie lo usa para pintar.
+ */
+export async function GET(request: Request) {
+  return proxyToBackend(request, "/area");
 }

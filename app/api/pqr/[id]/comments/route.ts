@@ -1,86 +1,30 @@
+import { proxyToBackend } from "@/lib/api/proxy";
 
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { NotificationFactory, notificationService } from "@/services/api/notification.service";
-
-const prisma = new PrismaClient();
-
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const pqrId = (await params).id
-  
-  const { text, userId } = await request.json();
-  
-  try {
-
-    const pqr = await prisma.pQRS.findUnique({
-      where: { id: pqrId },
-      select: { creatorId: true }
-    });
-
-    if (!pqr) {
-      return NextResponse.json({ error: "PQRS not found" }, { status: 404 });
-    }
-
-    if (!pqr.creatorId) {
-      return NextResponse.json({ error: "PQRS creator not found" }, { status: 400 });
-    }
-
-    const comment = await prisma.comment.create({
-      data: {
-        text,
-        userId,
-        pqrId,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-    });
-
-    if (userId !== pqr.creatorId && comment.user) {
-      const notificationInput = NotificationFactory.createComment(
-        pqr.creatorId,
-        pqrId,
-        comment.user,
-        comment.id
-      );
-
-      await notificationService.create(notificationInput);
-    }
-
-    return NextResponse.json(comment, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: "Error creating comment" }, { status: 500 });
-  }
+/**
+ * Comentarios de una PQRSD → `GET|POST /pqr/:id/comments`.
+ *
+ * Bloque A (contrato congelado).
+ *
+ * - **`GET`**: array pelado, más recientes primero, cada comentario con
+ *   `user { id, name, image }`. Público, como aquí.
+ * - **`POST`**: misma forma de respuesta y mismo **201**.
+ *
+ * 🔴 **El `POST` cierra H-16 sin cambiar la forma.** El manejador que sustituye
+ * no comprobaba sesión y tomaba el `userId` **del cuerpo**: cualquiera en
+ * internet podía publicar un comentario firmado con el nombre de cualquier
+ * ciudadano. El backend exige sesión y toma el autor de ella, descartando el
+ * `userId` del cuerpo.
+ *
+ * ✅ **Y no rompe a la móvil**, que en esta pantalla va siempre autenticada:
+ * `useComments.ts:26` llama por `apiClient`, cuyo interceptor adjunta el
+ * `Bearer` en todas las peticiones.
+ */
+export async function GET(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(request, `/pqr/${encodeURIComponent(id)}/comments`);
 }
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const pqrId = (await params).id
-
-  try {
-    const comments = await prisma.comment.findMany({
-      where: { pqrId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return NextResponse.json(comments);
-  } catch (error) {
-    return NextResponse.json({ error: "Error fetching comments" }, { status: 500 });
-  }
+export async function POST(request: Request, { params }: any) {
+  const { id } = await params;
+  return proxyToBackend(request, `/pqr/${encodeURIComponent(id)}/comments`);
 }

@@ -1,133 +1,28 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import geoData from "@/data/colombia-geo.json";
-import { z } from "zod";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-const createSuggestionSchema = z.object({
-  entityName: z.string().min(1, "Entity name is required"),
-  regionalDepartmentId: z.string().min(1, "Regional department is required"),
-  municipalityId: z.string().optional(),
-});
-
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const validatedData = createSuggestionSchema.parse(body);
-
-    const departmentExists = geoData.departments.find(
-      (dept) => dept.id === validatedData.regionalDepartmentId
-    );
-
-    if (!departmentExists) {
-      return NextResponse.json(
-        { error: "Regional department not found" },
-        { status: 404 }
-      );
-    }
-
-    if (validatedData.municipalityId) {
-      const municipalityExists = departmentExists.municipalities.find(
-        (mun) => mun.id === validatedData.municipalityId
-      );
-
-      if (!municipalityExists) {
-        return NextResponse.json(
-          { error: "Municipality not found" },
-          { status: 404 }
-        );
-      }
-    }
-
-    const suggestion = await prisma.entitySuggestion.create({
-      data: {
-        entityName: validatedData.entityName,
-        regionalDepartmentId: validatedData.regionalDepartmentId,
-        municipalityId: validatedData.municipalityId,
-      },
-    });
-
-    return NextResponse.json(
-      {
-        ...suggestion,
-        departmentName: departmentExists.name,
-        municipalityName: validatedData.municipalityId
-          ? departmentExists.municipalities.find(
-              (m) => m.id === validatedData.municipalityId
-            )?.name
-          : null,
-      },
-      { status: 201 }
-    );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Validation error", details: error.errors },
-        { status: 400 }
-      );
-    }
-
-    console.error("Error creating entity suggestion:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
-
-    const where = status ? { status: status as any } : {};
-
-    const departmentMap = new Map<string, string>();
-    const municipalityMap = new Map<string, string>();
-
-    geoData.departments.forEach((dept) => {
-      departmentMap.set(dept.id, dept.name);
-      dept.municipalities.forEach((mun) => {
-        municipalityMap.set(mun.id, mun.name);
-      });
-    });
-
-    const [suggestions, total] = await Promise.all([
-      prisma.entitySuggestion.findMany({
-        where,
-        orderBy: {
-          createdAt: "desc",
-        },
-        skip,
-        take: limit,
-      }),
-      prisma.entitySuggestion.count({ where }),
-    ]);
-
-    const result = suggestions.map((suggestion) => ({
-      ...suggestion,
-      departmentName: departmentMap.get(suggestion.regionalDepartmentId) || null,
-      municipalityName: suggestion.municipalityId
-        ? municipalityMap.get(suggestion.municipalityId) || null
-        : null,
-    }));
-
-    return NextResponse.json({
-      suggestions: result,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching entity suggestions:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
+/**
+ * Proponer una entidad que falta en el catálogo → `POST /entity-suggestions`.
+ *
+ * Bloque B (solo web): el modal «no encuentro mi entidad» del selector,
+ * `components/modals/entity-suggestion-modal.tsx:64`. Era uno de los cinco
+ * huecos: el backend solo tenía `GET`/`PATCH` bajo `admin/`.
+ *
+ * Sigue **sin exigir sesión**, y es deliberado: quien no encuentra su entidad
+ * puede no tener cuenta todavía, y el modal se abre desde el formulario público
+ * de PQRSD. Misma respuesta —la sugerencia con `departmentName` y
+ * `municipalityName`— y mismo **201**, y los mismos **404** cuando el
+ * departamento no existe o el municipio no pertenece a ese departamento.
+ *
+ * ⚠️ Añade dos controles que aquí no había: techo de longitud del nombre y
+ * límite de 10 altas por IP cada 15 minutos. El modal solo mira `response.ok`
+ * y, si falla, `error.error`.
+ *
+ * ---
+ * 🔴 **`GET /entity-suggestions` se retiró el 04/09/2026 (bloque C).** No lo
+ * llamaba nadie: la revisión del buzón de sugerencias es del panel, que usa su
+ * propia ruta contra `GET /admin/entity-suggestions`. Aquí era un listado
+ * **sin sesión** de todas las sugerencias. No reponerlo.
+ */
+export async function POST(request: Request) {
+  return proxyToBackend(request, "/entity-suggestions");
 }
