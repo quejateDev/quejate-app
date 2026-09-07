@@ -68,6 +68,36 @@ const HOP_BY_HOP = new Set([
 ]);
 
 /**
+ * Cabecera con la que este proxy le declara al backend la IP del ciudadano, y
+ * la que autentica esa declaración (**R-36**, salida A).
+ *
+ * 🔴 **La clave no es opcional para el backend**: sin ella —o con una que no
+ * cuadre— descarta la IP declarada y baja de escalón. Por eso las dos se
+ * emiten juntas o no se emite ninguna: media declaración solo produce un aviso
+ * en el log del backend y ningún efecto.
+ *
+ * Por qué una cabecera propia y no `X-Forwarded-For`: a `api.quejate.com.co`
+ * se llega por dos caminos de distinta longitud —por aquí son tres saltos,
+ * directo son dos— y Cloudflare **añade** a `X-Forwarded-For` en vez de
+ * reemplazarla, así que no hay ningún `TRUST_PROXY_HOPS` correcto para los
+ * dos. Un nombre propio y un secreto no dependen de contar saltos.
+ */
+const CLIENT_IP_HEADER = "x-quejate-client-ip";
+const PROXY_KEY_HEADER = "x-quejate-proxy-key";
+
+/**
+ * Secreto compartido con el backend (`TRUSTED_PROXY_SECRET`, el **mismo** valor
+ * en Render y en los dos proyectos de Vercel).
+ *
+ * Se lee del entorno del servidor y **nunca** llega al navegador: no lleva
+ * prefijo `NEXT_PUBLIC_`, y esta función solo corre en el servidor.
+ */
+const TRUSTED_PROXY_SECRET = process.env.TRUSTED_PROXY_SECRET;
+
+/** Un solo aviso por instancia, igual que el de la IP ausente. */
+let warnedAboutMissingSecret = false;
+
+/**
  * Cabeceras de reenvío que **nunca** se dejan pasar tal cual, aunque vengan en
  * la petición. Se sustituyen por el valor de confianza (ver
  * {@link trustedClientIp}) o no se envían.
@@ -89,6 +119,13 @@ const CLIENT_CONTROLLED_FORWARDING = new Set([
   "x-vercel-forwarded-for",
   "cf-connecting-ip",
   "true-client-ip",
+  // 🔴 Las dos de R-36 salida A, y son las que hacen inútil todo lo demás si
+  // se olvidan. Este proxy las EMITE, así que si además copiara las entrantes,
+  // el cliente podría mandar su propio par —IP inventada y una clave a
+  // probar— y el backend recibiría dos valores para cada nombre. Se descartan
+  // aquí, antes de que se pongan los nuestros.
+  CLIENT_IP_HEADER,
+  PROXY_KEY_HEADER,
 ]);
 
 /**
@@ -320,12 +357,17 @@ export class BackendError extends Error {
  * backend puede volver a contar por ciudadano y no por «la web entera», y nadie
  * puede elegir en qué cubo cae.
  *
- * ⚠️ Emitir esta cabecera **no basta por sí sola**: el backend solo la mira si
- * `TRUST_PROXY_HOPS` cuadra con la cadena real (cliente → Vercel → Cloudflare →
- * Render). Un salto de menos y el cubo sigue compartido; uno de más no reabre
- * la falsificación —porque aquí ya se descartó lo del cliente— pero tampoco
- * ayuda. Ese número **hay que medirlo contra el despliegue**, y está en el plan
- * de despliegue del informe de cierre de la Tarea 13.
+ * 🔑 **Y la IP va en una cabecera propia, firmada** (R-36, salida A). Contar
+ * saltos de proxy no puede funcionar aquí: a `api.quejate.com.co` se llega por
+ * dos caminos de distinta longitud —por este proxy son tres saltos, directo son
+ * dos— y Cloudflare añade a `X-Forwarded-For` en vez de reemplazarla, así que
+ * el `TRUST_PROXY_HOPS` que arregla el camino largo hace **evadible** el corto.
+ * Con {@link CLIENT_IP_HEADER} y {@link PROXY_KEY_HEADER} el backend no cuenta
+ * saltos: comprueba un secreto que un cliente no tiene.
+ *
+ * ⚠️ Sin `TRUSTED_PROXY_SECRET` en el entorno esto no está activo, y el
+ * síntoma es el de siempre —el cubo compartido de toda la plataforma— con un
+ * aviso por instancia en el log de Vercel, nunca en silencio (A-21).
  */
 export function forwardableHeaders(request: Request): Record<string, string> {
   const headers: Record<string, string> = {};
@@ -339,7 +381,27 @@ export function forwardableHeaders(request: Request): Record<string, string> {
 
   const clientIp = trustedClientIp(request);
   if (clientIp) {
+    // Se sigue emitiendo, aunque ya no sea de donde el backend saca al
+    // ciudadano: es lo que alimenta su último escalón de respaldo y quitarla
+    // sería un cambio de comportamiento gratuito.
     headers["x-forwarded-for"] = clientIp;
+
+    // R-36 salida A: la IP va además en una cabecera propia, firmada. Las dos
+    // juntas o ninguna — la IP sin la clave el backend la descarta.
+    if (TRUSTED_PROXY_SECRET) {
+      headers[CLIENT_IP_HEADER] = clientIp;
+      headers[PROXY_KEY_HEADER] = TRUSTED_PROXY_SECRET;
+    } else if (
+      process.env.NODE_ENV === "production" &&
+      !warnedAboutMissingSecret
+    ) {
+      warnedAboutMissingSecret = true;
+      console.warn(
+        "[proxy] sin TRUSTED_PROXY_SECRET: el backend no puede creerse la IP " +
+          "de cliente y contará el rate limit por la IP de salida de este " +
+          "servidor (R-36).",
+      );
+    }
   }
 
   return headers;
