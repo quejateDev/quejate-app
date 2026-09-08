@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { hideAnonymousCreator } from "@/lib/pqr-anonymity";
 import MapaWrapper from "./MapaWrapper";
 import { MapPin } from "lucide-react";
 
@@ -31,6 +32,19 @@ export default async function MapaPage() {
       },
     },
   });
+
+  // H-18, y aquí pesa más que en el muro: cada fila lleva latitud y longitud,
+  // así que publicar el autor de una PQRSD anónima no solo lo nombra, lo
+  // sitúa. `MapaCiudadano.tsx:219` escribe «Anónimo», pero `MapaWrapper` es un
+  // componente de cliente y las filas viajan enteras en la carga de la
+  // página.
+  //
+  // Sin `viewerId`: la ventana emergente del mapa escribe «Anónimo» para
+  // cualquiera, también para el propio autor, así que la excepción de autoría
+  // no cambiaría nada y pedir la sesión solo para descartarla sería ruido.
+  const reportesVisibles = reportes.map((reporte) =>
+    hideAnonymousCreator(reporte),
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -74,7 +88,7 @@ export default async function MapaPage() {
             <p className="text-sm text-gray-500">Usa los filtros para encontrar reportes específicos</p>
           </div>
           <div className="p-4">
-            <MapaWrapper reportes={reportes} />
+            <MapaWrapper reportes={reportesVisibles} />
           </div>
         </div>
 
