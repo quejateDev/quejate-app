@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { currentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
@@ -23,7 +24,11 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
           entity: true,
         },
       },
-      creator: true,
+      // `creator: true` traía TODA la fila User —el hash bcrypt de la
+      // contraseña, el correo y el teléfono— para pintar un nombre. Es la
+      // misma corrección que recibió `app/api/pqr/[id]` en `5045f62` y que a
+      // esta copia no llegó.
+      creator: { select: { name: true } },
       customFieldValues: true,
       attachments: true,
       _count: {
@@ -36,6 +41,26 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
 
   if (!pqr) {
     notFound();
+  }
+
+  // 🔴 Una PQRSD privada solo la puede leer su autor o un rol privilegiado.
+  // Es la regla que `app/api/pqr/[id]` aplica desde `a5f5d20` y el backend
+  // desde la Tarea 06 (`pqr.service.ts:332`); esta página nunca la tuvo, y
+  // `/dashboard/pqr/*` no figura en `privateRoutes`, así que tampoco había
+  // sesión de por medio.
+  //
+  // Aquí se responde 404 y no el 403 del API a propósito: en una página el
+  // 403 confirmaría que ese identificador existe, que es justo lo que no
+  // conviene decirle a quien no puede leerla.
+  if (pqr.private) {
+    const caller = await currentUser();
+    const role = caller?.role;
+    const isPrivileged =
+      role === "EMPLOYEE" || role === "ADMIN" || role === "SUPER_ADMIN";
+    const isOwner = caller?.id && pqr.creatorId === caller.id;
+    if (!isPrivileged && !isOwner) {
+      notFound();
+    }
   }
 
   const remainingDays = Math.ceil(
