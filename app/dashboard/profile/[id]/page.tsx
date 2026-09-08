@@ -20,6 +20,20 @@ export default function ProfilePage() {
   const { user: userProfile, fetchUser, setUser: setUserProfile, isLoading } = useUser();
   const { pqrs, fetchUserPQRS, isLoading: pqrsLoading } = usePQR();
 
+  // 🔴 Se declara AQUÍ, antes del `return` de carga, porque ese `return`
+  // también lo usa (la lista de PQRSD está duplicada dentro del esqueleto).
+  // Declarado más abajo caía en la zona muerta temporal del `const`: si la
+  // petición de PQRSD volvía antes que la del perfil y traía al menos una
+  // pública, el `.map` del esqueleto lo leía sin inicializar y la página
+  // entera se caía con `ReferenceError`.
+  //
+  // Mientras el perfil no ha llegado, `userProfile` es `null` y esto vale
+  // `false`, que es el valor prudente: durante ese parpadeo las tarjetas se
+  // pintan como las de un visitante, nunca como las del dueño. El `!!` no
+  // sobra — sin él, dos `undefined` se compararían iguales y un visitante sin
+  // sesión se vería como dueño del perfil.
+  const isOwnProfile = !!currentUser?.id && currentUser.id === userProfile?.id;
+
   useEffect(() => {
     if (!id) return;
     fetchUser(id as string);
@@ -69,7 +83,6 @@ export default function ProfilePage() {
     );
   }
 
-  const isOwnProfile = currentUser?.id === userProfile.id;
 
   return (
     <div className="container mx-auto p-4">
