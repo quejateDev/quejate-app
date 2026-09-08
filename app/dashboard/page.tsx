@@ -6,6 +6,7 @@ import UserSidebar from "@/components/sidebars/UserSidebar";
 import { getFullUserWithFollowingStatus, getUsersForSidebar } from "@/data/user";
 import { currentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { hideAnonymousCreator } from "@/lib/pqr-anonymity";
 
 interface PageProps {
   searchParams: Promise<{
@@ -92,6 +93,16 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     take: 10,
   });
 
+  // H-18: el muro es público y sin sesión. Sin esto, el nombre y la foto de
+  // quien radicó una PQRSD anónima viajan al navegador dentro de los props de
+  // `PQRList`, que es un componente de cliente. La tarjeta escribe «Anónimo»
+  // (`PQRCardHeader.tsx:112`), pero el dato sale igual en la carga de la
+  // página. El backend ya lo aplica en `GET /pqr` desde el 04/09/2026; esta
+  // página no pasa por ahí.
+  const visiblePqrs = initialPqrs.map((pqr) =>
+    hideAnonymousCreator(pqr, fullUser?.id),
+  );
+
   return (
     <div className="w-full">
       <Header/>
@@ -108,7 +119,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               </h1>
             </div>
             <PQRList 
-              initialPqrs={initialPqrs} 
+              initialPqrs={visiblePqrs} 
               currentUser={fullUser || null}
             />
           </div>
