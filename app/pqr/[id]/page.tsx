@@ -1,7 +1,8 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
+import { backendFetch, BackendError } from "@/lib/api/backend";
 import { imageExtensions } from "@/constants/mediaExtensions";
 
 const SITE_URL = "https://www.quejate.com.co";
@@ -16,26 +17,56 @@ const isImageAttachment = (att: AttachmentLike) => {
   return t.startsWith("image/") || imageExtensions.includes(t) || imageExtensions.includes(ext);
 };
 
-async function getPublicPqr(id: string) {
-  const pqr = await prisma.pQRS.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      subject: true,
-      description: true,
-      private: true,
-      type: true,
-      status: true,
-      createdAt: true,
-      entity: { select: { name: true } },
-      attachments: { select: { url: true, type: true, name: true } },
-    },
+/** Lo que esta página lee de `GET /pqr/:id`; el detalle trae bastante más. */
+interface PublicPqr {
+  id: string;
+  subject: string | null;
+  description: string | null;
+  private: boolean;
+  entity: { name: string } | null;
+  attachments: AttachmentLike[];
+}
+
+/**
+ * La PQRSD para la tarjeta pública, o `null` si no debe verse.
+ *
+ * ## Por qué NO se reenvía la sesión
+ *
+ * Esta es la página del enlace que se comparte: lo que renderiza es lo que ve
+ * un rastreador de redes sociales, que nunca lleva sesión. Pidiéndola siempre
+ * sin identidad, la página **responde igual para todo el mundo** —que es lo
+ * que ya hacía— y no llama a `cookies()`, así que Next puede seguir
+ * sirviéndola sin recalcularla por visitante.
+ *
+ * Si se reenviara la sesión, el dueño de una PQRSD privada la vería aquí y el
+ * resto no. No sería una fuga, pero sí una página que dice cosas distintas
+ * según quién mire, y esta existe justamente para lo contrario.
+ *
+ * ## Por qué 403 y 404 se tratan igual
+ *
+ * El backend distingue: 404 si no existe, 403 si existe y es privada. Aquí las
+ * dos son `null` → `notFound()`. Responder distinto convertiría esta página en
+ * un oráculo: probando identificadores se sabría cuáles existen.
+ *
+ * El `pqr.private` de después es redundante hoy —sin sesión el backend ya
+ * responde 403— y se queda como red: si algún día esto reenviara identidad,
+ * la página seguiría sin publicar una privada.
+ *
+ * `cache()` de React lo memoriza dentro de la misma petición: `generateMetadata`
+ * y el componente piden lo mismo, y sin esto serían dos viajes al backend.
+ */
+const getPublicPqr = cache(async (id: string): Promise<PublicPqr | null> => {
+  const response = await backendFetch(`/pqr/${encodeURIComponent(id)}`, {
+    cookie: "",
+    authorization: "",
   });
 
-  // No filtrar og:* de PQRSD privadas o inexistentes.
-  if (!pqr || pqr.private) return null;
-  return pqr;
-}
+  if (response.status === 404 || response.status === 403) return null;
+  if (!response.ok) throw await BackendError.from(response, "/pqr/:id");
+
+  const pqr = (await response.json()) as PublicPqr;
+  return pqr.private ? null : pqr;
+});
 
 export async function generateMetadata({
   params,
