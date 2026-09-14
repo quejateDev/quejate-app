@@ -3,10 +3,22 @@ import PQRList from "@/components/pqr/pqrsd-list";
 import { Header } from "@/components/Header";
 import EntitiesSidebar from "@/components/sidebars/EntitiesSidebar";
 import UserSidebar from "@/components/sidebars/UserSidebar";
-import { getFullUserWithFollowingStatus, getUsersForSidebar } from "@/data/user";
+import { getFullUserWithFollowingStatus } from "@/data/user";
+import { backendJson } from "@/lib/api/backend";
 import { currentUser } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { hideAnonymousCreator } from "@/lib/pqr-anonymity";
+import type { PQR } from "@/types/pqrsd";
+import type { SidebarUser } from "@/types/sidebar-user";
+
+/** Lo que esta página lee de `GET /pqr`: la primera página del muro. */
+interface WallPage {
+  pqrs: PQR[];
+}
+
+/** Respuesta de `GET /users/sidebar`. */
+interface SidebarUsers {
+  topUsers: SidebarUser[];
+  discoverUsers: SidebarUser[];
+}
 
 interface PageProps {
   searchParams: Promise<{
@@ -28,80 +40,36 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     ? await getFullUserWithFollowingStatus(sessionUser.id!)
     : null;
 
-  const { topUsers, discoverUsers } = await getUsersForSidebar(fullUser?.id);
-
-  const initialPqrs = await prisma.pQRS.findMany({
-    where: {
-      private: false,
-      creatorId: { not: null }
-    },
-    include: {
-      creator: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
-        },
-      },
-      department: {
-        select: {
-          name: true,
-          entity: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
-      entity: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      likes: {
-        select: {
-          id: true,
-          userId: true
-        },
-      },
-      customFieldValues: {
-        select: {
-          name: true,
-          value: true,
-        },
-      },
-      attachments: {
-        select: {
-          name: true,
-          url: true,
-          type: true,
-          size: true,
-        },
-      }, 
-      _count: {
-        select: {
-          likes: true,
-          comments: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 10,
+  // B-09: esta página leía Prisma para la lista y para la barra lateral. Ahora
+  // las dos salen del backend, que es donde se decide qué se ve:
+  //
+  // - La lista, de `GET /pqr` — la MISMA ruta de la que `PQRList` ya pedía la
+  //   página 2 en adelante. Antes la página 1 salía de Prisma y las siguientes
+  //   del backend, así que las dos podían no coincidir. El anonimato (H-18) lo
+  //   aplica el backend, con la excepción del propio autor: por eso se reenvía
+  //   la sesión.
+  // - La barra lateral, de `GET /users/sidebar`: cinco campos por usuario.
+  //   Aquí vivía H-24 — filas completas, hash de la contraseña incluido, en una
+  //   página pública.
+  //
+  // El usuario de la sesión (`fullUser`) sigue saliendo de `data/user.ts`: es
+  // el perfil de quien mira, el mismo que ya lee el layout para todo
+  // `/dashboard`, no datos de terceros.
+  const wallRequest = backendJson<WallPage>("/pqr", {
+    searchParams: { page: "1", limit: "10" },
   });
 
-  // H-18: el muro es público y sin sesión. Sin esto, el nombre y la foto de
-  // quien radicó una PQRSD anónima viajan al navegador dentro de los props de
-  // `PQRList`, que es un componente de cliente. La tarjeta escribe «Anónimo»
-  // (`PQRCardHeader.tsx:112`), pero el dato sale igual en la carga de la
-  // página. El backend ya lo aplica en `GET /pqr` desde el 04/09/2026; esta
-  // página no pasa por ahí.
-  const visiblePqrs = initialPqrs.map((pqr) =>
-    hideAnonymousCreator(pqr, fullUser?.id),
+  // Si la barra lateral falla, se pinta vacía y queda aviso en los logs: una
+  // barra lateral ausente se ve incompleta, no engaña. La lista, en cambio, NO
+  // se captura — un muro vacío diría que no hay PQRSD, y eso sí sería mentir.
+  const sidebarRequest = backendJson<SidebarUsers>("/users/sidebar").catch(
+    (error: unknown) => {
+      console.warn("[muro] la barra lateral no cargó; se pinta vacía:", error);
+      return { topUsers: [], discoverUsers: [] } satisfies SidebarUsers;
+    },
   );
+
+  const [wall, sidebar] = await Promise.all([wallRequest, sidebarRequest]);
 
   return (
     <div className="w-full">
@@ -119,14 +87,14 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               </h1>
             </div>
             <PQRList 
-              initialPqrs={visiblePqrs} 
+              initialPqrs={wall.pqrs}
               currentUser={fullUser || null}
             />
           </div>
           <div className="hidden lg:block mt-8">
             <UserSidebar
-              initialTopUsers={topUsers}
-              initialDiscoverUsers={discoverUsers}
+              initialTopUsers={sidebar.topUsers}
+              initialDiscoverUsers={sidebar.discoverUsers}
             />
           </div>
         </div>
