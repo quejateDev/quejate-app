@@ -16,7 +16,9 @@ export type Reporte = {
   status: string;
   latitude: number | null;
   longitude: number | null;
-  createdAt: Date;
+  // Texto ISO: llega por HTTP desde `GET /pqr/map`, no como `Date` de Prisma.
+  // `MapaCiudadano` la envuelve siempre en `new Date(...)` antes de usarla.
+  createdAt: string;
   entity: { name: string } | null;
   creator: { name: string | null; image: string | null } | null;
   anonymous: boolean;
