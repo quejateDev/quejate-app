@@ -1,4 +1,5 @@
 "use client";
+import type { SidebarUser } from "@/types/sidebar-user";
 import { useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -8,13 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { User, UserPlus, Trophy } from "lucide-react";
 import { FollowButton } from "../Buttons/FollowButton";
-import { User as UserType } from "@/types/user";
-import { UserWithFollowingStatus } from "@/types/user-with-following";
 
 interface DashboardSidebarProps {
   className?: string;
-  initialTopUsers: UserWithFollowingStatus[];
-  initialDiscoverUsers: UserWithFollowingStatus[];
+  initialTopUsers: SidebarUser[];
+  initialDiscoverUsers: SidebarUser[];
 }
 
 export default function UserSidebar({
@@ -39,7 +38,7 @@ export default function UserSidebar({
     );
   };
 
-  const UserAvatar = ({ user }: { user: UserType }) => (
+  const UserAvatar = ({ user }: { user: Pick<SidebarUser, "name" | "image"> }) => (
     <Avatar className="h-10 w-10 border border-quaternary">
       {user?.image && <AvatarImage src={user.image} alt={user.name || ""} />}
       <AvatarFallback className="bg-muted-foreground/10">
@@ -48,7 +47,7 @@ export default function UserSidebar({
     </Avatar>
   );
 
-  const TopUserAvatar = ({ user, rank }: { user: UserType; rank: number }) => (
+  const TopUserAvatar = ({ user, rank }: { user: Pick<SidebarUser, "name" | "image">; rank: number }) => (
     <div className="relative">
       <Avatar className="h-10 w-10 border border-quaternary">
         {user?.image && <AvatarImage src={user.image} alt={user.name || ""} />}
