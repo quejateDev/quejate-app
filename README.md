@@ -100,16 +100,10 @@ AWS_BUCKET="nombre-del-bucket"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NEXT_PUBLIC_APP_NAME="Sistema PQRS"
 
-# Lambda Function
-NEXT_PUBLIC_API_GATEWAY_URL="https://clave.execute-api.region.amazonaws.com/default/name"
-
 # Resend
 AUTH_RESEND_KEY="key"
 RESEND_API_KEY="key"
 EMAIL_FROM="email"
-
-# API GPT
-OPENAI_API_KEY="key"
 
 # RECAPTCHA
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY="key"
