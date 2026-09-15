@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Category, RegionalDepartment, Municipality } from "@prisma/client";
+import { RegionalDepartment, Municipality } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Heart, Loader2, ChevronLeft, Search, ImageIcon, MapPin } from "lucide-react";
@@ -167,8 +167,24 @@ const LottiePlayer = dynamic(
 );
 
 
+/**
+ * Los cuatro campos de una categoría que este componente pinta.
+ *
+ * Antes era el tipo `Category` de `@prisma/client` entero, y con él llegaban
+ * `createdAt`, `updatedAt` e `isActive`, que aquí no se leen nunca. Declarar lo
+ * que se usa es lo que permite que la página lo alimente desde `GET /category`
+ * sin fabricar fechas: por HTTP las fechas llegan como cadena, y el tipo de
+ * Prisma las exige como `Date`.
+ */
+interface SimpleCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+}
+
 interface CategorySelectionProps {
-  categories: (Category & {
+  categories: (SimpleCategory & {
     entities: SimpleEntity[];
   })[];
   onEntitySelect: (entityId: string) => void;
@@ -181,7 +197,7 @@ export function CategorySelection({
   const router = useRouter();
   const userId = useCurrentUser()?.id || "";
   const { favorites, loading: favLoading, toggleFavorite } = useFavoriteEntities<SimpleEntity>(userId);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<SimpleCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [entitySearchQuery, setEntitySearchQuery] = useState("");
   const [departments, setDepartments] = useState<RegionalDepartment[]>([]);
