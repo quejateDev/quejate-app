@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
-import { currentUser } from "@/lib/auth";
+import { backendFetch, BackendError } from "@/lib/api/backend";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
@@ -13,59 +12,44 @@ interface PQRDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
+/** Lo que esta página lee de `GET /pqr/:id`; el detalle trae bastante más. */
+interface PqrDetail {
+  consecutiveCode: string | null;
+  type: keyof typeof typeMap;
+  status: keyof typeof statusMap;
+  subject: string | null;
+  description: string | null;
+  anonymous: boolean;
+  createdAt: string;
+  entity: { name: string; email: string | null };
+  department: { name: string } | null;
+  creator: { name: string | null } | null;
+  customFieldValues: Array<{ name: string; value: string }>;
+  attachments: Array<{ name: string; url: string; type: string }>;
+}
+
 export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
   const resolvedParams = await params;
-  const pqr = await prisma.pQRS.findUnique({
-    where: { id: resolvedParams.id },
-    include: {
-      entity: true,
-      department: {
-        include: {
-          entity: true,
-        },
-      },
-      // `creator: true` traía TODA la fila User —el hash bcrypt de la
-      // contraseña, el correo y el teléfono— para pintar un nombre. Es la
-      // misma corrección que recibió `app/api/pqr/[id]` en `5045f62` y que a
-      // esta copia no llegó.
-      creator: { select: { name: true } },
-      customFieldValues: true,
-      attachments: true,
-      _count: {
-        select: {
-          likes: true,
-        },
-      },
-    },
-  });
 
-  if (!pqr) {
+  // B-09: esta página leía Prisma y comprobaba la privacidad por su cuenta
+  // (H-22). Ahora la comprueba el backend, con **la misma regla** —el autor o
+  // un rol EMPLOYEE/ADMIN/SUPER_ADMIN— y con una mejora: `JweAuthGuard` relee
+  // el rol fresco de la base en cada petición, mientras que aquí se confiaba
+  // en el que viajaba dentro del token de sesión.
+  //
+  // 404 y 403 se responden igual, y es deliberado: en una página el 403
+  // confirmaría que ese identificador existe, que es justo lo que no conviene
+  // decirle a quien no puede leerla. Es la decisión que ya tomó H-22.
+  const response = await backendFetch(
+    `/pqr/${encodeURIComponent(resolvedParams.id)}`,
+  );
+  if (response.status === 404 || response.status === 403) {
     notFound();
   }
-
-  // 🔴 Una PQRSD privada solo la puede leer su autor o un rol privilegiado.
-  // Es la regla que `app/api/pqr/[id]` aplica desde `a5f5d20` y el backend
-  // desde la Tarea 06 (`pqr.service.ts:332`); esta página nunca la tuvo, y
-  // `/dashboard/pqr/*` no figura en `privateRoutes`, así que tampoco había
-  // sesión de por medio.
-  //
-  // Aquí se responde 404 y no el 403 del API a propósito: en una página el
-  // 403 confirmaría que ese identificador existe, que es justo lo que no
-  // conviene decirle a quien no puede leerla.
-  if (pqr.private) {
-    const caller = await currentUser();
-    const role = caller?.role;
-    const isPrivileged =
-      role === "EMPLOYEE" || role === "ADMIN" || role === "SUPER_ADMIN";
-    const isOwner = caller?.id && pqr.creatorId === caller.id;
-    if (!isPrivileged && !isOwner) {
-      notFound();
-    }
+  if (!response.ok) {
+    throw await BackendError.from(response, "/pqr/:id");
   }
-
-  const remainingDays = Math.ceil(
-    (new Date(pqr.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const pqr = (await response.json()) as PqrDetail;
 
   return (
     <div className="container mx-auto py-10 space-y-8">
@@ -89,12 +73,13 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
 
             <div className="font-semibold">Ciudadano:</div>
             <div>
-              {pqr.anonymous 
+              {/* `guestName` ya no llega: el backend retiró los campos
+                  `guest*` de la salida en la Tarea 21 (siguen en la entrada).
+                  Una PQRSD radicada sin cuenta se muestra ahora como
+                  «Usuario no registrado». */}
+              {pqr.anonymous
                 ? "Anónimo"
-                : pqr.creator
-                  ? `${pqr.creator?.name}`
-                  : pqr.guestName || "Usuario no registrado"
-              }
+                : pqr.creator?.name ?? "Usuario no registrado"}
             </div>
 
             <div className="font-semibold">Tipo de requerimiento:</div>
@@ -107,7 +92,7 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             <div>{formatDate(pqr.createdAt)}</div>
 
             <div className="font-semibold">Fecha límite de respuesta:</div>
-            <div>{formatDateWithoutTime(calculateDueDate(pqr.createdAt))}</div>
+            <div>{formatDateWithoutTime(calculateDueDate(new Date(pqr.createdAt)))}</div>
 
             <div className="font-semibold">Estado:</div>
             <div>
