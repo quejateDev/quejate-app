@@ -1,50 +1,24 @@
-import prisma from "@/lib/prisma";
-import { hideAnonymousCreator } from "@/lib/pqr-anonymity";
-import MapaWrapper from "./MapaWrapper";
+import { backendJson } from "@/lib/api/backend";
+import MapaWrapper, { type Reporte } from "./MapaWrapper";
 import { MapPin } from "lucide-react";
 
 export default async function MapaPage() {
-  const reportes = await prisma.pQRS.findMany({
-    where: {
-      latitude: { not: null },
-      longitude: { not: null },
-      private: false,
-    },
-    select: {
-      id: true,
-      subject: true,
-      type: true,
-      status: true,
-      latitude: true,
-      longitude: true,
-      createdAt: true,
-      anonymous: true,
-      entity: {
-        select: {
-          name: true,
-        },
-      },
-      creator: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
-    },
-  });
-
-  // H-18, y aquí pesa más que en el muro: cada fila lleva latitud y longitud,
-  // así que publicar el autor de una PQRSD anónima no solo lo nombra, lo
-  // sitúa. `MapaCiudadano.tsx:219` escribe «Anónimo», pero `MapaWrapper` es un
-  // componente de cliente y las filas viajan enteras en la carga de la
-  // página.
+  // B-09: esta página leía Prisma directamente. Ahora pide `GET /pqr/map`, que
+  // aplica en el backend lo mismo que se aplicaba aquí: solo PQRSD públicas,
+  // solo las que tienen coordenadas, y el autor de las anónimas oculto —
+  // `creator` y `creatorId` a `null`— (H-18). La copia de esa regla que vivía en
+  // esta página ya no hace falta.
   //
-  // Sin `viewerId`: la ventana emergente del mapa escribe «Anónimo» para
-  // cualquiera, también para el propio autor, así que la excepción de autoría
-  // no cambiaría nada y pedir la sesión solo para descartarla sería ruido.
-  const reportesVisibles = reportes.map((reporte) =>
-    hideAnonymousCreator(reporte),
-  );
+  // Sin sesión, a propósito: el mapa responde igual para todo el mundo, porque
+  // su ventana escribe «Anónimo» también para el autor. Reenviar la cookie no
+  // cambiaría ni un dato de la respuesta.
+  //
+  // Si el backend falla, la excepción sube y la página no se pinta. Mejor eso
+  // que un mapa vacío que parezca decir que no hay reportes en la ciudad.
+  const reportes = await backendJson<Reporte[]>("/pqr/map", {
+    cookie: "",
+    authorization: "",
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,7 +62,7 @@ export default async function MapaPage() {
             <p className="text-sm text-gray-500">Usa los filtros para encontrar reportes específicos</p>
           </div>
           <div className="p-4">
-            <MapaWrapper reportes={reportesVisibles} />
+            <MapaWrapper reportes={reportes} />
           </div>
         </div>
 
