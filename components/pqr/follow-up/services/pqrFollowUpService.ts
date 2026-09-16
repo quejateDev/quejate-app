@@ -23,10 +23,10 @@ export class PQRFollowUpService {
   }
 
   private async generateDocument(documentType: string, documentData: any): Promise<string> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
-    if (!apiUrl) throw new Error("URL de API no configurada");
-
-    const response = await fetch(apiUrl, {
+    // H-25: antes esto llamaba a la Lambda de AWS directamente desde el
+    // navegador (`NEXT_PUBLIC_API_GATEWAY_URL`, sin sesión ni límite). Ahora va
+    // al mismo origen, que reenvía al backend con la cookie de sesión.
+    const response = await fetch("/api/legal-docs/document", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

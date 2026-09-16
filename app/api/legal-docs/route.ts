@@ -1,77 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { generateTutelaPrompt } from "@/lib/gpt/generateTutelaPrompt";
-import { sendToGPT } from "@/lib/gpt/sendToModel";
-import { currentUser } from "@/lib/auth";
+import { proxyToBackend } from "@/lib/api/proxy";
 
-export async function POST(req: NextRequest) {
-  try {
-    // H-19: esta ruta llama a gpt-4o-mini (`lib/gpt/sendToModel.ts:11`), o sea
-    // que cada peticion la paga Quejate. Sin esta comprobacion era un endpoint
-    // FACTURADO abierto a internet: cualquiera podia hacernos gastar en bucle
-    // (OWASP API4). No hay ningun control de tasa en toda la web, asi que la
-    // sesion es lo unico que hay entre esta ruta y la factura de OpenAI.
-    //
-    // No rompe a ningun cliente, verificado uno a uno:
-    //   - `currentUser()` lee la cookie y, si no hay, cae al header
-    //     `Authorization: Bearer` (`lib/auth.ts:14-37`).
-    //   - La movil adjunta ese Bearer en TODAS sus peticiones, por el
-    //     interceptor de `src/core/api/client.ts:29-38`, y esta ruta va por
-    //     `apiClient` (`useLegalDocs.ts:33`).
-    //   - La unica puerta a esa pantalla exige ademas ya estar autenticado Y
-    //     ser el autor de la PQRSD: el modal de vencimiento solo se abre si
-    //     `isOwnerNow` (`DetailHeader.tsx:77-81`), y de ahi sale la navegacion
-    //     a `FormalFollowup` y luego a `GenerateTutela`
-    //     (`FormalFollowupScreen.tsx:27`). Quien llega aqui tiene sesion.
-    //   - La web NO usa esta ruta: su generador de tutelas va contra el
-    //     gateway externo (`pqrFollowUpService.ts:25-45`).
-    //
-    // Es ademas la UNICA ruta de `app/api/` que la Tarea 13 no repunta al
-    // backend unificado, asi que este es su sitio permanente y no uno de paso.
-    const user = await currentUser();
+/**
+ * Generar una acción de tutela → `POST /legal-docs` del backend (Tarea 10).
+ *
+ * 🔴 **Contrato congelado de la app móvil**: la llama con su `Bearer`
+ * (`useLegalDocs.ts`) y lee exactamente `{ tutela }`. El backend conserva la
+ * ruta y la clave.
+ *
+ * Antes la tutela se redactaba aquí mismo, con sesión desde H-19 pero **sin
+ * límite de peticiones**, y un fallo de la IA respondía **200** con el texto
+ * `"Error generando el contenido"`. El backend añade el límite por usuario, la
+ * validación de longitudes y errores reales (502/504), que la móvil ya trata
+ * igual que ese texto.
+ *
+ * El comentario que había aquí decía que esta era «la única ruta que la
+ * Tarea 13 no repunta» y su sitio permanente. Dejó de serlo cuando la Tarea 10
+ * llevó la generación al backend: mantener dos copias del prompt es la figura
+ * de casi todos los hallazgos del proyecto.
+ */
 
-    if (!user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
+/**
+ * Techo de duración de la función en Vercel.
+ *
+ * La generación tarda hasta 25 s en el backend (su corte a OpenAI), más el
+ * salto por este proxy. Sin declararlo, un proyecto sin *Fluid Compute* corta
+ * a los 10 s en el plan Hobby, y el ciudadano vería un error por un documento
+ * que sí se generó y se pagó. 60 s es el máximo de Hobby.
+ */
+export const maxDuration = 60;
 
-    const body = await req.json();
-    const {
-      fullName,
-      documentNumber,
-      city,
-      department,
-      rightViolated,
-      entity,
-      pqrType,
-      pqrDate,
-      daysExceeded,
-      pqrDescription,
-    } = body;
-    
-    if (
-      !fullName || !documentNumber || !city || !department || !rightViolated ||
-      !entity || !pqrType || !pqrDate || daysExceeded == null || !pqrDescription
-    ) {
-      return NextResponse.json({ error: "Faltan datos para generar la tutela" }, { status: 400 });
-    }
-
-    const prompt = generateTutelaPrompt({
-      fullName,
-      documentNumber,
-      city,
-      department,
-      rightViolated,
-      entity,
-      pqrType,
-      pqrDate,
-      daysExceeded,
-      pqrDescription,
-    });
-
-    const tutela = await sendToGPT(prompt);
-
-    return NextResponse.json({ tutela });
-  } catch (error) {
-    console.error("[TUTELA_GENERATE_ERROR]", error);
-    return NextResponse.json({ error: "Error generando tutela" }, { status: 500 });
-  }
+export async function POST(request: Request) {
+  return proxyToBackend(request, "/legal-docs");
 }
