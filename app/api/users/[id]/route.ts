@@ -11,11 +11,15 @@ import { proxyToBackend } from "@/lib/api/proxy";
  *   `phone` solo si quien pregunta es el titular** (Ley 1581, arreglo de H-05).
  *
  *   🔑 Es la **única** ruta proxiada que reenvía `Cache-Control`, y por eso
- *   lleva `forwardCacheControl`. El `private, max-age=60` forma parte del
- *   contrato de hoy y **tiene que seguir siendo `private`**: la respuesta
- *   depende de quién pregunta, así que una caché compartida podría entregarle a
- *   cualquiera la del titular, con su correo dentro (A-16). El backend emite la
- *   misma cabecera.
+ *   lleva `forwardCacheControl`. **Tiene que seguir siendo `private`**: la
+ *   respuesta depende de quién pregunta, así que una caché compartida podría
+ *   entregarle a cualquiera la del titular, con su correo dentro (A-16).
+ *
+ *   ⚠️ **Ya no es `max-age=60`, sino `no-cache` (A-28, 17/09/2026).** Aquel
+ *   minuto de frescura escondía el efecto de seguir a alguien: el cliente
+ *   volvía a pedir el perfil y su propia caché le devolvía la copia anterior,
+ *   con el contador viejo y el botón sin cambiar. El valor lo emite el backend
+ *   y este proxy solo lo reenvía; no hay nada que cambiar aquí.
  *
  * - **`PATCH`**: los dos modos del original (solo `image`, o el completo con
  *   nombre, teléfono y cambio de contraseña) y la misma respuesta
