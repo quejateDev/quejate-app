@@ -37,6 +37,7 @@ export function PQRFollowUpModal({
     showOversightEntityList,
     isGenerating,
     generatedDocument,
+    generatedDocumentId,
     showDocumentExport,
     showLawyersList,
     showLawyerRequestModal,
@@ -73,6 +74,7 @@ export function PQRFollowUpModal({
         <DocumentExportView
           selectedOption={selectedOption}
           generatedDocument={generatedDocument}
+          documentId={generatedDocumentId}
           pqrData={pqrData}
           oversightEntity={oversightEntity}
           onClose={handleClose}

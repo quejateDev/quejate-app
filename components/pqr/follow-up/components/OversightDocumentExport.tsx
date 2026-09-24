@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
-import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
 import { useS3Upload } from "@/hooks/use-s3-upload";
 import {
   Download,
@@ -11,10 +10,23 @@ import {
   Send
 } from "lucide-react";
 import { OversightEntity } from "../types";
-import { typeMap } from "@/constants/pqrMaps";
+import {
+  PdfDownloadError,
+  pqrFollowUpService,
+} from "../services/pqrFollowUpService";
+import { describePdfError, saveFile } from "../utils/pdfDownload";
+import {
+  LEGAL_DOC_NOT_SAVED_NOTICE,
+  LEGAL_DOC_UNAVAILABLE,
+} from "../constants/legalDocsCopy";
 
 interface OversightDocumentExportProps {
   generatedDocument: string;
+  /**
+   * Id del oficio guardado en el backend. Sin él no hay PDF, y por tanto
+   * tampoco nada que adjuntar al correo del ente de control.
+   */
+  documentId: string | null;
   onClose: () => void;
   pqrData: PQR;
   oversightEntity: OversightEntity | null;
@@ -22,6 +34,7 @@ interface OversightDocumentExportProps {
 
 export function OversightDocumentExport({
   generatedDocument,
+  documentId,
   onClose,
   pqrData,
   oversightEntity,
@@ -89,76 +102,9 @@ export function OversightDocumentExport({
     }
   };
 
-  const generatePDFBlob = async (): Promise<Blob> => {
-    const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");      
-    const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
-
-    const margin = 20;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const maxWidth = pageWidth - margin * 2;
-    const lineHeight = 6;
-    let yPosition = 80;
-    const typeLabel = typeMap[pqrData.type].label;
-
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    
-    const fullTitle = `Solicitud de Intervención por Incumplimiento en la Respuesta de ${typeLabel}`;
-    
-    const titleLines = doc.splitTextToSize(fullTitle, maxWidth);
-    
-    let titleY = 60;
-    
-    titleLines.forEach((line: string) => {
-        doc.text(line, pageWidth / 2, titleY, { align: "center" });
-        titleY += lineHeight + 2;
-    });
-
-
-    yPosition = titleY + 10; 
-
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-
-    const lines = generatedDocument.split("\n");
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.trim() === "") {
-            yPosition += lineHeight * 0.5;
-            continue;
-        }
-
-        if (line.match(/^(HECHOS:|MOTIVOS:|SOLICITUD:|CONCLUSIONES:)/i)) {
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            const textLines = doc.splitTextToSize(line, maxWidth);
-            doc.text(textLines, margin, yPosition);
-            yPosition += textLines.length * lineHeight + 1;
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            continue;
-        }
-
-        const textLines = doc.splitTextToSize(line, maxWidth);
-
-        doc.text(textLines, margin, yPosition, { align: "justify", maxWidth: maxWidth });
-        yPosition += textLines.length * lineHeight;
-
-        if (yPosition > doc.internal.pageSize.getHeight() - 35) {
-            doc.addPage();
-            const width = doc.internal.pageSize.getWidth();
-            const height = doc.internal.pageSize.getHeight();
-            doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
-            yPosition = 60;
-        }
-    }
-
-    const pdfBlob = doc.output('blob');
-    return pdfBlob;
-};
-
   const handleSendEmail = async () => {
+    if (!documentId) return;
+
     if (!oversightEntity?.email) {
       toast({
         title: "Error",
@@ -170,18 +116,21 @@ export function OversightDocumentExport({
 
     setIsSendingEmail(true);
     try {
-      const pdfBlob = await generatePDFBlob();
-      const file = new File([pdfBlob], `reporte_ente_control_${pqrData?.entity?.name || "documento"}.pdf`, {
-        type: 'application/pdf'
-      });
+      // El PDF lo maqueta el backend y llega con el nombre que él le pone
+      // (`oficio_ente_control.pdf`). Se sube y se envía igual que antes.
+      const file = await pqrFollowUpService.getLegalDocumentPdf(documentId);
 
       await upload(file);
       
     } catch (error) {
       console.error("Error al procesar el documento:", error);
       toast({
-        title: "Error",
-        description: "Error al procesar el documento para envío",
+        ...(error instanceof PdfDownloadError
+          ? describePdfError(error, LEGAL_DOC_UNAVAILABLE)
+          : {
+              title: "Error",
+              description: "Error al procesar el documento para envío",
+            }),
         variant: "destructive",
       });
       setIsSendingEmail(false);
@@ -189,30 +138,20 @@ export function OversightDocumentExport({
   };
 
   const handleDownloadPDF = async () => {
-    if (!generatedDocument) return;
+    if (!documentId) return;
 
     setIsDownloading(true);
     try {
-      const pdfBlob = await generatePDFBlob();
-      
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `reporte_ente_control_${pqrData?.entity?.name || "documento"}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      saveFile(await pqrFollowUpService.getLegalDocumentPdf(documentId));
 
       toast({
         title: "Documento descargado",
-        description: "El archivo PDF para el ente de control se ha generado correctamente",
+        description: "El archivo PDF para el ente de control se ha descargado correctamente",
       });
     } catch (error) {
-      console.error("Error al generar PDF:", error);
+      console.error("Error al descargar el PDF:", error);
       toast({
-        title: "Error",
-        description: "No se pudo generar el documento PDF",
+        ...describePdfError(error, LEGAL_DOC_UNAVAILABLE),
         variant: "destructive",
       });
     } finally {
@@ -237,6 +176,12 @@ export function OversightDocumentExport({
       </div>
 
       <div className="p-6 border-t">
+        {!documentId && (
+          <p className="mb-4 text-sm text-red-700">
+            {LEGAL_DOC_NOT_SAVED_NOTICE}
+          </p>
+        )}
+
         {oversightEntity?.email && (
           <div className="mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700">
             <div className="flex items-start">
@@ -256,7 +201,7 @@ export function OversightDocumentExport({
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
             onClick={handleDownloadPDF}
-            disabled={isDownloading || isSendingEmail || isUploading}
+            disabled={isDownloading || isSendingEmail || isUploading || !documentId}
             className="flex-1 max-w-sm bg-red-400 text-white hover:bg-red-500 focus:ring-2 focus:ring-red-400 focus:ring-opacity-50"
           >
             {isDownloading ? (
@@ -270,7 +215,7 @@ export function OversightDocumentExport({
           {oversightEntity?.email && (
             <Button
               onClick={handleSendEmail}
-              disabled={isDownloading || isSendingEmail || isUploading}
+              disabled={isDownloading || isSendingEmail || isUploading || !documentId}
               className="flex-1 max-w-sm bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
             >
               {isSendingEmail || isUploading ? (
