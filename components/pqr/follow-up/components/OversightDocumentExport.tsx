@@ -15,10 +15,8 @@ import {
   pqrFollowUpService,
 } from "../services/pqrFollowUpService";
 import { describePdfError, saveFile } from "../utils/pdfDownload";
-import {
-  LEGAL_DOC_NOT_SAVED_NOTICE,
-  LEGAL_DOC_UNAVAILABLE,
-} from "../constants/legalDocsCopy";
+import { LEGAL_DOC_UNAVAILABLE } from "../constants/legalDocsCopy";
+import { LegalDocumentNotices } from "./LegalDocumentNotices";
 
 interface OversightDocumentExportProps {
   generatedDocument: string;
@@ -176,11 +174,9 @@ export function OversightDocumentExport({
       </div>
 
       <div className="p-6 border-t">
-        {!documentId && (
-          <p className="mb-4 text-sm text-red-700">
-            {LEGAL_DOC_NOT_SAVED_NOTICE}
-          </p>
-        )}
+        <div className="mb-4">
+          <LegalDocumentNotices saved={!!documentId} />
+        </div>
 
         {oversightEntity?.email && (
           <div className="mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700">

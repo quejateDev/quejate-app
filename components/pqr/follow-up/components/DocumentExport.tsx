@@ -22,6 +22,7 @@ import {
   FileCheck,
   Info,
 } from "lucide-react";
+import { LegalDocumentNotices } from "./LegalDocumentNotices";
 
 interface StepProps {
   onClose: () => void;
@@ -244,6 +245,9 @@ export function DocumentExport({
             </div>
             
             <div className="overflow-auto px-4 pb-6">
+              <div className="mb-4">
+                <LegalDocumentNotices saved={!!documentId} />
+              </div>
               <div className="bg-white p-6 md:p-8 border rounded-lg shadow-sm mb-6">
                 <h1 className="text-2xl font-bold text-center mb-6">
                   ACCIÓN DE TUTELA

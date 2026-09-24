@@ -4,6 +4,27 @@
  */
 
 /**
+ * El documento es un borrador y la plataforma no responde por su contenido.
+ *
+ * Decisión de dirección. Hasta que se añadió, ninguna frase de este flujo lo
+ * decía: el ciudadano recibía un escrito generado por IA con aspecto de
+ * definitivo.
+ */
+export const LEGAL_DOC_DRAFT_NOTICE =
+  "Es un borrador redactado con inteligencia artificial: revísalo y corrígelo antes de presentarlo. Quéjate no se hace responsable de su contenido.";
+
+/**
+ * Cuánto se guarda: seis meses, y después se borra (decisión de dirección del
+ * 21/09/2026, con un abogado).
+ *
+ * **Mismo texto que la app móvil** (`src/features/pqr/utils/legalDocsCopy.ts`
+ * en `quejate-mobile-app`), para que los dos clientes prometan lo mismo. Si el
+ * plazo cambia, cambia aquí, allí y en los términos.
+ */
+export const LEGAL_DOC_RETENTION_NOTICE =
+  "Guardamos este documento seis meses para que puedas volver a descargarlo. Después se borra.";
+
+/**
  * El backend no pudo guardar el documento —su guardado es *best effort*—: el
  * texto está en pantalla, pero no hay PDF ni quedará en el historial.
  *
