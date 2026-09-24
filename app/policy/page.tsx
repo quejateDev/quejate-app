@@ -9,7 +9,7 @@ export default function Policy() {
             POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES - QUEJATE.COM.CO
           </h1>
           <p className="text-gray-600">
-            En vigor a partir del 4/8/2025 11:30:57
+            En vigor a partir del 24/9/2026
           </p>
         </div>
 

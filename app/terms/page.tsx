@@ -8,7 +8,7 @@ export default function TermsAndConditions() {
           <h1 className="text-3xl font-bold text-primary mb-4">
             TÉRMINOS Y CONDICIONES DE USO - QUEJATE.COM.CO
           </h1>
-          <p className="text-gray-600">En vigor a partir del 4/8/2025 11:30:57</p>
+          <p className="text-gray-600">En vigor a partir del 24/9/2026</p>
         </div>
 
         <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed text-justify">
