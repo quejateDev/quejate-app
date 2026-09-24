@@ -68,6 +68,24 @@ export interface ProxyOptions {
    * `GET /users/:id`, con su `private, no-cache` (A-28; antes `max-age=60`).
    */
   forwardCacheControl?: boolean;
+  /**
+   * Reenviar la cabecera `Content-Disposition` del backend.
+   *
+   * La necesitan las rutas que sirven un PDF: sin ella llegan los bytes sin
+   * nombre de fichero, y el navegador o los abre dentro de la pestaña o los
+   * guarda con un nombre inventado. En esas rutas el nombre lo pone el
+   * backend (`pdfResponse`), **fijo por tipo de documento** y nunca compuesto
+   * con datos del cliente, así que reenviarlo no abre una vía para colar
+   * cabeceras.
+   *
+   * Por defecto **no**, por el mismo motivo que
+   * {@link ProxyOptions.forwardCacheControl}: los manejadores de Next que se
+   * sustituyeron no la emitían, y este helper lo comparten casi todas las
+   * rutas de `app/api`, la mayoría contrato congelado de la móvil. Reenviarla
+   * en todas cambiaría respuestas que nadie ha revisado una por una; se pide
+   * ruta a ruta, donde se sabe qué se sirve.
+   */
+  forwardContentDisposition?: boolean;
 }
 
 /**
@@ -136,6 +154,13 @@ async function mirror(
     const cacheControl = response.headers.get("cache-control");
     if (cacheControl) {
       headers.set("cache-control", cacheControl);
+    }
+  }
+
+  if (options.forwardContentDisposition) {
+    const contentDisposition = response.headers.get("content-disposition");
+    if (contentDisposition) {
+      headers.set("content-disposition", contentDisposition);
     }
   }
 
