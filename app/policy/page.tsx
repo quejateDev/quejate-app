@@ -1127,6 +1127,47 @@ export default function Policy() {
             de las excepciones legales previstas en la ley.
           </p>
 
+          <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">
+            5. Redacción de documentos legales con inteligencia artificial
+          </h3>
+          <p className="mb-4">
+            Para redactar los borradores de acciones de tutela y de oficios
+            dirigidos a entes de control descritos en la sección TRATAMIENTO DE
+            LOS DOCUMENTOS LEGALES GENERADOS, la Plataforma envía los datos
+            necesarios a OpenAI, proveedor de servicios de inteligencia
+            artificial ubicado fuera de Colombia, a través de su servicio
+            api.openai.com. Por lo tanto, estos datos salen del país.
+          </p>
+          <p className="mb-4">
+            El envío lo realizan los servidores de la Plataforma, con
+            credenciales propias de la Plataforma, en el momento en que el
+            usuario solicita el documento. El dispositivo del usuario no se
+            comunica con dicho proveedor.
+          </p>
+          <p className="mb-4">
+            Para una acción de tutela se envían el nombre completo del usuario,
+            su número de identificación, su ciudad y su departamento, la entidad
+            demandada, el tipo de solicitud, el derecho que el usuario considera
+            vulnerado, la fecha de radicación de la PQRSD, los días
+            transcurridos sin respuesta y la descripción completa de los hechos.
+            Para un oficio dirigido a un ente de control se envían el nombre
+            completo del usuario, su ciudad o su departamento, la entidad a la
+            que se dirigió la PQRSD, el tipo de solicitud, la fecha de
+            radicación, los días transcurridos sin respuesta, la descripción
+            completa de los hechos y el nombre del ente de control destinatario.
+          </p>
+          <p className="mb-4">
+            Estos datos se envían únicamente para redactar el borrador del
+            documento solicitado por el usuario.
+          </p>
+          <p className="mb-6">
+            Si la descripción de los hechos contiene datos sensibles —por
+            ejemplo, información relativa a la salud del usuario—, a los que se
+            aplica lo dispuesto en la sección DATOS SENSIBLES de esta política,
+            esos datos también se envían a dicho proveedor y, en consecuencia,
+            también salen del país.
+          </p>
+
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
             TRATAMIENTO DE DATOS DE GEOLOCALIZACIÓN
           </h2>
