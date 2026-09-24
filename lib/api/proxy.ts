@@ -65,7 +65,7 @@ export interface ProxyOptions {
    * sustituye no emitía ninguna, y añadirla sería un cambio de comportamiento
    * en clientes que no se pueden parchear. Se activa solo donde la cabecera
    * **ya forma parte del contrato de hoy** — hoy, únicamente
-   * `GET /users/:id`, con su `private, max-age=60`.
+   * `GET /users/:id`, con su `private, no-cache` (A-28; antes `max-age=60`).
    */
   forwardCacheControl?: boolean;
 }
