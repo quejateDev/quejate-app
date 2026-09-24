@@ -25,6 +25,13 @@ export const LEGAL_DOC_RETENTION_NOTICE =
   "Guardamos este documento seis meses para que puedas volver a descargarlo. Después se borra.";
 
 /**
+ * El mismo plazo, dicho sobre el historial entero. En plural sin mentir: desde
+ * la Tarea 27 el historial trae tutelas **y** oficios a entes de control.
+ */
+export const LEGAL_DOCS_HISTORY_RETENTION_NOTICE =
+  "Guardamos tus documentos seis meses desde que los generas, para que puedas volver a descargarlos. Después se borran.";
+
+/**
  * El backend no pudo guardar el documento —su guardado es *best effort*—: el
  * texto está en pantalla, pero no hay PDF ni quedará en el historial.
  *

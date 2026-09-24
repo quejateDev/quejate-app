@@ -7,6 +7,9 @@ export const publicRoutes = [
 
 export const privateRoutes = [
   "/dashboard/profile",
+  // Historial de documentos legales: sin sesión no hay nada que enseñar. El
+  // backend exige sesión igual en cada ruta; esto solo evita pintar la página.
+  "/dashboard/profile/documentos",
   "/dashboard/lawyer/lawyer-requests",
   "/dashboard/lawyer",
   // Crear PQRSD requiere cuenta (#5). La página de selección de categoría
