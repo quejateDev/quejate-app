@@ -32,3 +32,21 @@ export const maxDuration = 60;
 export async function POST(request: Request) {
   return proxyToBackend(request, "/legal-docs");
 }
+
+/**
+ * Historial de documentos legales del titular → `GET /legal-docs` del backend
+ * (Tareas 26 y 27). Solo lo usa esta web: la app publicada llama a este mismo
+ * path, pero únicamente con `POST`, que no cambia.
+ *
+ * Un array, del más reciente al más antiguo, de `{ id, type, title, pqrId,
+ * createdAt, expiresAt }` —**sin el texto**—, con tutelas (`TUTELA`) y oficios
+ * a entes de control (`OVERSIGHT`). Lo que importa lo hace el backend: exige
+ * sesión (401 sin ella), devuelve solo los del titular y borra antes los ya
+ * vencidos.
+ *
+ * `forwardCacheControl` para conservar su `private, no-store`: el título de
+ * una tutela lleva la entidad demandada.
+ */
+export async function GET(request: Request) {
+  return proxyToBackend(request, "/legal-docs", { forwardCacheControl: true });
+}

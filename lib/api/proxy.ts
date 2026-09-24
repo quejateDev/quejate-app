@@ -63,9 +63,12 @@ export interface ProxyOptions {
    *
    * Por defecto **no**, igual que el panel: el manejador de Next que se
    * sustituye no emitía ninguna, y añadirla sería un cambio de comportamiento
-   * en clientes que no se pueden parchear. Se activa solo donde la cabecera
-   * **ya forma parte del contrato de hoy** — hoy, únicamente
-   * `GET /users/:id`, con su `private, no-cache` (A-28; antes `max-age=60`).
+   * en clientes que no se pueden parchear. Se activa donde la cabecera **ya
+   * forma parte del contrato de hoy** —`GET /users/:id`, con su
+   * `private, no-cache` (A-28; antes `max-age=60`)— y en rutas nuevas, que no
+   * sustituyen a nada, donde es la cabecera la que protege: las de documentos
+   * legales y el certificado de radicación, cuyo `private, no-store` impide
+   * que una caché guarde un documento con la cédula dentro.
    */
   forwardCacheControl?: boolean;
   /**
