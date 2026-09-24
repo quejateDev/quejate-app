@@ -10,8 +10,10 @@ import { proxyToBackend } from "@/lib/api/proxy";
  *   _count { followers, following, PQRS }, isFollowing }`, **más `email` y
  *   `phone` solo si quien pregunta es el titular** (Ley 1581, arreglo de H-05).
  *
- *   🔑 Es la **única** ruta proxiada que reenvía `Cache-Control`, y por eso
- *   lleva `forwardCacheControl`. **Tiene que seguir siendo `private`**: la
+ *   🔑 Es la **única** ruta del contrato congelado que reenvía
+ *   `Cache-Control`, y por eso lleva `forwardCacheControl`. Las otras que lo
+ *   hacen son nuevas y solo de la web: las de documentos legales y el
+ *   certificado. **Tiene que seguir siendo `private`**: la
  *   respuesta depende de quién pregunta, así que una caché compartida podría
  *   entregarle a cualquiera la del titular, con su correo dentro (A-16).
  *

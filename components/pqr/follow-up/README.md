@@ -82,5 +82,11 @@ Hoy el techo de 10 s se evita declarando `maxDuration = 60` en las dos rutas de 
 
 No hace falta ninguna variable de entorno en la web: `OPENAI_API_KEY` vive solo en el backend.
 
+El PDF también lo hace el backend (Tareas 26 y 27). Al generar, guarda el texto y devuelve su `id`;
+el servicio pide después `GET /api/legal-docs/:id/pdf`, y el certificado de radicación
+`GET /api/pqr/:id/certificate.pdf`. La web ya no maqueta nada: jsPDF y el membrete se fueron con ese
+cambio, y el nombre de cada fichero lo pone el backend. Si el guardado falla no llega `id`, no hay
+PDF, y la interfaz lo dice en vez de dejar el botón apagado sin explicación.
+
 
 

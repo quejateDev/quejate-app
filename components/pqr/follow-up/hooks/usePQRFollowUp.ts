@@ -25,6 +25,9 @@ export function usePQRFollowUp(
   const [showOversightEntityList, setShowOversightEntityList] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDocument, setGeneratedDocument] = useState<string | null>(null);
+  // Id del documento que guardó el backend; sin él no hay PDF (ver
+  // `GeneratedLegalDocument`).
+  const [generatedDocumentId, setGeneratedDocumentId] = useState<string | null>(null);
   const [showDocumentExport, setShowDocumentExport] = useState(false);
   const [showLawyersList, setShowLawyersList] = useState(false);
   const [showLawyerRequestModal, setShowLawyerRequestModal] = useState(false);
@@ -119,6 +122,7 @@ export function usePQRFollowUp(
       setShowDocumentExport(false);
       setShowLawyersList(false);
       setGeneratedDocument(null);
+      setGeneratedDocumentId(null);
       setOversightEntity(null);
       setOversightEntities([]);
       setError(null);
@@ -148,8 +152,9 @@ export function usePQRFollowUp(
         daysExceeded: daysExceeded,
       };
 
-      const document = await pqrFollowUpService.generateTutelaDocument(documentData);
-      setGeneratedDocument(document);
+      const generated = await pqrFollowUpService.generateTutelaDocument(documentData);
+      setGeneratedDocument(generated.document);
+      setGeneratedDocumentId(generated.id);
       setShowTutelaForm(false);
       setShowDocumentExport(true);
 
@@ -215,8 +220,9 @@ export function usePQRFollowUp(
         city: formatText(entityData.Municipality?.name || undefined),
       };
 
-      const document = await pqrFollowUpService.generateOversightDocument(documentData);
-      setGeneratedDocument(document);
+      const generated = await pqrFollowUpService.generateOversightDocument(documentData);
+      setGeneratedDocument(generated.document);
+      setGeneratedDocumentId(generated.id);
       setIsGeneratingOversightDoc(false);
       setShowDocumentExport(true);
 
@@ -260,6 +266,7 @@ export function usePQRFollowUp(
     showOversightEntityList,
     isGenerating,
     generatedDocument,
+    generatedDocumentId,
     showDocumentExport,
     showLawyersList,
     showLawyerRequestModal,

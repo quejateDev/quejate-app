@@ -12,7 +12,10 @@ import { proxyToBackend } from "@/lib/api/proxy";
  * exige sesión y aplica el límite por usuario.
  *
  * Mismo cuerpo que la Lambda (`{ documentType, ...datos }`) y misma respuesta
- * (`{ document }`).
+ * (`{ document }`), más el `id` que añadieron las Tareas 26 y 27: el del
+ * documento guardado, con el que la web pide después su PDF
+ * (`app/api/legal-docs/[id]/pdf`). **Puede faltar** si el guardado falló: el
+ * backend devuelve el texto igual.
  */
 
 /** Ver `app/api/legal-docs/route.ts`: la generación tarda hasta 25 s. */

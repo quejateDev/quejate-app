@@ -6,6 +6,8 @@ import { OversightEntity } from "../types";
 type DocumentExportViewProps = {
   selectedOption: string | null;
   generatedDocument: string;
+  /** Id del documento guardado en el backend; `null` si no se pudo guardar. */
+  documentId: string | null;
   pqrData: PQR;
   oversightEntity: OversightEntity | null;
   onClose: () => void;
@@ -14,6 +16,7 @@ type DocumentExportViewProps = {
 export function DocumentExportView({
   selectedOption,
   generatedDocument,
+  documentId,
   pqrData,
   oversightEntity,
   onClose,
@@ -22,6 +25,7 @@ export function DocumentExportView({
     return (
       <OversightDocumentExport
         generatedDocument={generatedDocument}
+        documentId={documentId}
         onClose={onClose}
         pqrData={pqrData}
         oversightEntity={oversightEntity}
@@ -32,6 +36,7 @@ export function DocumentExportView({
   return (
     <DocumentExport
       generatedDocument={generatedDocument}
+      documentId={documentId}
       onClose={onClose}
       pqrData={pqrData}
     />

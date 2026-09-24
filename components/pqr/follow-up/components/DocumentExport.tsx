@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
-import { createPdfWithMembrete, getImageBase64 } from "@/utils/pdfMembrete";
+import { pqrFollowUpService } from "../services/pqrFollowUpService";
+import { describePdfError, saveFile } from "../utils/pdfDownload";
+import {
+  LEGAL_DOC_NOT_SAVED_NOTICE,
+  LEGAL_DOC_UNAVAILABLE,
+} from "../constants/legalDocsCopy";
 
 import {
   Copy,
@@ -17,7 +22,7 @@ import {
   FileCheck,
   Info,
 } from "lucide-react";
-import { GeneratePQRCertificate } from "./GeneratePQRCertificate";
+import { LegalDocumentNotices } from "./LegalDocumentNotices";
 
 interface StepProps {
   onClose: () => void;
@@ -26,172 +31,38 @@ interface StepProps {
 
 export function DocumentExport({
   generatedDocument,
+  documentId,
   onClose,
   pqrData,
   isGenerating = false,
 }: StepProps & {
   generatedDocument: string | null;
+  /** Id del documento guardado en el backend; sin él no hay PDF. */
+  documentId: string | null;
   isGenerating?: boolean;
 }) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
   const [activeTab, setActiveTab] = useState("preview");
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleDownloadPDF = async () => {
-    if (!generatedDocument) return;
+    if (!documentId) return;
 
     setIsDownloading(true);
     try {
-      const doc = await createPdfWithMembrete("/MembreteWeb.png", "portrait", "a4");
-      const membreteImgBase64 = await getImageBase64("/MembreteWeb.png");
-
-      const margins = {
-        top: 60,
-        bottom: 35,
-        left: 30,
-        right: 30
-      };
-      
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const maxWidth = pageWidth - margins.left - margins.right;
-      const lineHeight = 6;
-      const paragraphSpacing = 4;
-      let yPosition = margins.top;
-
-      const checkPageBreak = async (requiredSpace: number = lineHeight) => {
-        if (yPosition + requiredSpace > pageHeight - margins.bottom) {
-          doc.addPage();
-          const width = doc.internal.pageSize.getWidth();
-          const height = doc.internal.pageSize.getHeight();
-          doc.addImage(membreteImgBase64, "PNG", 0, 0, width, height);
-          yPosition = margins.top;
-          return true;
-        }
-        return false;
-      };
-
-      const addTextWithPageControl = async (text: string, x: number, fontSize: number = 11, fontStyle: string = 'normal', align: string = 'justify') => {
-        doc.setFontSize(fontSize);
-        doc.setFont("helvetica", fontStyle);
-        
-        const textLines = doc.splitTextToSize(text, maxWidth - (x - margins.left));
-        const requiredSpace = textLines.length * lineHeight;
-        
-        await checkPageBreak(requiredSpace);
-        
-        if (align === 'justify' && textLines.length > 1) {
-          // Aplicar justificación manual para párrafos
-          textLines.forEach((line: string, index: number) => {
-            if (index < textLines.length - 1) { // No justificar la última línea
-              const words = line.trim().split(' ');
-              if (words.length > 1) {
-                const totalTextWidth = words.reduce((acc, word) => acc + doc.getTextWidth(word), 0);
-                const totalSpaceWidth = maxWidth - (x - margins.left) - totalTextWidth;
-                const spaceWidth = totalSpaceWidth / (words.length - 1);
-                
-                let currentX = x;
-                words.forEach((word, wordIndex) => {
-                  doc.text(word, currentX, yPosition + (index * lineHeight));
-                  if (wordIndex < words.length - 1) {
-                    currentX += doc.getTextWidth(word) + spaceWidth;
-                  }
-                });
-              } else {
-                doc.text(line, x, yPosition + (index * lineHeight));
-              }
-            } else {
-              doc.text(line, x, yPosition + (index * lineHeight));
-            }
-          });
-        } else {
-          doc.text(textLines, x, yPosition);
-        }
-        
-        yPosition += requiredSpace;
-      };
-
-      doc.setFontSize(16);
-      doc.setFont("helvetica", "bold");
-      doc.text("ACCIÓN DE TUTELA", pageWidth / 2, yPosition, { align: "center" });
-      yPosition += 15;
-
-      doc.setLineWidth(0.5);
-      doc.line(margins.left, yPosition, pageWidth - margins.right, yPosition);
-      yPosition += 10;
-
-      const lines = generatedDocument.split("\n");
-      
-      for (let index = 0; index < lines.length; index++) {
-        const line = lines[index];
-        const trimmedLine = line.trim();
-        
-        if (trimmedLine === "") {
-          yPosition += paragraphSpacing;
-          continue;
-        }
-
-        if (trimmedLine.match(/^(HECHOS:|DERECHOS VULNERADOS:|PRETENSIONES:|FUNDAMENTOS DE DERECHO:|SOLICITA:|NOTIFICACIONES:)/i)) {
-          if (index > 0) {
-            yPosition += paragraphSpacing * 2;
-            await checkPageBreak(lineHeight * 2);
-          }
-          
-          await addTextWithPageControl(trimmedLine, margins.left, 12, 'bold', 'left');
-          yPosition += paragraphSpacing;
-          continue;
-        }
-
-        if (trimmedLine.match(/^\d+\./)) {
-          const parts = trimmedLine.split(".");
-          const number = parts[0] + ".";
-          const content = parts.slice(1).join(".").trim();
-          
-          const estimatedLines = Math.ceil(content.length / 80) + 1;
-          await checkPageBreak(estimatedLines * lineHeight);
-          
-          doc.setFontSize(11);
-          doc.setFont("helvetica", "bold");
-          doc.text(number, margins.left, yPosition);
-          
-
-          if (content) {
-            doc.setFont("helvetica", "normal");
-            const contentLines = doc.splitTextToSize(content, maxWidth - 15);
-            doc.text(contentLines, margins.left + 15, yPosition);
-            yPosition += contentLines.length * lineHeight;
-          } else {
-            yPosition += lineHeight;
-          }
-          
-          yPosition += paragraphSpacing / 2;
-          continue;
-        }
-
-        if (trimmedLine.length > 0) {
-          const prevLine = index > 0 ? lines[index - 1].trim() : "";
-          if (prevLine.length > 0 && !prevLine.match(/^\d+\./) && !trimmedLine.match(/^(HECHOS:|DERECHOS VULNERADOS:|PRETENSIONES:)/i)) {
-            yPosition += paragraphSpacing / 2;
-          }
-          
-          await addTextWithPageControl(trimmedLine, margins.left);
-          yPosition += paragraphSpacing / 2;
-        }
-      }
-      
-      doc.setTextColor(0);
-
-      doc.save(`tutela_${pqrData?.entity?.name || "documento"}.pdf`);
+      // El PDF lo maqueta el backend a partir del texto que guardó al
+      // generar, y se descarga con el nombre que él le pone (`tutela.pdf`).
+      saveFile(await pqrFollowUpService.getLegalDocumentPdf(documentId));
 
       toast({
         title: "Documento descargado",
-        description: "El archivo PDF se ha generado correctamente",
+        description: "El archivo PDF se ha descargado correctamente",
       });
     } catch (error) {
-      console.error("Error al generar PDF:", error);
+      console.error("Error al descargar el PDF:", error);
       toast({
-        title: "Error",
-        description: "No se pudo generar el documento PDF",
+        ...describePdfError(error, LEGAL_DOC_UNAVAILABLE),
         variant: "destructive",
       });
     } finally {
@@ -229,30 +100,28 @@ export function DocumentExport({
   };
 
   const handleDownloadCertificate = async () => {
+    // Sin mirar `pqrData.creator` ni `anonymous`: quién puede pedirlo lo
+    // decide el backend (solo el autor), y su 404 se enseña como «no
+    // disponible».
+    setIsDownloadingCertificate(true);
     try {
-      const blob = await GeneratePQRCertificate(pqrData);
-      const url = URL.createObjectURL(blob);
-  
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "certificado_pqrsd.pdf";
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-  
+      saveFile(await pqrFollowUpService.getCertificatePdf(pqrData.id));
+
       toast({
         title: "Documento descargado",
-        description: "El certificado PDF se ha generado correctamente",
+        description: "El certificado PDF se ha descargado correctamente",
       });
     } catch (error) {
       console.error("Error al descargar el certificado:", error);
       toast({
-        title: "Error",
-        description: "No se pudo generar el certificado PDF",
+        ...describePdfError(
+          error,
+          "El certificado de esta PQRSD no está disponible."
+        ),
         variant: "destructive",
       });
+    } finally {
+      setIsDownloadingCertificate(false);
     }
   };
 
@@ -376,6 +245,9 @@ export function DocumentExport({
             </div>
             
             <div className="overflow-auto px-4 pb-6">
+              <div className="mb-4">
+                <LegalDocumentNotices saved={!!documentId} />
+              </div>
               <div className="bg-white p-6 md:p-8 border rounded-lg shadow-sm mb-6">
                 <h1 className="text-2xl font-bold text-center mb-6">
                   ACCIÓN DE TUTELA
@@ -410,7 +282,7 @@ export function DocumentExport({
                 variant="outline"
                 className="h-24 md:h-32 flex-col gap-2 md:gap-3 border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300 transition-all shadow-sm"
                 onClick={handleDownloadPDF}
-                disabled={isDownloading}
+                disabled={isDownloading || !documentId}
               >
                 {isDownloading ? (
                   <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-red-500" />
@@ -428,6 +300,11 @@ export function DocumentExport({
                   </span>
                 </div>
               </Button>
+              {!documentId && (
+                <p className="text-xs text-red-700 text-center">
+                  {LEGAL_DOC_NOT_SAVED_NOTICE}
+                </p>
+              )}
             </div>
 
             <div className="border-t border-slate-200 w-full max-w-xl pt-6 mt-2 flex flex-col items-center">
@@ -438,10 +315,14 @@ export function DocumentExport({
                 variant="outline"
                 className="flex items-center gap-2 border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 w-full max-w-md h-16 shadow-sm"
                 onClick={handleDownloadCertificate}
-                disabled={isDownloading || !pqrData}
+                disabled={isDownloading || isDownloadingCertificate || !pqrData}
               >
                 <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <FileCheck className="h-4 w-4 text-emerald-600" />
+                  {isDownloadingCertificate ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                  ) : (
+                    <FileCheck className="h-4 w-4 text-emerald-600" />
+                  )}
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-medium text-emerald-700">
