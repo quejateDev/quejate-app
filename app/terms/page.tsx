@@ -271,7 +271,7 @@ export default function TermsAndConditions() {
             Cada documento se conserva durante seis (6) meses contados desde la fecha de su generación. Vencido ese plazo, el documento deja de estar disponible y se elimina de forma automática. Si el Usuario desea conservarlo por más tiempo, deberá descargarlo antes de su vencimiento.
           </p>
           <p className="mb-4">
-            Únicamente el Usuario que generó el documento puede consultarlo y descargarlo desde su cuenta. La Plataforma no permite su consulta a las entidades destinatarias de las PQRSD, a los Profesionales del Derecho registrados ni a sus propios administradores.
+            Únicamente el Usuario que generó el documento puede consultarlo y descargarlo desde su cuenta. La Plataforma no ofrece a las entidades destinatarias de las PQRSD, a los Profesionales del Derecho registrados ni a sus propios administradores ninguna funcionalidad para consultarlos.
           </p>
           <p className="mb-6">
             Los documentos guardados son borradores elaborados con inteligencia artificial a partir de la información suministrada por el Usuario. Su revisión, corrección, uso y presentación ante cualquier autoridad son responsabilidad exclusiva del Usuario, y QUEJATE.COM.CO no se hace responsable de su contenido, en los términos del numeral 1.5. El tratamiento de los datos personales que contienen se rige por la Política de Tratamiento de Datos Personales.
