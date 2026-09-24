@@ -20,6 +20,7 @@ const LegalPage = () => {
             <li>Puedes solicitar la eliminación o modificación de tus datos en cualquier momento.</li>
             <li>Utilizamos medidas de seguridad para proteger tu información.</li>
             <li>La geolocalización de una PQRSD es completamente opcional. Si decides indicar la ubicación de tu solicitud, esas coordenadas se mostrarán en el mapa ciudadano únicamente si tu PQRSD es pública. Las PQRSD privadas nunca aparecen en el mapa.</li>
+            <li>Los documentos legales que generes, como tutelas y oficios a entes de control, se guardan seis meses en tu historial para que puedas volver a descargarlos. Solo tú puedes verlos, y pasado ese plazo se borran.</li>
           </ul>
         </section>
         <section className="mb-10">

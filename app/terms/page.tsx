@@ -8,7 +8,7 @@ export default function TermsAndConditions() {
           <h1 className="text-3xl font-bold text-primary mb-4">
             TÉRMINOS Y CONDICIONES DE USO - QUEJATE.COM.CO
           </h1>
-          <p className="text-gray-600">En vigor a partir del 4/8/2025 11:30:57</p>
+          <p className="text-gray-600">En vigor a partir del 24/9/2026</p>
         </div>
 
         <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed text-justify">
@@ -261,6 +261,20 @@ export default function TermsAndConditions() {
           </ol>
           <p className="mb-6">
             QUEJATE.COM.CO buscará que las entidades entreguen respuesta al usuario de acuerdo con los términos establecidos en la ley. En cuanto a los abogados contactados a través de la plataforma, el término de las asesorías dependerá de los acuerdos que realicen de manera directa el usuario y el correspondiente profesional.
+          </p>
+
+          <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.1. Historial de documentos legales</h3>
+          <p className="mb-4">
+            Los documentos legales que el Usuario genere a través de La Plataforma, como las acciones de tutela y los oficios dirigidos a los entes de control, se guardan en un historial asociado a su cuenta, con el fin de que pueda volver a consultarlos y descargarlos.
+          </p>
+          <p className="mb-4">
+            Cada documento se conserva durante seis (6) meses contados desde la fecha de su generación. Vencido ese plazo, el documento deja de estar disponible y se elimina de forma automática. Si el Usuario desea conservarlo por más tiempo, deberá descargarlo antes de su vencimiento.
+          </p>
+          <p className="mb-4">
+            Únicamente el Usuario que generó el documento puede consultarlo y descargarlo desde su cuenta. La Plataforma no ofrece a las entidades destinatarias de las PQRSD, a los Profesionales del Derecho registrados ni a sus propios administradores ninguna funcionalidad para consultarlos.
+          </p>
+          <p className="mb-6">
+            Los documentos guardados son borradores elaborados con inteligencia artificial a partir de la información suministrada por el Usuario. Su revisión, corrección, uso y presentación ante cualquier autoridad son responsabilidad exclusiva del Usuario, y QUEJATE.COM.CO no se hace responsable de su contenido, en los términos del numeral 1.5. El tratamiento de los datos personales que contienen se rige por la Política de Tratamiento de Datos Personales.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Precio</h2>

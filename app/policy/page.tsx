@@ -9,7 +9,7 @@ export default function Policy() {
             POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES - QUEJATE.COM.CO
           </h1>
           <p className="text-gray-600">
-            En vigor a partir del 4/8/2025 11:30:57
+            En vigor a partir del 24/9/2026
           </p>
         </div>
 
@@ -116,6 +116,19 @@ export default function Policy() {
               necesario para enviar avisos relacionados con el estado de las
               PQRSD y la actividad de la cuenta. Este identificador se utiliza
               exclusivamente con fines de notificación del servicio.
+            </li>
+            <li>
+              <span className="font-semibold">
+                Documentos legales generados:
+              </span>{" "}
+              el texto de las acciones de tutela y de los oficios dirigidos a
+              entes de control que el usuario genere en la plataforma, que
+              puede incluir su nombre, su número de identificación, su ciudad y
+              departamento, la entidad a la que se refiere, el derecho que
+              considera vulnerado y la descripción de los hechos de su PQRSD.
+              Se guardan junto con su título y sus fechas de generación y de
+              vencimiento, en los términos de la sección TRATAMIENTO DE LOS
+              DOCUMENTOS LEGALES GENERADOS de esta política.
             </li>
           </ul>
 
@@ -234,6 +247,14 @@ export default function Policy() {
               identificación geográfica de problemáticas ciudadanas. Las PQRSD
               marcadas como privadas por el usuario nunca serán visibles en
               dicho mapa.
+            </li>
+            <li>
+              Generar, a solicitud del usuario, borradores de documentos
+              legales —acciones de tutela y oficios dirigidos a entes de
+              control— a partir de la información de su PQRSD y de los datos
+              que suministre para ello, y conservarlos durante seis (6) meses
+              en un historial al que solo tiene acceso el propio usuario, para
+              que pueda volver a consultarlos y descargarlos.
             </li>
           </ul>
 
@@ -1106,6 +1127,47 @@ export default function Policy() {
             de las excepciones legales previstas en la ley.
           </p>
 
+          <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">
+            5. Redacción de documentos legales con inteligencia artificial
+          </h3>
+          <p className="mb-4">
+            Para redactar los borradores de acciones de tutela y de oficios
+            dirigidos a entes de control descritos en la sección TRATAMIENTO DE
+            LOS DOCUMENTOS LEGALES GENERADOS, la Plataforma envía los datos
+            necesarios a OpenAI, proveedor de servicios de inteligencia
+            artificial ubicado fuera de Colombia, a través de su servicio
+            api.openai.com. Por lo tanto, estos datos salen del país.
+          </p>
+          <p className="mb-4">
+            El envío lo realizan los servidores de la Plataforma, con
+            credenciales propias de la Plataforma, en el momento en que el
+            usuario solicita el documento. El dispositivo del usuario no se
+            comunica con dicho proveedor.
+          </p>
+          <p className="mb-4">
+            Para una acción de tutela se envían el nombre completo del usuario,
+            su número de identificación, su ciudad y su departamento, la entidad
+            demandada, el tipo de solicitud, el derecho que el usuario considera
+            vulnerado, la fecha de radicación de la PQRSD, los días
+            transcurridos sin respuesta y la descripción completa de los hechos.
+            Para un oficio dirigido a un ente de control se envían el nombre
+            completo del usuario, su ciudad o su departamento, la entidad a la
+            que se dirigió la PQRSD, el tipo de solicitud, la fecha de
+            radicación, los días transcurridos sin respuesta, la descripción
+            completa de los hechos y el nombre del ente de control destinatario.
+          </p>
+          <p className="mb-4">
+            Estos datos se envían únicamente para redactar el borrador del
+            documento solicitado por el usuario.
+          </p>
+          <p className="mb-6">
+            Si la descripción de los hechos contiene datos sensibles —por
+            ejemplo, información relativa a la salud del usuario—, a los que se
+            aplica lo dispuesto en la sección DATOS SENSIBLES de esta política,
+            esos datos también se envían a dicho proveedor y, en consecuencia,
+            también salen del país.
+          </p>
+
           <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
             TRATAMIENTO DE DATOS DE GEOLOCALIZACIÓN
           </h2>
@@ -1148,6 +1210,65 @@ export default function Policy() {
               asociados a su PQRSD contactando a soporte@quejate.com.co, sin
               perjuicio de los demás derechos del titular indicados en esta
               política.
+            </li>
+          </ul>
+
+          <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+            TRATAMIENTO DE LOS DOCUMENTOS LEGALES GENERADOS
+          </h2>
+          <p className="mb-4">
+            La Plataforma permite al usuario generar, con ayuda de inteligencia
+            artificial, borradores de documentos legales relacionados con sus
+            PQRSD, como acciones de tutela y oficios dirigidos a entes de
+            control. Por excepción a la regla general de conservación de la
+            sección VIGENCIA, estos documentos se rigen por las siguientes
+            reglas:
+          </p>
+          <ul className="list-disc list-inside ml-4 space-y-2 mb-6">
+            <li>
+              <span className="font-semibold">Datos almacenados:</span> Se
+              guarda el texto completo de cada documento generado, su título y
+              sus fechas de generación y de vencimiento, asociados a la cuenta
+              del usuario y, cuando corresponda, a la PQRSD de la que proviene.
+              El texto incluye los datos que el usuario suministró para
+              generarlo, como su nombre, su número de identificación, su ciudad
+              y la descripción de los hechos; si esa descripción contiene datos
+              sensibles, el documento también los contiene.
+            </li>
+            <li>
+              <span className="font-semibold">Finalidad:</span> Los documentos
+              se guardan exclusivamente para que el usuario pueda volver a
+              consultarlos y descargarlos. No se utilizan para ningún otro fin.
+            </li>
+            <li>
+              <span className="font-semibold">Plazo de conservación:</span>{" "}
+              Cada documento se conserva durante seis (6) meses contados desde
+              la fecha de su generación. Vencido ese plazo, deja de estar
+              disponible y se elimina de forma automática. Si el usuario desea
+              conservarlo por más tiempo, deberá descargarlo antes de su
+              vencimiento.
+            </li>
+            <li>
+              <span className="font-semibold">Acceso:</span> Únicamente el
+              titular de la cuenta que generó el documento puede consultarlo y
+              descargarlo. La Plataforma no ofrece a las entidades destinatarias
+              de las PQRSD, a los Profesionales del Derecho registrados ni a sus
+              propios administradores ninguna funcionalidad para consultarlos.
+            </li>
+            <li>
+              <span className="font-semibold">Supresión:</span> El titular
+              puede solicitar en cualquier momento la supresión anticipada de
+              sus documentos escribiendo a soporte@quejate.com.co, conforme al
+              PROCEDIMIENTO previsto en esta política. La eliminación de la
+              cuenta conlleva la eliminación de todos los documentos asociados
+              a ella.
+            </li>
+            <li>
+              <span className="font-semibold">Contenido:</span> Los documentos
+              son borradores elaborados con inteligencia artificial. Su
+              revisión, corrección, uso y presentación son responsabilidad
+              exclusiva del usuario, y la Plataforma no se hace responsable de
+              su contenido.
             </li>
           </ul>
 
