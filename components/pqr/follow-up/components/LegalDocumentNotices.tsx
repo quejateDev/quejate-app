@@ -17,10 +17,7 @@ import {
 export function LegalDocumentNotices({ saved }: { saved: boolean }) {
   return (
     <div className="space-y-2 text-sm">
-      <div className="flex items-start gap-2 p-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-800">
-        <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-        <p>{LEGAL_DOC_DRAFT_NOTICE}</p>
-      </div>
+      <LegalDocumentDraftNotice />
 
       {saved ? (
         <div className="flex items-start gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
@@ -33,6 +30,19 @@ export function LegalDocumentNotices({ saved }: { saved: boolean }) {
           <p>{LEGAL_DOC_NOT_SAVED_NOTICE}</p>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * El aviso de borrador, solo. Lo usa también el historial al abrir un
+ * documento guardado, donde el plazo ya está dicho arriba de la lista.
+ */
+export function LegalDocumentDraftNotice() {
+  return (
+    <div className="flex items-start gap-2 p-3 rounded-lg border border-amber-200 bg-amber-50 text-sm text-amber-800">
+      <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+      <p>{LEGAL_DOC_DRAFT_NOTICE}</p>
     </div>
   );
 }

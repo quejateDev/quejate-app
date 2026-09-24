@@ -1,4 +1,8 @@
 import { OversightEntity } from "../types";
+import {
+  LegalDocumentDetail,
+  LegalDocumentSummary,
+} from "@/types/legal-document";
 
 /**
  * Un documento legal recién generado.
@@ -106,6 +110,38 @@ export class PQRFollowUpService {
    */
   async getCertificatePdf(pqrId: string): Promise<File> {
     return this.fetchPdf(`/api/pqr/${encodeURIComponent(pqrId)}/certificate.pdf`);
+  }
+
+  /**
+   * El historial de documentos legales del titular → `GET /api/legal-docs`,
+   * del más reciente al más antiguo y sin el texto. El backend borra antes
+   * los ya vencidos, así que todo lo que llega se puede descargar.
+   */
+  async listLegalDocuments(): Promise<LegalDocumentSummary[]> {
+    const response = await fetch("/api/legal-docs");
+    if (!response.ok) {
+      throw new Error(`El backend respondió ${response.status} al pedir el historial`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Un documento legal del titular con su texto → `GET /api/legal-docs/:id`.
+   *
+   * @returns `null` si ya no está disponible: el 404 cubre a la vez lo
+   *   caducado, lo ajeno y lo inexistente, a propósito.
+   */
+  async getLegalDocument(documentId: string): Promise<LegalDocumentDetail | null> {
+    const response = await fetch(`/api/legal-docs/${encodeURIComponent(documentId)}`);
+    if (response.status === 404) {
+      return null;
+    }
+    if (!response.ok) {
+      throw new Error(`El backend respondió ${response.status} al pedir el documento`);
+    }
+
+    return response.json();
   }
 
   private async fetchPdf(url: string): Promise<File> {
