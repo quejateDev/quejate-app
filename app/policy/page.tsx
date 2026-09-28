@@ -9,7 +9,7 @@ export default function Policy() {
             POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES - QUEJATE.COM.CO
           </h1>
           <p className="text-gray-600">
-            En vigor a partir del 24/9/2026
+            En vigor a partir del 28/9/2026
           </p>
         </div>
 
@@ -105,8 +105,12 @@ export default function Policy() {
               a una PQRSD. Para ello, la App puede solicitar acceso a la cámara
               y a la galería del dispositivo, siempre previa autorización del
               usuario en el sistema operativo. Estos archivos se almacenan
-              asociados a la PQRSD correspondiente y se rigen por las mismas
-              reglas de visibilidad (pública/privada) descritas en esta política.
+              asociados a la PQRSD correspondiente. Cuando la PQRSD es pública,
+              sus adjuntos se muestran junto con ella; cuando es privada, la
+              Plataforma no los muestra a terceros. Sin embargo, cada archivo se
+              guarda en un servicio de almacenamiento externo bajo una dirección
+              web única, y cualquier persona que llegue a conocer esa dirección
+              puede acceder a él, incluso si la PQRSD es privada.
             </li>
             <li>
               <span className="font-semibold">
