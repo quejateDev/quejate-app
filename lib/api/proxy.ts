@@ -89,6 +89,23 @@ export interface ProxyOptions {
    * ruta a ruta, donde se sabe qué se sirve.
    */
   forwardContentDisposition?: boolean;
+  /**
+   * En un **429**, reenviar cuántos segundos faltan para que el límite se
+   * levante, como la cabecera estándar `Retry-After`.
+   *
+   * La necesitan las rutas cuya pantalla tiene que decirle al ciudadano
+   * **cuánto esperar**, no solo que espere. El backend la emite con el nombre
+   * del limitador que saltó —`@nestjs/throttler` añade el sufijo a todo
+   * limitador con nombre—: `Retry-After-per-user` el que cuenta por cuenta y
+   * `Retry-After` el global por IP. Al navegador le basta el número, así que
+   * sale uno solo y con el nombre estándar; si llegaran los dos, manda el de
+   * la cuenta, que es el que cuenta a esa persona.
+   *
+   * Por defecto **no**, por el mismo motivo que
+   * {@link ProxyOptions.forwardCacheControl}; y solo en un 429, que es donde
+   * el backend la pone.
+   */
+  forwardRetryAfter?: boolean;
 }
 
 /**
@@ -164,6 +181,15 @@ async function mirror(
     const contentDisposition = response.headers.get("content-disposition");
     if (contentDisposition) {
       headers.set("content-disposition", contentDisposition);
+    }
+  }
+
+  if (options.forwardRetryAfter && response.status === 429) {
+    const retryAfter =
+      response.headers.get("retry-after-per-user") ??
+      response.headers.get("retry-after");
+    if (retryAfter) {
+      headers.set("retry-after", retryAfter);
     }
   }
 
