@@ -61,6 +61,12 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
     console.log("Comentario enviado:", text);
   };
 
+  // P-05: el detalle completo de una PQRSD solo se enlaza en el perfil de su
+  // dueño. Desde el muro sigue sin enlace; es una decisión aparte.
+  const detailHref = isUserProfile
+    ? `/dashboard/pqr/${encodeURIComponent(pqr.id)}`
+    : undefined;
+
   if (!shouldShowCard) {
     return null;
   }
@@ -87,6 +93,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
                 commentCount={commentCount}
                 onCommentClick={handleToggleComments}
                 pqrId={pqr.id}
+                detailHref={detailHref}
               />
             </div>
             {showComments && (
@@ -119,6 +126,7 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
             commentCount={commentCount}
             onCommentClick={handleToggleComments}
             pqrId={pqr.id}
+            detailHref={detailHref}
           />
         </div>
         {showComments && (

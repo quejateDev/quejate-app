@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { ChevronRight, MessageCircle } from "lucide-react";
 import LikeButton from "@/components/Buttons/LikeButton";
 
 type PQRCardActionsProps = {
@@ -8,6 +9,8 @@ type PQRCardActionsProps = {
   commentCount: number;
   onCommentClick: () => void;
   pqrId: string;
+  /** Si se pasa, un enlace a la página de detalle al final de la fila. */
+  detailHref?: string;
 };
 
 export function PQRCardActions({
@@ -16,6 +19,7 @@ export function PQRCardActions({
   commentCount,
   onCommentClick,
   pqrId,
+  detailHref,
 }: PQRCardActionsProps) {
   return (
     <div className="flex items-center">
@@ -29,6 +33,14 @@ export function PQRCardActions({
         <MessageCircle className="w-4 h-4 text-gray-500" />
         <span>{commentCount}</span>
       </Button>
+      {detailHref && (
+        <Button variant="ghost" size="sm" asChild className="ml-auto gap-1">
+          <Link href={detailHref}>
+            Ver detalle
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </Button>
+      )}
     </div>
   );
 }
