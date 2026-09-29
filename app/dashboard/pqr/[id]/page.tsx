@@ -6,7 +6,6 @@ import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
 import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqr/pqr-custom-fields";
 import { statusMap, typeMap } from "@/constants/pqrMaps";
-import { calculateDueDate } from "@/utils/dateHelpers";
 
 interface PQRDetailPageProps {
   params: Promise<{ id: string }>;
@@ -22,10 +21,24 @@ interface PqrDetail {
   anonymous: boolean;
   createdAt: string;
   entity: { name: string; email: string | null };
+  /** El **área** de la entidad (modelo `Department`), no un departamento del país. */
   department: { name: string } | null;
   creator: { name: string | null } | null;
   customFieldValues: Array<{ name: string; value: string }>;
-  attachments: Array<{ name: string; url: string; type: string }>;
+  attachments: Array<{
+    name: string;
+    url: string;
+    type: string;
+    thumbnailUrl?: string | null;
+  }>;
+  /**
+   * El plazo legal, **calculado por el servidor**: la fecha que guardó al
+   * radicar, con el plazo propio de la entidad o del área y los festivos
+   * calculados. `hasLegalDeadline: false` (las sugerencias) quiere decir que no
+   * se pinta ningún plazo.
+   */
+  dueDate: string;
+  hasLegalDeadline: boolean;
 }
 
 export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
@@ -56,7 +69,9 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
       <Card>
         <CardHeader className="bg-muted py-3 mb-6 rounded-t-md">
           <CardTitle className="text-2xl font-bold text-start">
-            No. Radicado {pqr.consecutiveCode}
+            {pqr.consecutiveCode
+              ? `No. Radicado ${pqr.consecutiveCode}`
+              : "PQRSD sin número de radicado"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -91,8 +106,15 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             <div className="font-semibold">Fecha de creación:</div>
             <div>{formatDate(pqr.createdAt)}</div>
 
-            <div className="font-semibold">Fecha límite de respuesta:</div>
-            <div>{formatDateWithoutTime(calculateDueDate(new Date(pqr.createdAt)))}</div>
+            {/* La fecha es la que guardó el servidor, no una recalculada aquí:
+                la de antes asumía 15 días para todas las entidades y los
+                festivos de una lista que se acaba en 2026. */}
+            {pqr.hasLegalDeadline && (
+              <>
+                <div className="font-semibold">Fecha límite de respuesta:</div>
+                <div>{formatDateWithoutTime(pqr.dueDate)}</div>
+              </>
+            )}
 
             <div className="font-semibold">Estado:</div>
             <div>
@@ -103,7 +125,7 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
 
             {pqr.department && (
               <>
-                <div className="font-semibold">Departamento y municipio:</div>
+                <div className="font-semibold">Área:</div>
                 <div>{pqr.department.name}</div>
               </>
             )}
@@ -131,4 +153,4 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
       </Card>
     </div>
   );
-} 
+}
