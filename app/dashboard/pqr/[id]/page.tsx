@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
 import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqr/pqr-custom-fields";
+import { CertificateDownloadButton } from "@/components/pqr/CertificateDownloadButton";
 import { statusMap, typeMap } from "@/constants/pqrMaps";
 
 interface PQRDetailPageProps {
@@ -13,6 +14,7 @@ interface PQRDetailPageProps {
 
 /** Lo que esta página lee de `GET /pqr/:id`; el detalle trae bastante más. */
 interface PqrDetail {
+  id: string;
   consecutiveCode: string | null;
   type: keyof typeof typeMap;
   status: keyof typeof statusMap;
@@ -20,6 +22,8 @@ interface PqrDetail {
   description: string | null;
   anonymous: boolean;
   createdAt: string;
+  /** En una anónima, `null` para todo el que no sea el autor (H-18). */
+  creatorId: string | null;
   entity: { name: string; email: string | null };
   /** El **área** de la entidad (modelo `Department`), no un departamento del país. */
   department: { name: string } | null;
@@ -144,6 +148,10 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
                 <div>{pqr.department.name}</div>
               </>
             )}
+          </div>
+
+          <div className="mt-6 empty:hidden">
+            <CertificateDownloadButton pqrId={pqr.id} creatorId={pqr.creatorId} />
           </div>
         </CardContent>
       </Card>
