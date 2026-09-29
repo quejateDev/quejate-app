@@ -32,13 +32,21 @@ interface PqrDetail {
     thumbnailUrl?: string | null;
   }>;
   /**
-   * El plazo legal, **calculado por el servidor**: la fecha que guardó al
-   * radicar, con el plazo propio de la entidad o del área y los festivos
-   * calculados. `hasLegalDeadline: false` (las sugerencias) quiere decir que no
-   * se pinta ningún plazo.
+   * El plazo legal, **calculado por el servidor** en cada respuesta: la
+   * fecha que guardó al radicar —con el plazo propio de la entidad o del área
+   * y los festivos calculados— y si ya venció. `hasLegalDeadline: false`
+   * (las sugerencias) quiere decir que no se pinta ningún plazo.
    */
   dueDate: string;
+  isOverdue: boolean;
+  businessDaysOverdue: number;
   hasLegalDeadline: boolean;
+}
+
+/** «Vencida», y cuántos días hábiles de retraso lleva si ya pasa de cero. */
+function overdueLabel(businessDays: number): string {
+  if (businessDays <= 0) return "Vencida";
+  return `Vencida · ${businessDays} ${businessDays === 1 ? "día hábil" : "días hábiles"} de retraso`;
 }
 
 export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
@@ -112,7 +120,14 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
             {pqr.hasLegalDeadline && (
               <>
                 <div className="font-semibold">Fecha límite de respuesta:</div>
-                <div>{formatDateWithoutTime(pqr.dueDate)}</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span>{formatDateWithoutTime(pqr.dueDate)}</span>
+                  {pqr.isOverdue && (
+                    <Badge variant="destructive">
+                      {overdueLabel(pqr.businessDaysOverdue)}
+                    </Badge>
+                  )}
+                </div>
               </>
             )}
 
