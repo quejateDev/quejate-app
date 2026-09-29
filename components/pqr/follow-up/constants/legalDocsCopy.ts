@@ -43,6 +43,14 @@ export const LEGAL_DOC_NOT_SAVED_NOTICE =
   "No pudimos guardar este documento, así que esta vez no hay PDF. Copia el texto antes de cerrar esta ventana; si lo necesitas en PDF, vuelve a generarlo más tarde.";
 
 /**
+ * Lo mismo, para el envío del oficio al ente de control: sin documento
+ * guardado **tampoco hay envío**, porque el backend maqueta el oficio desde lo
+ * que guardó. Se dice en lugar de dejar un botón que no hace nada.
+ */
+export const OVERSIGHT_SEND_NOT_SAVED_NOTICE =
+  "Como no pudimos guardarlo, tampoco podemos enviárselo por correo al ente de control: el envío sale del documento guardado. Si quieres enviarlo, vuelve a generarlo más tarde.";
+
+/**
  * El backend respondió 404 al pedir el PDF: el documento caducó, o no existe,
  * o no es de quien lo pide. El backend no distingue los tres casos, a
  * propósito, así que el mensaje tampoco.

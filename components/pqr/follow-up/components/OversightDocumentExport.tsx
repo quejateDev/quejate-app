@@ -1,28 +1,39 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PQR } from "@/types/pqrsd";
 import { toast } from "@/hooks/use-toast";
-import { useS3Upload } from "@/hooks/use-s3-upload";
 import {
+  AlertTriangle,
+  CheckCircle2,
   Download,
   Loader2,
   Mail,
-  Send
+  MailX,
+  Send,
+  XCircle,
 } from "lucide-react";
 import { OversightEntity } from "../types";
 import {
-  PdfDownloadError,
+  OversightSendResult,
   pqrFollowUpService,
 } from "../services/pqrFollowUpService";
 import { describePdfError, saveFile } from "../utils/pdfDownload";
-import { LEGAL_DOC_UNAVAILABLE } from "../constants/legalDocsCopy";
+import {
+  OversightSendNotice,
+  allowsAnotherSend,
+  describeOversightSend,
+} from "../utils/oversightSend";
+import {
+  LEGAL_DOC_UNAVAILABLE,
+  OVERSIGHT_SEND_NOT_SAVED_NOTICE,
+} from "../constants/legalDocsCopy";
 import { LegalDocumentNotices } from "./LegalDocumentNotices";
 
 interface OversightDocumentExportProps {
   generatedDocument: string;
   /**
-   * Id del oficio guardado en el backend. Sin él no hay PDF, y por tanto
-   * tampoco nada que adjuntar al correo del ente de control.
+   * Id del oficio guardado en el backend. Sin él no hay PDF ni envío: el
+   * backend maqueta los dos a partir del documento guardado.
    */
   documentId: string | null;
   onClose: () => void;
@@ -39,98 +50,52 @@ export function OversightDocumentExport({
 }: OversightDocumentExportProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [sendResult, setSendResult] = useState<OversightSendResult | null>(null);
+  // El estado de React no se ve hasta el siguiente pintado; esto sí, y es lo
+  // que impide que un doble clic mande el oficio dos veces.
+  const sendingRef = useRef(false);
 
-  const { upload, isUploading } = useS3Upload({
-    folder: 'oversight-documents',
-    onSuccess: (url) => {
-      sendEmailWithDocument(url);
-    },
-    onError: (error) => {
-      console.error('Error uploading document:', error);
-      toast({
-        title: "Error",
-        description: "Error al subir el documento a S3",
-        variant: "destructive",
-      });
-      setIsSendingEmail(false);
+  // El directorio puede tener un ente sin buzón: el backend respondería 409.
+  const hasMailbox = !!oversightEntity?.email?.trim();
+  const canSend = !!documentId && !!oversightEntity && hasMailbox;
+  const sendOpen = canSend && allowsAnotherSend(sendResult);
+
+  const sendNotice = ((): OversightSendNotice | null => {
+    if (!oversightEntity) return null;
+    if (sendResult) return describeOversightSend(sendResult, oversightEntity);
+    // Sin buzón se avisa desde el principio, con el mismo texto que el 409,
+    // en vez de esconder el botón sin decir por qué.
+    if (documentId && !hasMailbox) {
+      return describeOversightSend({ kind: "no-mailbox" }, oversightEntity);
     }
-  });
-
-  const sendEmailWithDocument = async (documentUrl: string) => {
-    try {
-      const response = await fetch('/api/oversight/send-document', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          oversightEntity,
-          pqrData,
-          documentUrl,
-          creatorInfo: {
-            name: `${pqrData.creator?.name || ""}`.trim() || "Usuario",
-            email: "usuario@quejate.com.co", // Email por defecto ya que no está en la estructura actual
-            phone: ""
-          }
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al enviar el correo');
-      }
-
-      const result = await response.json();
-      
-      toast({
-        title: "Correos enviados exitosamente",
-        description: `El documento ha sido enviado a ${oversightEntity?.name} y se ha enviado una confirmación a tu correo`,
-      });
-
-      onClose();
-      
-    } catch (error) {
-      console.error('Error sending email:', error);
-      toast({
-        title: "Error",
-        description: "Error al enviar el correo con el documento",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSendingEmail(false);
-    }
-  };
+    return null;
+  })();
 
   const handleSendEmail = async () => {
-    if (!documentId) return;
+    if (!documentId || !oversightEntity || sendingRef.current) return;
 
-    if (!oversightEntity?.email) {
-      toast({
-        title: "Error",
-        description: "No se encontró el correo del ente de control",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    sendingRef.current = true;
     setIsSendingEmail(true);
+    // El aviso del intento anterior no describe el que empieza.
+    setSendResult(null);
     try {
-      // El PDF lo maqueta el backend y llega con el nombre que él le pone
-      // (`oficio_ente_control.pdf`). Se sube y se envía igual que antes.
-      const file = await pqrFollowUpService.getLegalDocumentPdf(documentId);
-
-      await upload(file);
-      
+      // Del navegador solo salen identificadores. El backend maqueta el
+      // oficio desde el documento guardado y lo envía adjunto al buzón que
+      // tiene en su directorio para ese ente: ya no se sube a ninguna parte.
+      setSendResult(
+        await pqrFollowUpService.sendOversightLetter(documentId, {
+          pqrId: pqrData.id,
+          oversightEntityId: oversightEntity.id,
+        })
+      );
     } catch (error) {
-      console.error("Error al procesar el documento:", error);
-      toast({
-        ...(error instanceof PdfDownloadError
-          ? describePdfError(error, LEGAL_DOC_UNAVAILABLE)
-          : {
-              title: "Error",
-              description: "Error al procesar el documento para envío",
-            }),
-        variant: "destructive",
-      });
+      // `sendOversightLetter` no lanza. Si algo lo hiciera, la petición pudo
+      // haber salido igual, y un botón de nuevo disponible invitaría a
+      // repetirla.
+      console.error("Error al enviar el oficio:", error);
+      setSendResult({ kind: "unconfirmed" });
+    } finally {
+      sendingRef.current = false;
       setIsSendingEmail(false);
     }
   };
@@ -174,17 +139,24 @@ export function OversightDocumentExport({
       </div>
 
       <div className="p-6 border-t">
-        <div className="mb-4">
+        <div className="mb-4 space-y-2">
           <LegalDocumentNotices saved={!!documentId} />
+
+          {oversightEntity && !documentId && (
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-red-200 bg-red-50 text-sm text-red-700">
+              <MailX className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              <p>{OVERSIGHT_SEND_NOT_SAVED_NOTICE}</p>
+            </div>
+          )}
         </div>
 
-        {oversightEntity?.email && (
+        {sendOpen && (
           <div className="mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700">
             <div className="flex items-start">
               <Mail className="h-5 w-5 mr-2 mt-0.5" />
               <div>
                 <p className="text-sm">
-                  Se enviará el documento a <span className="font-medium">{oversightEntity.name}</span> a través del correo: <span className="font-medium">{oversightEntity.email}</span>
+                  Se enviará el documento a <span className="font-medium">{oversightEntity?.name}</span> a través del correo: <span className="font-medium">{oversightEntity?.email}</span>
                 </p>
                 <p className="text-sm mt-1">
                   También recibirás una confirmación en tu correo electrónico.
@@ -193,11 +165,22 @@ export function OversightDocumentExport({
             </div>
           </div>
         )}
-        
+
+        {sendNotice && (
+          <SendNotice
+            notice={sendNotice}
+            // Tras un envío sin confirmar, el reenvío existe pero no está a un
+            // clic distraído: el ciudadano tiene que decir que lo comprobó.
+            onConfirmedResend={
+              sendResult?.kind === "unconfirmed" ? handleSendEmail : undefined
+            }
+          />
+        )}
+
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
             onClick={handleDownloadPDF}
-            disabled={isDownloading || isSendingEmail || isUploading || !documentId}
+            disabled={isDownloading || isSendingEmail || !documentId}
             className="flex-1 max-w-sm bg-red-400 text-white hover:bg-red-500 focus:ring-2 focus:ring-red-400 focus:ring-opacity-50"
           >
             {isDownloading ? (
@@ -207,22 +190,84 @@ export function OversightDocumentExport({
             )}
             Descargar PDF
           </Button>
-          
-          {oversightEntity?.email && (
+
+          {sendOpen && (
             <Button
               onClick={handleSendEmail}
-              disabled={isDownloading || isSendingEmail || isUploading || !documentId}
+              disabled={isDownloading || isSendingEmail}
               className="flex-1 max-w-sm bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
             >
-              {isSendingEmail || isUploading ? (
+              {isSendingEmail ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <Send className="h-4 w-4 mr-2" />
               )}
-              {isSendingEmail || isUploading ? 'Enviando...' : 'Enviar por Correo'}
+              {isSendingEmail ? 'Enviando...' : 'Enviar por Correo'}
+            </Button>
+          )}
+
+          {sendResult?.kind === "sent" && (
+            <Button
+              onClick={onClose}
+              variant="outline"
+              className="flex-1 max-w-sm"
+            >
+              Cerrar
             </Button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+const NOTICE_STYLES = {
+  success: {
+    box: "border-green-200 bg-green-50 text-green-800",
+    Icon: CheckCircle2,
+  },
+  warning: {
+    box: "border-amber-200 bg-amber-50 text-amber-800",
+    Icon: AlertTriangle,
+  },
+  error: {
+    box: "border-red-200 bg-red-50 text-red-700",
+    Icon: XCircle,
+  },
+} as const;
+
+/**
+ * El resultado del envío, **fijo en la pantalla** y no en un aviso que se
+ * desvanece: lo que dice —sobre todo «no lo vuelvas a enviar»— tiene que
+ * seguir ahí cuando el ciudadano decida qué hacer.
+ */
+function SendNotice({
+  notice,
+  onConfirmedResend,
+}: {
+  notice: OversightSendNotice;
+  onConfirmedResend?: () => void;
+}) {
+  const { box, Icon } = NOTICE_STYLES[notice.tone];
+
+  return (
+    <div
+      role={notice.tone === "success" ? "status" : "alert"}
+      className={`mb-4 flex items-start gap-2 p-4 rounded-lg border text-sm ${box}`}
+    >
+      <Icon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+      <div className="space-y-1">
+        <p className="font-medium">{notice.title}</p>
+        <p>{notice.description}</p>
+        {onConfirmedResend && (
+          <button
+            type="button"
+            onClick={onConfirmedResend}
+            className="pt-1 font-medium underline underline-offset-2 hover:no-underline"
+          >
+            Ya comprobé que no le llegó: enviarlo de nuevo
+          </button>
+        )}
       </div>
     </div>
   );
