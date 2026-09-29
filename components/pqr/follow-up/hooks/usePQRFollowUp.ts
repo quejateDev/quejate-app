@@ -3,7 +3,6 @@ import { toast } from "@/hooks/use-toast";
 import { PQR } from "@/types/pqrsd";
 import { LawyerData } from "@/types/lawyer-profile";
 import { typeMap } from "@/constants/pqrMaps";
-import { calculateBusinessDaysExceeded } from "@/utils/dateHelpers";
 import { OversightEntity, TutelaFormData } from "../types";
 import { pqrFollowUpService } from "../services/pqrFollowUpService";
 import { formatText } from "@/utils/formatText";
@@ -144,7 +143,11 @@ export function usePQRFollowUp(
         throw new Error("Fecha de creación inválida");
       }
 
-      const daysExceeded = calculateBusinessDaysExceeded(pqrData.createdAt);
+      // Los días de retraso son los del servidor, los mismos con los que
+      // redacta la app móvil. Antes se contaban aquí desde la radicación, así
+      // que el plazo de respuesta completo de la entidad entraba en la tutela
+      // como retraso.
+      const daysExceeded = pqrData.businessDaysOverdue;
       const documentData = {
         ...formData,
         pqrType: pqrType,
@@ -205,7 +208,8 @@ export function usePQRFollowUp(
 
       const entityData = await entityResponse.json();
 
-      const daysExceeded = calculateBusinessDaysExceeded(pqrData.createdAt);
+      // Del servidor, como en la tutela (ver `handleGenerateDocument`).
+      const daysExceeded = pqrData.businessDaysOverdue;
       const documentData = {
         fullName: pqrData.creator
           ? `${pqrData.creator.name}`

@@ -35,4 +35,21 @@ export interface PQR {
     likes: number;
     comments: number;
   };
+  /**
+   * Vencimiento legal, **calculado por el servidor** en cada respuesta
+   * (`getOverdueInfo`, `quejate-backend/src/pqr/overdue/overdue.ts`): los mismos
+   * dos campos con los que la app móvil decide y redacta. `false` cuando el
+   * tipo no tiene plazo legal —las sugerencias— o la PQRSD ya está resuelta o
+   * cerrada.
+   *
+   * Los traen `GET /pqr`, `GET /pqr/:id` y `GET /pqr/user/:id`. La respuesta de
+   * radicar (`POST /pqr`) no: una PQRSD recién radicada no puede estar vencida.
+   */
+  isOverdue: boolean;
+  /**
+   * Días **hábiles** transcurridos desde `dueDate`, con los festivos
+   * colombianos calculados; `0` si no está vencida. Es el número que va en la
+   * tutela y en el oficio.
+   */
+  businessDaysOverdue: number;
 }
