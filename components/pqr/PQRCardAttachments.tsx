@@ -23,14 +23,18 @@ type PQRCardAttachmentsProps = {
 // `type` puede venir como MIME real ("image/jpeg", "video/mp4") o como
 // una extensión suelta ("jpg") en adjuntos antiguos. Detectamos por ambos,
 // y como último recurso por la extensión del nombre del archivo.
-const nameExt = (att: AttachmentItem) => att.name.toLowerCase().split(".").pop() ?? "";
+// Exportadas para que el detalle de la PQRSD (`pqr-attachments.tsx`) decida
+// igual que el muro.
+type MediaCheckable = Pick<AttachmentItem, "name" | "type">;
 
-const isImageAttachment = (att: AttachmentItem) => {
+const nameExt = (att: MediaCheckable) => att.name.toLowerCase().split(".").pop() ?? "";
+
+export const isImageAttachment = (att: MediaCheckable) => {
   const t = att.type.toLowerCase();
   return t.startsWith("image/") || imageExtensions.includes(t) || imageExtensions.includes(nameExt(att));
 };
 
-const isVideoAttachment = (att: AttachmentItem) => {
+export const isVideoAttachment = (att: MediaCheckable) => {
   const t = att.type.toLowerCase();
   return t.startsWith("video/") || videoExtensions.includes(t) || videoExtensions.includes(nameExt(att));
 };
