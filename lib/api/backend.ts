@@ -162,9 +162,18 @@ let warnedAboutMissingClientIp = false;
  * costó **A-21**.
  */
 export function trustedClientIp(request: Request): string | null {
+  return trustedClientIpFrom(request.headers);
+}
+
+/**
+ * {@link trustedClientIp} a partir de las cabeceras de la petición entrante:
+ * las del `Request` de una ruta de `app/api/*`, o las de `headers()` en un
+ * componente de servidor. Es la misma cabecera en los dos casos.
+ */
+function trustedClientIpFrom(incoming: Pick<Headers, "get">): string | null {
   // Vercel manda una sola IP; si algún día llegara una lista, la primera
   // entrada es la del cliente y las siguientes los saltos intermedios.
-  const value = request.headers
+  const value = incoming
     .get(PLATFORM_CLIENT_IP_HEADER)
     ?.split(",")[0]
     ?.trim();
@@ -250,6 +259,20 @@ export async function backendFetch(
   }
 
   const outgoing = new Headers(options.headers);
+
+  // 🔴 R-36 también para los componentes de servidor. El muro, el mapa, la
+  // página de radicar y las dos de detalle llaman aquí sin pasar por
+  // `forwardableHeaders`, así que el backend los contaba a todos por la IP de
+  // salida de Vercel, en un solo cubo de 120 por minuto: quien recargara el
+  // muro en bucle lo dejaba sin servicio para todos. La IP sale de la misma
+  // cabecera de confianza. El proxy de `app/api` ya la trae declarada, y
+  // entonces no se toca.
+  if (!outgoing.has(CLIENT_IP_HEADER)) {
+    const declared = clientIpDeclaration(trustedClientIpFrom(await headers()));
+    for (const [name, value] of Object.entries(declared)) {
+      outgoing.set(name, value);
+    }
+  }
 
   // Las dos credenciales, por separado y explícitas: el backend elige cuál
   // usar. Se fijan DESPUÉS de `options.headers` para que el reenvío en bloque
@@ -379,29 +402,40 @@ export function forwardableHeaders(request: Request): Record<string, string> {
     headers[key] = value;
   });
 
-  const clientIp = trustedClientIp(request);
-  if (clientIp) {
-    // Se sigue emitiendo, aunque ya no sea de donde el backend saca al
-    // ciudadano: es lo que alimenta su último escalón de respaldo y quitarla
-    // sería un cambio de comportamiento gratuito.
-    headers["x-forwarded-for"] = clientIp;
+  return { ...headers, ...clientIpDeclaration(trustedClientIp(request)) };
+}
 
-    // R-36 salida A: la IP va además en una cabecera propia, firmada. Las dos
-    // juntas o ninguna — la IP sin la clave el backend la descarta.
-    if (TRUSTED_PROXY_SECRET) {
-      headers[CLIENT_IP_HEADER] = clientIp;
-      headers[PROXY_KEY_HEADER] = TRUSTED_PROXY_SECRET;
-    } else if (
-      process.env.NODE_ENV === "production" &&
-      !warnedAboutMissingSecret
-    ) {
-      warnedAboutMissingSecret = true;
-      console.warn(
-        "[proxy] sin TRUSTED_PROXY_SECRET: el backend no puede creerse la IP " +
-          "de cliente y contará el rate limit por la IP de salida de este " +
-          "servidor (R-36).",
-      );
-    }
+/**
+ * Las cabeceras con las que esta web le declara al backend la IP del cliente,
+ * o ninguna si no la hay. Las usan las dos vías al backend: el proxy de
+ * `app/api/*` ({@link forwardableHeaders}) y los componentes de servidor
+ * ({@link backendFetch}).
+ */
+function clientIpDeclaration(clientIp: string | null): Record<string, string> {
+  if (!clientIp) {
+    return {};
+  }
+
+  // Se sigue emitiendo, aunque ya no sea de donde el backend saca al
+  // ciudadano: es lo que alimenta su último escalón de respaldo y quitarla
+  // sería un cambio de comportamiento gratuito.
+  const headers: Record<string, string> = { "x-forwarded-for": clientIp };
+
+  // R-36 salida A: la IP va además en una cabecera propia, firmada. Las dos
+  // juntas o ninguna — la IP sin la clave el backend la descarta.
+  if (TRUSTED_PROXY_SECRET) {
+    headers[CLIENT_IP_HEADER] = clientIp;
+    headers[PROXY_KEY_HEADER] = TRUSTED_PROXY_SECRET;
+  } else if (
+    process.env.NODE_ENV === "production" &&
+    !warnedAboutMissingSecret
+  ) {
+    warnedAboutMissingSecret = true;
+    console.warn(
+      "[proxy] sin TRUSTED_PROXY_SECRET: el backend no puede creerse la IP " +
+        "de cliente y contará el rate limit por la IP de salida de este " +
+        "servidor (R-36).",
+    );
   }
 
   return headers;
