@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { User, Scale, ArrowRight, Edit2 } from 'lucide-react';
+import { User, Scale, ArrowRight, Edit2, Info } from 'lucide-react';
 import Link from 'next/link';
 import usePQR from '@/hooks/usePQR';
 import { useToast } from '@/hooks/use-toast';
@@ -20,21 +20,19 @@ export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
   const currentUser = useFullUser();
-  const { pqrs, fetchUserPQRS, updatePQRStatus, isLoading: pqrsLoading, isLoadingMore: pqrsLoadingMore, hasMore, page } = usePQR();
+  const { pqrs, fetchAllUserPQRS, updatePQRStatus, allPQRSStatus } = usePQR();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
 
+  // P-09: la lista entera, y los filtros en el navegador. Con páginas de 10,
+  // el filtro por estado decía «No tienes PQRSD con estado…» de las que aún
+  // no se habían cargado.
   useEffect(() => {
     if (currentUser?.id) {
-      fetchUserPQRS(currentUser.id, 1, 10);
+      fetchAllUserPQRS(currentUser.id);
     }
-  }, [currentUser?.id, fetchUserPQRS]);
-
-  const loadMorePqrs = async () => {
-    if (pqrsLoading || !hasMore || !currentUser?.id) return;
-    await fetchUserPQRS(currentUser.id, page, 10);
-  };
+  }, [currentUser?.id, fetchAllUserPQRS]);
 
   const filteredPqrs = statusFilter === "all" 
     ? pqrs 
@@ -105,7 +103,9 @@ export default function ProfilePage() {
   }
 
   const renderPQRSContent = () => {
-    if (pqrsLoading && pqrs.length === 0) {
+    // También antes de empezar: si no, hasta que la página hidrata se lee
+    // «Aún no has creado ninguna PQRSD».
+    if (allPQRSStatus === "idle" || allPQRSStatus === "loading") {
       return (
         <div className="space-y-4">
           {[...Array(3)].map((_, index) => (
@@ -115,13 +115,18 @@ export default function ProfilePage() {
       );
     }
 
+    if (allPQRSStatus === "failed") {
+      return (
+        <p className="text-muted-foreground">
+          No se pudieron cargar tus PQRSD. Recarga la página para intentarlo de nuevo.
+        </p>
+      );
+    }
+
      if (filteredPqrs.length > 0) {
       return (
         <PQRListProfile
           pqrs={filteredPqrs}
-          isLoading={pqrsLoadingMore}
-          hasMore={hasMore}
-          onLoadMore={loadMorePqrs}
           currentUser={currentUser || null}
           onUpdatePQRStatus={updatePQRStatus}
         />
@@ -212,6 +217,14 @@ export default function ProfilePage() {
               onValueChange={setStatusFilter}
             />
           </div>
+          {allPQRSStatus === "truncated" && (
+            <div className="flex items-start gap-2 p-3 mb-4 rounded-lg border border-amber-200 bg-amber-50 text-sm text-amber-800">
+              <Info className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              <p>
+                Tienes más de {pqrs.length} PQRSD. Aquí están las {pqrs.length} más recientes, y los filtros solo buscan entre ellas.
+              </p>
+            </div>
+          )}
           {renderPQRSContent()}
         </div>
       </div>
