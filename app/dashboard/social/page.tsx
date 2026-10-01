@@ -13,18 +13,30 @@ interface User {
   name: string;
   image?: string | null;
   role: string;
-  _count: {
+  // Opcional: la búsqueda lo trae desde A-31 en el backend. Si esta página se
+  // despliega antes, los resultados llegan sin él y se pintan sin contadores.
+  _count?: {
     followers: number;
     following: number;
     PQRS: number;
   };
 }
 
+/**
+ * Resultados que devuelve como mucho `GET /users/search` (`SEARCH_TAKE` en el
+ * backend). Si llegan justo esos, puede haber más coincidencias.
+ */
+const SEARCH_LIMIT = 5;
+
 export default function SocialPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const debouncedSearch = useDebounce(searchQuery, 300);
+  // `null` mientras no hay texto: entonces se enseña el directorio.
+  const [results, setResults] = useState<User[] | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchFailed, setSearchFailed] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -45,11 +57,41 @@ export default function SocialPage() {
     fetchUsers();
   }, []);
 
-  // Búsqueda solo por nombre: el correo ya no viaja al cliente (dato personal).
-  const filteredUsers = users.filter(user => {
-    const searchLower = debouncedSearch.toLowerCase();
-    return user.name.toLowerCase().includes(searchLower);
-  });
+  // A-31: con texto se busca en el servidor, por nombre. Antes se filtraba en
+  // el navegador el directorio descargado, que son las 50 cuentas más
+  // recientes, así que a las más antiguas no las encontraba.
+  useEffect(() => {
+    const q = debouncedSearch.trim();
+    if (!q) {
+      setResults(null);
+      setSearchFailed(false);
+      return;
+    }
+
+    // Si se sigue escribiendo, la respuesta de una búsqueda anterior se descarta.
+    let current = true;
+    setIsSearching(true);
+    setSearchFailed(false);
+    fetch(`/api/users/search?q=${encodeURIComponent(q)}`)
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data: User[] = await response.json();
+        if (current) setResults(data);
+      })
+      .catch((error) => {
+        console.error('Error searching users:', error);
+        if (current) setSearchFailed(true);
+      })
+      .finally(() => {
+        if (current) setIsSearching(false);
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [debouncedSearch]);
+
+  const shownUsers = results ?? users;
 
   const UserCard = ({ user }: { user: User }) => (
     <Link href={`/dashboard/profile/${user.id}`}>
@@ -72,14 +114,16 @@ export default function SocialPage() {
               <h3 className="text-base md:text-lg font-semibold truncate">
                 {user.name}
               </h3>
-              <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-2 text-sm">
-                <span className="text-muted-foreground">
-                  {user._count.followers} seguidores
-                </span>
-                <span className="text-muted-foreground">
-                  {user._count.PQRS} PQRSD
-                </span>
-              </div>
+              {user._count && (
+                <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-2 text-sm">
+                  <span className="text-muted-foreground">
+                    {user._count.followers} seguidores
+                  </span>
+                  <span className="text-muted-foreground">
+                    {user._count.PQRS} PQRSD
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -108,14 +152,24 @@ export default function SocialPage() {
         <div className="grid grid-cols-1 gap-3 sm:gap-4">
           {isLoading ? (
             <p className="text-muted-foreground col-span-full text-center py-8">Cargando usuarios...</p>
-          ) : filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
+          ) : searchFailed ? (
+            <p className="text-muted-foreground col-span-full text-center py-8">No se pudo buscar. Inténtalo de nuevo.</p>
+          ) : isSearching && results === null ? (
+            <p className="text-muted-foreground col-span-full text-center py-8">Buscando usuarios...</p>
+          ) : shownUsers.length > 0 ? (
+            shownUsers.map((user) => (
               <UserCard key={user.id} user={user} />
             ))
           ) : (
             <p className="text-muted-foreground col-span-full text-center py-8">No se encontraron usuarios</p>
           )}
         </div>
+
+        {results?.length === SEARCH_LIMIT && (
+          <p className="text-sm text-muted-foreground text-center">
+            Se muestran las {SEARCH_LIMIT} primeras coincidencias. Escribe más del nombre para afinar.
+          </p>
+        )}
       </div>
     </div>
   );
