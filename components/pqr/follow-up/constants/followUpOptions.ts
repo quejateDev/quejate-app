@@ -23,10 +23,14 @@ export const followUpOptions = {
   },
 };
 
+// Cuando una PQRSD se vence se ofrecen todas las opciones y el ciudadano
+// escoge (decisión de la dirección del 05/10/2026). La sugerencia no tiene
+// plazo legal: no se vence, y la ventana de vencimiento no se abre para ella
+// (`PQRCardHeader`).
 export const pqrTypeOptions = {
-  PETITION: ["tutela", "abogado"],
-  CLAIM: ["tutela", "abogado"],
-  COMPLAINT: ["oversight", "abogado"],
-  REPORT: ["oversight", "abogado"],
+  PETITION: ["tutela", "oversight", "abogado"],
+  CLAIM: ["tutela", "oversight", "abogado"],
+  COMPLAINT: ["tutela", "oversight", "abogado"],
+  REPORT: ["tutela", "oversight", "abogado"],
   SUGGESTION: ["abogado"],
 } as const;

@@ -39,11 +39,6 @@ export function FollowUpOptionsList({
         {availableOptions.map((optionKey: string) => {
           const option = followUpOptions[optionKey as keyof typeof followUpOptions];
           const isOversight = optionKey === "oversight";
-          
-          const isDisabled = isOversight && 
-            !(pqrType === "COMPLAINT" || pqrType === "REPORT") && 
-            (!!error || !oversightEntity);
-            
           const description = isOversight ? getOversightDescription() : option.description;
 
           return (
@@ -54,7 +49,6 @@ export function FollowUpOptionsList({
               title={option.title}
               description={description}
               colorClass={option.colorClass}
-              disabled={isDisabled}
               onSelect={onOptionSelect}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
