@@ -321,9 +321,14 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     </FormItem>
                   )}
                 />
-                <p className="text-xs text-gray-500">
-                  Si marca esta opción, su nombre y datos de contacto no serán
-                  visibles para la entidad ni para otros usuarios.
+                {/* Al marcar la casilla, la ayuda pasa a decir lo que «anónima»
+                    implica (texto aprobado, decisión del 05/10/2026). El
+                    párrafo es el mismo nodo en los dos casos y va con
+                    aria-live para que un lector de pantalla lea el cambio. */}
+                <p className="text-xs text-gray-500" aria-live="polite">
+                  {isAnonymous
+                    ? "Si la envías como anónima, la entidad no sabrá quién eres y no podrá contestarte por correo. Si responde desde Quéjate, verás la respuesta aquí y te llegará a tu correo; si no, puede publicarla en su página web. Para que la tramite, cuenta hechos concretos —qué pasó, dónde y cuándo— y adjunta pruebas si las tienes."
+                    : "Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios."}
                 </p>
               </div>
 
