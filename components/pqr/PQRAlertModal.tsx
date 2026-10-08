@@ -48,7 +48,7 @@ export function PQRAlertModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-md bg-white max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center mb-3 gap-2 text-amber-600">
               <AlertTriangle className="h-5 w-5" />
