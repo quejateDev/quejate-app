@@ -64,6 +64,11 @@ export function PQRAlertModal({
               <DialogDescription>
                 ¿Has recibido una respuesta a tu solicitud o deseas realizar un seguimiento?
               </DialogDescription>
+              {/* Quéjate no sigue esos avisos de la entidad (decisión del
+                  05/10/2026): solo se lo recuerda al ciudadano. Texto aprobado. */}
+              <p className="text-sm text-muted-foreground">
+                Si la entidad te pidió completar información, te avisó que la pasó a otra entidad o que necesita más tiempo, espera esa nueva fecha antes de presentar una tutela.
+              </p>
             </div>
           </DialogHeader>
           
