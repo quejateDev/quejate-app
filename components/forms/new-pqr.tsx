@@ -327,7 +327,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     aria-live para que un lector de pantalla lea el cambio. */}
                 <p className="text-xs text-gray-500" aria-live="polite">
                   {isAnonymous
-                    ? "Si la envías como anónima, la entidad no sabrá quién eres y no podrá contestarte por correo. Si responde desde Quéjate, verás la respuesta aquí y te llegará a tu correo; si no, puede publicarla en su página web. Para que la tramite, cuenta hechos concretos —qué pasó, dónde y cuándo— y adjunta pruebas si las tienes."
+                    ? "Si la envías como anónima, la entidad no sabrá quién eres y no podrá contestarte por correo. Si responde desde Quéjate, verás la respuesta aquí y te llegará a tu correo; si no, puede publicarla en su página web. Para que la tramite, cuenta hechos concretos (qué pasó, dónde y cuándo) y adjunta pruebas si las tienes."
                     : "Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios."}
                 </p>
               </div>
