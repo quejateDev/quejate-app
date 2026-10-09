@@ -10,6 +10,7 @@ import { useVideoPlayback } from "../../hooks/useVideoPlayback";
 import { useComments } from "../../hooks/useComments";
 import { PQR } from "@/types/pqrsd";
 import { cn } from "@/lib/utils";
+import { isOverdueForOwner } from "./pqrOverdue";
 
 export type PQRCardProps = {
   pqr: PQR;
@@ -30,9 +31,8 @@ export function PQRCard({ pqr, initialLiked = false, user, isUserProfile = false
     pqr._count?.likes || 0
   );
 
-  const isOverdue = new Date(pqr.dueDate) < new Date() && 
-                   pqr.status !== "RESOLVED" && 
-                   pqr.status !== "CLOSED" && isUserProfile;
+  // La misma condición que el aviso de `PQRCardHeader`: sin aviso no hay borde.
+  const isOverdue = isOverdueForOwner(pqr, isUserProfile);
   
   const cardClasses = cn(
     "border-secondary",
