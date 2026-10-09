@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Info, Loader2 } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -69,6 +69,8 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     onSubmit,
     setRecaptchaToken,
   } = usePQRForm(entityId, userId);
+
+  const isAnonymous = form.watch("isAnonymous");
 
   if (isLoadingInitial) {
     return (
@@ -319,9 +321,14 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     </FormItem>
                   )}
                 />
-                <p className="text-xs text-gray-500">
-                  Si marca esta opción, su nombre y datos de contacto no serán
-                  visibles para la entidad ni para otros usuarios.
+                {/* Al marcar la casilla, la ayuda pasa a decir lo que «anónima»
+                    implica (texto aprobado, decisión del 05/10/2026). El
+                    párrafo es el mismo nodo en los dos casos y va con
+                    aria-live para que un lector de pantalla lea el cambio. */}
+                <p className="text-xs text-gray-500" aria-live="polite">
+                  {isAnonymous
+                    ? "Si la envías como anónima, la entidad no sabrá quién eres y no podrá contestarte por correo. Si responde desde Quéjate, verás la respuesta aquí y te llegará a tu correo; si no, puede publicarla en su página web. Para que la tramite, cuenta hechos concretos —qué pasó, dónde y cuándo— y adjunta pruebas si las tienes."
+                    : "Si marca esta opción, su nombre y datos de contacto no serán visibles para la entidad ni para otros usuarios."}
                 </p>
               </div>
 
@@ -386,23 +393,6 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   />
                 </div>
               )}
-              <div className="text-xs text-gray-600 mt-2">
-                Al enviar esta PQRSD, aceptas automáticamente nuestros{' '}
-                <Link 
-                  href="/terms" 
-                  className="text-blue-600 hover:text-blue-800 underline"
-                >
-                  Términos y Condiciones
-                </Link>
-                {' '}y{' '}
-                <Link 
-                  href="/policy" 
-                  className="text-blue-600 hover:text-blue-800 underline"
-                >
-                  Política de Privacidad
-                </Link>
-                .
-              </div>
 
               {/* Minimapa de ubicación */}
               <div className="flex flex-col space-y-1">
@@ -416,6 +406,47 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                   }}
                 />
               </div>
+
+              {/* Quéjate se presenta como facilitador y lo dice antes de enviar
+                  (decisión del 05/10/2026). Textos aprobados: van tal cual.
+                  En una anónima la entidad no tiene el correo del ciudadano,
+                  así que se cae lo que promete una respuesta por ese medio. */}
+              <div className="flex items-start gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700">
+                <Info className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <p>
+                  Quéjate es un facilitador. Te ayuda a escribir tu PQRSD y la
+                  envía a la entidad en tu nombre, porque tú lo pides. Quéjate
+                  no es la entidad ni una autoridad: no radica tu petición, no
+                  la responde y no puede garantizar que te respondan. El número
+                  que te da Quéjate es de seguimiento.{" "}
+                  {isAnonymous
+                    ? "El radicado oficial lo asigna la entidad."
+                    : "El radicado oficial lo asigna la entidad, que te lo enviará a tu correo junto con su respuesta."}
+                </p>
+              </div>
+
+              {/* Aceptar la respuesta por correo es lo que le permite a la
+                  entidad notificar por ese medio (CPACA, art. 56). */}
+              <p className="text-xs text-gray-600">
+                Al enviar, autorizas a Quéjate a enviar tu PQRSD a{" "}
+                {entityName || "la entidad"}
+                {isAnonymous ? "" : " y aceptas recibir su respuesta en tu correo"}
+                . Tus datos se tratan según la{" "}
+                <Link
+                  href="/policy"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Política de Privacidad
+                </Link>
+                , y al enviar aceptas los{" "}
+                <Link
+                  href="/terms"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Términos y Condiciones
+                </Link>
+                .
+              </p>
 
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
