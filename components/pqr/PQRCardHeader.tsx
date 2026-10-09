@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { PQR } from "@/types/pqrsd";
 import { AvatarFallback, Avatar, AvatarImage } from "../ui/avatar";
 import { formatDateWithoutTime } from "@/lib/dateUtils";
+import { isOverdueForOwner } from "./pqrOverdue";
 
 type PQRCardHeaderProps = {
   pqr: PQR;
@@ -20,20 +21,8 @@ export function PQRCardHeader({ pqr, isUserProfile, onUpdatePQRStatus }: PQRCard
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPrivate, setIsPrivate] = useState(pqr.private);
 
-  // Si está vencida lo decide el servidor (`isOverdue`), como en la app móvil.
-  // De este aviso sale la tutela, así que aquí la condición solo se estrecha,
-  // nunca se amplía:
-  // - por el tipo, porque una sugerencia no tiene plazo legal y no puede
-  //   acabar en una tutela aunque un dato llegara mal;
-  // - por el estado, porque «Ya recibí respuesta» lo cambia aquí mismo sin
-  //   volver a pedir la PQRSD, y el `isOverdue` que llegó con la lista seguiría
-  //   en `true` hasta recargar.
-  const showAlert =
-    isUserProfile &&
-    pqr.isOverdue === true &&
-    pqr.type !== "SUGGESTION" &&
-    pqr.status !== "RESOLVED" &&
-    pqr.status !== "CLOSED";
+  // La misma condición que pinta el borde rojo de la tarjeta (`PQRCard`).
+  const showAlert = isOverdueForOwner(pqr, isUserProfile);
 
   // También del servidor: el mismo número que irá en la tutela y en el oficio.
   const daysExceeded = pqr.businessDaysOverdue;
