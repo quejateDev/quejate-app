@@ -273,8 +273,8 @@ export default function Policy() {
             </li>
             <li>
               Generar, a solicitud del usuario, borradores de documentos
-              legales —acciones de tutela y oficios dirigidos a entes de
-              control— a partir de la información de su PQRSD y de los datos
+              legales (acciones de tutela y oficios dirigidos a entes de
+              control) a partir de la información de su PQRSD y de los datos
               que suministre para ello, y conservarlos durante seis (6) meses
               en un historial al que solo tiene acceso el propio usuario, para
               que pueda volver a consultarlos y descargarlos.
@@ -1184,8 +1184,8 @@ export default function Policy() {
             documento solicitado por el usuario.
           </p>
           <p className="mb-6">
-            Si la descripción de los hechos contiene datos sensibles —por
-            ejemplo, información relativa a la salud del usuario—, a los que se
+            Si la descripción de los hechos contiene datos sensibles (por
+            ejemplo, información relativa a la salud del usuario), a los que se
             aplica lo dispuesto en la sección DATOS SENSIBLES de esta política,
             esos datos también se envían a dicho proveedor y, en consecuencia,
             también salen del país.
