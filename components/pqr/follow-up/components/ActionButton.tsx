@@ -6,6 +6,16 @@ const LottiePlayer = dynamic(
   { ssr: false }
 );
 
+// Tailwind solo genera una clase si la encuentra escrita entera en algún
+// fichero. Compuestas con el color (`bg-${colorClass}-50`), las de `blue` y
+// `gray` existían porque otros ficheros las usan; las de `purple` no las usaba
+// ninguno, y el botón del ente de control salía blanco (R-52).
+const colorClasses: Record<string, { button: string; arrow: string }> = {
+  blue: { button: "bg-blue-50 hover:bg-blue-100", arrow: "text-blue-600" },
+  gray: { button: "bg-gray-50 hover:bg-gray-100", arrow: "text-gray-600" },
+  purple: { button: "bg-purple-50 hover:bg-purple-100", arrow: "text-purple-600" },
+};
+
 type ActionButtonProps = {
   option: string;
   icon: any;
@@ -29,10 +39,12 @@ export function ActionButton({
   onMouseEnter,
   onMouseLeave,
 }: ActionButtonProps) {
+  const colors = colorClasses[colorClass];
+
   return (
     <button
       onClick={() => onSelect(option)}
-      className={`flex items-center justify-between p-4 rounded-lg border ${colorClass}-200 bg-${colorClass}-50 hover:bg-${colorClass}-100 transition-colors ${
+      className={`flex items-center justify-between p-4 rounded-lg border ${colorClass}-200 ${colors?.button ?? ""} transition-colors ${
         disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
       onMouseEnter={() => onMouseEnter(option)}
@@ -50,7 +62,7 @@ export function ActionButton({
           </span>
         </div>
       </div>
-      <ChevronRight className={`h-5 w-5 text-${colorClass}-600`} />
+      <ChevronRight className={`h-5 w-5 ${colors?.arrow ?? ""}`} />
     </button>
   );
 }
