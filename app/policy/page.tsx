@@ -9,7 +9,7 @@ export default function Policy() {
             POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES - QUEJATE.COM.CO
           </h1>
           <p className="text-gray-600">
-            En vigor a partir del 28/9/2026
+            En vigor a partir del 13/10/2026
           </p>
         </div>
 
@@ -111,6 +111,20 @@ export default function Policy() {
               guarda en un servicio de almacenamiento externo bajo una dirección
               web única, y cualquier persona que llegue a conocer esa dirección
               puede acceder a él, incluso si la PQRSD es privada.
+            </li>
+            <li>
+              <span className="font-semibold">
+                Datos que solicita la entidad destinataria:
+              </span>{" "}
+              según la entidad a la que se dirija la PQRSD, el formulario puede
+              pedir datos adicionales, como el número del documento de identidad
+              y la dirección de residencia o de notificación del usuario. La
+              entidad puede exigirlos como obligatorios para dar trámite a la
+              solicitud. Estos datos se comparten únicamente con la entidad
+              destinataria, junto con la PQRSD, para que pueda identificar al
+              solicitante y responderle. La Plataforma no los publica: no
+              aparecen en el muro, en el perfil ni en el detalle público de la
+              PQRSD, aunque esta sea pública.
             </li>
             <li>
               <span className="font-semibold">
@@ -244,6 +258,11 @@ export default function Policy() {
             <li>
               Gestionar solicitudes, quejas y reclamos, direccionándolos a las
               áreas responsables.
+            </li>
+            <li>
+              Enviar a la entidad destinataria de una PQRSD los datos de
+              identificación y de contacto que su formulario solicite, con el
+              único fin de que pueda tramitarla y responderla.
             </li>
             <li>
               Visualizar en un mapa ciudadano las PQRSD públicas que el usuario
