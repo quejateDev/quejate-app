@@ -6,6 +6,7 @@ import UserSidebar from "@/components/sidebars/UserSidebar";
 import { getFullUserWithFollowingStatus } from "@/data/user";
 import { backendJson } from "@/lib/api/backend";
 import { currentUser } from "@/lib/auth";
+import { parseWallFilters } from "@/lib/wall-filters";
 import type { PQR } from "@/types/pqrsd";
 import type { SidebarUser } from "@/types/sidebar-user";
 
@@ -21,20 +22,12 @@ interface SidebarUsers {
 }
 
 interface PageProps {
-  searchParams: Promise<{
-    page?: string;
-    limit?: string;
-  }>;
-}
-
-interface PageProps {
-  searchParams: Promise<{
-    page?: string;
-    limit?: string;
-  }>;
+  /** Los filtros del muro (`parseWallFilters`), para abrir un enlace copiado igual. */
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
+  const initialFilters = parseWallFilters(await searchParams);
   const sessionUser = await currentUser();
   const fullUser = sessionUser
     ? await getFullUserWithFollowingStatus(sessionUser.id!)
@@ -89,6 +82,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             <PQRList 
               initialPqrs={wall.pqrs}
               currentUser={fullUser || null}
+              initialFilters={initialFilters}
             />
           </div>
           <div className="hidden lg:block mt-8">
