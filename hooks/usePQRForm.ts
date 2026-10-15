@@ -13,7 +13,9 @@ export const formSchema = z.object({
   departmentId: z.string().optional(),
   subject: z.string().min(1, "Describa brevemente el tema de su PQRSD"),
   description: z.string().min(1, "Describa detalladamente su PQRSD"),
-  customFields: z.record(z.string()),
+  // Un campo sin tocar llega sin valor: no debe frenar el envío (se manda "").
+  // Los obligatorios los frena el `required` del propio campo.
+  customFields: z.record(z.string().optional()),
   isAnonymous: z.boolean(),
   isPrivate: z.boolean(),
   includePhone: z.boolean(),
@@ -33,6 +35,10 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   const [entityCustomFields, setEntityCustomFields] = useState<CustomField[]>([]);
   const [areaCustomFields, setAreaCustomFields] = useState<CustomField[]>([]);
   const [entityName, setEntityName] = useState<string>("");
+  // Solo de la entidad, como en la app y en el servidor; sin configuración, lo
+  // de siempre.
+  const [allowAnonymous, setAllowAnonymous] = useState(true);
+  const [requireEvidence, setRequireEvidence] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pqr, setPqr] = useState({
@@ -147,6 +153,8 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     if (!selectedEntityId) {
       setEntityCustomFields([]);
       setEntityName("");
+      setAllowAnonymous(true);
+      setRequireEvidence(false);
       return;
     }
 
@@ -157,6 +165,8 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
         const data = await response.json();
         setEntityName(data?.name || "");
         setEntityCustomFields(data?.pqrConfig?.customFields || []);
+        setAllowAnonymous(data?.pqrConfig?.allowAnonymous ?? true);
+        setRequireEvidence(data?.pqrConfig?.requireEvidence ?? false);
       } catch (error) {
         console.error("Error al cargar la entidad:", error);
       }
@@ -164,6 +174,18 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
     fetchEntity();
   }, [selectedEntityId]);
+
+  // Si la entidad no recibe anónimas, la casilla no se puede marcar y se
+  // desmarca si ya lo estaba (la configuración llega después de pintar).
+  useEffect(() => {
+    if (!allowAnonymous) form.setValue("isAnonymous", false);
+  }, [allowAnonymous, form]);
+
+  // El aviso de adjunto obligatorio se va en cuanto hay un adjunto.
+  const attachmentCount = form.watch("attachments")?.length ?? 0;
+  useEffect(() => {
+    if (attachmentCount > 0) form.clearErrors("attachments");
+  }, [attachmentCount, form]);
 
   const watchedDepartmentId = form.watch("departmentId");
 
@@ -176,16 +198,43 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     }
   }, [watchedDepartmentId]);
 
-  // Unión de campos de entidad + área (dedupe por nombre; el área prevalece)
+  // Unión de campos de entidad + área: primero los de la entidad y detrás los
+  // del área cuyo nombre no esté ya. Con el mismo nombre en los dos gana la
+  // entidad, como en la app (`getMergedCustomFields`) y en el servidor
+  // (`buildPqrForm`, que es el que hace cumplir el formulario).
   useEffect(() => {
-    const byName = new Map<string, CustomField>();
-    for (const field of [...entityCustomFields, ...areaCustomFields]) {
-      byName.set(field.name, field);
+    const merged = [...entityCustomFields];
+    const seen = new Set(merged.map(field => field.name));
+    for (const field of areaCustomFields) {
+      if (!seen.has(field.name)) {
+        merged.push(field);
+        seen.add(field.name);
+      }
     }
-    setCustomFields(Array.from(byName.values()));
+    setCustomFields(merged);
   }, [entityCustomFields, areaCustomFields]);
 
+  // En una anónima no se piden ni se envían los campos con
+  // `isForAnonymous: false` (R-59, decisión del 14/10/2026: ni la cédula ni la
+  // dirección). Como en la app, solo se quitan los que lo dicen expresamente.
+  // Lo escrito sigue en el formulario: si se desmarca «anónima», vuelve.
+  const fieldsFor = (isAnonymous: boolean) =>
+    isAnonymous
+      ? customFields.filter(field => field.isForAnonymous !== false)
+      : customFields;
+
+  const visibleCustomFields = fieldsFor(form.watch("isAnonymous"));
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Como en la app y en el servidor: sin adjunto no sale (solo con
+    // `requireEvidence: true` en la entidad).
+    if (requireEvidence && values.attachments.length === 0) {
+      const message = "Debes adjuntar al menos un archivo de evidencia.";
+      form.setError("attachments", { message });
+      toast({ title: "Error", description: message, variant: "destructive" });
+      return;
+    }
+
     if (process.env.NODE_ENV === 'production' && !recaptchaToken) {
       toast({
         title: "Error",
@@ -199,7 +248,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
     try {
       const formData = new FormData();
-      const customFieldsData = customFields.map(field => ({
+      const customFieldsData = fieldsFor(values.isAnonymous).map(field => ({
         name: field.name,
         value: values.customFields[field.name] || "",
         type: field.type,
@@ -259,6 +308,18 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           description: "Por favor completa la verificación reCAPTCHA",
           variant: "destructive",
         });
+      } else if (
+        error.response?.status === 400 &&
+        typeof error.response?.data?.error === "string" &&
+        error.response.data.error.trim() !== ""
+      ) {
+        // El servidor dice por qué la rechaza (p. ej. un campo obligatorio
+        // vacío, o una entidad que no recibe anónimas): se enseña su texto.
+        toast({
+          title: "Error",
+          description: error.response.data.error,
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Error",
@@ -274,8 +335,9 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   return {
     form,
     departments,
-    customFields,
+    customFields: visibleCustomFields,
     entityName,
+    allowAnonymous,
     currentUser,
     isLoading,
     isLoadingInitial,

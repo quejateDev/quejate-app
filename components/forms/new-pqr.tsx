@@ -61,6 +61,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
     departments,
     customFields,
     entityName,
+    allowAnonymous,
     currentUser,
     isLoading,
     isLoadingInitial,
@@ -313,6 +314,7 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                           id="isAnonymous"
                           checked={field.value}
                           onCheckedChange={(checked) => field.onChange(checked)}
+                          disabled={!allowAnonymous}
                         />
                       </FormControl>
                       <FormLabel>
@@ -321,6 +323,11 @@ export function NewPQRForm({ entityId }: NewPQRFormProps) {
                     </FormItem>
                   )}
                 />
+                {!allowAnonymous && (
+                  <p className="text-xs text-gray-700">
+                    Esta entidad no recibe PQRSD anónimas.
+                  </p>
+                )}
                 {/* Al marcar la casilla, la ayuda pasa a decir lo que «anónima»
                     implica (texto aprobado, decisión del 05/10/2026). El
                     párrafo es el mismo nodo en los dos casos y va con
