@@ -176,13 +176,20 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     }
   }, [watchedDepartmentId]);
 
-  // Unión de campos de entidad + área (dedupe por nombre; el área prevalece)
+  // Unión de campos de entidad + área: primero los de la entidad y detrás los
+  // del área cuyo nombre no esté ya. Con el mismo nombre en los dos gana la
+  // entidad, como en la app (`getMergedCustomFields`) y en el servidor
+  // (`buildPqrForm`, que es el que hace cumplir el formulario).
   useEffect(() => {
-    const byName = new Map<string, CustomField>();
-    for (const field of [...entityCustomFields, ...areaCustomFields]) {
-      byName.set(field.name, field);
+    const merged = [...entityCustomFields];
+    const seen = new Set(merged.map(field => field.name));
+    for (const field of areaCustomFields) {
+      if (!seen.has(field.name)) {
+        merged.push(field);
+        seen.add(field.name);
+      }
     }
-    setCustomFields(Array.from(byName.values()));
+    setCustomFields(merged);
   }, [entityCustomFields, areaCustomFields]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
