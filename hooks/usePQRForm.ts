@@ -33,6 +33,9 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   const [entityCustomFields, setEntityCustomFields] = useState<CustomField[]>([]);
   const [areaCustomFields, setAreaCustomFields] = useState<CustomField[]>([]);
   const [entityName, setEntityName] = useState<string>("");
+  // Solo de la entidad, como en la app y en el servidor; sin configuración, lo
+  // de siempre.
+  const [allowAnonymous, setAllowAnonymous] = useState(true);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pqr, setPqr] = useState({
@@ -147,6 +150,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     if (!selectedEntityId) {
       setEntityCustomFields([]);
       setEntityName("");
+      setAllowAnonymous(true);
       return;
     }
 
@@ -157,6 +161,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
         const data = await response.json();
         setEntityName(data?.name || "");
         setEntityCustomFields(data?.pqrConfig?.customFields || []);
+        setAllowAnonymous(data?.pqrConfig?.allowAnonymous ?? true);
       } catch (error) {
         console.error("Error al cargar la entidad:", error);
       }
@@ -164,6 +169,12 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
     fetchEntity();
   }, [selectedEntityId]);
+
+  // Si la entidad no recibe anónimas, la casilla no se puede marcar y se
+  // desmarca si ya lo estaba (la configuración llega después de pintar).
+  useEffect(() => {
+    if (!allowAnonymous) form.setValue("isAnonymous", false);
+  }, [allowAnonymous, form]);
 
   const watchedDepartmentId = form.watch("departmentId");
 
@@ -294,6 +305,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     departments,
     customFields: visibleCustomFields,
     entityName,
+    allowAnonymous,
     currentUser,
     isLoading,
     isLoadingInitial,
