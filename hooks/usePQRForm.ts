@@ -306,6 +306,18 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
           description: "Por favor completa la verificación reCAPTCHA",
           variant: "destructive",
         });
+      } else if (
+        error.response?.status === 400 &&
+        typeof error.response?.data?.error === "string" &&
+        error.response.data.error.trim() !== ""
+      ) {
+        // El servidor dice por qué la rechaza (p. ej. un campo obligatorio
+        // vacío, o una entidad que no recibe anónimas): se enseña su texto.
+        toast({
+          title: "Error",
+          description: error.response.data.error,
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Error",
