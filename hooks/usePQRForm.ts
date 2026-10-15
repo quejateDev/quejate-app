@@ -36,6 +36,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   // Solo de la entidad, como en la app y en el servidor; sin configuración, lo
   // de siempre.
   const [allowAnonymous, setAllowAnonymous] = useState(true);
+  const [requireEvidence, setRequireEvidence] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pqr, setPqr] = useState({
@@ -151,6 +152,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
       setEntityCustomFields([]);
       setEntityName("");
       setAllowAnonymous(true);
+      setRequireEvidence(false);
       return;
     }
 
@@ -162,6 +164,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
         setEntityName(data?.name || "");
         setEntityCustomFields(data?.pqrConfig?.customFields || []);
         setAllowAnonymous(data?.pqrConfig?.allowAnonymous ?? true);
+        setRequireEvidence(data?.pqrConfig?.requireEvidence ?? false);
       } catch (error) {
         console.error("Error al cargar la entidad:", error);
       }
@@ -175,6 +178,12 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   useEffect(() => {
     if (!allowAnonymous) form.setValue("isAnonymous", false);
   }, [allowAnonymous, form]);
+
+  // El aviso de adjunto obligatorio se va en cuanto hay un adjunto.
+  const attachmentCount = form.watch("attachments")?.length ?? 0;
+  useEffect(() => {
+    if (attachmentCount > 0) form.clearErrors("attachments");
+  }, [attachmentCount, form]);
 
   const watchedDepartmentId = form.watch("departmentId");
 
@@ -215,6 +224,15 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   const visibleCustomFields = fieldsFor(form.watch("isAnonymous"));
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Como en la app y en el servidor: sin adjunto no sale (solo con
+    // `requireEvidence: true` en la entidad).
+    if (requireEvidence && values.attachments.length === 0) {
+      const message = "Debes adjuntar al menos un archivo de evidencia.";
+      form.setError("attachments", { message });
+      toast({ title: "Error", description: message, variant: "destructive" });
+      return;
+    }
+
     if (process.env.NODE_ENV === 'production' && !recaptchaToken) {
       toast({
         title: "Error",
