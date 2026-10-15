@@ -13,7 +13,9 @@ export const formSchema = z.object({
   departmentId: z.string().optional(),
   subject: z.string().min(1, "Describa brevemente el tema de su PQRSD"),
   description: z.string().min(1, "Describa detalladamente su PQRSD"),
-  customFields: z.record(z.string()),
+  // Un campo sin tocar llega sin valor: no debe frenar el envío (se manda "").
+  // Los obligatorios los frena el `required` del propio campo.
+  customFields: z.record(z.string().optional()),
   isAnonymous: z.boolean(),
   isPrivate: z.boolean(),
   includePhone: z.boolean(),
