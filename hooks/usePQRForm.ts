@@ -192,6 +192,17 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
     setCustomFields(merged);
   }, [entityCustomFields, areaCustomFields]);
 
+  // En una anónima no se piden ni se envían los campos con
+  // `isForAnonymous: false` (R-59, decisión del 14/10/2026: ni la cédula ni la
+  // dirección). Como en la app, solo se quitan los que lo dicen expresamente.
+  // Lo escrito sigue en el formulario: si se desmarca «anónima», vuelve.
+  const fieldsFor = (isAnonymous: boolean) =>
+    isAnonymous
+      ? customFields.filter(field => field.isForAnonymous !== false)
+      : customFields;
+
+  const visibleCustomFields = fieldsFor(form.watch("isAnonymous"));
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (process.env.NODE_ENV === 'production' && !recaptchaToken) {
       toast({
@@ -206,7 +217,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
     try {
       const formData = new FormData();
-      const customFieldsData = customFields.map(field => ({
+      const customFieldsData = fieldsFor(values.isAnonymous).map(field => ({
         name: field.name,
         value: values.customFields[field.name] || "",
         type: field.type,
@@ -281,7 +292,7 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
   return {
     form,
     departments,
-    customFields,
+    customFields: visibleCustomFields,
     entityName,
     currentUser,
     isLoading,
