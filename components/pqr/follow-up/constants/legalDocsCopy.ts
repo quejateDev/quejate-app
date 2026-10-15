@@ -51,6 +51,22 @@ export const OVERSIGHT_SEND_NOT_SAVED_NOTICE =
   "Como no pudimos guardarlo, tampoco podemos enviárselo por correo al ente de control: el envío sale del documento guardado. Si quieres enviarlo, vuelve a generarlo más tarde.";
 
 /**
+ * El oficio lleva el nombre de quien lo envía, y el correo al ente de control
+ * su nombre, su correo y su teléfono (los pone el backend). Decisión de
+ * dirección del 14/10/2026: se mantienen, para que el ente pueda responder y
+ * actuar, pero se avisa **antes** de enviar.
+ */
+export const OVERSIGHT_SEND_IDENTITY_NOTICE =
+  "Al enviar el oficio, el ente de control recibirá tu nombre y tus datos de contacto, para que pueda responderte y actuar frente a la entidad que no respondió tu solicitud.";
+
+/**
+ * Lo mismo cuando la PQRSD es anónima: lo es ante la entidad, no ante el ente
+ * de control. Va antes del aviso anterior.
+ */
+export const OVERSIGHT_SEND_ANONYMOUS_NOTICE =
+  "Tu PQRSD es anónima ante la entidad, pero el oficio no lo es.";
+
+/**
  * El backend respondió 404 al pedir el PDF: el documento caducó, o no existe,
  * o no es de quien lo pide. El backend no distingue los tres casos, a
  * propósito, así que el mensaje tampoco.

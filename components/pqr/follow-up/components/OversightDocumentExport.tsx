@@ -25,6 +25,8 @@ import {
 } from "../utils/oversightSend";
 import {
   LEGAL_DOC_UNAVAILABLE,
+  OVERSIGHT_SEND_ANONYMOUS_NOTICE,
+  OVERSIGHT_SEND_IDENTITY_NOTICE,
   OVERSIGHT_SEND_NOT_SAVED_NOTICE,
 } from "../constants/legalDocsCopy";
 import { LegalDocumentNotices } from "./LegalDocumentNotices";
@@ -161,6 +163,12 @@ export function OversightDocumentExport({
                 <p className="text-sm mt-1">
                   También recibirás una confirmación en tu correo electrónico.
                 </p>
+                {pqrData.anonymous && (
+                  <p className="text-sm mt-1 font-medium">
+                    {OVERSIGHT_SEND_ANONYMOUS_NOTICE}
+                  </p>
+                )}
+                <p className="text-sm mt-1">{OVERSIGHT_SEND_IDENTITY_NOTICE}</p>
               </div>
             </div>
           </div>
