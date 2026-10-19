@@ -82,8 +82,8 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
         <CardHeader className="bg-muted py-3 mb-6 rounded-t-md">
           <CardTitle className="text-2xl font-bold text-start">
             {pqr.consecutiveCode
-              ? `No. Radicado ${pqr.consecutiveCode}`
-              : "PQRSD sin número de radicado"}
+              ? `Número de seguimiento ${pqr.consecutiveCode}`
+              : "PQRSD sin número de seguimiento"}
           </CardTitle>
         </CardHeader>
         <CardContent>
