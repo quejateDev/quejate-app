@@ -12,6 +12,7 @@ import { entityFilterOptions } from "@/components/filters/entity-filter";
 import { useWholeWall } from "@/hooks/useWholeWall";
 import {
   EMPTY_WALL_FILTERS,
+  WALL_FILTERS_VISIBLE,
   applyWallFilters,
   cityFilterOptions,
   hasWallFilters,
@@ -42,7 +43,9 @@ export default function PQRList({ initialPqrs, currentUser, initialFilters }: PQ
   // siempre y no se pide nada más.
   const [filters, setFilters] = useState<WallFilters>(initialFilters);
   const filtering = hasWallFilters(filters);
-  const wholeWall = useWholeWall();
+  // El catálogo de entidades solo lo usa el filtro de ciudad: con los filtros
+  // escondidos, buscar no lo pide.
+  const wholeWall = useWholeWall({ withPlaces: WALL_FILTERS_VISIBLE });
   const { load: loadWholeWall } = wholeWall;
 
   useEffect(() => {
@@ -149,8 +152,10 @@ export default function PQRList({ initialPqrs, currentUser, initialFilters }: PQ
           <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
             <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <p>
-              El muro tiene más de {wholeWall.pqrs.length} PQRSD. La búsqueda y los filtros
-              miran solo las {wholeWall.pqrs.length} más recientes.
+              El muro tiene más de {wholeWall.pqrs.length} PQRSD.{" "}
+              {WALL_FILTERS_VISIBLE
+                ? `La búsqueda y los filtros miran solo las ${wholeWall.pqrs.length} más recientes.`
+                : `La búsqueda mira solo las ${wholeWall.pqrs.length} más recientes.`}
             </p>
           </div>
         )}
@@ -175,10 +180,12 @@ export default function PQRList({ initialPqrs, currentUser, initialFilters }: PQ
         ) : (
           <div className="space-y-4 py-12 text-center">
             <p className="text-muted-foreground">
-              Ninguna PQRSD del muro coincide con la búsqueda y los filtros.
+              {WALL_FILTERS_VISIBLE
+                ? "Ninguna PQRSD del muro coincide con la búsqueda y los filtros."
+                : "Ninguna PQRSD del muro coincide con la búsqueda."}
             </p>
             <Button variant="outline" onClick={() => setFilters(EMPTY_WALL_FILTERS)}>
-              Quitar filtros
+              {WALL_FILTERS_VISIBLE ? "Quitar filtros" : "Borrar la búsqueda"}
             </Button>
           </div>
         )}

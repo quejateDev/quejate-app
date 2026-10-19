@@ -94,8 +94,12 @@ async function fetchPlaces(): Promise<PlacesByEntity> {
  *
  * Cada cosa se pide una vez por visita a la página. `load` vuelve a pedir lo
  * que falló, así que sirve también para «Reintentar».
+ *
+ * Con `withPlaces` en `false`, `load` no pide el catálogo y `placesStatus` se
+ * queda en `"idle"`: solo lo usa el filtro de ciudad, y con los filtros del
+ * muro escondidos una búsqueda no lo necesita.
  */
-export function useWholeWall() {
+export function useWholeWall({ withPlaces }: { withPlaces: boolean }) {
   const [wall, setWall] = useState<{ status: WholeWallStatus; pqrs: PQR[] }>({
     status: "idle",
     pqrs: [],
@@ -124,7 +128,7 @@ export function useWholeWall() {
         });
     }
 
-    if (!placesRequested.current) {
+    if (withPlaces && !placesRequested.current) {
       placesRequested.current = true;
       setPlaces((prev) => ({ ...prev, status: "loading" }));
       fetchPlaces()
@@ -135,7 +139,7 @@ export function useWholeWall() {
           setPlaces({ status: "failed", places: new Map() });
         });
     }
-  }, []);
+  }, [withPlaces]);
 
   return {
     wallStatus: wall.status,
