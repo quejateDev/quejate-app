@@ -288,8 +288,8 @@ export const usePQRForm = (entityId: string, userId: string | undefined) => {
 
       if (response) {
         toast({
-          title: "PQRSD creada",
-          description: "La PQRSD ha sido creada exitosamente, la entidad deberá responder pronto.",
+          title: "PQRSD enviada",
+          description: "Tu PQRSD quedó registrada y Quéjate la envió a la entidad. El radicado oficial lo asigna la entidad.",
         });
         router.push("/dashboard");
       }
