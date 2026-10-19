@@ -249,7 +249,7 @@ export default function EntityResponsePage() {
                   href={`/dashboard/profile/pqr/${pqrId}`}
                   className="text-sm font-semibold text-secondary hover:text-quaternary-foreground underline-offset-2 hover:underline transition-colors"
                 >
-                  No. {pqr.consecutiveCode}
+                  Número de seguimiento {pqr.consecutiveCode}
                 </Link>
               )}
             </div>
