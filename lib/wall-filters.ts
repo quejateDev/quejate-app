@@ -5,6 +5,18 @@ import type { PQR } from "@/types/pqrsd";
 import { formatText } from "@/utils/formatText";
 
 /**
+ * Si el muro enseña los cinco filtros (tipo, estado, entidad, ciudad y «Solo
+ * vencidas») debajo de la caja de búsqueda.
+ *
+ * Apagado desde el 19/10/2026: la dirección del proyecto no les encontró
+ * utilidad y decidió esconderlos sin borrar el código. Apagado, encima de la
+ * lista solo queda la caja, `parseWallFilters` solo lee `q` (un enlace con
+ * filtros abre el muro sin ellos) y una búsqueda no pide el catálogo de
+ * entidades. Con `true` vuelven tal cual estaban en el PR #186.
+ */
+export const WALL_FILTERS_VISIBLE: boolean = false;
+
+/**
  * Lo que se busca y se filtra en el muro. Con todo vacío, el muro es el de
  * siempre: la primera página del servidor y «Mostrar más».
  */
@@ -57,10 +69,17 @@ function oneOf<T extends string>(value: string | null, allowed: readonly T[]): T
  * Los filtros que trae la dirección. Un tipo o un estado que no existe se
  * ignora; una entidad o una ciudad que no está en el muro se deja, y el muro
  * dirá que no hay resultados.
+ *
+ * Con los filtros escondidos solo se lee el texto: un enlace copiado con
+ * filtros abriría un muro filtrado sin nada en pantalla que lo diga ni que
+ * deje quitarlo. Al sincronizar la dirección, los demás parámetros se borran.
  */
 export function parseWallFilters(params: SearchParams): WallFilters {
+  const text = first(params[PARAM.text]) ?? "";
+  if (!WALL_FILTERS_VISIBLE) return { ...EMPTY_WALL_FILTERS, text };
+
   return {
-    text: first(params[PARAM.text]) ?? "",
+    text,
     type: oneOf(first(params[PARAM.type]), Object.keys(typeMap) as PQR["type"][]),
     status: oneOf(first(params[PARAM.status]), Object.keys(statusMap) as PQR["status"][]),
     entityId: first(params[PARAM.entityId]),
