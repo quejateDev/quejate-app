@@ -42,12 +42,12 @@ export function CertificateDownloadButton({
 
       toast({
         title: "Documento descargado",
-        description: "El certificado de radicación se ha descargado correctamente",
+        description: "La constancia de envío se ha descargado correctamente",
       });
     } catch (error) {
       console.error("Error al descargar el certificado:", error);
       toast({
-        ...describePdfError(error, "El certificado de esta PQRSD no está disponible."),
+        ...describePdfError(error, "La constancia de envío de esta PQRSD no está disponible."),
         variant: "destructive",
       });
     } finally {
@@ -62,7 +62,7 @@ export function CertificateDownloadButton({
       ) : (
         <Download className="h-4 w-4 mr-2" />
       )}
-      Descargar certificado de radicación
+      Descargar constancia de envío
     </Button>
   );
 }

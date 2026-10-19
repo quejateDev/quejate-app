@@ -109,14 +109,14 @@ export function DocumentExport({
 
       toast({
         title: "Documento descargado",
-        description: "El certificado PDF se ha descargado correctamente",
+        description: "La constancia de envío se ha descargado correctamente",
       });
     } catch (error) {
       console.error("Error al descargar el certificado:", error);
       toast({
         ...describePdfError(
           error,
-          "El certificado de esta PQRSD no está disponible."
+          "La constancia de envío de esta PQRSD no está disponible."
         ),
         variant: "destructive",
       });
@@ -309,7 +309,7 @@ export function DocumentExport({
 
             <div className="border-t border-slate-200 w-full max-w-xl pt-6 mt-2 flex flex-col items-center">
               <h5 className="font-medium text-sm mb-4">
-                Certificados y Comprobantes
+                Constancias
               </h5>
               <Button
                 variant="outline"
@@ -326,7 +326,7 @@ export function DocumentExport({
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-medium text-emerald-700">
-                    Certificado de radicación
+                    Constancia de envío
                   </span>
                   <span className="text-xs text-muted-foreground">
                     Comprobante de envío de su PQRSD
