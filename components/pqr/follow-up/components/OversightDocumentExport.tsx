@@ -124,8 +124,12 @@ export function OversightDocumentExport({
     }
   };
 
+  // En un teléfono pequeño el pie (avisos y botones) no cabe en la ventana, que
+  // corta lo que sobra: el documento quedaba en cero líneas y «Enviar por
+  // Correo» por debajo, sin poder llegar. Ahora, si no cabe, se desplaza todo,
+  // y el documento conserva un alto mínimo. En escritorio cabe y no cambia.
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-y-auto">
       <div className="p-6 border-b">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">
@@ -134,7 +138,7 @@ export function OversightDocumentExport({
         </div>
       </div>
 
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="flex-1 min-h-48 p-6 overflow-y-auto">
         <div className="prose max-w-none whitespace-pre-wrap">
           {generatedDocument}
         </div>
