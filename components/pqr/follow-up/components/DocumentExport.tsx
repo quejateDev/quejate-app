@@ -313,7 +313,7 @@ export function DocumentExport({
               </h5>
               <Button
                 variant="outline"
-                className="flex items-center gap-2 border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 w-full max-w-md h-16 shadow-sm"
+                className="flex items-center gap-2 border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 w-full max-w-md h-16 shadow-sm whitespace-normal"
                 onClick={handleDownloadCertificate}
                 disabled={isDownloading || isDownloadingCertificate || !pqrData}
               >
@@ -349,11 +349,14 @@ export function DocumentExport({
             <div className="text-xs text-muted-foreground text-start max-w-md mt-4 p-3 bg-slate-100 rounded-lg border border-slate-200">
               <p>
                 Una vez descargados los documentos necesarios, puede dirigirse al siguiente enlace para subir la tutela:&nbsp;
+                {/* La dirección no tiene dónde partirse y, pegada a «tutela:»
+                    por el &nbsp;, ensanchaba la ventana más que un teléfono:
+                    se cortaba por la derecha. Solo se parte si no cabe. */}
                 <a
                   href="https://procesojudicial.ramajudicial.gov.co/tutelaenlinea"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800"
+                  className="text-blue-600 underline hover:text-blue-800 [overflow-wrap:anywhere]"
                 >
                   https://procesojudicial.ramajudicial.gov.co/tutelaenlinea
                 </a>

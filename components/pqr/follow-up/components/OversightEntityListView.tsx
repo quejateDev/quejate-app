@@ -122,7 +122,9 @@ export function OversightEntityListView({
             onClick={() => onEntitySelect(entity)}
           >
             <CardContent className="p-4">
-              <div className="flex items-start justify-between">
+              {/* En un teléfono pequeño «Seleccionar» baja debajo del ente en
+                  vez de salirse por la derecha. */}
+              <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex-1">
                   <h3 className="font-semibold text-sm mb-2">{entity.name}</h3>
                   
@@ -135,7 +137,7 @@ export function OversightEntityListView({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Mail className="h-3 w-3" />
-                      <span>{entity.email}</span>
+                      <span className="[overflow-wrap:anywhere]">{entity.email}</span>
                     </div>
                     
                     {entity.phone && (
@@ -157,7 +159,7 @@ export function OversightEntityListView({
                   </div>
                 </div>
                 
-                <Button size="sm" className="ml-4">
+                <Button size="sm">
                   Seleccionar
                 </Button>
               </div>

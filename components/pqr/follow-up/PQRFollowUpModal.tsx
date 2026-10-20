@@ -55,17 +55,20 @@ export function PQRFollowUpModal({
     setShowLawyerRequestModal,
   } = usePQRFollowUp(pqrType, pqrData, onOpenChange);
 
+  // Sin `max-h-[90vh] overflow-y-auto` la ventana va centrada y fija: en un
+  // teléfono pequeño se sale por arriba y por abajo sin poder desplazarse. El
+  // documento generado ya lo trae, con su propio desplazamiento por dentro.
   const getDialogClassName = () => {
     if (showDocumentExport && generatedDocument) {
       return "sm:max-w-3xl p-0 overflow-hidden flex flex-col max-h-[90vh] h-[90vh]";
     }
     if (showTutelaForm) {
-      return "sm:max-w-xl";
+      return "sm:max-w-xl max-h-[90vh] overflow-y-auto";
     }
     if (showLawyersList || showOversightEntityList || isGeneratingOversightDoc) {
-      return "sm:max-w-2xl";
+      return "sm:max-w-2xl max-h-[90vh] overflow-y-auto";
     }
-    return "sm:max-w-md";
+    return "sm:max-w-md max-h-[90vh] overflow-y-auto";
   };
 
   const renderContent = () => {
