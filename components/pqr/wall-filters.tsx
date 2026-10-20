@@ -87,7 +87,7 @@ export function WallFiltersBar({
           type="search"
           value={filters.text}
           onChange={(event) => set({ text: event.target.value })}
-          placeholder="Buscar por asunto, descripción o entidad"
+          placeholder="Buscar en el muro"
           aria-label="Buscar en el muro"
           className="bg-white pl-9"
         />
