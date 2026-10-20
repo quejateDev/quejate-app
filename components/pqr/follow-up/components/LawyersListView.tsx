@@ -191,7 +191,7 @@ export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersLi
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
                         <div className="space-y-1">
-                          <div className=" flex items-center space-x-2">
+                          <div className=" flex flex-wrap items-center space-x-2">
                             <h3 className="font-medium text-gray-900">
                               {lawyer.user.name} -
                             </h3>
@@ -232,7 +232,9 @@ export function LawyersListView({ pqrData, onBack, onLawyerSelected }: LawyersLi
                         </div>
                       )}
 
-                      <div className="flex space-x-2 pt-3">
+                      {/* En un teléfono los dos botones no caben en una fila:
+                          bajan uno debajo del otro en vez de salirse. */}
+                      <div className="flex flex-wrap gap-2 pt-3">
                         <Button
                           variant="outline"
                           size="sm"
