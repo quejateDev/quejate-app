@@ -392,8 +392,14 @@ export function CategorySelection({
               : entity.regionalDepartmentId === selectedDepartmentId ||
                 (entity.municipalityId && municipalities.some((m) => m.id === entity.municipalityId))
             : true;
+          // Un municipio es parte de su departamento: con un municipio elegido
+          // salen las entidades de ese municipio y también las departamentales
+          // (sin municipio) del departamento elegido, como su gobernación.
           const matchesMunicipality = selectedMunicipalityId
-            ? entity.municipalityId === selectedMunicipalityId
+            ? entity.municipalityId === selectedMunicipalityId ||
+              (!entity.municipalityId &&
+                !!selectedDepartmentId &&
+                entity.regionalDepartmentId === selectedDepartmentId)
             : true;
           return (
             (matchesName || matchesDescription) &&
