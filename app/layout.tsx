@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import "@/app/globals.css"; 
 import { SessionProvider } from "next-auth/react"
 import { LoginModalProvider } from "@/providers/LoginModalProvider";
-import { GoogleTagManager } from '@next/third-parties/google'
+import { SiteGoogleTagManager } from "@/components/SiteGoogleTagManager";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -36,7 +36,8 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/IsotipoVector.svg" type="image/svg+xml" />
-        <GoogleTagManager gtmId="GTM-K8H7JGNP" />
+        {/* Fuera de /entidad/*: ver el componente. */}
+        <SiteGoogleTagManager />
       </head>
       <body className="font-sans antialiased"> 
         <SessionProvider refetchOnWindowFocus={false}>
