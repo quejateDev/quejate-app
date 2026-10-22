@@ -36,7 +36,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/IsotipoVector.svg" type="image/svg+xml" />
-        {/* Fuera de /entidad/*: ver el componente. */}
+        {/* Fuera de /entidad/*, /policy y /terms: ver el componente. */}
         <SiteGoogleTagManager />
       </head>
       <body className="font-sans antialiased"> 
