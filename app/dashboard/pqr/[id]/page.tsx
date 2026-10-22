@@ -6,6 +6,10 @@ import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
 import { PQRAttachments } from "@/components/pqr/pqr-attachments";
 import { PQRCustomFields } from "@/components/pqr/pqr-custom-fields";
 import { CertificateDownloadButton } from "@/components/pqr/CertificateDownloadButton";
+import {
+  EntityLinkTimeline,
+  type PqrEntityLinkStatus,
+} from "@/components/pqr/entity-link-timeline";
 import { statusMap, typeMap } from "@/constants/pqrMaps";
 
 interface PQRDetailPageProps {
@@ -45,6 +49,12 @@ interface PqrDetail {
   isOverdue: boolean;
   businessDaysOverdue: number;
   hasLegalDeadline: boolean;
+  /**
+   * El enlace de la entidad (R-42): cuándo lo abrió y cuándo confirmó. Solo
+   * le llega al autor, y `null` si la PQRSD no tiene enlace; a los demás no
+   * les llega.
+   */
+  entityLink?: PqrEntityLinkStatus | null;
 }
 
 /** «Vencida», y cuántos días hábiles de retraso lleva si ya pasa de cero. */
@@ -155,6 +165,14 @@ export default async function PQRDetailPage({ params }: PQRDetailPageProps) {
           </div>
         </CardContent>
       </Card>
+
+      {pqr.entityLink && (
+        <EntityLinkTimeline
+          entityName={pqr.entity.name}
+          createdAt={pqr.createdAt}
+          link={pqr.entityLink}
+        />
+      )}
 
       <Card>
         <CardHeader className="bg-muted py-3 mb-6 rounded-t-md">
