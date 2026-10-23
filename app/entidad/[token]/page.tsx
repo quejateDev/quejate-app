@@ -5,6 +5,7 @@ import {
   EntityLinkConfirmation,
   type EntityLinkConfirmationState,
 } from "@/components/pqr/entity-link-confirmation";
+import { EntityLinkOpenedReport } from "@/components/pqr/entity-link-opened-report";
 import { statusMap, typeMap } from "@/constants/pqrMaps";
 import { backendFetch } from "@/lib/api/backend";
 import { formatDate, formatDateWithoutTime } from "@/lib/dateUtils";
@@ -19,6 +20,10 @@ import { ENTITY_LINK_MESSAGES, isBase64UrlToken } from "@/lib/entity-link";
  * Enseña lo mismo que el correo, con sus etiquetas, y deja confirmar la
  * recepción y anotar el radicado de la entidad.
  *
+ * La apertura la avisa el navegador, una vez cargada la página
+ * (`EntityLinkOpenedReport`), y no la lectura de aquí: esa la hace el servidor
+ * también cuando quien abre el enlace es el antivirus del correo.
+ *
  * 🔴 **Que el token no salga de aquí.** El middleware le pone las cabeceras de
  * `ENTITY_LINK_HEADERS` (sin `Referer`, sin índice, sin caché), el layout raíz
  * no carga Google Tag Manager en `/entidad/*`, y nada de este fichero escribe
@@ -27,7 +32,8 @@ import { ENTITY_LINK_MESSAGES, isBase64UrlToken } from "@/lib/entity-link";
  * esta dirección al volver atrás.
  */
 
-// Cada lectura cuenta como una apertura en el backend: nunca se sirve de caché.
+// Lleva los datos del ciudadano y el estado de la confirmación: nunca se sirve
+// de caché.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -310,6 +316,8 @@ function EntityLinkContent({
         token={token}
         initialConfirmation={confirmation}
       />
+
+      <EntityLinkOpenedReport token={token} />
     </>
   );
 }
